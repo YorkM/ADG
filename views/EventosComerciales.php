@@ -99,6 +99,7 @@
       font-weight: 600;
       font-size: .8rem;
       text-align: left;
+      color: red;
     }
 
     .handsontable th {

@@ -886,7 +886,7 @@ const verDetalleEvento = async () => {
       { data: "cantidadFacturada", type: "numeric", readOnly: true },
       { data: "valorFacturadoTotal", type: "numeric", readOnly: true },
       { data: "valorFacturadoEvento", type: "numeric", readOnly: true },
-      { data: "porcentajeCumplimiento", type: "numeric", readOnly: true }
+      { data: "porcentajeCumplimiento", type: "numeric", columnSorting: false, readOnly: true }
     ];
 
     hot1 = new Handsontable(handsontable1, {
