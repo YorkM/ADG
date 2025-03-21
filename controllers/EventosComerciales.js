@@ -1051,9 +1051,10 @@ const buscarEventos = async () => {
         <th>Estado</th>
         <th>Usuario</th>
         <th>Lab</th>
-        <th>Editar</th>
-        <th>Eliminar</th>
-        <th>Seguimiento</th>
+        <th class="text-center">Presupuesto</th>
+        <th class="text-center">Editar</th>
+        <th class="text-center">Eliminar</th>
+        <th class="text-center">Seguimiento</th>
       </tr>
     </thead>
     <tbody>`;
@@ -1093,17 +1094,22 @@ const buscarEventos = async () => {
                         <i class="fa fa-plus"></i>
                       </button> 
                   </td>
-                  <td>
+                  <td class="text-center">
+                    <button class="btn btn-sm btn-light btn-presupuesto" data-id="${item.id}">
+                      <i class="fa-solid fa-money-bill-1 text-success"></i>
+                    </button>
+                  </td>
+                  <td class="text-center">
                     <button class="btn btn-sm btn-light" onclick="cargarForm(${item.id})">
                       <i class="fa-regular fa-pen-to-square text-warning"></i>
                     </button>
                   </td>
-                  <td>
+                  <td class="text-center">
                     <button class="btn btn-sm btn-light" onclick="eliminarEvento(${item.id},this)">
                       <i class="fa-regular fa-trash-can text-danger"></i>
                     </button>
                   </td>
-                  <td>
+                  <td class="text-center">
                     <button class="btn btn-sm btn-light btn-seguimiento" data-id="${item.id}">
                       <i class="fa-solid fa-record-vinyl text-primary"></i>
                     </button>
@@ -1125,6 +1131,14 @@ const buscarEventos = async () => {
         await verConsolidadoEvento(id);
         $('#modalSeguimiento').modal('show');
       }
+    });
+
+    $('#tablaEventos').off('click').on('click', '.btn-presupuesto', async function () {
+      const idEvento = $(this).attr('data-id');
+      $('#idEventoPresu').val(idEvento);
+
+      $('#modalPresupuesto').modal('show');
+      // console.log({idEvento, oficina});
     });
 
   } catch (e) {
@@ -1408,7 +1422,6 @@ const getDataTableCsv = (id_evento, idDiv) => {
   }
 }
 
-
 const addLabList = (id) => {
 
   n = $("#" + id + " div.row").length;
@@ -1648,6 +1661,15 @@ const loadCsv = (idInput, iDiv, e) => {
 }
 
 $(function () {
+  const oficinas = OficinasVentas('S');
+  $('#oficinaPresupuesto').html(oficinas);
+
+  $('#eventoAnterior, #presupuesto').on('input', function () {
+    let value = $(this).val().replace(/[^0-9]/g, '');
+    if (value) value = parseFloat(value).toLocaleString('es-ES', { minimumFractionDigits: 0 });
+    $(this).val(value);
+  });
+
   listarOficinas(link = '../models/Usuarios.php')
     .then(resp => {
       nuevoArray = resp.map(item => {
@@ -1894,5 +1916,23 @@ $(function () {
 
   $("#btnExportDetalleConsolidado").click(function () {
     exportarExcel(4);
+  });
+
+  // TODO: PROCEDER CON EL GUARDADO DEL PRESUPUESTO
+  // TODO: TRAER LAS ZONAS RELACIONADAS - ACCIÓN - CONSULTA
+  // TODO: CREAR TABLA PARA MOSTRAR PRESUPUESTOS
+  $("#btnPresupuesto").click(function () {
+    const oficina = $('#oficinaPresupuesto').val();
+    const eventoAnterior = $('#eventoAnterior').val();
+    const presupuesto = $('#presupuesto').val();
+
+    if (oficina === "2000" || !eventoAnterior || !presupuesto) {
+      Swal.fire("Campos requeridos", "Debe agregar (Oficina - Presupuesto evento anterior - Presupuesto actual)", "warning");
+      return;
+    }
+
+    $('#oficinaPresupuesto').val("2000");
+    $('#eventoAnterior').val("");
+    $('#presupuesto').val("");
   });
 });

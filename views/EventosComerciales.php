@@ -18,7 +18,7 @@
     html,
     * {
       font-size: .9rem;
-    }
+    }    
 
     body {
       background-color: #F9F9F9
@@ -510,6 +510,54 @@
             </button>
           </div>
           <div id="handsontable4"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- MODAL ASIGNACIÓN PRESUPUESTO -->
+  <div class="modal fade" id="modalPresupuesto" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="min-width: 70%;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="modal-title">
+            <h5>Presupuesto Evento</h5>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form class="mb-3" id="formularioPresupuesto">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="idEventoPresu">Evento</label>
+                  <input type="text" id="idEventoPresu" class="form-control form-control-sm" name="ID_EVENTO" readonly>
+                </div>
+                <div class="form-group mt-2">
+                  <label for="eventoAnterior">Evento anterior</label>
+                  <input type="text" id="eventoAnterior" class="form-control form-control-sm" name="EVENTO_ANTERIOR">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="oficinaPresupuesto">Oficina</label>
+                  <select class="form-select form-select-sm" name="OFICINA_VENTAS" id="oficinaPresupuesto"></select>
+                </div>
+                <div class="form-group mt-2">
+                  <label for="presupuesto">Presupuesto</label>
+                  <input type="text" id="presupuesto" class="form-control form-control-sm" name="PRESUPUESTO">
+                </div>
+              </div>
+            </div>
+          </form>
+          <div class="d-flex justify-content-end">
+            <button
+              id="btnPresupuesto" 
+              class="btn btn-outline-primary btn-sm" 
+              style="width: 200px; display: flex; justify-content: center; align-items: center; gap: 10px;">
+              <i class="fa-solid fa-floppy-disk"></i>
+              Guardar
+            </button>
+          </div>
         </div>
       </div>
     </div>
