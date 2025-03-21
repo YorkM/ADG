@@ -411,27 +411,17 @@ const verDetalleConsolidados = async (codigoCliente) => {
       }      
 
       return {
-          id: item.ID,
           codigo: item.CODIGO,
           descripcion: item.DESCRIPCION,
           grupoArticulos: item.GRUPO_ARTICULOS,
-          pedidoADG: item.PEDIDO_ADG,
-          fechaHora: formatDate(item.FECHA_HORA),
           oficina: item.OFICINA_VENTAS,
-          organizacion: item.ORGANIZACION_VENTAS,
-          centro: item.CENTRO,
-          almacen: item.ALMACEN,
           codigoCliente: item.CODIGO_CLIENTE,
           nitCliente: item.NIT_CLIENTE,
           ciudad: item.CIUDAD.toUpperCase(),
           nombreCliente: item.NOMBRE_CLIENTE,
-          razonCliente: item.RAZON_CLIENTE,
-          codigoVendedor: item.CODIGO_VENDEDOR,
-          nombreVendedor: item.NOMBRE_VENDEDOR,
           usuarioPassport: item.USUARIO_PASSPORT.toUpperCase(),
           zonaVentas: item.ZONA_VENTAS,
           zonaDescripcion: item.ZONA_DESCRIPCION,
-          condicionPago: item.CONDICION_PAGO,
           valorUnitario: formatNum(item.VALOR_UNITARIO, "$"),
           descuento: item.DESCUENTO,
           iva: item.IVA,
@@ -446,31 +436,21 @@ const verDetalleConsolidados = async (codigoCliente) => {
 
     console.log(objDetalleConso);
 
-    const colHeadersArr = ['Id', 'Código', 'Descripción', 'Grupo Articulos', 'Pedido ADG', 'Fecha y hora', 'Oficina', 'Organización', 'Centro', 'Almacen', 'Código Cliente', 'Nit Cliente', 'Ciudad', 'Nombre Cliente', 'Razón Cliente', 'Código Vendedor', 'Nombre Vendedor', 'Usuario Passport', 'Zona Ventas', 'Zona Descripción', 'Condición Pago', 'Valor Unitario', 'Descuento', 'Iva', 'Cantidad', 'Valor Total', 'Cant. Facturada', 'Val. Fact. Total', 'Val. Fact. Evento', '% Cumplimiento'];
+    const colHeadersArr = ['Código', 'Descripción', 'Grupo Articulos', 'Oficina', 'Código Cliente', 'Nit Cliente', 'Ciudad', 'Nombre Cliente', 'Usuario Passport', 'Zona Ventas', 'Zona Descripción', 'Valor Unitario', 'Descuento', 'Iva', 'Cantidad', 'Valor Total', 'Cant. Facturada', 'Val. Fact. Total', 'Val. Fact. Evento', '% Cumplimiento'];
 
     const handsontable4 = document.getElementById("handsontable4");
     const colWidthsArr = [
-      50,   // 'Id'
       95,  // 'Código'
       320,  // 'Descripción'
       120,  // 'Grupo articulos'
-      100,  // 'Pedido ADG'
-      180,  // 'Fecha y hora'
       75,  // 'Oficina'
-      105,  // 'Organización'
-      90,  // 'Centro'
-      90,  // 'Almacen'
       120,  // 'Código cliente'
       110,  // 'Nit cliente'
       110,  // 'Ciudad'
       250,  // 'Nombre cliente'
-      250,  // 'Razón cliente'
-      130,  // 'Código vendedor'
-      220,  // 'Nombre vendedor'
       200,  // 'Usuario passport'
       120,  // 'Zona ventas'
       150,  // 'Zona descripción'
-      120,  // 'Condición pago'
       120,  // 'Valor unitario'
       100,  // 'Descuento'
       70,   // 'Iva'
@@ -483,27 +463,17 @@ const verDetalleConsolidados = async (codigoCliente) => {
     ];
 
     const columnsArr = [
-      { data: "id", type: "text", readOnly: true },
       { data: "codigo", type: "text", readOnly: true },
       { data: "descripcion", type: "text", readOnly: true },
       { data: "grupoArticulos", type: "text", readOnly: true },
-      { data: "pedidoADG", type: "text", readOnly: true },
-      { data: "fechaHora", type: "text", readOnly: true },
       { data: "oficina", type: "text", readOnly: true },
-      { data: "organizacion", type: "text", readOnly: true },
-      { data: "centro", type: "text", readOnly: true },
-      { data: "almacen", type: "text", readOnly: true },
       { data: "codigoCliente", type: "text", readOnly: true },
       { data: "nitCliente", type: "text", readOnly: true },
       { data: "ciudad", type: "text", readOnly: true },
       { data: "nombreCliente", type: "text", readOnly: true },
-      { data: "razonCliente", type: "text", readOnly: true },
-      { data: "codigoVendedor", type: "text", readOnly: true },
-      { data: "nombreVendedor", type: "text", readOnly: true },
       { data: "usuarioPassport", type: "text", readOnly: true },
       { data: "zonaVentas", type: "text", readOnly: true },
       { data: "zonaDescripcion", type: "text", readOnly: true },
-      { data: "condicionPago", type: "text", readOnly: true },
       { data: "valorUnitario", type: "numeric", readOnly: true },
       { data: "descuento", type: "numeric", readOnly: true },
       { data: "iva", type: "numeric", readOnly: true },
@@ -582,7 +552,6 @@ const verConsolidadoOficinas = (resp) => {
     : 0;
   consolidadoMedellin.porcentajeCumplimiento = parseFloat(consolidadoMedellin.porcentajeCumplimiento.toFixed(2));
   consolidadoMedellin.oficina = "MEDELLÍN";
-  console.log(consolidadoMedellin);
 
   //? BOGOTÁ
   const consolidadoBogota = oficinaBogota.reduce((acumulado, item) => {
@@ -642,6 +611,8 @@ const verConsolidadoOficinas = (resp) => {
 
   objOficinas.forEach(item => {
     const porcentaje = parseFloat(item.porcentajeCumplimiento);
+    const facturado = parseFloat(item.facturado).toFixed(2);
+    const pendiente = parseFloat(item.pendiente).toFixed(2);
 
     if (porcentaje < 30.5) {
       bgColor = "#ec7063";
@@ -655,8 +626,8 @@ const verConsolidadoOficinas = (resp) => {
           <tr>
             <td>${item.oficina}</td>
             <td>${formatNum(item.total, "$")}</td>
-            <td>${formatNum(item.facturado, "$")}</td>
-            <td>${formatNum(item.pendiente, "$")}</td>
+            <td>${formatNum(facturado, "$")}</td>
+            <td>${formatNum(pendiente, "$")}</td>
             <td style="background-color: ${bgColor};">${item.porcentajeCumplimiento}</td>
           </tr>`;
   });
@@ -886,7 +857,7 @@ const verDetalleEvento = async () => {
       { data: "cantidadFacturada", type: "numeric", readOnly: true },
       { data: "valorFacturadoTotal", type: "numeric", readOnly: true },
       { data: "valorFacturadoEvento", type: "numeric", readOnly: true },
-      { data: "porcentajeCumplimiento", type: "numeric", columnSorting: false, readOnly: true }
+      { data: "porcentajeCumplimiento", type: "numeric", readOnly: true }
     ];
 
     hot1 = new Handsontable(handsontable1, {
@@ -1068,8 +1039,8 @@ const buscarEventos = async () => {
       return;
     }
 
-    tabla = `<table class="table table-sm table-striped table-hover" id="tablaEventos">
-    <thead class="thead-list-eventos">
+    tabla = `<table class="table table-sm table-bordered table-hover" id="tablaEventos">
+    <thead class="thead-list-eventos table-info">
       <tr>
         <th>#</th>
         <th>Id</th>

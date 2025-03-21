@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="../resources/bootstrap/bootstrap-5.0.2-dist/css/select2-bootstrap-5-theme.min.css">
   <link rel="stylesheet" href="../lib/SweetAlert2_V10/dist/sweetalert2.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable@12.1.0/dist/handsontable.full.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
     html,
@@ -126,6 +127,11 @@
     }
 
     #tablaOficinas thead tr th {
+      font-weight: 500;
+      color: #055160;
+    }
+
+    #tablaEventos thead tr th {
       font-weight: 500;
       color: #055160;
     }
@@ -408,7 +414,7 @@
     </div>
   </div>
   <!-- MODAL SEGUIMIENTO EVENTOS -->
-  <div class="modal fade" id="modalSeguimiento" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal fade animate__animated animate__fadeIn" id="modalSeguimiento" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" style="min-width: 100%;">
       <div class="modal-content">
         <div class="modal-header">
