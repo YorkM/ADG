@@ -136,6 +136,16 @@
       color: #055160;
     }
 
+    #tablaPresupuestoEvento thead tr th {
+      font-weight: 500;
+      color: #055160;
+    }
+
+    #tablaPresupuestoZona thead tr th {
+      font-weight: 500;
+      color: #055160;
+    }
+
     #tablaOficinas tfoot tr td {
       font-weight: 400;
       font-size: larger;
@@ -517,7 +527,7 @@
   <!-- MODAL ASIGNACIÓN PRESUPUESTO -->
   <div class="modal fade" id="modalPresupuesto" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" style="min-width: 70%;">
-      <div class="modal-content">
+      <div class="modal-content" style="background-color: whitesmoke;">
         <div class="modal-header">
           <div class="modal-title">
             <h5>Presupuesto Evento</h5>
@@ -525,7 +535,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <form class="mb-3" id="formularioPresupuesto">
+          <form class="mb-1" id="formularioPresupuesto">
             <div class="row">
               <div class="col-md-6">
                 <div class="form-group">
@@ -552,11 +562,32 @@
           <div class="d-flex justify-content-end">
             <button
               id="btnPresupuesto" 
-              class="btn btn-outline-primary btn-sm" 
-              style="width: 200px; display: flex; justify-content: center; align-items: center; gap: 10px;">
+              class="btn btn-outline-primary btn-sm">
               <i class="fa-solid fa-floppy-disk"></i>
               Guardar
             </button>
+          </div>
+          <div class="mt-4" id="containerTablaPresupuesto">               
+             
+          </div>
+
+          <div class="mt-4" id="containerTablaPresupuestoZona">
+            <table class="table table-bordered table-sm table-hover" id="tablaPresupuestoZona">
+              <thead class="table-info">
+               <tr>
+                 <th>Zona Ventas</th>
+                 <th>Zona Descripción</th>
+                 <th>Presupuesto</th>
+               </tr>
+              </thead>
+              <tbody>
+               <tr>
+                 <td>112305</td>
+                 <td>YURANIS - SINDY</td>
+                 <td>$5.000.000</td>
+               </tr>
+              </tbody>
+            </table>               
           </div>
         </div>
       </div>

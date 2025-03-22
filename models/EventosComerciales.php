@@ -34,4 +34,22 @@ switch ($_POST['op']) {
         if ($resultado) echo json_encode(array('ok' => true, 'data' => $resultado));
         else echo json_encode(array('ok' => false, 'msg' => "Error al obtener los datos"));
         break;
+
+    case "I_PRESUPUESTO_EVENTO":
+        $id_evento = intval($_POST['idEvento']);
+        $oficica = $_POST['oficina'];
+        $evento_anterior = $_POST['eventoAnterior'];
+        $presupuesto = $_POST['presupuesto'];
+        $sql = mssql_query("INSERT INTO T_PRESUPUESTO_EVENTO (ID_EVENTO, OFICINA_VENTAS, EVENTO_ANTERIOR, PRESUPUESTO) VALUES ($id_evento, '$oficica', '$evento_anterior', '$presupuesto')");
+        if ($sql) echo json_encode(array('ok' => true, 'msg' => "Se inserto el registro correctamente"));
+        else echo json_encode(array('ok' => false, 'msg' => "Error al insertar registro"));
+        break;
+
+    case "G_PRESUPUESTO_EVENTO":
+        $id_evento = intval($_POST['idEvento']);    
+        $sql = "SELECT * FROM T_PRESUPUESTO_EVENTO WHERE ID_EVENTO = $id_evento";
+        $resultado = GenerarArray($sql, '');
+        if ($resultado) echo json_encode(array('ok' => true, 'data' => $resultado));
+        else echo json_encode(array('ok' => false, 'data' => []));
+        break;
 }

@@ -1012,6 +1012,88 @@ function exportarExcel(sw) {
   XLSX.writeFile(wb, "reporte.xlsx");
 }
 
+const guardarPresupuestoEvento = async () => {
+  try {
+    const idEvento = $('#idEventoPresu').val();
+    const oficina = $('#oficinaPresupuesto').val();
+    const eventoAnterior = $('#eventoAnterior').val();
+    const presupuesto = $('#presupuesto').val();
+  
+    if (oficina === "2000" || !eventoAnterior || !presupuesto) {
+      setTimeout(() => {
+        Swal.fire("Campos requeridos", "Debe agregar (Oficina - Presupuesto evento anterior - Presupuesto actual)", "warning");        
+      }, 100);
+      return;
+    }  
+  
+    showLoadingSwalAlert2("Guardando la información...", false, true);
+    const resp = await enviarPeticion({
+      op: "I_PRESUPUESTO_EVENTO",
+      link: "../models/EventosComerciales.php",
+      idEvento,
+      oficina,
+      eventoAnterior: eventoAnterior.replace(/\./g, ""),
+      presupuesto: presupuesto.replace(/\./g, "")
+    });
+    
+    if (!resp.ok) {
+      Swal.fire("Error", "No se pudo insertar el registro", "error");
+      return;
+    }
+
+    await getPresupuestoEvento(idEvento);
+  
+    $('#oficinaPresupuesto').val("2000");
+    $('#eventoAnterior').val("");
+    $('#presupuesto').val("");    
+  } catch (error) {
+    console.log(error);
+  } finally {
+    dissminSwal();
+  }
+}
+
+const getPresupuestoEvento = async (idEvento) => {
+  $('#containerTablaPresupuesto').html(``);
+  const resp = await enviarPeticion({op: "G_PRESUPUESTO_EVENTO", link: "../models/EventosComerciales.php", idEvento});
+  let tabla = `
+    <table class="table table-bordered table-sm table-hover" id="tablaPresupuestoEvento">
+      <thead class="table-info">
+        <tr>
+          <th>Oficina</th>
+          <th>Evento Anterior</th>
+          <th>Presupuesto</th>
+          <th class="text-center">Presupuesto Zona</th>
+        </tr>
+      </thead>
+      <tbody>`;
+  if (resp.data.length) {
+    resp.data.forEach(item => {
+      tabla += `
+        <tr>
+          <td style="vertical-align: middle;">${item.OFICINA_VENTAS}</td>
+          <td style="vertical-align: middle;">${formatNum(item.EVENTO_ANTERIOR, "$")}</td>
+          <td style="vertical-align: middle;">${formatNum(item.PRESUPUESTO, "$")}</td>
+          <td class="text-center">
+            <button class="btn btn-outline-primary btn-sm btn-presupuesto" data-item="${item.OFICINA_VENTAS}">
+              <i class="fa-solid fa-plus"></i>
+            </button>
+          </td>
+        </tr>`;
+    });
+    tabla += `</tbody>
+          </table>`;
+    $('#containerTablaPresupuesto').html(tabla);
+    $('#tablaPresupuestoEvento').off('click').on('click', '.btn-presupuesto', async function() {
+      let oficina = $(this).attr('data-item');
+      oficina = oficina.substring(0, 2);
+      console.log(oficina);
+    })
+  } else {
+    $('#containerTablaPresupuesto').html(`<p class="lead text-center fw-bold">No hay presupuestos asignados</td>`);
+  }
+}
+
 const buscarEventos = async () => {
   try {
     const data = {
@@ -1089,7 +1171,7 @@ const buscarEventos = async () => {
                   <td>${estado}</td>						
                   <td>${item.usuario}</td>
                   <td>
-                      <span class="badge bg-primary shadow-sm">${item.n_lab}</span> 
+                      <span class="badge bg-primary shadow-sm" style="width: 30px;">${item.n_lab}</span> 
                       <button class="btn btn-sm" onclick="abrirModalLab(${item.id})">
                         <i class="fa fa-plus"></i>
                       </button> 
@@ -1137,8 +1219,8 @@ const buscarEventos = async () => {
       const idEvento = $(this).attr('data-id');
       $('#idEventoPresu').val(idEvento);
 
+      await getPresupuestoEvento(idEvento);
       $('#modalPresupuesto').modal('show');
-      // console.log({idEvento, oficina});
     });
 
   } catch (e) {
@@ -1921,18 +2003,7 @@ $(function () {
   // TODO: PROCEDER CON EL GUARDADO DEL PRESUPUESTO
   // TODO: TRAER LAS ZONAS RELACIONADAS - ACCIÓN - CONSULTA
   // TODO: CREAR TABLA PARA MOSTRAR PRESUPUESTOS
-  $("#btnPresupuesto").click(function () {
-    const oficina = $('#oficinaPresupuesto').val();
-    const eventoAnterior = $('#eventoAnterior').val();
-    const presupuesto = $('#presupuesto').val();
-
-    if (oficina === "2000" || !eventoAnterior || !presupuesto) {
-      Swal.fire("Campos requeridos", "Debe agregar (Oficina - Presupuesto evento anterior - Presupuesto actual)", "warning");
-      return;
-    }
-
-    $('#oficinaPresupuesto').val("2000");
-    $('#eventoAnterior').val("");
-    $('#presupuesto').val("");
+  $("#btnPresupuesto").click(async function () {
+    await guardarPresupuestoEvento();
   });
 });
