@@ -6,6 +6,22 @@ const oficinas = {
   "2300": "CALI",
   "2400": "BARRANQUILLA"
 }
+
+const confirmAlert = async (title, text) => {
+  const result = await Swal.fire({
+      title: `${title}`,
+      text: `${text}`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Aceptar',
+      cancelButtonText: 'Cancelar'
+  });
+
+  return result;
+}
+
 const listarEventosCierres = async (descripcion) => {
 
   try {
@@ -1058,6 +1074,65 @@ const guardarPresupuestoEvento = async () => {
   }
 }
 
+const gestionarPresupuestoZona = () => {
+  const oficina = $('#oficinaSubs').val();
+  $('#tablaPresupuestoZona').on('click', '.btn-presupuesto-zona', async function() {
+    const idEvento = $('#idEventoPresu').val();
+    let $input = $(this).closest("tr").find(".inputPresupuestoZona");
+    let valorPresupuesto = parseFloat($input.val().replace(/\$/g, "").replace(/\./g, ""));
+
+    let { ZONA_VENTAS, ZONA_DESCRIPCION, PRESUPUESTO } = JSON.parse($(this).attr('data-item'));
+
+    if (valorPresupuesto === 0) {
+      Swal.fire("Campo requerido", "El valor de presupuesto es obligatorio", "warning");
+      return;
+    }
+
+    if (parseFloat(PRESUPUESTO) === 0) {
+      const resp = await enviarPeticion({
+        op: "I_PRESUPUESTO_EVENTO_ZONA", 
+        link: "../models/EventosComerciales.php",
+        idEvento,
+        ZONA_VENTAS,
+        ZONA_DESCRIPCION,
+        valorPresupuesto
+      });
+      
+      if (resp.ok) {
+        Swal.fire("Guardar presupuesto", "Se guardó el presupuesto de la zona correctamente", "success");
+        $input.val("");
+        await getZonasPresupuesto(oficina);
+      }
+    }
+
+    if (valorPresupuesto !== parseFloat(PRESUPUESTO) && parseFloat(PRESUPUESTO) > 0) {
+      const result = await confirmAlert("Actualizar presupuesto", "¿Desea actualizar el presupuesto de la zona?");
+      if  (!result.isConfirmed) return;
+
+      const resp = await enviarPeticion({op: "U_PRESUPUESTO_EVENTO_ZONA", link: "../models/EventosComerciales.php", valorPresupuesto, ZONA_VENTAS, idEvento});
+      if (resp.ok) {
+        Swal.fire("Actualizar presupuesto", "Se actualizó el presupuesto de la zona correctamente", "success");
+        $input.val("");
+        await getZonasPresupuesto(oficina);
+      }
+    }    
+  });
+
+  $('#tablaPresupuestoZona').on('click', '.btn-eliminar-presupuesto-zona', async function() {
+    const idEvento = $('#idEventoPresu').val();
+    const { ZONA_VENTAS, ZONA_DESCRIPCION, PRESUPUESTO } = JSON.parse($(this).attr('data-item'));
+
+    const result = await confirmAlert("Eliminar presupuesto", "¿Está seguro de eliminar el presupuesto asignado a la zona?");
+    if (!result.isConfirmed) return;
+
+    const resp = await enviarPeticion({op: "D_PRESUPUESTO_EVENTO_ZONA", link: "../models/EventosComerciales.php", idEvento, ZONA_VENTAS});
+    if (resp.ok) {
+      Swal.fire("Eliminar presupuesto", "Se eliminó el presupuesto de la zona", "success");
+      await getZonasPresupuesto(oficina);
+    }
+  });
+}
+
 const getZonasPresupuesto = async (oficina) => {
   try {    
     $('#containerTablaPresupuestoZona').html(``);
@@ -1087,9 +1162,12 @@ const getZonasPresupuesto = async (oficina) => {
             <td>
               <input type="text" class="form-control form-control-sm inputPresupuestoZona" value="${formatNum(item.PRESUPUESTO, "$")}">
             </td>
-            <td class="text-center">
+            <td style="display: flex; justify-content: center; gap: 8px;">
               <button class="btn btn-outline-primary btn-sm btn-presupuesto-zona" data-item='${JSON.stringify(item)}'>
                 <i class="fa-solid fa-floppy-disk"></i>
+              </button>
+              <button class="btn btn-outline-danger btn-sm btn-eliminar-presupuesto-zona" data-item='${JSON.stringify(item)}'>
+                <i class="fa-regular fa-trash-can"></i>
               </button>
             </td>
           </tr>`;
@@ -1107,17 +1185,7 @@ const getZonasPresupuesto = async (oficina) => {
         $(this).val("$" + value);
       });
 
-      $('#tablaPresupuestoZona').off('click').on('click', '.btn-presupuesto-zona', async function() {
-        let $row = $(this).closest("tr");
-        let $input = $row.find(".inputPresupuestoZona");
-        let valorPresupuesto = $input.val().replace(/\$/g, "").replace(/\./g, "");
-        
-        let { ZONA_VENTAS, ZONA_DESCRIPCION, PRESUPUESTO } = JSON.parse($(this).attr('data-item'));
-        // TODO: VERIFICAR EL VALORPRESUPUESTO CON PRESUPUESTO
-        // TODO: SI SON IGUALES NO HACER NADA
-        // TODO: SI VALORPRESUPUESTO VACÍO REALIZAR INSERT
-        // TODO: SI SON DIFERENTES REALIZAR UPDATE
-      });
+      gestionarPresupuestoZona();
     }
   } catch (error) {
     console.log(error);
@@ -1147,7 +1215,7 @@ const getPresupuestoEvento = async (idEvento) => {
           <td style="vertical-align: middle;">${formatNum(item.PRESUPUESTO, "$")}</td>
           <td class="text-center">
             <button class="btn btn-outline-primary btn-sm btn-presupuesto" data-item="${item.OFICINA_VENTAS}">
-              <i class="fa-solid fa-plus"></i>
+              <i class="fa-solid fa-circle-plus"></i>
             </button>
           </td>
         </tr>`;
@@ -1158,6 +1226,7 @@ const getPresupuestoEvento = async (idEvento) => {
     $('#tablaPresupuestoEvento').off('click').on('click', '.btn-presupuesto', async function() {
       let oficina = $(this).attr('data-item');
       oficina = oficina.substring(0, 2);
+      $('#oficinaSubs').val(oficina);
       await getZonasPresupuesto(oficina);
     });
   } else {
@@ -1276,17 +1345,16 @@ const buscarEventos = async () => {
     $("#result").html(tabla);
     $("#buscar-evento").html(`<i class="fa-solid fa-search"></i>`).prop("disabled", true).attr("disabled", false);
 
-    $('#tablaEventos').off('click').on('click', '.btn-seguimiento', async function () {
+    $('#tablaEventos').on('click', '.btn-seguimiento', async function () {
       const id = $(this).attr('data-id');
       $('#idEvento').val(id);
       if (id === "200") {
-        // await verConsolidadoOficinas(id);
         await verConsolidadoEvento(id);
         $('#modalSeguimiento').modal('show');
       }
     });
 
-    $('#tablaEventos').off('click').on('click', '.btn-presupuesto', async function () {
+    $('#tablaEventos').on('click', '.btn-presupuesto', async function () {
       const idEvento = $(this).attr('data-id');
       $('#idEventoPresu').val(idEvento);
 

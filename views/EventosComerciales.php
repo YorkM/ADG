@@ -159,6 +159,7 @@
   <input type="hidden" id="org_ses" value="<?php echo (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : "" ?>" readonly />
   <input type="hidden" id="usuario_ses" value="<?php echo (!empty($_SESSION['ses_Login'])) ? $_SESSION['ses_Login'] : "" ?>" readonly />
   <input type="hidden" id="idEvento">
+  <input type="hidden" id="oficinaSubs">
 
   <!-- MODAL CREACION DE EVENTOS DE CIERRES  -->
   <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -535,6 +536,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
+          <h5 class="text-center" style="color: #055160;">Crear presupuesto evento oficina</h5>
           <form class="mb-1" id="formularioPresupuesto">
             <div class="row">
               <div class="col-md-6">
