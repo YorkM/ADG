@@ -1,5 +1,11 @@
 var miModal;
 const url_img = 'https://app.pwmultiroma.com/web/banners/eventoscomerciales/';
+const oficinas = {
+  "2100": "MEDELLÍN",
+  "2200": "BOGOTÁ",
+  "2300": "CALI",
+  "2400": "BARRANQUILLA"
+}
 const listarEventosCierres = async (descripcion) => {
 
   try {
@@ -22,7 +28,6 @@ const listarEventosCierres = async (descripcion) => {
   } catch (e) {
     console.error(e)
   }
-
 }
 
 const ApilistarOficinas = async () => {
@@ -1053,6 +1058,72 @@ const guardarPresupuestoEvento = async () => {
   }
 }
 
+const getZonasPresupuesto = async (oficina) => {
+  try {    
+    $('#containerTablaPresupuestoZona').html(``);
+
+    const resp = await enviarPeticion({op: "G_PRESUPUESTO_EVENTO_ZONA", link: "../models/EventosComerciales.php", oficina});
+    let tabla = `
+      <h5 class="text-center mt-5" style="color: #055160;">Presupuesto evento zona</h5>
+      <table class="table table-bordered table-sm table-hover animate__animated animate__fadeIn" id="tablaPresupuestoZona">
+        <thead class="table-info">
+          <tr>
+            <th>N°</th>
+            <th>Zona Ventas</th>
+            <th>Zona Descripción</th>
+            <th>Presupuesto</th>
+            <th class="text-center">Presupuesto zona</th>
+          </tr>
+        </thead>
+        <tbody>`;
+
+    if (resp.data.length) {
+      resp.data.forEach((item, index) => {
+        tabla += `
+          <tr>
+            <td>${index + 1}</td>
+            <td>${item.ZONA_VENTAS}</td>
+            <td>${item.ZONA_DESCRIPCION}</td>
+            <td>
+              <input type="text" class="form-control form-control-sm inputPresupuestoZona" value="${formatNum(item.PRESUPUESTO, "$")}">
+            </td>
+            <td class="text-center">
+              <button class="btn btn-outline-primary btn-sm btn-presupuesto-zona" data-item='${JSON.stringify(item)}'>
+                <i class="fa-solid fa-floppy-disk"></i>
+              </button>
+            </td>
+          </tr>`;
+      });
+
+      tabla += `
+        </tbody>
+      </table>`;
+
+      $('#containerTablaPresupuestoZona').html(tabla);
+
+      $('.inputPresupuestoZona').on('input', function () {
+        let value = $(this).val().replace(/[^0-9]/g, '');
+        if (value) value = parseFloat(value).toLocaleString('es-ES', { minimumFractionDigits: 0 });
+        $(this).val("$" + value);
+      });
+
+      $('#tablaPresupuestoZona').off('click').on('click', '.btn-presupuesto-zona', async function() {
+        let $row = $(this).closest("tr");
+        let $input = $row.find(".inputPresupuestoZona");
+        let valorPresupuesto = $input.val().replace(/\$/g, "").replace(/\./g, "");
+        
+        let { ZONA_VENTAS, ZONA_DESCRIPCION, PRESUPUESTO } = JSON.parse($(this).attr('data-item'));
+        // TODO: VERIFICAR EL VALORPRESUPUESTO CON PRESUPUESTO
+        // TODO: SI SON IGUALES NO HACER NADA
+        // TODO: SI VALORPRESUPUESTO VACÍO REALIZAR INSERT
+        // TODO: SI SON DIFERENTES REALIZAR UPDATE
+      });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 const getPresupuestoEvento = async (idEvento) => {
   $('#containerTablaPresupuesto').html(``);
   const resp = await enviarPeticion({op: "G_PRESUPUESTO_EVENTO", link: "../models/EventosComerciales.php", idEvento});
@@ -1071,7 +1142,7 @@ const getPresupuestoEvento = async (idEvento) => {
     resp.data.forEach(item => {
       tabla += `
         <tr>
-          <td style="vertical-align: middle;">${item.OFICINA_VENTAS}</td>
+          <td style="vertical-align: middle;">${item.OFICINA_VENTAS} - ${oficinas[item.OFICINA_VENTAS]}</td>
           <td style="vertical-align: middle;">${formatNum(item.EVENTO_ANTERIOR, "$")}</td>
           <td style="vertical-align: middle;">${formatNum(item.PRESUPUESTO, "$")}</td>
           <td class="text-center">
@@ -1087,8 +1158,8 @@ const getPresupuestoEvento = async (idEvento) => {
     $('#tablaPresupuestoEvento').off('click').on('click', '.btn-presupuesto', async function() {
       let oficina = $(this).attr('data-item');
       oficina = oficina.substring(0, 2);
-      console.log(oficina);
-    })
+      await getZonasPresupuesto(oficina);
+    });
   } else {
     $('#containerTablaPresupuesto').html(`<p class="lead text-center fw-bold">No hay presupuestos asignados</td>`);
   }
@@ -1220,6 +1291,7 @@ const buscarEventos = async () => {
       $('#idEventoPresu').val(idEvento);
 
       await getPresupuestoEvento(idEvento);
+      $('#containerTablaPresupuestoZona').html(``);
       $('#modalPresupuesto').modal('show');
     });
 
@@ -1746,7 +1818,7 @@ $(function () {
   const oficinas = OficinasVentas('S');
   $('#oficinaPresupuesto').html(oficinas);
 
-  $('#eventoAnterior, #presupuesto').on('input', function () {
+  $('#eventoAnterior, #presupuesto, .inputPresupuestoZona').on('input', function () {
     let value = $(this).val().replace(/[^0-9]/g, '');
     if (value) value = parseFloat(value).toLocaleString('es-ES', { minimumFractionDigits: 0 });
     $(this).val(value);
@@ -2000,9 +2072,6 @@ $(function () {
     exportarExcel(4);
   });
 
-  // TODO: PROCEDER CON EL GUARDADO DEL PRESUPUESTO
-  // TODO: TRAER LAS ZONAS RELACIONADAS - ACCIÓN - CONSULTA
-  // TODO: CREAR TABLA PARA MOSTRAR PRESUPUESTOS
   $("#btnPresupuesto").click(async function () {
     await guardarPresupuestoEvento();
   });

@@ -33,7 +33,7 @@ switch ($_POST['op']) {
         $resultado = GenerarArray($sql, '');
         if ($resultado) echo json_encode(array('ok' => true, 'data' => $resultado));
         else echo json_encode(array('ok' => false, 'msg' => "Error al obtener los datos"));
-        break;
+        break; 
 
     case "I_PRESUPUESTO_EVENTO":
         $id_evento = intval($_POST['idEvento']);
@@ -48,6 +48,19 @@ switch ($_POST['op']) {
     case "G_PRESUPUESTO_EVENTO":
         $id_evento = intval($_POST['idEvento']);    
         $sql = "SELECT * FROM T_PRESUPUESTO_EVENTO WHERE ID_EVENTO = $id_evento";
+        $resultado = GenerarArray($sql, '');
+        if ($resultado) echo json_encode(array('ok' => true, 'data' => $resultado));
+        else echo json_encode(array('ok' => false, 'data' => []));
+        break;
+
+    case "G_PRESUPUESTO_EVENTO_ZONA":
+        $oficina = intval($_POST['oficina']);    
+        $sql = "SELECT ZV.ZONA_VENTAS,
+       ZV.ZONA_DESCRIPCION,
+       ISNULL(ZP.PRESUPUESTO, 0) AS PRESUPUESTO
+        FROM T_ZONAS_VENTAS ZV
+            LEFT JOIN T_ZONA_PRESUPUESTO_EVENTO ZP ON ZV.ZONA_VENTAS = ZP.ZONA_VENTAS
+        WHERE ZV.ZONA_VENTAS LIKE '$oficina%'";
         $resultado = GenerarArray($sql, '');
         if ($resultado) echo json_encode(array('ok' => true, 'data' => $resultado));
         else echo json_encode(array('ok' => false, 'data' => []));
