@@ -64,15 +64,31 @@ switch ($_POST['op']) {
         $resultado = GenerarArray($sql, '');
         if ($resultado) echo json_encode(array('ok' => true, 'data' => $resultado));
         else echo json_encode(array('ok' => false, 'data' => []));
-        break;
+        break; 
+        
     case "I_PRESUPUESTO_EVENTO_ZONA":
-        $id_evento = intval($_POST['idEvento']);    
-        $zona_ventas = $_POST['ZONA_VENTAS'];    
-        $zona_descrip = $_POST['ZONA_DESCRIPCION'];    
-        $presupuesto = intval($_POST['valorPresupuesto']);    
-        $sql = mssql_query("INSERT INTO T_ZONA_PRESUPUESTO_EVENTO (ID_EVENTO, ZONA_VENTAS, ZONA_DESCRIPCION, PRESUPUESTO) VALUES ($id_evento, '$zona_ventas', '$zona_descrip', $presupuesto)");
-        if ($sql) echo json_encode(array('ok' => true, 'msg' => "Se inserto correctamente"));
-        else echo json_encode(array('ok' => false, 'msg' => "Error al insertar"));
+        $datos = json_decode($_POST["datos"], true);
+
+        if (!empty($datos)) {
+            $valores = [];
+
+            foreach ($datos as $fila) {
+                $id_evento = intval($fila["idEvento"]);
+                $zona_ventas = $fila["zonaVentas"];
+                $zona_descrip = $fila["zonaDescripcion"];                
+                $presupuesto = $fila["presupuesto"];                
+                
+                $valores[] = "($id_evento, '$zona_ventas', '$zona_descrip', '$presupuesto')";
+            }
+
+            if (!empty($valores)) {
+                $sql = "INSERT INTO T_ZONA_PRESUPUESTO_EVENTO (ID_EVENTO, ZONA_VENTAS, ZONA_DESCRIPCION, PRESUPUESTO) VALUES " . implode(",", $valores);
+
+                $result = mssql_query($sql);
+                if ($result) echo json_encode(array('ok' => true, 'msg' => "Se insertaron los datos correctamente"));
+                else echo json_encode(array('ok' => false, 'msg' => "Error al insertar los datos"));
+            } else echo json_encode("No hay datos");
+        }
         break;
 
     case "U_PRESUPUESTO_EVENTO_ZONA":

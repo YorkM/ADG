@@ -527,13 +527,19 @@
   </div>
   <!-- MODAL ASIGNACIÓN PRESUPUESTO -->
   <div class="modal fade" id="modalPresupuesto" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-scrollable" style="min-width: 70%;">
+    <div class="modal-dialog modal-dialog-scrollable" style="min-width: 80%;">
       <div class="modal-content" style="background-color: whitesmoke;">
         <div class="modal-header">
           <div class="modal-title">
             <h5>Asignación de Presupuesto Evento</h5>
           </div>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <div class="d-flex align-items-center gap-3">
+            <button class="btn btn-outline-primary btn-sm" id="btnGuardarPresupuesto">
+              <i class="fa-solid fa-floppy-disk"></i>
+              Guardar presupuesto
+            </button>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
         </div>
         <div class="modal-body">
           <h5 class="text-center" style="color: #055160;">Crear presupuesto evento oficina</h5>
@@ -562,25 +568,18 @@
             </div>
           </form>
           <div class="d-flex justify-content-end">
-            <button
-              id="btnPresupuesto" 
-              class="btn btn-outline-primary btn-sm">
-              <i class="fa-solid fa-floppy-disk"></i>
-              Guardar
-            </button>
-          </div>
-          <h5 class="text-center" style="color: #055160;">Presupuesto evento oficina</h5>
-          <div class="mt-4" id="containerTablaPresupuesto">               
-             
+            <button id="btnPresupuesto" class="btn btn-outline-primary btn-sm">Agregar</button>
           </div>
           
-          <div id="containerTablaPresupuestoZona">              
-                          
+          <div class="mt-4" id="containerTablaPresupuesto">             
+          </div>
+          
+          <div id="containerTablaPresupuestoZona">                          
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </div>  
   <script type="text/javascript" src="../lib/js/jquery-2.1.1.min.js"></script>
   <script type="text/javascript" src="../lib/js/jquery-ui-1.9.2.custom.js"></script>
   <script type="text/javascript" src="../resources/bootstrap/bootstrap-5.0.2-dist/js/bootstrap.js"></script>
