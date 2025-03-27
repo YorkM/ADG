@@ -538,6 +538,10 @@
               <i class="fa-solid fa-floppy-disk"></i>
               Guardar presupuesto
             </button>
+            <button class="btn btn-outline-danger btn-sm" id="btnEliminararPresupuesto">
+              <i class="fa-regular fa-trash-can"></i>
+              Eliminar presupuesto
+            </button>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
         </div>

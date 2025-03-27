@@ -33,7 +33,7 @@ switch ($_POST['op']) {
         $resultado = GenerarArray($sql, '');
         if ($resultado) echo json_encode(array('ok' => true, 'data' => $resultado));
         else echo json_encode(array('ok' => false, 'msg' => "Error al obtener los datos"));
-        break; 
+        break;
 
     case "I_PRESUPUESTO_EVENTO":
         $id_evento = intval($_POST['idEvento']);
@@ -46,7 +46,7 @@ switch ($_POST['op']) {
         break;
 
     case "G_PRESUPUESTO_EVENTO":
-        $id_evento = intval($_POST['idEvento']);    
+        $id_evento = intval($_POST['idEvento']);
         $sql = "SELECT * FROM T_PRESUPUESTO_EVENTO WHERE ID_EVENTO = $id_evento";
         $resultado = GenerarArray($sql, '');
         if ($resultado) echo json_encode(array('ok' => true, 'data' => $resultado));
@@ -54,7 +54,8 @@ switch ($_POST['op']) {
         break;
 
     case "G_PRESUPUESTO_EVENTO_ZONA":
-        $oficina = intval($_POST['oficina']);    
+        $oficina = intval($_POST['oficina']);
+        $id_evento = intval($_POST['idEvento']);
         $sql = "SELECT ZV.ZONA_VENTAS,
        ZV.ZONA_DESCRIPCION,
        ISNULL(ZP.PRESUPUESTO, 0) AS PRESUPUESTO
@@ -64,8 +65,17 @@ switch ($_POST['op']) {
         $resultado = GenerarArray($sql, '');
         if ($resultado) echo json_encode(array('ok' => true, 'data' => $resultado));
         else echo json_encode(array('ok' => false, 'data' => []));
-        break; 
-        
+        break;
+
+    case "G_PRESUPUESTO_ZONA_BANDERA":
+        $oficina = intval($_POST['oficinaSubs']);
+        $id_evento = intval($_POST['idEvento']);
+        $sql = "SELECT * FROM T_ZONA_PRESUPUESTO_EVENTO WHERE ZONA_VENTAS LIKE '$oficina%' AND ID_EVENTO = '$id_evento'";
+        $resultado = GenerarArray($sql, '');
+        if ($resultado) echo json_encode(array('ok' => true, 'data' => $resultado));
+        else echo json_encode(array('ok' => false, 'data' => []));
+        break;
+
     case "I_PRESUPUESTO_EVENTO_ZONA":
         $datos = json_decode($_POST["datos"], true);
 
@@ -75,9 +85,9 @@ switch ($_POST['op']) {
             foreach ($datos as $fila) {
                 $id_evento = intval($fila["idEvento"]);
                 $zona_ventas = $fila["zonaVentas"];
-                $zona_descrip = $fila["zonaDescripcion"];                
-                $presupuesto = $fila["presupuesto"];                
-                
+                $zona_descrip = $fila["zonaDescripcion"];
+                $presupuesto = $fila["presupuesto"];
+
                 $valores[] = "($id_evento, '$zona_ventas', '$zona_descrip', '$presupuesto')";
             }
 
@@ -92,19 +102,50 @@ switch ($_POST['op']) {
         break;
 
     case "U_PRESUPUESTO_EVENTO_ZONA":
-        $id_evento = intval($_POST['idEvento']);    
-        $zona_ventas = $_POST['ZONA_VENTAS'];    
-        $presupuesto = intval($_POST['valorPresupuesto']);    
-        $sql = mssql_query("UPDATE T_ZONA_PRESUPUESTO_EVENTO SET PRESUPUESTO = $presupuesto WHERE ZONA_VENTAS = '$zona_ventas' AND ID_EVENTO = $id_evento");
-        if ($sql) echo json_encode(array('ok' => true, 'msg' => "Se actualizo correctamente"));
-        else echo json_encode(array('ok' => false, 'msg' => "Error al actualizar"));
+        $datos = json_decode($_POST["datos"], true);
+        $result = "";
+
+        if (!empty($datos)) {
+            foreach ($datos as $fila) {
+                $id_evento = intval($fila["idEvento"]);
+                $zona_ventas = $fila["zonaVentas"];
+                $presupuesto = $fila["presupuesto"];
+
+                $sql = "UPDATE T_ZONA_PRESUPUESTO_EVENTO SET PRESUPUESTO = '$presupuesto' WHERE ZONA_VENTAS = '$zona_ventas' AND ID_EVENTO = $id_evento";
+                $result = mssql_query($sql);
+            }
+
+            if ($result) echo json_encode(array('ok' => true, 'msg' => "Se actualizaron los datos correctamente"));
+            else echo json_encode(array('ok' => false, 'msg' => "Error al actualizar los datos"));
+        }
         break;
 
-    case "D_PRESUPUESTO_EVENTO_ZONA":
-        $id_evento = intval($_POST['idEvento']);    
-        $zona_ventas = $_POST['ZONA_VENTAS'];    
-        $sql = mssql_query("UPDATE T_ZONA_PRESUPUESTO_EVENTO SET PRESUPUESTO = 0 WHERE ZONA_VENTAS = '$zona_ventas' AND ID_EVENTO = $id_evento");
-        if ($sql) echo json_encode(array('ok' => true, 'msg' => "Se actualizo correctamente"));
-        else echo json_encode(array('ok' => false, 'msg' => "Error al actualizar"));
+    case "D_PRESUPUESTO_EVENTO":
+        $id_evento = intval($_POST['idEvento']);
+        $zona_ventas = $_POST['zonaVentas'];
+        $oficina = $_POST['oficina'];
+
+        mssql_query("BEGIN TRANSACTION");
+
+        try {
+            $query_zonas = "DELETE FROM T_ZONA_PRESUPUESTO_EVENTO WHERE ZONA_VENTAS LIKE '$zona_ventas%' AND ID_EVENTO = $id_evento";
+            $result_zona = mssql_query($query_zonas);
+            if (!$result_zona) {
+                throw new Exception("Error eliminando registros en T_ZONA_PRESUPUESTO_EVENTO: " . mssql_get_last_message());
+            }
+
+            $queryOficina = "DELETE FROM T_PRESUPUESTO_EVENTO WHERE ID_EVENTO = $id_evento AND OFICINA_VENTAS = '$oficina'";
+            $resultOficina = mssql_query($queryOficina);
+            if (!$resultOficina) {
+                throw new Exception("Error eliminando registros en T_PRESUPUESTO_EVENTO: " . mssql_get_last_message());
+            }
+
+            mssql_query("COMMIT");
+
+            echo json_encode(array('ok' => true, 'message' => 'Se eliminó correctamente el registro'));
+        } catch (Exception $e) {
+            mssql_query("ROLLBACK");
+            echo json_encode(array('ok' => false, 'message' => 'Error: ' . $e->getMessage()));
+        }
         break;
 }

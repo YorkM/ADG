@@ -1078,9 +1078,12 @@ const guardarPresupuestoZonas = async () => {
   try {
       const contenidoTabla1 = $("#tablaPresupuestoEvento tbody tr").length;
       const contenidoTabla2 = $("#tablaPresupuestoZona tbody tr").length;
+      const idEvento = $('#idEventoPresu').val().split('-')[0].trim();
 
       if (contenidoTabla1 < 1 || contenidoTabla2 < 1) {
-        Swal.fire("Guardar presupuesto", "Para guardar el presupuesto general se debe cargar presupuesto de la oficina y el presupuesto de las zonas", "warning");
+        setTimeout(() => {
+          Swal.fire("Guardar presupuesto", "Para guardar el presupuesto general se debe cargar presupuesto de la oficina y el presupuesto de las zonas", "warning");          
+        }, 100);
         return;
       }
 
@@ -1088,29 +1091,29 @@ const guardarPresupuestoZonas = async () => {
       let datosZona = [];
 
       $("#tablaPresupuestoZona tbody tr").each(function () {
-          let fila = $(this).find("td");
-          let $input = fila.find(".inputPresupuestoZona");
-          let valorPresupuesto = parseFloat($input.val().replace(/\$/g, "").replace(/\./g, ""));
+        let fila = $(this).find("td");
+        let $input = fila.find(".inputPresupuestoZona");
+        let valorPresupuesto = parseFloat($input.val().replace(/\$/g, "").replace(/\./g, ""));
 
-          let data = {
-            idEvento: $('#idEventoPresu').val(),
-            zonaVentas: fila.eq(1).text(),
-            zonaDescripcion: fila.eq(2).text(),
-            presupuesto: valorPresupuesto,              
-          };
+        let data = {
+          idEvento,
+          zonaVentas: fila.eq(1).text(),
+          zonaDescripcion: fila.eq(2).text(),
+          presupuesto: valorPresupuesto,              
+        };
 
-          datosZona.push(data);
+        datosZona.push(data);
       });
 
       $("#tablaPresupuestoEvento tbody tr").each(function () {
-          let fila = $(this).find("td");
+        let fila = $(this).find("td");
 
-          let data = {
-            oficina: fila.eq(0).text().split('-')[0].trim(),
-            presupuesto: parseFloat(fila.eq(2).text().replace(/\./g, "").replace(/\$/g, ""))           
-          };
+        let data = {
+          oficina: fila.eq(0).text().split('-')[0].trim(),
+          presupuesto: parseFloat(fila.eq(2).text().replace(/\./g, "").replace(/\$/g, ""))           
+        };
 
-          datosOficina.push(data);
+        datosOficina.push(data);
       });
 
       let oficinaSubs = datosZona[0].zonaVentas.substring(0, 2);
@@ -1118,13 +1121,13 @@ const guardarPresupuestoZonas = async () => {
 
       let presupuestoOficina = datosOficina.filter(item => item.oficina === oficina);
       presupuestoOficina = presupuestoOficina[0].presupuesto;
-      console.log(presupuestoOficina);
 
       const totalPresupuestoZona = datosZona.reduce((acc, zona) => acc + zona.presupuesto, 0);
-      console.log(totalPresupuestoZona);
 
       if (totalPresupuestoZona < presupuestoOficina) {
-        Swal.fire("Guardar presupuesto", "El presupuesto total de las zonas no puede ser menor al presupuesto de la oficina", "error");
+        setTimeout(() => {
+          Swal.fire("Guardar presupuesto", "El presupuesto total de las zonas no puede ser menor al presupuesto de la oficina", "error");          
+        }, 100);
         return;
       }
       
@@ -1133,93 +1136,101 @@ const guardarPresupuestoZonas = async () => {
 
       showLoadingSwalAlert2('Guardando el presupuesto', false, true);
 
-      const resp = await enviarPeticion({
-          op: "I_PRESUPUESTO_EVENTO_ZONA",
+      let resp = "";
+
+      const respZonas = await enviarPeticion({
+        op: "G_PRESUPUESTO_ZONA_BANDERA", 
+        link: "../models/EventosComerciales.php", 
+        oficinaSubs, 
+        idEvento
+      });
+
+      if (!respZonas.data.length) {
+        resp = await enviarPeticion({
+            op: "I_PRESUPUESTO_EVENTO_ZONA",
+            datos: JSON.stringify(datosZona),
+            link: "../models/EventosComerciales.php"
+        });
+      } else {
+        resp = await enviarPeticion({
+          op: "U_PRESUPUESTO_EVENTO_ZONA",
           datos: JSON.stringify(datosZona),
           link: "../models/EventosComerciales.php"
-      });
+        });
+      }
 
       if (resp.ok) {
         setTimeout(() => {
           Swal.fire("Guardar presupuesto", "Se guardó el presupuesto correctamente", "success");          
         }, 100);
-        await getZonasPresupuesto(oficinaSubs);
+        await getZonasPresupuesto(oficinaSubs, idEvento);
       }
-
-      dissminSwal();
-
-  } catch (error) {
+      
+    } catch (error) {
       console.log(error);
+    } finally {
+    dissminSwal();
   }
 }
 
-const gestionarPresupuestoZona = () => {
-  const oficina = $('#oficinaSubs').val();
-  $('#tablaPresupuestoZona').on('click', '.btn-presupuesto-zona', async function() {
-    const idEvento = $('#idEventoPresu').val();
-    let $input = $(this).closest("tr").find(".inputPresupuestoZona");
-    let valorPresupuesto = parseFloat($input.val().replace(/\$/g, "").replace(/\./g, ""));
+const eliminarPresupuestoEvento = async () => {
+  const contenidoTabla2 = $("#tablaPresupuestoZona tbody tr").length;
+  const idEvento = $('#idEventoPresu').val().split('-')[0].trim();
 
-    let { ZONA_VENTAS, ZONA_DESCRIPCION, PRESUPUESTO } = JSON.parse($(this).attr('data-item'));
+  if (contenidoTabla2 < 1) {
+    setTimeout(() => {
+      Swal.fire("Eliminar presupuesto", "No hay presupuesto disponible para eliminar", "warning");
+    }, 100);
+    return;
+  }
 
-    if (valorPresupuesto === 0) {
-      Swal.fire("Campo requerido", "El valor de presupuesto es obligatorio", "warning");
-      return;
-    }
+  let datosZona = [];
 
-    if (parseFloat(PRESUPUESTO) === 0) {
-      const resp = await enviarPeticion({
-        op: "I_PRESUPUESTO_EVENTO_ZONA", 
-        link: "../models/EventosComerciales.php",
-        idEvento,
-        ZONA_VENTAS,
-        ZONA_DESCRIPCION,
-        valorPresupuesto
-      });
-      
-      if (resp.ok) {
-        Swal.fire("Guardar presupuesto", "Se guardó el presupuesto de la zona correctamente", "success");
-        $input.val("");
-        await getZonasPresupuesto(oficina);
-      }
-    }
+  $("#tablaPresupuestoZona tbody tr").each(function () {
+    let fila = $(this).find("td");
 
-    if (valorPresupuesto !== parseFloat(PRESUPUESTO) && parseFloat(PRESUPUESTO) > 0) {
-      const result = await confirmAlert("Actualizar presupuesto", "¿Desea actualizar el presupuesto de la zona?");
-      if  (!result.isConfirmed) return;
+    let data = {
+      zonaVentas: fila.eq(1).text(),
+    };
 
-      const resp = await enviarPeticion({op: "U_PRESUPUESTO_EVENTO_ZONA", link: "../models/EventosComerciales.php", valorPresupuesto, ZONA_VENTAS, idEvento});
-      if (resp.ok) {
-        Swal.fire("Actualizar presupuesto", "Se actualizó el presupuesto de la zona correctamente", "success");
-        $input.val("");
-        await getZonasPresupuesto(oficina);
-      }
-    }    
+    datosZona.push(data);
   });
 
-  $('#tablaPresupuestoZona').on('click', '.btn-eliminar-presupuesto-zona', async function() {
-    const idEvento = $('#idEventoPresu').val();
-    const { ZONA_VENTAS, ZONA_DESCRIPCION, PRESUPUESTO } = JSON.parse($(this).attr('data-item'));
+  let oficinaSubs = datosZona[0].zonaVentas.substring(0, 2);
+  let oficina = `${oficinaSubs}00`;
 
-    const result = await confirmAlert("Eliminar presupuesto", "¿Está seguro de eliminar el presupuesto asignado a la zona?");
-    if (!result.isConfirmed) return;
+  const result = await confirmAlert("Eliminar presupuesto", `Se eliminará el presupuesto`);
+  if (!result.isConfirmed) return;
 
-    const resp = await enviarPeticion({op: "D_PRESUPUESTO_EVENTO_ZONA", link: "../models/EventosComerciales.php", idEvento, ZONA_VENTAS});
-    if (resp.ok) {
-      Swal.fire("Eliminar presupuesto", "Se eliminó el presupuesto de la zona", "success");
-      await getZonasPresupuesto(oficina);
-    }
+  showLoadingSwalAlert2('Eliinando el presupuesto', false, true);
+
+  const resp = await enviarPeticion({
+    op: "D_PRESUPUESTO_EVENTO",
+    link: "../models/EventosComerciales.php",
+    idEvento,
+    oficina,
+    zonaVentas: oficinaSubs
   });
+
+  if (resp.ok) {
+    setTimeout(() => {
+      Swal.fire("Eliminar presupuesto", "Se eliminó el presupuesto correctamente", "success");          
+    }, 100);
+    await getPresupuestoEvento(oficinaSubs, idEvento);
+    $('#containerTablaPresupuestoZona').html(``);
+  }
 }
 
-// todo: realizar limpieza de funcionalidades que no aplican
-// todo: realizar funcionalidad de actualizar presupuesto
-// todo: realizar funcionalidad de eliminar presupuesto
-const getZonasPresupuesto = async (oficina) => {
+const getZonasPresupuesto = async (oficina, idEvento) => {
   try {    
     $('#containerTablaPresupuestoZona').html(``);
 
-    const resp = await enviarPeticion({op: "G_PRESUPUESTO_EVENTO_ZONA", link: "../models/EventosComerciales.php", oficina});
+    const resp = await enviarPeticion({
+      op: "G_PRESUPUESTO_EVENTO_ZONA", 
+      link: "../models/EventosComerciales.php", 
+      oficina,
+      idEvento
+    });
     let tabla = `
       <h5 class="text-center mt-5" style="color: #055160;">Presupuesto evento zona</h5>
       <table class="table table-bordered table-sm table-hover animate__animated animate__fadeIn" id="tablaPresupuestoZona">
@@ -1258,8 +1269,6 @@ const getZonasPresupuesto = async (oficina) => {
         if (value) value = parseFloat(value).toLocaleString('es-ES', { minimumFractionDigits: 0 });
         $(this).val("$" + value);
       });
-
-      gestionarPresupuestoZona();
     }
   } catch (error) {
     console.log(error);
@@ -1302,7 +1311,7 @@ const getPresupuestoEvento = async (idEvento) => {
       let oficina = $(this).attr('data-item');
       oficina = oficina.substring(0, 2);
       $('#oficinaSubs').val(oficina);
-      await getZonasPresupuesto(oficina);
+      await getZonasPresupuesto(oficina, idEvento);
     });
   } else {
     $('#containerTablaPresupuesto').html(`<p class="lead text-center fw-bold">No hay presupuestos asignados</td>`);
@@ -2222,5 +2231,9 @@ $(function () {
 
   $("#btnGuardarPresupuesto").click(async function () {
     await guardarPresupuestoZonas();
+  });
+
+  $("#btnEliminararPresupuesto").click(async function () {
+    await eliminarPresupuestoEvento();
   });
 });
