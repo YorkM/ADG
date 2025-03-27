@@ -18,7 +18,7 @@
     html,
     * {
       font-size: .9rem;
-    }    
+    }
 
     body {
       background-color: #F9F9F9
@@ -35,7 +35,7 @@
       background-color: #F3F3F3;
       border-bottom: 1px solid #CCCCCC;
       border-radius: 0;
-    } 
+    }
 
     .datepicker td.day {
       padding: 6px;
@@ -146,9 +146,18 @@
       color: #055160;
     }
 
+    #tablaDatos thead tr th {
+      font-weight: 500;
+      color: #055160;
+    }
+
     #tablaOficinas tfoot tr td {
       font-weight: 400;
       font-size: larger;
+    }
+
+    .btn-bar {
+      width: 100px;
     }
   </style>
 </head>
@@ -437,29 +446,29 @@
         <div class="modal-body">
           <h5 class="mb-3" style="color: #055160; text-align: center; font-weight: 400;">CONSOLIDADOS POR OFICINA</h5>
           <div style="overflow: auto;" class="mb-3">
-              <table id="tablaOficinas" class="table table-bordered table-hover" style="width: 100%;">
-                <thead class="table-info">
-                    <tr>
-                        <th>OFICINA</th>
-                        <th>VALOR PASSPORT</th>
-                        <th>VALOR FACTURADO</th>
-                        <th>VALOR PENDIENTE</th>
-                        <th>% CUMPLIMIENTO</th>
-                    </tr>
-                </thead>
-                <tbody>
+            <table id="tablaOficinas" class="table table-bordered table-hover" style="width: 100%;">
+              <thead class="table-info">
+                <tr>
+                  <th>OFICINA</th>
+                  <th>VALOR PASSPORT</th>
+                  <th>VALOR FACTURADO</th>
+                  <th>VALOR PENDIENTE</th>
+                  <th>% CUMPLIMIENTO</th>
+                </tr>
+              </thead>
+              <tbody>
 
-                </tbody>
-                <tfoot>
-                  <tr style="background-color: #cff4fc;">
-                    <td>TOTALES</td>
-                    <td id="tPassport"></td>
-                    <td id="tFacturado"></td>
-                    <td id="tPendiente"></td>
-                    <td id="tPorcentaje"></td>
-                  </tr>
-                </tfoot>
-              </table>        
+              </tbody>
+              <tfoot>
+                <tr style="background-color: #cff4fc;">
+                  <td>TOTALES</td>
+                  <td id="tPassport"></td>
+                  <td id="tFacturado"></td>
+                  <td id="tPendiente"></td>
+                  <td id="tPorcentaje"></td>
+                </tr>
+              </tfoot>
+            </table>
           </div>
           <nav class="row p-1">
             <div class="nav nav-tabs" id="nav-tab" role="tablist">
@@ -528,25 +537,23 @@
   <!-- MODAL ASIGNACIÓN PRESUPUESTO -->
   <div class="modal fade" id="modalPresupuesto" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable" style="min-width: 80%;">
-      <div class="modal-content" style="background-color: whitesmoke;">
+      <div class="modal-content">
         <div class="modal-header">
           <div class="modal-title">
             <h5>Asignación de Presupuesto Evento</h5>
           </div>
           <div class="d-flex align-items-center gap-3">
-            <button class="btn btn-outline-primary btn-sm" id="btnGuardarPresupuesto">
-              <i class="fa-solid fa-floppy-disk"></i>
-              Guardar presupuesto
-            </button>
-            <button class="btn btn-outline-danger btn-sm" id="btnEliminararPresupuesto">
-              <i class="fa-regular fa-trash-can"></i>
-              Eliminar presupuesto
-            </button>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
         </div>
         <div class="modal-body">
-          <h5 class="text-center" style="color: #055160;">Crear presupuesto evento oficina</h5>
+          <div class="alert alert-danger d-flex justify-content-center align-items-center gap-3 mb-3 mt-2" role="alert">
+            <i class="fa-solid fa-triangle-exclamation fa-xl"></i>
+            <div class="fw-bold">
+              EL PRESUPUESTO SOLO SE PODRÁ GUARDAR UN DIÁ ANTES DE LA FECHA DE LA CONVOCATORIA
+            </div>
+          </div>
+          <h5 class="text-center mb-3" style="color: #055160;">Crear presupuesto evento oficina</h5>
           <form class="mb-1" id="formularioPresupuesto">
             <div class="row">
               <div class="col-md-6">
@@ -574,16 +581,98 @@
           <div class="d-flex justify-content-end">
             <button id="btnPresupuesto" class="btn btn-outline-primary btn-sm">Agregar</button>
           </div>
-          
-          <div class="mt-4" id="containerTablaPresupuesto">             
-          </div>
-          
-          <div id="containerTablaPresupuestoZona">                          
+          <div class="mt-2" id="containerTablaPresupuesto">
+
           </div>
         </div>
       </div>
     </div>
-  </div>  
+  </div>
+  <!-- MODAL ASIGNACIÓN PRESUPUESTO ZONA -->
+  <div class="modal fade" id="modalPresupuestoZona" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable" style="min-width: 80%;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="modal-title">
+            <h5>Asignación de Presupuesto Zona</h5>
+          </div>
+          <div class="d-flex justify-content-between align-items-center gap-3">
+            <p style="margin: auto;">TOTAL PRESUPUESTO: <span style="font-weight: 700; font-size: large;" id="totalPresupuesto">$2000.000</span></p>
+            <button class="btn btn-outline-primary btn-sm" id="btnGuardarPresupuesto">
+              <i class="fa-solid fa-floppy-disk"></i>
+              Guardar
+            </button>
+            <button class="btn btn-outline-danger btn-sm" id="btnEliminarPresupuesto1">
+              <i class="fa-regular fa-trash-can"></i>
+              Eliminar
+            </button>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+        </div>
+        <div class="modal-body">
+          <div id="containerTablaPresupuestoZona">
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- MODAL PORTAFOLIO -->
+  <div class="modal fade" id="modalPortafolio" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable" style="min-width: 80%;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="modal-title">
+            <h5></h5>
+          </div>
+          <div class="d-flex justify-content-between align-items-center gap-3">
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+        </div>
+        <div class="modal-body">
+          <div class="row shadow-sm py-2 w-90 mx-auto mb-3 mt-2" id=barraFiltros>
+            <div class="col-7">
+              <div class="form-group">
+                <label for="archivo">Cargar portafolio</label>
+                <input type="file" class="form-control form-control-sm" accept=".csv" id="archivo">
+              </div>
+            </div>
+            <div class="col-5 d-flex justify-content-evenly">
+              <div class="d-flex">
+                <button class="btn btn-outline-warning btn-sm btn-bar align-self-end" title="Cargar" id="btnCargarDatos">
+                  <i class="fa-solid fa-arrow-up-from-bracket"></i>
+                  Cargar
+                </button>
+              </div>
+              <div class="d-flex">
+                <button class="btn btn-outline-success btn-sm btn-bar align-self-end" title="Guardar" id="btnGuardarDatos">
+                  <i class="fa-solid fa-floppy-disk"></i>
+                  Guardar
+                </button>
+              </div>
+              <div class="d-flex">
+                <button class="btn btn-outline-dark btn-sm btn-bar align-self-end" title="Limpiar" id="btnLimpiarDatos">
+                  <i class="fa-solid fa-eraser"></i>
+                  Limpiar
+                </button>
+              </div>
+            </div>
+          </div>
+          <p id="errorMessages" style="color: red; font-weight: bold;"></p>
+          <div style="overflow: auto;">
+            <table id="tablaDatos" class="table table-sm table-bordered table-hover" style="width: 100%;">
+              <thead class="table-info">
+                <tr id="tableHeader"></tr>
+              </thead>
+              <tbody id="tableBody">
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   <script type="text/javascript" src="../lib/js/jquery-2.1.1.min.js"></script>
   <script type="text/javascript" src="../lib/js/jquery-ui-1.9.2.custom.js"></script>
   <script type="text/javascript" src="../resources/bootstrap/bootstrap-5.0.2-dist/js/bootstrap.js"></script>

@@ -148,4 +148,19 @@ switch ($_POST['op']) {
             echo json_encode(array('ok' => false, 'message' => 'Error: ' . $e->getMessage()));
         }
         break;
+
+    case "G_FECHA_HORA":
+        $sql = "SELECT GETDATE()";
+        $resultado = GenerarArray($sql, '');
+        echo json_encode($resultado);
+        break;
+    
+    case "I_PORTAFOLIO":
+        $id_evento = intval($_POST['idEvento']);
+        $material = $_POST['material'];
+        $estatus = $_POST['estatus'];
+        $sql = mssql_query("INSERT INTO T_PORTAFOLIOS (ID_EVENTO, CODIGO_MATERIAL, ESTATUS) VALUES ($id_evento, '$material', '$estatus')");
+        if ($sql) echo json_encode(array('ok' => true, 'msg' => "Se inserto el registro correctamente"));
+        else echo json_encode(array('ok' => false, 'msg' => "Error al insertar registro"));
+        break;
 }

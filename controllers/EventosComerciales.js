@@ -9,14 +9,14 @@ const oficinas = {
 
 const confirmAlert = async (title, text) => {
   const result = await Swal.fire({
-      title: `${title}`,
-      text: `${text}`,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Aceptar',
-      cancelButtonText: 'Cancelar'
+    title: `${title}`,
+    text: `${text}`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Aceptar',
+    cancelButtonText: 'Cancelar'
   });
 
   return result;
@@ -417,41 +417,41 @@ let hot4 = undefined;
 const verDetalleConsolidados = async (codigoCliente) => {
   try {
     showLoadingSwalAlert2("Cargando información...", false, true);
-    const detalleConso = await enviarPeticion({ op: "G_DETALLE_CONSOLIDADOS", link: "../models/EventosComerciales.php", codigoCliente});
+    const detalleConso = await enviarPeticion({ op: "G_DETALLE_CONSOLIDADOS", link: "../models/EventosComerciales.php", codigoCliente });
 
-    const objDetalleConso = detalleConso.data.map(item => {      
+    const objDetalleConso = detalleConso.data.map(item => {
       let porcentajeCumplimiento = 0;
 
       const valorTotal = parseFloat(item.VALOR_TOTAL);
       const valorFacturadoEvento = parseFloat(item.VALOR_FACTURADO_EVENTO);
-      
+
       if (!isNaN(valorTotal) && valorTotal > 0 && !isNaN(valorFacturadoEvento) && valorFacturadoEvento > 0) {
-          porcentajeCumplimiento = (valorFacturadoEvento * 100) / valorTotal;
+        porcentajeCumplimiento = (valorFacturadoEvento * 100) / valorTotal;
       } else {
         porcentajeCumplimiento = 0;
-      }      
+      }
 
       return {
-          codigo: item.CODIGO,
-          descripcion: item.DESCRIPCION,
-          grupoArticulos: item.GRUPO_ARTICULOS,
-          oficina: item.OFICINA_VENTAS,
-          codigoCliente: item.CODIGO_CLIENTE,
-          nitCliente: item.NIT_CLIENTE,
-          ciudad: item.CIUDAD.toUpperCase(),
-          nombreCliente: item.NOMBRE_CLIENTE,
-          usuarioPassport: item.USUARIO_PASSPORT.toUpperCase(),
-          zonaVentas: item.ZONA_VENTAS,
-          zonaDescripcion: item.ZONA_DESCRIPCION,
-          valorUnitario: formatNum(item.VALOR_UNITARIO, "$"),
-          descuento: item.DESCUENTO,
-          iva: item.IVA,
-          cantidad: item.CANTIDAD,
-          cantidadFacturada: item.CANTIDAD_FACTURADA,
-          valorTotal: formatNum(item.VALOR_TOTAL, "$"),
-          valorFacturadoTotal: formatNum(item.VALOR_FACTURADO_TOTAL, "$"),
-          valorFacturadoEvento: formatNum(item.VALOR_FACTURADO_EVENTO, "$"),
-          porcentajeCumplimiento: porcentajeCumplimiento.toFixed(2),
+        codigo: item.CODIGO,
+        descripcion: item.DESCRIPCION,
+        grupoArticulos: item.GRUPO_ARTICULOS,
+        oficina: item.OFICINA_VENTAS,
+        codigoCliente: item.CODIGO_CLIENTE,
+        nitCliente: item.NIT_CLIENTE,
+        ciudad: item.CIUDAD.toUpperCase(),
+        nombreCliente: item.NOMBRE_CLIENTE,
+        usuarioPassport: item.USUARIO_PASSPORT.toUpperCase(),
+        zonaVentas: item.ZONA_VENTAS,
+        zonaDescripcion: item.ZONA_DESCRIPCION,
+        valorUnitario: formatNum(item.VALOR_UNITARIO, "$"),
+        descuento: item.DESCUENTO,
+        iva: item.IVA,
+        cantidad: item.CANTIDAD,
+        cantidadFacturada: item.CANTIDAD_FACTURADA,
+        valorTotal: formatNum(item.VALOR_TOTAL, "$"),
+        valorFacturadoTotal: formatNum(item.VALOR_FACTURADO_TOTAL, "$"),
+        valorFacturadoEvento: formatNum(item.VALOR_FACTURADO_EVENTO, "$"),
+        porcentajeCumplimiento: porcentajeCumplimiento.toFixed(2),
       }
     });
 
@@ -515,7 +515,7 @@ const verDetalleConsolidados = async (codigoCliente) => {
       cells: function (row, col, prop) {
         let cellProperties = {};
         let cellValue = parseFloat(this.instance.getDataAtCell(row, col)) || 0;
-        
+
         if (prop === "porcentajeCumplimiento") {
           if (cellValue < 30.5) {
             cellProperties.className = "low-percentage";
@@ -524,10 +524,10 @@ const verDetalleConsolidados = async (codigoCliente) => {
           } else {
             cellProperties.className = "high-percentage";
           }
-        }      
+        }
         return cellProperties;
-      },      
-      afterChange: async function (changes, source) {},
+      },
+      afterChange: async function (changes, source) { },
       dropdownMenu: true,
       hiddenColumns: {
         indicators: true,
@@ -584,10 +584,10 @@ const verConsolidadoOficinas = (resp) => {
     acumulado.pendiente += valorTotal - valorFacturado;
 
     return acumulado;
-  }, { total: 0, facturado: 0, pendiente: 0 });    
-  consolidadoBogota.porcentajeCumplimiento = consolidadoBogota.total > 0 
-    ? (consolidadoBogota.facturado / consolidadoBogota.total) * 100 
-    : 0;    
+  }, { total: 0, facturado: 0, pendiente: 0 });
+  consolidadoBogota.porcentajeCumplimiento = consolidadoBogota.total > 0
+    ? (consolidadoBogota.facturado / consolidadoBogota.total) * 100
+    : 0;
   consolidadoBogota.porcentajeCumplimiento = parseFloat(consolidadoBogota.porcentajeCumplimiento.toFixed(2));
   consolidadoBogota.oficina = "BOGOTÁ";
 
@@ -601,10 +601,10 @@ const verConsolidadoOficinas = (resp) => {
     acumulado.pendiente += valorTotal - valorFacturado;
 
     return acumulado;
-  }, { total: 0, facturado: 0, pendiente: 0 });    
-  consolidadoCali.porcentajeCumplimiento = consolidadoCali.total > 0 
-    ? (consolidadoCali.facturado / consolidadoCali.total) * 100 
-    : 0;    
+  }, { total: 0, facturado: 0, pendiente: 0 });
+  consolidadoCali.porcentajeCumplimiento = consolidadoCali.total > 0
+    ? (consolidadoCali.facturado / consolidadoCali.total) * 100
+    : 0;
   consolidadoCali.porcentajeCumplimiento = parseFloat(consolidadoCali.porcentajeCumplimiento.toFixed(2));
   consolidadoCali.oficina = "CALI";
 
@@ -618,10 +618,10 @@ const verConsolidadoOficinas = (resp) => {
     acumulado.pendiente += valorTotal - valorFacturado;
 
     return acumulado;
-  }, { total: 0, facturado: 0, pendiente: 0 });    
-  consolidadoBarranquilla.porcentajeCumplimiento = consolidadoBarranquilla.total > 0 
-    ? (consolidadoBarranquilla.facturado / consolidadoBarranquilla.total) * 100 
-    : 0;    
+  }, { total: 0, facturado: 0, pendiente: 0 });
+  consolidadoBarranquilla.porcentajeCumplimiento = consolidadoBarranquilla.total > 0
+    ? (consolidadoBarranquilla.facturado / consolidadoBarranquilla.total) * 100
+    : 0;
   consolidadoBarranquilla.porcentajeCumplimiento = parseFloat(consolidadoBarranquilla.porcentajeCumplimiento.toFixed(2));
   consolidadoBarranquilla.oficina = "BARRANQUILLA";
 
@@ -672,17 +672,17 @@ const verConsolidadoEvento = async (id) => {
 
     verConsolidadoOficinas(consolidado.data);
 
-    const objConsolidados = consolidado.data.map(item => {      
+    const objConsolidados = consolidado.data.map(item => {
       let porcentajeCumplimiento = 0;
 
       const valorTotal = parseFloat(item.VALOR_TOTAL);
       const valorFacturado = parseFloat(item.VALOR_FACTURADO);
-      
+
       if (!isNaN(valorTotal) && valorTotal > 0 && !isNaN(valorFacturado) && valorFacturado > 0) {
-          porcentajeCumplimiento = (valorFacturado * 100) / valorTotal;
+        porcentajeCumplimiento = (valorFacturado * 100) / valorTotal;
       } else {
         porcentajeCumplimiento = 0;
-      }      
+      }
 
       return {
         oficina: item.OFICINA_VENTAS,
@@ -728,13 +728,14 @@ const verConsolidadoEvento = async (id) => {
       { data: "valorTotal", type: "numeric", readOnly: true },
       { data: "valorFacturado", type: "numeric", readOnly: true },
       { data: "porcentajeCumplimiento", type: "numeric", readOnly: true },
-      { data: null, renderer: function(instance, td, row, col, prop, value, cellProperties) {
+      {
+        data: null, renderer: function (instance, td, row, col, prop, value, cellProperties) {
           td.innerHTML = `<button class="btn btn-light btn-eye" data-row="${row}">
             <i class="fa-solid fa-eye text-primary"></i>
           </button>`;
           td.style.textAlign = "center";
         }
-      }   
+      }
     ];
 
     hot2 = new Handsontable(handsontable2, {
@@ -746,7 +747,7 @@ const verConsolidadoEvento = async (id) => {
       cells: function (row, col, prop) {
         let cellProperties = {};
         let cellValue = parseFloat(this.instance.getDataAtCell(row, col)) || 0;
-        
+
         if (prop === "porcentajeCumplimiento") {
           if (cellValue < 30.5) {
             cellProperties.className = "low-percentage";
@@ -755,10 +756,10 @@ const verConsolidadoEvento = async (id) => {
           } else {
             cellProperties.className = "high-percentage";
           }
-        }      
+        }
         return cellProperties;
-      },      
-      afterChange: async function (changes, source) {},
+      },
+      afterChange: async function (changes, source) { },
       dropdownMenu: true,
       hiddenColumns: {
         indicators: true,
@@ -771,10 +772,10 @@ const verConsolidadoEvento = async (id) => {
       autoWrapCol: true,
       autoWrapRow: true,
       licenseKey: "non-commercial-and-evaluation",
-      afterOnCellMouseDown: async function(event, coords, TD) {
+      afterOnCellMouseDown: async function (event, coords, TD) {
         if (TD.querySelector('.btn-eye')) {
           let row = coords.row;
-          let rowData = hot2.getSourceDataAtRow(row);          
+          let rowData = hot2.getSourceDataAtRow(row);
           await verDetalleConsolidados(rowData.codigoCliente);
           $('#modalDetalleConso').modal('show');
         }
@@ -796,43 +797,44 @@ const verDetalleEvento = async () => {
     const id = $('#idEvento').val();
     const detalle = await enviarPeticion({ op: "G_DETALLE_EVENTO", link: "../models/EventosComerciales.php", id });
 
-    const objDetalles = detalle.data.map(item => {      
+    const objDetalles = detalle.data.map(item => {
       let porcentajeCumplimiento = 0;
 
       const valorTotal = parseFloat(item.VALOR_TOTAL);
       const valorFacturadoEvento = parseFloat(item.VALOR_FACTURADO_EVENTO);
-      
+
       if (!isNaN(valorTotal) && valorTotal > 0 && !isNaN(valorFacturadoEvento) && valorFacturadoEvento > 0) {
-          porcentajeCumplimiento = (valorFacturadoEvento * 100) / valorTotal;
+        porcentajeCumplimiento = (valorFacturadoEvento * 100) / valorTotal;
       } else {
         porcentajeCumplimiento = 0;
-      }      
+      }
 
       return {
-          codigo: item.CODIGO,
-          descripcion: item.DESCRIPCION,
-          grupoArticulos: item.GRUPO_ARTICULOS,
-          oficina: item.OFICINA_VENTAS,
-          codigoCliente: item.CODIGO_CLIENTE,
-          nitCliente: item.NIT_CLIENTE,
-          ciudad: item.CIUDAD.toUpperCase(),
-          nombreCliente: item.NOMBRE_CLIENTE,
-          usuarioPassport: item.USUARIO_PASSPORT.toUpperCase(),
-          zonaVentas: item.ZONA_VENTAS,
-          zonaDescripcion: item.ZONA_DESCRIPCION,
-          valorUnitario: formatNum(item.VALOR_UNITARIO, "$"),
-          descuento: item.DESCUENTO,
-          iva: item.IVA,
-          cantidad: item.CANTIDAD,
-          cantidadFacturada: item.CANTIDAD_FACTURADA,
-          valorTotal: formatNum(item.VALOR_TOTAL, "$"),
-          valorFacturadoTotal: formatNum(item.VALOR_FACTURADO_TOTAL, "$"),
-          valorFacturadoEvento: formatNum(item.VALOR_FACTURADO_EVENTO, "$"),
-          porcentajeCumplimiento: porcentajeCumplimiento.toFixed(2),
+        codigo: item.CODIGO,
+        descripcion: item.DESCRIPCION,
+        grupoArticulos: item.GRUPO_ARTICULOS,
+        oficina: item.OFICINA_VENTAS,
+        codigoCliente: item.CODIGO_CLIENTE,
+        nitCliente: item.NIT_CLIENTE,
+        ciudad: item.CIUDAD.toUpperCase(),
+        nombreCliente: item.NOMBRE_CLIENTE,
+        usuarioPassport: item.USUARIO_PASSPORT.toUpperCase(),
+        zonaVentas: item.ZONA_VENTAS,
+        zonaDescripcion: item.ZONA_DESCRIPCION,
+        valorUnitario: formatNum(item.VALOR_UNITARIO, "$"),
+        stock: item.STOCK,
+        descuento: item.DESCUENTO,
+        iva: item.IVA,
+        cantidad: item.CANTIDAD,
+        cantidadFacturada: item.CANTIDAD_FACTURADA,
+        valorTotal: formatNum(item.VALOR_TOTAL, "$"),
+        valorFacturadoTotal: formatNum(item.VALOR_FACTURADO_TOTAL, "$"),
+        valorFacturadoEvento: formatNum(item.VALOR_FACTURADO_EVENTO, "$"),
+        porcentajeCumplimiento: porcentajeCumplimiento.toFixed(2),
       }
     });
 
-    const colHeadersArr = ['Código', 'Descripción', 'Grupo Articulos', 'Oficina', 'Código Cliente', 'Nit Cliente', 'Ciudad', 'Nombre Cliente', 'Usuario Passport', 'Zona Ventas', 'Zona Descripción', 'Valor Unitario', 'Descuento', 'Iva', 'Cantidad', 'Valor Total', 'Cant. Facturada', 'Val. Fact. Total', 'Val. Fact. Evento', '% Cumplimiento'];
+    const colHeadersArr = ['Código', 'Descripción', 'Grupo Articulos', 'Oficina', 'Código Cliente', 'Nit Cliente', 'Ciudad', 'Nombre Cliente', 'Usuario Passport', 'Zona Ventas', 'Zona Descripción', 'Valor Unitario', 'Stock', 'Descuento', 'Iva', 'Cantidad', 'Valor Total', 'Cant. Facturada', 'Val. Fact. Total', 'Val. Fact. Evento', '% Cumplimiento'];
 
     const handsontable1 = document.getElementById("handsontable1");
     const colWidthsArr = [
@@ -848,6 +850,7 @@ const verDetalleEvento = async () => {
       120,  // 'Zona ventas'
       150,  // 'Zona descripción'
       120,  // 'Valor unitario'
+      100,  // 'Stock'
       100,  // 'Descuento'
       70,   // 'Iva'
       90,  // 'Cantidad'
@@ -871,6 +874,7 @@ const verDetalleEvento = async () => {
       { data: "zonaVentas", type: "text", readOnly: true },
       { data: "zonaDescripcion", type: "text", readOnly: true },
       { data: "valorUnitario", type: "numeric", readOnly: true },
+      { data: "stock", type: "numeric", readOnly: true },
       { data: "descuento", type: "numeric", readOnly: true },
       { data: "iva", type: "numeric", readOnly: true },
       { data: "cantidad", type: "numeric", readOnly: true },
@@ -890,7 +894,7 @@ const verDetalleEvento = async () => {
       cells: function (row, col, prop) {
         let cellProperties = {};
         let cellValue = parseFloat(this.instance.getDataAtCell(row, col)) || 0;
-        
+
         if (prop === "porcentajeCumplimiento") {
           if (cellValue < 30.5) {
             cellProperties.className = "low-percentage";
@@ -899,10 +903,10 @@ const verDetalleEvento = async () => {
           } else {
             cellProperties.className = "high-percentage";
           }
-        }      
+        }
         return cellProperties;
-      },      
-      afterChange: async function (changes, source) {},
+      },
+      afterChange: async function (changes, source) { },
       dropdownMenu: true,
       hiddenColumns: {
         indicators: true,
@@ -929,24 +933,24 @@ const verZonaEvento = async () => {
     const id = $('#idEvento').val();
     const zona = await enviarPeticion({ op: "G_ZONA_EVENTO", link: "../models/EventosComerciales.php", id });
 
-    const objZonas = zona.data.map(item => {      
+    const objZonas = zona.data.map(item => {
       let porcentajeCumplimiento = 0;
 
       const valorTotal = parseFloat(item.VALOR_TOTAL);
       const valorFacturado = parseFloat(item.VALOR_FACTURADO);
-      
+
       if (!isNaN(valorTotal) && valorTotal > 0 && !isNaN(valorFacturado) && valorFacturado > 0) {
-          porcentajeCumplimiento = (valorFacturado * 100) / valorTotal;
+        porcentajeCumplimiento = (valorFacturado * 100) / valorTotal;
       } else {
         porcentajeCumplimiento = 0;
-      }      
+      }
 
       return {
         zonaVentas: item.ZONA_VENTAS,
         zonaDescripcion: item.ZONA_DESCRIPCION,
         valorTotal: formatNum(item.VALOR_TOTAL, "$"),
         valorFacturado: formatNum(item.VALOR_FACTURADO, "$"),
-        porcentajeCumplimiento: porcentajeCumplimiento.toFixed(2)        
+        porcentajeCumplimiento: porcentajeCumplimiento.toFixed(2)
       }
     });
 
@@ -966,7 +970,7 @@ const verZonaEvento = async () => {
       { data: "zonaDescripcion", type: "text", readOnly: true },
       { data: "valorTotal", type: "numeric", readOnly: true },
       { data: "valorFacturado", type: "numeric", readOnly: true },
-      { data: "porcentajeCumplimiento", type: "numeric", readOnly: true }    
+      { data: "porcentajeCumplimiento", type: "numeric", readOnly: true }
     ];
 
     hot3 = new Handsontable(handsontable3, {
@@ -980,7 +984,7 @@ const verZonaEvento = async () => {
       cells: function (row, col, prop) {
         let cellProperties = {};
         let cellValue = parseFloat(this.instance.getDataAtCell(row, col)) || 0;
-        
+
         if (prop === "porcentajeCumplimiento") {
           if (cellValue < 30.5) {
             cellProperties.className = "low-percentage";
@@ -989,10 +993,10 @@ const verZonaEvento = async () => {
           } else {
             cellProperties.className = "high-percentage";
           }
-        }      
+        }
         return cellProperties;
-      },      
-      afterChange: async function (changes, source) {},
+      },
+      afterChange: async function (changes, source) { },
       dropdownMenu: true,
       hiddenColumns: {
         indicators: true,
@@ -1033,20 +1037,34 @@ function exportarExcel(sw) {
   XLSX.writeFile(wb, "reporte.xlsx");
 }
 
+const validarPresupuesto = async () => {
+
+}
+
+// TODO: REALIZAR VALIDACIÓN AL GUARDAR EL PRESUPUESTO
+// TODO: VALIDAR FECHA DE CONVOCATORIA
+// TODO: CONTROLAR AL ELIMINAR TAMBIÉN - VALIDACIÓN
+// TODO: AL GUARDAR
+
 const guardarPresupuestoEvento = async () => {
   try {
     const idEvento = $('#idEventoPresu').val().split('-')[0];
     const oficina = $('#oficinaPresupuesto').val();
     const eventoAnterior = $('#eventoAnterior').val();
     const presupuesto = $('#presupuesto').val();
-  
+
     if (oficina === "2000" || !eventoAnterior || !presupuesto) {
       setTimeout(() => {
-        Swal.fire("Campos requeridos", "Debe agregar (Oficina - Presupuesto evento anterior - Presupuesto actual)", "warning");        
+        Swal.fire("Campos requeridos", "Debe agregar (Oficina - Presupuesto evento anterior - Presupuesto actual)", "warning");
       }, 100);
       return;
-    }  
-  
+    }
+
+    const respFH = await enviarPeticion({op: "G_FECHA_HORA", link: "../models/EventosComerciales.php"});
+    const fechaHoraActual = respFH[0].computed;
+    console.log(fechaHoraActual);
+    return;
+
     showLoadingSwalAlert2("Guardando la información...", false, true);
     const resp = await enviarPeticion({
       op: "I_PRESUPUESTO_EVENTO",
@@ -1056,17 +1074,17 @@ const guardarPresupuestoEvento = async () => {
       eventoAnterior: eventoAnterior.replace(/\./g, "").replace(/\$/g, ""),
       presupuesto: presupuesto.replace(/\./g, "").replace(/\$/g, "")
     });
-    
+
     if (!resp.ok) {
       Swal.fire("Error", "No se pudo insertar el registro", "error");
       return;
     }
 
     await getPresupuestoEvento(idEvento);
-  
+
     $('#oficinaPresupuesto').val("2000");
     $('#eventoAnterior').val("");
-    $('#presupuesto').val("");    
+    $('#presupuesto').val("");
   } catch (error) {
     console.log(error);
   } finally {
@@ -1076,163 +1094,140 @@ const guardarPresupuestoEvento = async () => {
 
 const guardarPresupuestoZonas = async () => {
   try {
-      const contenidoTabla1 = $("#tablaPresupuestoEvento tbody tr").length;
-      const contenidoTabla2 = $("#tablaPresupuestoZona tbody tr").length;
-      const idEvento = $('#idEventoPresu').val().split('-')[0].trim();
+    const contenidoTabla1 = $("#tablaPresupuestoEvento tbody tr").length;
+    const contenidoTabla2 = $("#tablaPresupuestoZona tbody tr").length;
+    const idEvento = $('#idEventoPresu').val().split('-')[0].trim();
 
-      if (contenidoTabla1 < 1 || contenidoTabla2 < 1) {
-        setTimeout(() => {
-          Swal.fire("Guardar presupuesto", "Para guardar el presupuesto general se debe cargar presupuesto de la oficina y el presupuesto de las zonas", "warning");          
-        }, 100);
-        return;
-      }
+    if (contenidoTabla1 < 1 || contenidoTabla2 < 1) {
+      setTimeout(() => {
+        Swal.fire("Guardar presupuesto", "Para guardar el presupuesto general se debe cargar presupuesto de la oficina y el presupuesto de las zonas", "warning");
+      }, 100);
+      return;
+    }
 
-      let datosOficina = [];
-      let datosZona = [];
+    let datosOficina = [];
+    let datosZona = [];
 
-      $("#tablaPresupuestoZona tbody tr").each(function () {
-        let fila = $(this).find("td");
-        let $input = fila.find(".inputPresupuestoZona");
-        let valorPresupuesto = parseFloat($input.val().replace(/\$/g, "").replace(/\./g, ""));
+    $("#tablaPresupuestoZona tbody tr").each(function () {
+      let fila = $(this).find("td");
+      let $input = fila.find(".inputPresupuestoZona");
+      let valorPresupuesto = parseFloat($input.val().replace(/\$/g, "").replace(/\./g, ""));
 
-        let data = {
-          idEvento,
-          zonaVentas: fila.eq(1).text(),
-          zonaDescripcion: fila.eq(2).text(),
-          presupuesto: valorPresupuesto,              
-        };
+      let data = {
+        idEvento,
+        zonaVentas: fila.eq(1).text(),
+        zonaDescripcion: fila.eq(2).text(),
+        presupuesto: valorPresupuesto,
+      };
 
-        datosZona.push(data);
+      datosZona.push(data);
+    });
+
+    $("#tablaPresupuestoEvento tbody tr").each(function () {
+      let fila = $(this).find("td");
+
+      let data = {
+        oficina: fila.eq(0).text().split('-')[0].trim(),
+        presupuesto: parseFloat(fila.eq(2).text().replace(/\./g, "").replace(/\$/g, ""))
+      };
+
+      datosOficina.push(data);
+    });
+
+    let oficinaSubs = datosZona[0].zonaVentas.substring(0, 2);
+    let oficina = `${oficinaSubs}00`;
+
+    let presupuestoOficina = datosOficina.filter(item => item.oficina === oficina);
+    presupuestoOficina = presupuestoOficina[0].presupuesto;
+
+    const totalPresupuestoZona = datosZona.reduce((acc, zona) => acc + zona.presupuesto, 0);
+
+    if (totalPresupuestoZona < presupuestoOficina) {
+      setTimeout(() => {
+        Swal.fire("Guardar presupuesto", "El presupuesto total de las zonas no puede ser menor al presupuesto de la oficina", "error");
+      }, 100);
+      return;
+    }
+
+    const result = await confirmAlert("Guardar presupuesto", `Se guardará el presupuesto cargado con un total de las zonas de: ${formatNum(totalPresupuestoZona, "$")}`);
+    if (!result.isConfirmed) return;
+
+    showLoadingSwalAlert2('Guardando el presupuesto', false, true);
+
+    let resp = "";
+
+    const respZonas = await enviarPeticion({
+      op: "G_PRESUPUESTO_ZONA_BANDERA",
+      link: "../models/EventosComerciales.php",
+      oficinaSubs,
+      idEvento
+    });
+
+    if (!respZonas.data.length) {
+      resp = await enviarPeticion({
+        op: "I_PRESUPUESTO_EVENTO_ZONA",
+        datos: JSON.stringify(datosZona),
+        link: "../models/EventosComerciales.php"
       });
-
-      $("#tablaPresupuestoEvento tbody tr").each(function () {
-        let fila = $(this).find("td");
-
-        let data = {
-          oficina: fila.eq(0).text().split('-')[0].trim(),
-          presupuesto: parseFloat(fila.eq(2).text().replace(/\./g, "").replace(/\$/g, ""))           
-        };
-
-        datosOficina.push(data);
+    } else {
+      resp = await enviarPeticion({
+        op: "U_PRESUPUESTO_EVENTO_ZONA",
+        datos: JSON.stringify(datosZona),
+        link: "../models/EventosComerciales.php"
       });
+    }
 
-      let oficinaSubs = datosZona[0].zonaVentas.substring(0, 2);
-      let oficina = `${oficinaSubs}00`;
+    if (resp.ok) {
+      setTimeout(() => {
+        Swal.fire("Guardar presupuesto", "Se guardó el presupuesto correctamente", "success");
+      }, 100);
+      await getZonasPresupuesto(oficinaSubs, idEvento);
+    }
 
-      let presupuestoOficina = datosOficina.filter(item => item.oficina === oficina);
-      presupuestoOficina = presupuestoOficina[0].presupuesto;
-
-      const totalPresupuestoZona = datosZona.reduce((acc, zona) => acc + zona.presupuesto, 0);
-
-      if (totalPresupuestoZona < presupuestoOficina) {
-        setTimeout(() => {
-          Swal.fire("Guardar presupuesto", "El presupuesto total de las zonas no puede ser menor al presupuesto de la oficina", "error");          
-        }, 100);
-        return;
-      }
-      
-      const result = await confirmAlert("Guardar presupuesto", `Se guardará el presupuesto cargado con un total de las zonas de: ${formatNum(totalPresupuestoZona, "$")}`);
-      if (!result.isConfirmed) return;      
-
-      showLoadingSwalAlert2('Guardando el presupuesto', false, true);
-
-      let resp = "";
-
-      const respZonas = await enviarPeticion({
-        op: "G_PRESUPUESTO_ZONA_BANDERA", 
-        link: "../models/EventosComerciales.php", 
-        oficinaSubs, 
-        idEvento
-      });
-
-      if (!respZonas.data.length) {
-        resp = await enviarPeticion({
-            op: "I_PRESUPUESTO_EVENTO_ZONA",
-            datos: JSON.stringify(datosZona),
-            link: "../models/EventosComerciales.php"
-        });
-      } else {
-        resp = await enviarPeticion({
-          op: "U_PRESUPUESTO_EVENTO_ZONA",
-          datos: JSON.stringify(datosZona),
-          link: "../models/EventosComerciales.php"
-        });
-      }
-
-      if (resp.ok) {
-        setTimeout(() => {
-          Swal.fire("Guardar presupuesto", "Se guardó el presupuesto correctamente", "success");          
-        }, 100);
-        await getZonasPresupuesto(oficinaSubs, idEvento);
-      }
-      
-    } catch (error) {
-      console.log(error);
-    } finally {
+  } catch (error) {
+    console.log(error);
+  } finally {
     dissminSwal();
   }
 }
 
-const eliminarPresupuestoEvento = async () => {
-  const contenidoTabla2 = $("#tablaPresupuestoZona tbody tr").length;
-  const idEvento = $('#idEventoPresu').val().split('-')[0].trim();
-
-  if (contenidoTabla2 < 1) {
-    setTimeout(() => {
-      Swal.fire("Eliminar presupuesto", "No hay presupuesto disponible para eliminar", "warning");
-    }, 100);
-    return;
-  }
-
-  let datosZona = [];
-
-  $("#tablaPresupuestoZona tbody tr").each(function () {
-    let fila = $(this).find("td");
-
-    let data = {
-      zonaVentas: fila.eq(1).text(),
-    };
-
-    datosZona.push(data);
-  });
-
-  let oficinaSubs = datosZona[0].zonaVentas.substring(0, 2);
-  let oficina = `${oficinaSubs}00`;
-
-  const result = await confirmAlert("Eliminar presupuesto", `Se eliminará el presupuesto`);
+const eliminarPresupuestoEvento = async (idEvento, oficina, zonaVentas) => {
+  const result = await confirmAlert("Eliminar presupuesto", "Se eliminará el presupuesto de la oficina y todos los presupuestos de las zonas asociadas a la misma... ¿Desea seguir?");
   if (!result.isConfirmed) return;
 
-  showLoadingSwalAlert2('Eliinando el presupuesto', false, true);
+  showLoadingSwalAlert2('Eliminando el presupuesto', false, true);
 
   const resp = await enviarPeticion({
     op: "D_PRESUPUESTO_EVENTO",
     link: "../models/EventosComerciales.php",
     idEvento,
     oficina,
-    zonaVentas: oficinaSubs
+    zonaVentas
   });
 
   if (resp.ok) {
     setTimeout(() => {
-      Swal.fire("Eliminar presupuesto", "Se eliminó el presupuesto correctamente", "success");          
+      Swal.fire("Eliminar presupuesto", "Se eliminó el presupuesto correctamente", "success");
     }, 100);
-    await getPresupuestoEvento(oficinaSubs, idEvento);
+    await getPresupuestoEvento(idEvento);
     $('#containerTablaPresupuestoZona').html(``);
   }
 }
 
 const getZonasPresupuesto = async (oficina, idEvento) => {
-  try {    
+  try {
     $('#containerTablaPresupuestoZona').html(``);
 
     const resp = await enviarPeticion({
-      op: "G_PRESUPUESTO_EVENTO_ZONA", 
-      link: "../models/EventosComerciales.php", 
+      op: "G_PRESUPUESTO_EVENTO_ZONA",
+      link: "../models/EventosComerciales.php",
       oficina,
       idEvento
     });
+
+    const totalPresupuestoZona = resp.data.reduce((acc, item) => acc + parseFloat(item.PRESUPUESTO), 0);
+
     let tabla = `
-      <h5 class="text-center mt-5" style="color: #055160;">Presupuesto evento zona</h5>
       <table class="table table-bordered table-sm table-hover animate__animated animate__fadeIn" id="tablaPresupuestoZona">
         <thead class="table-info">
           <tr>
@@ -1269,6 +1264,8 @@ const getZonasPresupuesto = async (oficina, idEvento) => {
         if (value) value = parseFloat(value).toLocaleString('es-ES', { minimumFractionDigits: 0 });
         $(this).val("$" + value);
       });
+
+      $('#totalPresupuesto').text(formatNum(totalPresupuestoZona, "$"));
     }
   } catch (error) {
     console.log(error);
@@ -1277,7 +1274,11 @@ const getZonasPresupuesto = async (oficina, idEvento) => {
 
 const getPresupuestoEvento = async (idEvento) => {
   $('#containerTablaPresupuesto').html(``);
-  const resp = await enviarPeticion({op: "G_PRESUPUESTO_EVENTO", link: "../models/EventosComerciales.php", idEvento});
+
+  const resp = await enviarPeticion({ op: "G_PRESUPUESTO_EVENTO", link: "../models/EventosComerciales.php", idEvento });
+  const totalPresupuestoAnterior = resp.data.reduce((acc, item) => acc + parseFloat(item.EVENTO_ANTERIOR), 0);
+  const totalPresupuesto = resp.data.reduce((acc, item) => acc + parseFloat(item.PRESUPUESTO), 0);
+
   let tabla = `
     <h5 class="text-center mt-2 mb-3" style="color: #055160;">Presupuesto evento oficina</h5>
     <table class="table table-bordered table-sm table-hover" id="tablaPresupuestoEvento">
@@ -1290,6 +1291,7 @@ const getPresupuestoEvento = async (idEvento) => {
         </tr>
       </thead>
       <tbody>`;
+
   if (resp.data.length) {
     resp.data.forEach(item => {
       tabla += `
@@ -1301,21 +1303,126 @@ const getPresupuestoEvento = async (idEvento) => {
             <button class="btn btn-outline-primary btn-sm btn-presupuesto" data-item="${item.OFICINA_VENTAS}">
               <i class="fa-solid fa-circle-plus"></i>
             </button>
+            <button class="btn btn-outline-danger btn-sm btn-eliminar-presupuesto" data-item='${JSON.stringify(item)}'>
+              <i class="fa-regular fa-trash-can"></i>
+            </button>
           </td>
         </tr>`;
     });
-    tabla += `</tbody>
-          </table>`;
+
+    tabla += `
+          </tbody>
+          <tfoot class="table-info">
+            <tr>
+              <td style="vertical-align: middle;">TOTALES</td>
+              <td style="vertical-align: middle; font-weight: 600">${formatNum(totalPresupuestoAnterior, "$")}</td>
+              <td style="vertical-align: middle; font-weight: 600">${formatNum(totalPresupuesto, "$")}</td>                
+              <td style="vertical-align: middle;"></td>                
+            </tr>
+        </tfoot>
+      </table>`;
     $('#containerTablaPresupuesto').html(tabla);
-    $('#tablaPresupuestoEvento').off('click').on('click', '.btn-presupuesto', async function() {
+
+    $('#tablaPresupuestoEvento').on('click', '.btn-presupuesto', async function () {
       let oficina = $(this).attr('data-item');
       oficina = oficina.substring(0, 2);
       $('#oficinaSubs').val(oficina);
       await getZonasPresupuesto(oficina, idEvento);
+      $('#modalPresupuestoZona').modal('show');
     });
+
+    $('#tablaPresupuestoEvento').on('click', '.btn-eliminar-presupuesto', async function () {
+      let { ID_EVENTO, OFICINA_VENTAS } = JSON.parse($(this).attr('data-item'));
+      const zonaVentas = OFICINA_VENTAS.substring(0, 2);
+      $('#oficinaSubs').val(zonaVentas);
+      await eliminarPresupuestoEvento(ID_EVENTO, OFICINA_VENTAS, zonaVentas);
+    });
+
   } else {
     $('#containerTablaPresupuesto').html(`<p class="lead text-center fw-bold">No hay presupuestos asignados</td>`);
   }
+}
+
+const procesarArchivo = async (esquema) => {
+  const fileInput = document.getElementById("archivo");
+  const tableBody = document.getElementById("tableBody");
+  const tableHeader = document.getElementById("tableHeader");
+
+  if (!fileInput.files.length) {
+    Swal.fire("Campo requerido", "Debe seleccionar el archivo a procesar", "warning");
+    return;
+  }
+
+  showLoadingSwalAlert2("Cargando los datos...", false, true);
+
+  setTimeout(() => {
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+
+    reader.onload = function (event) {
+      try {
+        const text = event.target.result;
+        const rows = text.split("\n").map(row => row.split(",").map(cell => cell.trim()));
+
+        if (rows.length < 2) {
+          Swal.fire("Carga de archivo", "El archivo CSV está vacío o no tiene suficientes datos", "error");
+          return;
+        }
+
+        const csvHeaders = rows[0];
+        const expectedHeaders = esquema.map(col => col.name);
+
+        if (csvHeaders.join(",") !== expectedHeaders.join(",")) {
+          setTimeout(() => {
+            Swal.fire("Carga de archivo", "El archivo CSV no tiene los encabezados correctos", "error");
+          }, 200);
+          return;
+        }
+
+        tableHeader.innerHTML = `<th>No.</th>` + expectedHeaders.map(header => `<th>${header.replace(/\_/g, " ")}</th>`).join("");
+        tableBody.innerHTML = "";
+        let elementosCsv = [];
+
+        for (let i = 1; i < rows.length; i++) {
+          const element = rows[i][0];
+          const element1 = rows[i][1];
+          let objElementos = {
+            element,
+            element1
+          }
+
+          elementosCsv.push(objElementos);          
+        }
+
+        let rowHTML = ``;
+        elementosCsv.forEach((item, index) => {
+          rowHTML += `
+            <tr>
+              <td>${index + 1}</td>
+              <td>${item.element}</td>
+              <td>${item.element1}</td>
+            </tr>`;
+        });
+
+        tableBody.innerHTML += rowHTML;
+
+      } catch (error) {
+        console.error("Error procesando el archivo:", error);
+      } finally {
+        dissminSwal();
+      }
+    };
+
+    reader.readAsText(file);
+  }, 200);
+}
+
+const cargarDatos = async () => {
+  const esquema = [
+    { name: "MATERIAL", type: "varchar" },
+    { name: "ESTATUS", type: "int" }
+  ];
+  await procesarArchivo(esquema);
 }
 
 const buscarEventos = async () => {
@@ -1358,9 +1465,10 @@ const buscarEventos = async () => {
         <th>Usuario</th>
         <th>Lab</th>
         <th class="text-center">Presupuesto</th>
+        <th class="text-center">Portafolio</th>
+        <th class="text-center">Seguimiento</th>
         <th class="text-center">Editar</th>
         <th class="text-center">Eliminar</th>
-        <th class="text-center">Seguimiento</th>
       </tr>
     </thead>
     <tbody>`;
@@ -1385,42 +1493,48 @@ const buscarEventos = async () => {
         estado = '<span class="bg-success badge ">Activo</span>'
       }
 
-      tabla += `<tr>
-                  <td>${(index + 1)}</td>
-                  <td>${item.id}</td>
-                  <td>${item.nombre}</td>
-                  <td>${item.fecha_inicio}</td>
-                  <td>${item.fecha_fin}</td>
-                  <td>${item.oficina_ventas}</td>
-                  <td>${estado}</td>						
-                  <td>${item.usuario}</td>
-                  <td>
-                      <span class="badge bg-primary shadow-sm" style="width: 30px;">${item.n_lab}</span> 
-                      <button class="btn btn-sm" onclick="abrirModalLab(${item.id})">
-                        <i class="fa fa-plus"></i>
-                      </button> 
-                  </td>
-                  <td class="text-center">
-                    <button class="btn btn-sm btn-light btn-presupuesto" data-id='${JSON.stringify(item)}'>
-                      <i class="fa-solid fa-money-bill-1 text-success"></i>
-                    </button>
-                  </td>
-                  <td class="text-center">
-                    <button class="btn btn-sm btn-light" onclick="cargarForm(${item.id})">
-                      <i class="fa-regular fa-pen-to-square text-warning"></i>
-                    </button>
-                  </td>
-                  <td class="text-center">
-                    <button class="btn btn-sm btn-light" onclick="eliminarEvento(${item.id},this)">
-                      <i class="fa-regular fa-trash-can text-danger"></i>
-                    </button>
-                  </td>
-                  <td class="text-center">
-                    <button class="btn btn-sm btn-light btn-seguimiento" data-id="${item.id}">
-                      <i class="fa-solid fa-record-vinyl text-primary"></i>
-                    </button>
-                  </td>
-                </tr>`;
+      tabla += `
+        <tr>
+          <td>${(index + 1)}</td>
+          <td>${item.id}</td>
+          <td>${item.nombre}</td>
+          <td>${item.fecha_inicio}</td>
+          <td>${item.fecha_fin}</td>
+          <td>${item.oficina_ventas}</td>
+          <td>${estado}</td>						
+          <td>${item.usuario}</td>
+          <td>
+              <span class="badge bg-primary shadow-sm" style="width: 30px;">${item.n_lab}</span> 
+              <button class="btn btn-sm" onclick="abrirModalLab(${item.id})">
+                <i class="fa fa-plus"></i>
+              </button> 
+          </td>
+          <td class="text-center">
+            <button class="btn btn-sm btn-light btn-presupuesto" data-id='${JSON.stringify(item)}'>
+              <i class="fa-solid fa-money-bill-1 text-success"></i>
+            </button>
+          </td>                       
+          <td class="text-center">
+            <button class="btn btn-sm btn-light btn-portafolio" data-id='${JSON.stringify(item)}'>
+              <i class="fa-solid fa-briefcase text-dark"></i>
+            </button>
+          </td>                       
+          <td class="text-center">
+            <button class="btn btn-sm btn-light btn-seguimiento" data-id="${item.id}">
+              <i class="fa-solid fa-record-vinyl text-primary"></i>
+            </button>
+          </td>
+          <td class="text-center">
+            <button class="btn btn-sm btn-light" onclick="cargarForm(${item.id})">
+              <i class="fa-regular fa-pen-to-square text-warning"></i>
+            </button>
+          </td>             
+          <td class="text-center">
+            <button class="btn btn-sm btn-light" onclick="eliminarEvento(${item.id},this)">
+              <i class="fa-regular fa-trash-can text-danger"></i>
+            </button>
+          </td>
+        </tr>`;
     });
 
     tabla += `</tbody>
@@ -1446,6 +1560,12 @@ const buscarEventos = async () => {
       await getPresupuestoEvento(id);
       $('#containerTablaPresupuestoZona').html(``);
       $('#modalPresupuesto').modal('show');
+    });
+
+    $('#tablaEventos').on('click', '.btn-portafolio', async function () {
+      const evento = JSON.parse($(this).attr('data-id'));
+      $('#idEvento').val(evento);
+      $('#modalPortafolio').modal('show');
     });
 
   } catch (e) {
@@ -1990,7 +2110,7 @@ $(function () {
         p += `<option value="${oficina.OFICINA_VENTAS}">${oficina.OFICINA_VENTAS}-${oficina.DESCRIPCION}</option>`;
       });
       $("#sh_oficinas").html(p);
-  });
+    });
 
   asignarDatosMaestros();
 
@@ -2233,7 +2353,24 @@ $(function () {
     await guardarPresupuestoZonas();
   });
 
-  $("#btnEliminararPresupuesto").click(async function () {
-    await eliminarPresupuestoEvento();
+  $("#btnEliminarPresupuesto1").click(async function () {
+    const idEvento = $('#idEventoPresu').val().split('-')[0].trim();
+    let datosZona = [];
+    $("#tablaPresupuestoZona tbody tr").each(function () {
+      let fila = $(this).find("td");
+      let data = {
+        zonaVentas: fila.eq(1).text(),
+      };
+      datosZona.push(data);
+    });
+
+    let oficinaSubs = datosZona[0].zonaVentas.substring(0, 2);
+    let oficina = `${oficinaSubs}00`;
+
+    await eliminarPresupuestoEvento(idEvento, oficina, oficinaSubs);
+  });
+
+  $("#btnCargarDatos").click(async function () {
+    await cargarDatos();
   });
 });
