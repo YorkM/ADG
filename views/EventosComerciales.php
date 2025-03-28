@@ -101,7 +101,7 @@
       font-size: .8rem;
       text-align: left;
       color: red;
-    }
+    } 
 
     .handsontable th {
       border: 1px solid #ccc !important;
@@ -657,7 +657,7 @@
                 </button>
               </div>
             </div>
-          </div>
+          </div> 
           <p id="errorMessages" style="color: red; font-weight: bold;"></p>
           <div style="overflow: auto;">
             <table id="tablaDatos" class="table table-sm table-bordered table-hover" style="width: 100%;">

@@ -56,12 +56,15 @@ switch ($_POST['op']) {
     case "G_PRESUPUESTO_EVENTO_ZONA":
         $oficina = intval($_POST['oficina']);
         $id_evento = intval($_POST['idEvento']);
-        $sql = "SELECT ZV.ZONA_VENTAS,
-       ZV.ZONA_DESCRIPCION,
-       ISNULL(ZP.PRESUPUESTO, 0) AS PRESUPUESTO
-        FROM T_ZONAS_VENTAS ZV
-            LEFT JOIN T_ZONA_PRESUPUESTO_EVENTO ZP ON ZV.ZONA_VENTAS = ZP.ZONA_VENTAS
-        WHERE ZV.ZONA_VENTAS LIKE '$oficina%'";
+        $sql = "SELECT 
+                    ZV.ZONA_VENTAS,
+                    ZV.ZONA_DESCRIPCION,
+                    ISNULL(ZP.PRESUPUESTO, 0) AS PRESUPUESTO
+                FROM T_ZONAS_VENTAS ZV
+                LEFT JOIN T_ZONA_PRESUPUESTO_EVENTO ZP 
+                    ON ZV.ZONA_VENTAS = ZP.ZONA_VENTAS 
+                    AND (ZP.ID_EVENTO = $id_evento OR ZP.ID_EVENTO IS NULL)
+                WHERE ZV.ZONA_VENTAS LIKE '$oficina%'";
         $resultado = GenerarArray($sql, '');
         if ($resultado) echo json_encode(array('ok' => true, 'data' => $resultado));
         else echo json_encode(array('ok' => false, 'data' => []));
@@ -150,17 +153,78 @@ switch ($_POST['op']) {
         break;
 
     case "G_FECHA_HORA":
-        $sql = "SELECT GETDATE()";
+        $id_evento = $_POST['idEvento'];
+        $sql = "SELECT
+                DATEADD(HOUR, 17, CAST(C.FECHA_FIN AS DATETIME)) AS FIN_EVENTO,
+                GETDATE() AS FECHA_ACTUAL, 
+                    CASE 
+                        WHEN DATEADD(HOUR, 17, CAST(C.FECHA_FIN AS DATETIME)) > GETDATE() 
+                        THEN 'TRUE' 
+                        ELSE 'FALSE' 
+                    END AS ACTIVO
+                FROM T_EVENTOS_CONVOCATORIA C
+                WHERE C.ID = $id_evento;";
         $resultado = GenerarArray($sql, '');
         echo json_encode($resultado);
         break;
     
-    case "I_PORTAFOLIO":
-        $id_evento = intval($_POST['idEvento']);
-        $material = $_POST['material'];
-        $estatus = $_POST['estatus'];
-        $sql = mssql_query("INSERT INTO T_PORTAFOLIOS (ID_EVENTO, CODIGO_MATERIAL, ESTATUS) VALUES ($id_evento, '$material', '$estatus')");
-        if ($sql) echo json_encode(array('ok' => true, 'msg' => "Se inserto el registro correctamente"));
-        else echo json_encode(array('ok' => false, 'msg' => "Error al insertar registro"));
+    case "I_DATOS_PORTAFOLIO":
+        $datos = json_decode($_POST["datos"], true);
+    
+        if (!empty($datos)) {   
+    
+            mssql_query("BEGIN TRANSACTION");
+    
+            $errores = 0;
+            $lotes = array_chunk($datos, 1000);
+    
+            foreach ($lotes as $lote) {
+                $valores = [];
+    
+                foreach ($lote as $fila) {
+                    $id_evento = intval($fila["idEvento"]);
+                    $material = addslashes($fila["material"]);
+                    $estatus = addslashes($fila["estatus"]);
+                    $usuario = addslashes($fila["usuario"]);
+    
+                    $valores[] = "($id_evento, '$material', '$estatus', '$usuario')";
+                }
+    
+                $sql = "INSERT INTO T_PORTAFOLIOS (ID_EVENTO, CODIGO_MATERIAL, ESTATUS, USUARIO) VALUES " . implode(",", $valores);
+                $result = mssql_query($sql);
+    
+                if (!$result) {
+                    $errores++;
+                }
+            }
+    
+            if ($errores == 0) {
+                mssql_query("COMMIT TRANSACTION");
+                echo json_encode(array('ok' => true, 'msg' => "Se insertaron los datos correctamente"));
+            } else {
+                mssql_query("ROLLBACK TRANSACTION");
+                echo json_encode(array('ok' => false, 'msg' => "Error al insertar algunos datos"));
+            }
+
+        } else {
+            echo json_encode(array('ok' => false, 'msg' => "No hay datos"));
+        }
         break;
-}
+        
+    case "U_REPLACE_PRESUPUESTO":
+        $id_evento = intval($_POST["idEvento"]);
+        $oficina = addslashes($_POST["oficina"]);
+        $zona_ventas = $_POST['zonaVentas'];
+        $evento_anterior = $_POST["eventoAnterior"];
+        $presupuesto = $_POST["presupuesto"];
+
+        $sql = "UPDATE T_PRESUPUESTO_EVENTO SET EVENTO_ANTERIOR = '$evento_anterior', PRESUPUESTO = '$presupuesto' WHERE ID_EVENTO = $id_evento AND OFICINA_VENTAS = '$oficina'";
+        $result_update = mssql_query($sql);
+
+        $delete_zonas = "DELETE FROM T_ZONA_PRESUPUESTO_EVENTO WHERE ZONA_VENTAS LIKE '$zona_ventas%' AND ID_EVENTO = $id_evento";
+        $result_zona = mssql_query($delete_zonas);
+
+        if ($result_update && $delete_zonas) echo json_encode(array('ok' => true, 'msg' => "Se actualizaron los datos correctamente"));
+        else echo json_encode(array('ok' => false, 'msg' => "Error al actualizar los datos"));
+        break;
+} 

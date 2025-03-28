@@ -1041,17 +1041,13 @@ const validarPresupuesto = async () => {
 
 }
 
-// TODO: REALIZAR VALIDACIÓN AL GUARDAR EL PRESUPUESTO
-// TODO: VALIDAR FECHA DE CONVOCATORIA
-// TODO: CONTROLAR AL ELIMINAR TAMBIÉN - VALIDACIÓN
-// TODO: AL GUARDAR
-
 const guardarPresupuestoEvento = async () => {
   try {
     const idEvento = $('#idEventoPresu').val().split('-')[0];
     const oficina = $('#oficinaPresupuesto').val();
-    const eventoAnterior = $('#eventoAnterior').val();
-    const presupuesto = $('#presupuesto').val();
+    const eventoAnterior = $('#eventoAnterior').val().replace(/\./g, "").replace(/\$/g, "");
+    const presupuesto = $('#presupuesto').val().replace(/\./g, "").replace(/\$/g, "");
+    const zonaVentas = oficina.substring(0, 2);
 
     if (oficina === "2000" || !eventoAnterior || !presupuesto) {
       setTimeout(() => {
@@ -1060,10 +1056,40 @@ const guardarPresupuestoEvento = async () => {
       return;
     }
 
-    const respFH = await enviarPeticion({op: "G_FECHA_HORA", link: "../models/EventosComerciales.php"});
-    const fechaHoraActual = respFH[0].computed;
-    console.log(fechaHoraActual);
-    return;
+    const respFH = await enviarPeticion({op: "G_FECHA_HORA", link: "../models/EventosComerciales.php", idEvento});
+    const eventoActivo = respFH[0].ACTIVO;
+
+    if (eventoActivo === "FALSE") {
+      setTimeout(() => {
+        Swal.fire("Guardar presupuesto", "El evento ya excedió el limite de la fecha fin de la convocatoria, por lo tanto no es posible realizar esta acción", "error");        
+      }, 100);
+      return;
+    }
+
+    const respEvento = await getPresupuestoEvento(idEvento);
+    const resultado = respEvento.data.find(item => item.OFICINA_VENTAS === oficina);
+    if (resultado) {
+      const result = await confirmAlert("Guardar presupuesto", "La oficina que desea agregar ya se encuentra con presupuesto asignado... Si acepta seguir se reemplazará el presupuesto actual y se eliminarán todos los presupuestos asignados a las zonas relacionadas");
+
+      if (!result.isConfirmed) return;
+      const respReplace = await enviarPeticion({
+        op: "U_REPLACE_PRESUPUESTO",
+        link: "../models/EventosComerciales.php",
+        idEvento,
+        oficina,
+        zonaVentas,
+        eventoAnterior,
+        presupuesto
+      });
+      await getPresupuestoEvento(idEvento);
+      setTimeout(() => {
+        Swal.fire("Reemplazar presupuesto", "El presupuesto ha sido reemplazado y el presupuesto de las zonas asociadas han sido eliminados", "info");
+      }, 100);
+      $('#oficinaPresupuesto').val("2000");
+      $('#eventoAnterior').val("");
+      $('#presupuesto').val("");
+      return;
+    }
 
     showLoadingSwalAlert2("Guardando la información...", false, true);
     const resp = await enviarPeticion({
@@ -1071,8 +1097,8 @@ const guardarPresupuestoEvento = async () => {
       link: "../models/EventosComerciales.php",
       idEvento,
       oficina,
-      eventoAnterior: eventoAnterior.replace(/\./g, "").replace(/\$/g, ""),
-      presupuesto: presupuesto.replace(/\./g, "").replace(/\$/g, "")
+      eventoAnterior,
+      presupuesto
     });
 
     if (!resp.ok) {
@@ -1094,13 +1120,14 @@ const guardarPresupuestoEvento = async () => {
 
 const guardarPresupuestoZonas = async () => {
   try {
-    const contenidoTabla1 = $("#tablaPresupuestoEvento tbody tr").length;
-    const contenidoTabla2 = $("#tablaPresupuestoZona tbody tr").length;
     const idEvento = $('#idEventoPresu').val().split('-')[0].trim();
 
-    if (contenidoTabla1 < 1 || contenidoTabla2 < 1) {
+    const respFH = await enviarPeticion({op: "G_FECHA_HORA", link: "../models/EventosComerciales.php", idEvento});
+    const eventoActivo = respFH[0].ACTIVO;
+
+    if (eventoActivo === "FALSE") {
       setTimeout(() => {
-        Swal.fire("Guardar presupuesto", "Para guardar el presupuesto general se debe cargar presupuesto de la oficina y el presupuesto de las zonas", "warning");
+        Swal.fire("Guardar presupuesto", "El evento ya excedió el limite de la fecha fin de la convocatoria, por lo tanto no es posible realizar esta acción", "error");        
       }, 100);
       return;
     }
@@ -1266,6 +1293,7 @@ const getZonasPresupuesto = async (oficina, idEvento) => {
       });
 
       $('#totalPresupuesto').text(formatNum(totalPresupuestoZona, "$"));
+      $('#modalPresupuestoZona').modal('show');
     }
   } catch (error) {
     console.log(error);
@@ -1328,10 +1356,20 @@ const getPresupuestoEvento = async (idEvento) => {
       oficina = oficina.substring(0, 2);
       $('#oficinaSubs').val(oficina);
       await getZonasPresupuesto(oficina, idEvento);
-      $('#modalPresupuestoZona').modal('show');
+      // $('#modalPresupuestoZona').modal('show');
     });
 
     $('#tablaPresupuestoEvento').on('click', '.btn-eliminar-presupuesto', async function () {
+      const respFH = await enviarPeticion({op: "G_FECHA_HORA", link: "../models/EventosComerciales.php", idEvento});
+      const eventoActivo = respFH[0].ACTIVO;
+  
+      if (eventoActivo === "FALSE") {
+        setTimeout(() => {
+          Swal.fire("Guardar presupuesto", "El evento ya excedió el limite de la fecha fin de la convocatoria, por lo tanto no es posible realizar esta acción", "error");        
+        }, 100);
+        return;
+      }
+
       let { ID_EVENTO, OFICINA_VENTAS } = JSON.parse($(this).attr('data-item'));
       const zonaVentas = OFICINA_VENTAS.substring(0, 2);
       $('#oficinaSubs').val(zonaVentas);
@@ -1341,6 +1379,8 @@ const getPresupuestoEvento = async (idEvento) => {
   } else {
     $('#containerTablaPresupuesto').html(`<p class="lead text-center fw-bold">No hay presupuestos asignados</td>`);
   }
+
+  return resp;
 }
 
 const procesarArchivo = async (esquema) => {
@@ -1423,6 +1463,60 @@ const cargarDatos = async () => {
     { name: "ESTATUS", type: "int" }
   ];
   await procesarArchivo(esquema);
+}
+
+const guardarDatosPortafolios = async () => {
+  const idEvento =  $('#idEvento').val();
+  try {
+      const contenidoTabla = $("#tablaDatos tbody tr").length;
+      if (contenidoTabla < 1) {
+          Swal.fire("Guardar datos", "Debe cargar la información para guardar", "warning");
+          return;
+      }
+
+      const respFH = await enviarPeticion({op: "G_FECHA_HORA", link: "../models/EventosComerciales.php", idEvento});
+      const eventoActivo = respFH[0].ACTIVO;
+  
+      if (eventoActivo === "FALSE") {
+        setTimeout(() => {
+          Swal.fire("Guardar presupuesto", "El evento ya excedió el limite de la fecha fin de la convocatoria, por lo tanto no es posible realizar esta acción", "error");        
+        }, 100);
+        return;
+      }
+
+      let datos = [];
+
+      $("#tablaDatos tbody tr").each(function () {
+          let fila = $(this).find("td");
+
+          let data = {
+            material: fila.eq(1).text(),
+            estatus: fila.eq(2).text(),
+            idEvento: $('#idEvento').val(),
+            usuario: $('#usuario_ses').val()                          
+          };
+          datos.push(data);
+      });
+
+      showLoadingSwalAlert2('Guardando los datos...', false, true);
+
+      const resp = await enviarPeticion({
+          op: "I_DATOS_PORTAFOLIO",
+          datos: JSON.stringify(datos),
+          link: "../models/EventosComerciales.php"
+      });
+
+      dissminSwal();
+      if (resp.ok) {
+        Swal.fire("Guardar datos", "Lo datos se guardaron correctamente", "success");
+        $('#archivo').val("");
+        document.getElementById("tableBody").innerHTML = ``;
+        document.getElementById("tableHeader").innerHTML = ``;
+      }
+
+  } catch (error) {
+      console.log(error);
+  }
 }
 
 const buscarEventos = async () => {
@@ -1516,7 +1610,7 @@ const buscarEventos = async () => {
           </td>                       
           <td class="text-center">
             <button class="btn btn-sm btn-light btn-portafolio" data-id='${JSON.stringify(item)}'>
-              <i class="fa-solid fa-briefcase text-dark"></i>
+              <i class="fa-solid fa-briefcase text-secondary"></i>
             </button>
           </td>                       
           <td class="text-center">
@@ -1563,8 +1657,8 @@ const buscarEventos = async () => {
     });
 
     $('#tablaEventos').on('click', '.btn-portafolio', async function () {
-      const evento = JSON.parse($(this).attr('data-id'));
-      $('#idEvento').val(evento);
+      const {id} = JSON.parse($(this).attr('data-id'));
+      $('#idEvento').val(id);
       $('#modalPortafolio').modal('show');
     });
 
@@ -2355,6 +2449,16 @@ $(function () {
 
   $("#btnEliminarPresupuesto1").click(async function () {
     const idEvento = $('#idEventoPresu').val().split('-')[0].trim();
+    const respFH = await enviarPeticion({op: "G_FECHA_HORA", link: "../models/EventosComerciales.php", idEvento});
+    const eventoActivo = respFH[0].ACTIVO;
+
+    if (eventoActivo === "FALSE") {
+      setTimeout(() => {
+        Swal.fire("Guardar presupuesto", "El evento ya excedió el limite de la fecha fin de la convocatoria, por lo tanto no es posible realizar esta acción", "error");        
+      }, 100);
+      return;
+    }
+    
     let datosZona = [];
     $("#tablaPresupuestoZona tbody tr").each(function () {
       let fila = $(this).find("td");
@@ -2372,5 +2476,27 @@ $(function () {
 
   $("#btnCargarDatos").click(async function () {
     await cargarDatos();
+  });
+
+  $("#btnGuardarDatos").click(async function () {
+    await guardarDatosPortafolios();
+  });
+
+  $("#btnLimpiarDatos").click(async function () {
+    $('#archivo').val("");
+    document.getElementById("tableBody").innerHTML = ``;
+    document.getElementById("tableHeader").innerHTML = ``;
+  });
+
+  $('#modalPresupuesto').on('hidden.bs.modal', function () {
+    $('#oficinaPresupuesto').val("2000");
+    $('#eventoAnterior').val("");
+    $('#presupuesto').val("");
+  });
+
+  $('#modalPortafolio').on('hidden.bs.modal', function () {
+    $('#archivo').val("");
+    document.getElementById("tableBody").innerHTML = ``;
+    document.getElementById("tableHeader").innerHTML = ``;
   });
 });
