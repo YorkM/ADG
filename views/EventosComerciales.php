@@ -157,7 +157,7 @@
     }
 
     .btn-bar {
-      width: 100px;
+      width: 120px;
     }
   </style>
 </head>
@@ -228,7 +228,7 @@
       </form>
     </div>
   </div>
-  <!-- VISTA GENERAL CREACIÓN - BÚSQUEDA -->
+  <!-- VISTA GENERAL CREACIÓN - BÚSQUEDA EVENTO -->
   <div>
     <div class="alert alert-info mb-2" style="font-weight: 500;"><i class="fa-solid fa-star fa-flip"></i>&nbsp;0632 - EVENTOS COMERCIALES</div>
     <nav class="row p-1">
@@ -418,7 +418,7 @@
           <div class="row">
             <div class="container-fluid mt-4">
               <div class="input-group mb-3">
-                <input type="text" class="form-control form-control-sm" id="filtro" placeholder="Nombre/Oficina/Usuario">
+                <input type="text" class="form-control form-control-sm" id="filtro" placeholder="Nombre / Oficina / Usuario">
                 <span class="input-group-text text-primary">
                   <button class="btn btn-sm btn-outline-primary" id="buscar-evento"><i class="fa-solid fa-search"></i></button>
                 </span>
@@ -540,7 +540,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <div class="modal-title">
-            <h5>Asignación de Presupuesto Evento</h5>
+            <h5 style="font-weight: 500; color: #055160;">Asignación de Presupuesto Evento <span id="tituloModalPresu" style="font-size: medium;"></span></h5>
           </div>
           <div class="d-flex align-items-center gap-3">
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -549,11 +549,11 @@
         <div class="modal-body">
           <div class="alert alert-danger d-flex justify-content-center align-items-center gap-3 mb-3 mt-2" role="alert">
             <i class="fa-solid fa-triangle-exclamation fa-xl"></i>
-            <div class="fw-bold">
-              EL PRESUPUESTO SOLO SE PODRÁ GUARDAR UN DIÁ ANTES DE LA FECHA DE LA CONVOCATORIA
+            <div style="font-weight: 500;">
+              El presupuesto solo podrá cargarse en el sistema hasta el día final de la convocatoria, a las 5:00 PM
             </div>
           </div>
-          <h5 class="text-center mb-3" style="color: #055160;">Crear presupuesto evento oficina</h5>
+          <h5 class="text-center mb-3" style="color: #055160; font-weight: 400;">Crear presupuesto evento oficina</h5>
           <form class="mb-1" id="formularioPresupuesto">
             <div class="row">
               <div class="col-md-6">
@@ -623,21 +623,27 @@
       <div class="modal-content">
         <div class="modal-header">
           <div class="modal-title">
-            <h5></h5>
+            <h5 style="font-weight: 500; color: #055160;">Asignación de Portafolio Evento <span id="tituloModalPorta" style="font-size: medium;"></span></h5>
           </div>
           <div class="d-flex justify-content-between align-items-center gap-3">
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
         </div>
         <div class="modal-body">
+          <div class="alert alert-danger d-flex justify-content-center align-items-center gap-3 mb-3 mt-2" role="alert">
+              <i class="fa-solid fa-triangle-exclamation fa-xl"></i>
+              <div style="font-weight: 500;">
+                El portafolio de materiales solo podrá cargarse en el sistema hasta el día final de la convocatoria, a las 5:00 PM
+              </div>
+          </div>
           <div class="row shadow-sm py-2 w-90 mx-auto mb-3 mt-2" id=barraFiltros>
-            <div class="col-7">
+            <div class="col-5">
               <div class="form-group">
                 <label for="archivo">Cargar portafolio</label>
                 <input type="file" class="form-control form-control-sm" accept=".csv" id="archivo">
               </div>
             </div>
-            <div class="col-5 d-flex justify-content-evenly">
+            <div class="col-7 d-flex justify-content-evenly">
               <div class="d-flex">
                 <button class="btn btn-outline-warning btn-sm btn-bar align-self-end" title="Cargar" id="btnCargarDatos">
                   <i class="fa-solid fa-arrow-up-from-bracket"></i>
@@ -654,6 +660,12 @@
                 <button class="btn btn-outline-dark btn-sm btn-bar align-self-end" title="Limpiar" id="btnLimpiarDatos">
                   <i class="fa-solid fa-eraser"></i>
                   Limpiar
+                </button>
+              </div>
+              <div class="d-flex">
+                <button class="btn btn-outline-primary btn-sm btn-bar align-self-end" title="Ver portafolio" id="btnVerPortafolio">
+                  <i class="fa-solid fa-briefcase"></i>
+                  Ver portafolio
                 </button>
               </div>
             </div>

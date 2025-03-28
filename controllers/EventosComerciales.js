@@ -557,6 +557,7 @@ const verConsolidadoOficinas = (resp) => {
   const oficinaBogota = resp.filter(item => item.OFICINA_VENTAS === "2200");
   const oficinaCali = resp.filter(item => item.OFICINA_VENTAS === "2300");
   const oficinaBarranquilla = resp.filter(item => item.OFICINA_VENTAS === "2400");
+  
   //? MEDELLIN
   const consolidadoMedellin = oficinaMedellin.reduce((acumulado, item) => {
     const valorTotal = parseFloat(item.VALOR_TOTAL || 0);
@@ -1028,10 +1029,10 @@ function exportarExcel(sw) {
   } else {
     hot = hot4;
   }
-  const headers = hot.getColHeader(); // Obtener encabezados
-  const datos = hot.getData(); // Obtener datos sin encabezados
-  datos.unshift(headers); // Insertar los encabezados en la primera fila
-  const hoja = XLSX.utils.aoa_to_sheet(datos); // Convertir a hoja de Excel
+  const headers = hot.getColHeader();
+  const datos = hot.getData();
+  datos.unshift(headers);
+  const hoja = XLSX.utils.aoa_to_sheet(datos);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, hoja, "Datos");
   XLSX.writeFile(wb, "reporte.xlsx");
@@ -1056,12 +1057,12 @@ const guardarPresupuestoEvento = async () => {
       return;
     }
 
-    const respFH = await enviarPeticion({op: "G_FECHA_HORA", link: "../models/EventosComerciales.php", idEvento});
+    const respFH = await enviarPeticion({ op: "G_FECHA_HORA", link: "../models/EventosComerciales.php", idEvento });
     const eventoActivo = respFH[0].ACTIVO;
 
     if (eventoActivo === "FALSE") {
       setTimeout(() => {
-        Swal.fire("Guardar presupuesto", "El evento ya excedió el limite de la fecha fin de la convocatoria, por lo tanto no es posible realizar esta acción", "error");        
+        Swal.fire("Guardar presupuesto", "El evento ya excedió el limite de la fecha fin de la convocatoria, por lo tanto no es posible realizar esta acción", "error");
       }, 100);
       return;
     }
@@ -1122,12 +1123,12 @@ const guardarPresupuestoZonas = async () => {
   try {
     const idEvento = $('#idEventoPresu').val().split('-')[0].trim();
 
-    const respFH = await enviarPeticion({op: "G_FECHA_HORA", link: "../models/EventosComerciales.php", idEvento});
+    const respFH = await enviarPeticion({ op: "G_FECHA_HORA", link: "../models/EventosComerciales.php", idEvento });
     const eventoActivo = respFH[0].ACTIVO;
 
     if (eventoActivo === "FALSE") {
       setTimeout(() => {
-        Swal.fire("Guardar presupuesto", "El evento ya excedió el limite de la fecha fin de la convocatoria, por lo tanto no es posible realizar esta acción", "error");        
+        Swal.fire("Guardar presupuesto", "El evento ya excedió el limite de la fecha fin de la convocatoria, por lo tanto no es posible realizar esta acción", "error");
       }, 100);
       return;
     }
@@ -1308,7 +1309,7 @@ const getPresupuestoEvento = async (idEvento) => {
   const totalPresupuesto = resp.data.reduce((acc, item) => acc + parseFloat(item.PRESUPUESTO), 0);
 
   let tabla = `
-    <h5 class="text-center mt-2 mb-3" style="color: #055160;">Presupuesto evento oficina</h5>
+    <h5 class="text-center mt-2 mb-3" style="color: #055160; font-weight: 400">Presupuesto evento oficina</h5>
     <table class="table table-bordered table-sm table-hover" id="tablaPresupuestoEvento">
       <thead class="table-info">
         <tr>
@@ -1360,12 +1361,12 @@ const getPresupuestoEvento = async (idEvento) => {
     });
 
     $('#tablaPresupuestoEvento').on('click', '.btn-eliminar-presupuesto', async function () {
-      const respFH = await enviarPeticion({op: "G_FECHA_HORA", link: "../models/EventosComerciales.php", idEvento});
+      const respFH = await enviarPeticion({ op: "G_FECHA_HORA", link: "../models/EventosComerciales.php", idEvento });
       const eventoActivo = respFH[0].ACTIVO;
-  
+
       if (eventoActivo === "FALSE") {
         setTimeout(() => {
-          Swal.fire("Guardar presupuesto", "El evento ya excedió el limite de la fecha fin de la convocatoria, por lo tanto no es posible realizar esta acción", "error");        
+          Swal.fire("Guardar presupuesto", "El evento ya excedió el limite de la fecha fin de la convocatoria, por lo tanto no es posible realizar esta acción", "error");
         }, 100);
         return;
       }
@@ -1377,7 +1378,7 @@ const getPresupuestoEvento = async (idEvento) => {
     });
 
   } else {
-    $('#containerTablaPresupuesto').html(`<p class="lead text-center fw-bold">No hay presupuestos asignados</td>`);
+    $('#containerTablaPresupuesto').html(`<p class="lead text-center">No hay presupuestos asignados</td>`);
   }
 
   return resp;
@@ -1431,7 +1432,7 @@ const procesarArchivo = async (esquema) => {
             element1
           }
 
-          elementosCsv.push(objElementos);          
+          elementosCsv.push(objElementos);
         }
 
         let rowHTML = ``;
@@ -1465,57 +1466,95 @@ const cargarDatos = async () => {
   await procesarArchivo(esquema);
 }
 
+const getInfoPortafolio = async () => {
+  const idEvento = $('#idEvento').val();
+  const resp = await enviarPeticion({op: "G_PORTAFOLIO_EVENTO", link: "../models/EventosComerciales.php", idEvento});
+
+  if (!resp.data.length) {
+    Swal.fire("Ver portafolio", "El evento no cuenta con portafolio cargado", "info");
+    return;
+  }
+
+  showLoadingSwalAlert2("Cargando información...", false, true);
+
+  setTimeout(() => {
+    $('#archivo').val("");
+    document.getElementById("tableBody").innerHTML = ``;
+    document.getElementById("tableHeader").innerHTML = ``;
+
+    let header = `
+      <th>No.</th>
+      <th>MATERIAL</th>
+      <th>ESTATUS</th>`;
+    
+    document.getElementById("tableHeader").innerHTML = header;
+
+    let elementos = ``;
+    resp.data.forEach((item, index) => {
+      elementos += `
+        <tr>
+          <td>${index + 1}</td>
+          <td>${item.CODIGO_MATERIAL}</td>
+          <td>${item.ESTATUS}</td>
+        </tr>
+      `;
+    });
+    document.getElementById("tableBody").innerHTML = elementos;
+    dissminSwal();      
+  }, 500);
+}
+
 const guardarDatosPortafolios = async () => {
-  const idEvento =  $('#idEvento').val();
+  const idEvento = $('#idEvento').val();
   try {
-      const contenidoTabla = $("#tablaDatos tbody tr").length;
-      if (contenidoTabla < 1) {
-          Swal.fire("Guardar datos", "Debe cargar la información para guardar", "warning");
-          return;
-      }
+    const contenidoTabla = $("#tablaDatos tbody tr").length;
+    if (contenidoTabla < 1) {
+      Swal.fire("Guardar datos", "Debe cargar la información para guardar", "warning");
+      return;
+    }
 
-      const respFH = await enviarPeticion({op: "G_FECHA_HORA", link: "../models/EventosComerciales.php", idEvento});
-      const eventoActivo = respFH[0].ACTIVO;
-  
-      if (eventoActivo === "FALSE") {
-        setTimeout(() => {
-          Swal.fire("Guardar presupuesto", "El evento ya excedió el limite de la fecha fin de la convocatoria, por lo tanto no es posible realizar esta acción", "error");        
-        }, 100);
-        return;
-      }
+    const respFH = await enviarPeticion({ op: "G_FECHA_HORA", link: "../models/EventosComerciales.php", idEvento });
+    const eventoActivo = respFH[0].ACTIVO;
 
-      let datos = [];
+    if (eventoActivo === "FALSE") {
+      setTimeout(() => {
+        Swal.fire("Guardar presupuesto", "El evento ya excedió el limite de la fecha fin de la convocatoria, por lo tanto no es posible realizar esta acción", "error");
+      }, 100);
+      return;
+    }
 
-      $("#tablaDatos tbody tr").each(function () {
-          let fila = $(this).find("td");
+    let datos = [];
 
-          let data = {
-            material: fila.eq(1).text(),
-            estatus: fila.eq(2).text(),
-            idEvento: $('#idEvento').val(),
-            usuario: $('#usuario_ses').val()                          
-          };
-          datos.push(data);
-      });
+    $("#tablaDatos tbody tr").each(function () {
+      let fila = $(this).find("td");
 
-      showLoadingSwalAlert2('Guardando los datos...', false, true);
+      let data = {
+        material: fila.eq(1).text(),
+        estatus: fila.eq(2).text(),
+        idEvento: $('#idEvento').val(),
+        usuario: $('#usuario_ses').val()
+      };
+      datos.push(data);
+    });
 
-      const resp = await enviarPeticion({
-          op: "I_DATOS_PORTAFOLIO",
-          datos: JSON.stringify(datos),
-          link: "../models/EventosComerciales.php"
-      });
+    showLoadingSwalAlert2('Guardando los datos...', false, true);
 
-      dissminSwal();
-      if (resp.ok) {
-        Swal.fire("Guardar datos", "Lo datos se guardaron correctamente", "success");
-        $('#archivo').val("");
-        document.getElementById("tableBody").innerHTML = ``;
-        document.getElementById("tableHeader").innerHTML = ``;
-      }
+    const resp = await enviarPeticion({
+      op: "I_DATOS_PORTAFOLIO",
+      datos: JSON.stringify(datos),
+      link: "../models/EventosComerciales.php"
+    });
+
+    dissminSwal();
+    if (resp.ok) {
+      Swal.fire("Guardar datos", "Lo datos se guardaron correctamente", "success");
+      $('#archivo').val("");
+      document.getElementById("tableBody").innerHTML = ``;
+      document.getElementById("tableHeader").innerHTML = ``;
+    }
 
   } catch (error) {
-      console.log(error);
+    console.log(error);
   }
 }
 
@@ -1650,6 +1689,7 @@ const buscarEventos = async () => {
       const evento = JSON.parse($(this).attr('data-id'));
       const { id, nombre } = evento;
       $('#idEventoPresu').val(`${id} - ${nombre}`);
+      $('#tituloModalPresu').text(`${id} - ${nombre}`);
 
       await getPresupuestoEvento(id);
       $('#containerTablaPresupuestoZona').html(``);
@@ -1657,7 +1697,8 @@ const buscarEventos = async () => {
     });
 
     $('#tablaEventos').on('click', '.btn-portafolio', async function () {
-      const {id} = JSON.parse($(this).attr('data-id'));
+      const { id, nombre } = JSON.parse($(this).attr('data-id'));
+      $('#tituloModalPorta').text(`${id} - ${nombre}`);
       $('#idEvento').val(id);
       $('#modalPortafolio').modal('show');
     });
@@ -2449,16 +2490,16 @@ $(function () {
 
   $("#btnEliminarPresupuesto1").click(async function () {
     const idEvento = $('#idEventoPresu').val().split('-')[0].trim();
-    const respFH = await enviarPeticion({op: "G_FECHA_HORA", link: "../models/EventosComerciales.php", idEvento});
+    const respFH = await enviarPeticion({ op: "G_FECHA_HORA", link: "../models/EventosComerciales.php", idEvento });
     const eventoActivo = respFH[0].ACTIVO;
 
     if (eventoActivo === "FALSE") {
       setTimeout(() => {
-        Swal.fire("Guardar presupuesto", "El evento ya excedió el limite de la fecha fin de la convocatoria, por lo tanto no es posible realizar esta acción", "error");        
+        Swal.fire("Guardar presupuesto", "El evento ya excedió el limite de la fecha fin de la convocatoria, por lo tanto no es posible realizar esta acción", "error");
       }, 100);
       return;
     }
-    
+
     let datosZona = [];
     $("#tablaPresupuestoZona tbody tr").each(function () {
       let fila = $(this).find("td");
@@ -2482,10 +2523,14 @@ $(function () {
     await guardarDatosPortafolios();
   });
 
-  $("#btnLimpiarDatos").click(async function () {
+  $("#btnLimpiarDatos").click(function () {
     $('#archivo').val("");
     document.getElementById("tableBody").innerHTML = ``;
     document.getElementById("tableHeader").innerHTML = ``;
+  });
+
+  $("#btnVerPortafolio").click(async function () {
+    getInfoPortafolio();
   });
 
   $('#modalPresupuesto').on('hidden.bs.modal', function () {

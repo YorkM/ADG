@@ -53,6 +53,14 @@ switch ($_POST['op']) {
         else echo json_encode(array('ok' => false, 'data' => []));
         break;
 
+    case "G_PORTAFOLIO_EVENTO":
+        $id_evento = intval($_POST['idEvento']);
+        $sql = "SELECT * FROM T_PORTAFOLIOS WHERE ID_EVENTO = $id_evento";
+        $resultado = GenerarArray($sql, '');
+        if ($resultado) echo json_encode(array('ok' => true, 'data' => $resultado));
+        else echo json_encode(array('ok' => false, 'data' => []));
+        break;
+
     case "G_PRESUPUESTO_EVENTO_ZONA":
         $oficina = intval($_POST['oficina']);
         $id_evento = intval($_POST['idEvento']);
@@ -167,37 +175,37 @@ switch ($_POST['op']) {
         $resultado = GenerarArray($sql, '');
         echo json_encode($resultado);
         break;
-    
+
     case "I_DATOS_PORTAFOLIO":
         $datos = json_decode($_POST["datos"], true);
-    
-        if (!empty($datos)) {   
-    
+
+        if (!empty($datos)) {
+
             mssql_query("BEGIN TRANSACTION");
-    
+
             $errores = 0;
             $lotes = array_chunk($datos, 1000);
-    
+
             foreach ($lotes as $lote) {
                 $valores = [];
-    
+
                 foreach ($lote as $fila) {
                     $id_evento = intval($fila["idEvento"]);
                     $material = addslashes($fila["material"]);
                     $estatus = addslashes($fila["estatus"]);
                     $usuario = addslashes($fila["usuario"]);
-    
+
                     $valores[] = "($id_evento, '$material', '$estatus', '$usuario')";
                 }
-    
+
                 $sql = "INSERT INTO T_PORTAFOLIOS (ID_EVENTO, CODIGO_MATERIAL, ESTATUS, USUARIO) VALUES " . implode(",", $valores);
                 $result = mssql_query($sql);
-    
+
                 if (!$result) {
                     $errores++;
                 }
             }
-    
+
             if ($errores == 0) {
                 mssql_query("COMMIT TRANSACTION");
                 echo json_encode(array('ok' => true, 'msg' => "Se insertaron los datos correctamente"));
@@ -205,12 +213,11 @@ switch ($_POST['op']) {
                 mssql_query("ROLLBACK TRANSACTION");
                 echo json_encode(array('ok' => false, 'msg' => "Error al insertar algunos datos"));
             }
-
         } else {
             echo json_encode(array('ok' => false, 'msg' => "No hay datos"));
         }
         break;
-        
+
     case "U_REPLACE_PRESUPUESTO":
         $id_evento = intval($_POST["idEvento"]);
         $oficina = addslashes($_POST["oficina"]);
@@ -227,4 +234,4 @@ switch ($_POST['op']) {
         if ($result_update && $delete_zonas) echo json_encode(array('ok' => true, 'msg' => "Se actualizaron los datos correctamente"));
         else echo json_encode(array('ok' => false, 'msg' => "Error al actualizar los datos"));
         break;
-} 
+}
