@@ -148,9 +148,6 @@ const getDatosUsuario = async () => {
 }
 
 const getInfoTablaGastos = async () => {
-  const colores = {
-
-  }
   try {
     const resp = await enviarPeticion({op: "G_INFOTABLAG", link: "../models/WorkFlow.php"});
     const colores = {
