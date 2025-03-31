@@ -409,10 +409,11 @@ const abrirModalLab = async (id_evento) => {
   }
 }
 
-let hot1 = undefined;
-let hot2 = undefined;
-let hot3 = undefined;
-let hot4 = undefined;
+let hot1;
+let hot2;
+let hot3;
+let hot4;
+let hot5;
 
 const verDetalleConsolidados = async (codigoCliente) => {
   try {
@@ -921,7 +922,129 @@ const verDetalleEvento = async () => {
       autoWrapRow: true,
       licenseKey: "non-commercial-and-evaluation",
     });
+    console.log(hot1);
     $("#handsontable1").addClass("full-screen");
+    dissminSwal();
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+const verConsolidados2 = async () => {
+  try {
+    showLoadingSwalAlert2("Cargando información...", false, true);
+    const id = $('#idEvento').val();
+    const consolidados2 = await enviarPeticion({ op: "G_CONSOLIDADO_COMPRA_EVENTO", link: "../models/EventosComerciales.php", id });
+  
+    const resultado = consolidados2.datos.map(evento => {
+      const match = JSON.parse( consolidados2.transito).find(t => t.MATERIAL === evento.codigo && t.CENTRO === evento.centro);
+      return {
+          ...evento, 
+          transito: match ? match.TRANSITO : "0"
+      };
+    });  
+
+    const objResultado = resultado.map(item => {
+      let diferencia = 0;
+
+      const stock = parseFloat(item.stock);
+      const transito = parseFloat(item.transito);
+      const cantidadFacturada = parseFloat(item.cantidad_facturada);
+      const cantidad = parseFloat(item.cantidad);
+
+      diferencia = (cantidad) - (stock + transito + cantidadFacturada);
+
+      return {
+        codigo: item.codigo,
+        descripcion: item.descripcion,
+        grupoArticulos: item.grupo,
+        oficina: item.oficina,
+        organizacion: item.organizacion,
+        centro: item.centro,
+        almacen: item.almacen,
+        cantidad: item.cantidad,
+        cantidadFacturada: item.cantidad_facturada,
+        stock: item.stock,
+        transito: item.transito,
+        pnetoEvento: formatNum(item.pneto_evento, "$"),
+        pnetoFacturado: formatNum(item.pneto_facturado, "$"),
+        diferencia 
+      }
+    });
+
+    const colHeadersArr = ['Código', 'Descripción', 'Grupo Articulos', 'Oficina', 'Organización', 'Centro', 'Almacen', 'Cantidad', 'Cant. Facturada', 'Stock', 'Transito', 'Val. Fact. Evento', 'Val. Facturado', 'Diferencia'];
+
+    const handsontable5 = document.getElementById("handsontable5");
+    const colWidthsArr = [
+      95,  // 'Código'
+      310,  // 'Descripción'
+      130,  // 'Grupo articulos'
+      75,  // 'Oficina'
+      120,  // 'Organización'
+      90,  // 'centro'
+      90,  // 'almacen'
+      90,  // 'Cantidad'
+      120,  // 'Cantidad facturada'
+      90,  // 'Stock'
+      110,  // 'transito'
+      130,  // 'Valor facturado evento'
+      130,  // 'Valor facturado total'
+      120,  // 'diferencia'
+    ];
+
+    const columnsArr = [
+      { data: "codigo", type: "text", readOnly: true },
+      { data: "descripcion", type: "text", readOnly: true },
+      { data: "grupoArticulos", type: "text", readOnly: true },
+      { data: "oficina", type: "text", readOnly: true },
+      { data: "organizacion", type: "text", readOnly: true },
+      { data: "centro", type: "text", readOnly: true },
+      { data: "almacen", type: "text", readOnly: true },
+      { data: "cantidad", type: "numeric", readOnly: true },
+      { data: "cantidadFacturada", type: "numeric", readOnly: true },
+      { data: "stock", type: "numeric", readOnly: true },
+      { data: "transito", type: "numeric", readOnly: true },
+      { data: "pnetoEvento", type: "numeric", readOnly: true },
+      { data: "pnetoFacturado", type: "numeric", readOnly: true },    
+      { data: "diferencia", type: "numeric", readOnly: true }    
+    ];
+
+    hot5 = new Handsontable(handsontable5, {
+      data: objResultado,
+      height: $(window).height() - 10,
+      colWidths: colWidthsArr,
+      colHeaders: colHeadersArr,
+      columns: columnsArr,
+      // cells: function (row, col, prop) {
+      //   let cellProperties = {};
+      //   let cellValue = parseFloat(this.instance.getDataAtCell(row, col)) || 0;
+
+      //   if (prop === "porcentajeCumplimiento") {
+      //     if (cellValue < 30.5) {
+      //       cellProperties.className = "low-percentage";
+      //     } else if (cellValue >= 30.5 && cellValue < 99) {
+      //       cellProperties.className = "medium-percentage";
+      //     } else {
+      //       cellProperties.className = "high-percentage";
+      //     }
+      //   }
+      //   return cellProperties;
+      // },
+      afterChange: async function (changes, source) { },
+      dropdownMenu: true,
+      hiddenColumns: {
+        indicators: true,
+      },
+      contextMenu: true,
+      multiColumnSorting: true,
+      filters: true,
+      rowHeaders: true,
+      manualRowMove: true,
+      autoWrapCol: true,
+      autoWrapRow: true,
+      licenseKey: "non-commercial-and-evaluation",
+    });
+    $("#handsontable5").addClass("full-screen");
     dissminSwal();
   } catch (error) {
     console.log(error);
@@ -1019,16 +1142,16 @@ const verZonaEvento = async () => {
 }
 
 function exportarExcel(sw) {
-  let hot = undefined;
-  if (sw === 1) {
-    hot = hot1;
-  } else if (sw === 2) {
-    hot = hot2;
-  } else if (sw === 3) {
-    hot = hot3;
-  } else {
-    hot = hot4;
-  }
+  const hotMap = {
+    1: hot1,
+    2: hot2,
+    3: hot3,
+    4: hot4,
+    5: hot5
+  };
+  
+  const hot = hotMap[sw];  
+
   const headers = hot.getColHeader();
   const datos = hot.getData();
   datos.unshift(headers);
@@ -2464,8 +2587,17 @@ $(function () {
     await verConsolidadoEvento(id);
   });
 
+  $("#tabConsolidados2").click(async function () {
+    const id = $('#idEvento').val();
+    await verConsolidados2(id);
+  });
+
   $("#btnExportConsolidado").click(function () {
     exportarExcel(2);
+  });
+
+  $("#btnExportConso2").click(function () {
+    exportarExcel(5);
   });
 
   $("#tabZonas").click(async function () {

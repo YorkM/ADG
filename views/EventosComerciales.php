@@ -472,11 +472,13 @@
           </div>
           <nav class="row p-1">
             <div class="nav nav-tabs" id="nav-tab" role="tablist">
-              <button class="nav-link active" id="tabConsolidados" data-bs-toggle="tab" data-bs-target="#consolidados" type="button" role="tab" aria-controls="nav-home" aria-selected="true"><i class="fa fa-pencil"></i> &nbsp;Consolidados</button>
+              <button class="nav-link active" id="tabConsolidados" data-bs-toggle="tab" data-bs-target="#consolidados" type="button" role="tab" aria-controls="nav-home" aria-selected="true"><i class="fa-solid fa-rectangle-list"></i> &nbsp;Consolidados</button>
 
-              <button class="nav-link" id="tabDetalles" data-bs-toggle="tab" data-bs-target="#detalles" type="button" role="tab" aria-controls="nav-profile" aria-selected="false"><i class="fa fa-search"></i>&nbsp;Detalles</button>
+              <button class="nav-link" id="tabDetalles" data-bs-toggle="tab" data-bs-target="#detalles" type="button" role="tab" aria-controls="nav-profile" aria-selected="false"><i class="fa-solid fa-bars"></i>&nbsp;Detalles</button>
 
-              <button class="nav-link" id="tabZonas" data-bs-toggle="tab" data-bs-target="#zonas" type="button" role="tab" aria-controls="nav-profile" aria-selected="false"><i class="fa fa-search"></i>&nbsp;Zonas</button>
+              <button class="nav-link" id="tabZonas" data-bs-toggle="tab" data-bs-target="#zonas" type="button" role="tab" aria-controls="nav-profile" aria-selected="false"><i class="fa-solid fa-location-dot"></i></i>&nbsp;Zonas</button>
+
+              <button class="nav-link" id="tabConsolidados2" data-bs-toggle="tab" data-bs-target="#consolidados2" type="button" role="tab" aria-controls="nav-profile" aria-selected="false"><i class="fa-solid fa-eye"></i>&nbsp;Seguimiento compras</button>
             </div>
           </nav>
           <div class="tab-content " id="nav-tabContent">
@@ -506,6 +508,15 @@
                 </button>
               </div>
               <div id="handsontable3"></div>
+            </div>
+            <div class="tab-pane fade" id="consolidados2" role="tabpanel" aria-labelledby="nav-profile-tab">
+              <div class="mb-2">
+                <button class="btn btn-outline-success btn-sm" id="btnExportConso2">
+                  <i class="fa-solid fa-file-excel"></i>
+                  Exportar a Excel
+                </button>
+              </div>
+              <div id="handsontable5"></div>
             </div>
           </div>
         </div>

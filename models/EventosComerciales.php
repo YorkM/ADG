@@ -2,6 +2,42 @@
 include('funciones.php');
 session_start();
 conectar();
+
+function materialesTransito($anio,$mes){
+  $sociedad = $_SESSION['ses_NumOrg'];
+
+  $sql ="SELECT 
+            --A.AEDAT AS FECHA,
+            --A.EBELN AS OC,
+            --A.EBELP AS POSICION,
+            A.WERKS AS CENTRO,
+            LTRIM(A.MATNR, '0') AS MATERIAL,
+           -- A.MENGE AS CANTIDAD_OC,
+            --COALESCE(SUM(C.MENGE), 0) AS CANTIDAD_ING,
+            --(A.MENGE - COALESCE(SUM(C.MENGE), 0)) AS CANTIDAD_PENDIENTE
+           ROUND( CAST( (SUM(A.MENGE) - COALESCE(SUM(C.MENGE), 0)) AS DECIMAL(18,0)) ,0) AS TRANSITO
+        FROM EKPO A
+        INNER JOIN EKKO B ON A.EBELN = B.EBELN
+        LEFT  JOIN EKBE C ON A.EBELN = C.EBELN  AND A.EBELP = C.EBELP AND C.BEWTP = 'E'
+        WHERE 
+            YEAR(A.AEDAT) = '$anio'  
+            AND MONTH(A.AEDAT) = '$mes'  
+            AND B.BUKRS = '$sociedad'
+            AND A.LOEKZ <> 'X' --Indicador de borrado
+            -- AND A.EBELN = '4000012804'  
+            -- AND A.MATKL = 'BICO0331' 
+        GROUP BY 
+            --A.AEDAT,
+            --A.EBELN,
+            --A.EBELP,
+            A.WERKS,
+            LTRIM(A.MATNR, '0')
+          --  A.MENGE
+        HAVING  (SUM(A.MENGE) - COALESCE(SUM(C.MENGE), 0))  > 0
+       ";
+        return json_encode(generarArrayHana($sql,''));
+}
+
 switch ($_POST['op']) {
     case "G_DETALLE_EVENTO":
         $id_evento = intval($_POST['id']);
@@ -33,6 +69,40 @@ switch ($_POST['op']) {
         $resultado = GenerarArray($sql, '');
         if ($resultado) echo json_encode(array('ok' => true, 'data' => $resultado));
         else echo json_encode(array('ok' => false, 'msg' => "Error al obtener los datos"));
+        break;
+
+    case "G_CONSOLIDADO_COMPRA_EVENTO":
+        $id_evento = intval($_POST['id']);
+        $sp = mssql_init("P_EVENTOS_SEGUIMIENTO_COMPRAS");
+               mssql_bind($sp, '@ID_EVENTO',$id_evento , SQLINT4, false, false);	
+        $r  = mssql_execute($sp);
+      //  echo json_encode(GenerarArray($r,"SP"));
+       $anio = '';
+       $mes = '';
+        while ( $row = mssql_fetch_array( $r ) ) {    
+            $anio = $row['ANIO'];
+            $mes = $row['MES'];
+            $datos[]=array(
+                'id_evento'=>$row['ID_EVENTO'],
+                'codigo'=>$row['CODIGO'],
+                'descripcion'=>utf8_encode( $row['DESCRIPCION']),
+                'grupo'=>utf8_encode($row['GRUPO_ARTICULOS']),
+                'oficina'=>$row['OFICINA_VENTAS'],
+                'organizacion'=>$row['ORGANIZACION_VENTAS'],
+                'centro'=>$row['CENTRO'],
+                'almacen'=>$row['ALMACEN'],
+                'stock'=>$row['STOCK'],
+                'cantidad'=>$row['CANTIDAD'],
+                'pneto_evento'=>$row['P_NETO_EVENTO'],
+                'cantidad_facturada'=>$row['CANTIDAD_FACTURADA'],
+                'pneto_facturado'=>$row['VALOR_FACTURADO_EVENTO']
+            ); 
+        }
+        $transito = materialesTransito($anio,$mes);
+        echo json_encode([
+                'datos'=>$datos,
+                'transito'=>$transito
+            ]);
         break;
 
     case "I_PRESUPUESTO_EVENTO":
