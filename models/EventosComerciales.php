@@ -3,10 +3,11 @@ include('funciones.php');
 session_start();
 conectar();
 
-function materialesTransito($anio,$mes){
-  $sociedad = $_SESSION['ses_NumOrg'];
+function materialesTransito($anio, $mes)
+{
+    $sociedad = $_SESSION['ses_NumOrg'];
 
-  $sql ="SELECT 
+    $sql = "SELECT 
             --A.AEDAT AS FECHA,
             --A.EBELN AS OC,
             --A.EBELP AS POSICION,
@@ -35,7 +36,7 @@ function materialesTransito($anio,$mes){
           --  A.MENGE
         HAVING  (SUM(A.MENGE) - COALESCE(SUM(C.MENGE), 0))  > 0
        ";
-        return json_encode(generarArrayHana($sql,''));
+    return json_encode(generarArrayHana($sql, ''));
 }
 
 switch ($_POST['op']) {
@@ -74,35 +75,34 @@ switch ($_POST['op']) {
     case "G_CONSOLIDADO_COMPRA_EVENTO":
         $id_evento = intval($_POST['id']);
         $sp = mssql_init("P_EVENTOS_SEGUIMIENTO_COMPRAS");
-               mssql_bind($sp, '@ID_EVENTO',$id_evento , SQLINT4, false, false);	
+        mssql_bind($sp, '@ID_EVENTO', $id_evento, SQLINT4, false, false);
         $r  = mssql_execute($sp);
-      //  echo json_encode(GenerarArray($r,"SP"));
-       $anio = '';
-       $mes = '';
-        while ( $row = mssql_fetch_array( $r ) ) {    
+        $anio = '';
+        $mes = '';
+        while ($row = mssql_fetch_array($r)) {
             $anio = $row['ANIO'];
             $mes = $row['MES'];
-            $datos[]=array(
-                'id_evento'=>$row['ID_EVENTO'],
-                'codigo'=>$row['CODIGO'],
-                'descripcion'=>utf8_encode( $row['DESCRIPCION']),
-                'grupo'=>utf8_encode($row['GRUPO_ARTICULOS']),
-                'oficina'=>$row['OFICINA_VENTAS'],
-                'organizacion'=>$row['ORGANIZACION_VENTAS'],
-                'centro'=>$row['CENTRO'],
-                'almacen'=>$row['ALMACEN'],
-                'stock'=>$row['STOCK'],
-                'cantidad'=>$row['CANTIDAD'],
-                'pneto_evento'=>$row['P_NETO_EVENTO'],
-                'cantidad_facturada'=>$row['CANTIDAD_FACTURADA'],
-                'pneto_facturado'=>$row['VALOR_FACTURADO_EVENTO']
-            ); 
+            $datos[] = array(
+                'id_evento' => $row['ID_EVENTO'],
+                'codigo' => $row['CODIGO'],
+                'descripcion' => utf8_encode($row['DESCRIPCION']),
+                'grupo' => utf8_encode($row['GRUPO_ARTICULOS']),
+                'oficina' => $row['OFICINA_VENTAS'],
+                'organizacion' => $row['ORGANIZACION_VENTAS'],
+                'centro' => $row['CENTRO'],
+                'almacen' => $row['ALMACEN'],
+                'stock' => $row['STOCK'],
+                'cantidad' => $row['CANTIDAD'],
+                'pneto_evento' => $row['P_NETO_EVENTO'],
+                'cantidad_facturada' => $row['CANTIDAD_FACTURADA'],
+                'pneto_facturado' => $row['VALOR_FACTURADO_EVENTO']
+            );
         }
-        $transito = materialesTransito($anio,$mes);
+        $transito = materialesTransito($anio, $mes);
         echo json_encode([
-                'datos'=>$datos,
-                'transito'=>$transito
-            ]);
+            'datos' => $datos,
+            'transito' => $transito
+        ]);
         break;
 
     case "I_PRESUPUESTO_EVENTO":

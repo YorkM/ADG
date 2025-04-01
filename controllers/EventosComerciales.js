@@ -669,7 +669,7 @@ const verConsolidadoOficinas = (resp) => {
 
 const verConsolidadoEvento = async (id) => {
   try {
-    showLoadingSwalAlert2("Cargando consolidados...", false, true);
+    showLoadingSwalAlert2("Cargando información... Por favor espere, esto puede tardar unos minutos", false, true);
     const consolidado = await enviarPeticion({ op: "G_CONSOLIDADO_EVENTO", link: "../models/EventosComerciales.php", id });
 
     verConsolidadoOficinas(consolidado.data);
@@ -954,6 +954,8 @@ const verConsolidados2 = async () => {
 
       diferencia = (cantidad) - (stock + transito + cantidadFacturada);
 
+      diferencia = (diferencia < 1 ? 0 : diferencia);
+
       return {
         codigo: item.codigo,
         descripcion: item.descripcion,
@@ -1149,8 +1151,8 @@ function exportarExcel(sw) {
     4: hot4,
     5: hot5
   };
-  
-  const hot = hotMap[sw];  
+
+  const hot = hotMap[sw];
 
   const headers = hot.getColHeader();
   const datos = hot.getData();
@@ -1158,7 +1160,27 @@ function exportarExcel(sw) {
   const hoja = XLSX.utils.aoa_to_sheet(datos);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, hoja, "Datos");
-  XLSX.writeFile(wb, "reporte.xlsx");
+
+  // Forzar codificación UTF-8
+  function s2ab(s) {
+    const buf = new ArrayBuffer(s.length);
+    const view = new Uint8Array(buf);
+    for (let i = 0; i < s.length; i++) {
+      view[i] = s.charCodeAt(i) & 0xFF;
+    }
+    return buf;
+  }
+
+  const wbout = XLSX.write(wb, { bookType: "xlsx", type: "binary", cellDates: true });
+
+  // Crear y descargar el archivo correctamente
+  const blob = new Blob([s2ab(wbout)], { type: "application/octet-stream" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "reporte.xlsx";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 }
 
 const validarPresupuesto = async () => {
