@@ -2130,7 +2130,6 @@ const getDataTableCsv = (id_evento, idDiv) => {
 }
 
 const addLabList = (id) => {
-
   n = $("#" + id + " div.row").length;
   n++;
   fila = '';
@@ -2138,64 +2137,62 @@ const addLabList = (id) => {
   if (n == 1) {
     fila = `
             <div class="row">
-			    <div class="col-1">
-			    </div>
-               <div class="col-2">
-					<label class="m-1">Nit</label>
-			   </div>
-               <div class="col-3">
-					<label class="m-1">Nombres</label>
-			   </div>
-               <div class="col-2">
-					<label class="m-1">Grupo articulo</label>
-			   </div>
-               <div class="col-2">
-					<label class="m-1">Monto</label>
-			   </div>
-               <div class="col-1">
-					<label class="m-1 text-center">Patrocinador</label>
-			   </div>
-               <div class="col-1">
-					<label class="m-1 text-center"></label>
-			   </div>
-			</div>
-		`
+              <div class="col-1">
+              </div>
+              <div class="col-2">
+                  <label class="m-1">Nit</label>
+              </div>
+              <div class="col-3">
+                  <label class="m-1">Nombres</label>
+              </div>
+              <div class="col-2">
+                  <label class="m-1">Grupo articulo</label>
+              </div>
+              <div class="col-2">
+                  <label class="m-1">Monto</label>
+              </div>
+              <div class="col-1">
+                  <label class="m-1 text-center">Patrocinador</label>
+              </div>
+              <div class="col-1">
+                  <label class="m-1 text-center"></label>
+              </div>
+          </div>`;
   }
 
   fila += `
-          <div class="row rows-lab" id="row-lab-${n}">
-			  <div class="col-1 columna-${n}-0">
-				${n}
-			  </div>
-			  <div class="col-2 columna-${n}-1">
-				<input type="text" onkeypress="return vnumeros(event)" class="form-control autocomplete-lab form-control-sm" name="lab-nit" minlength="6" maxlength="15" required>
-			  </div>
-			  <div class="col-3  columna-${n}-2">
-				<input type="text" minlength="3" maxlength="50"  class="form-control form-control-sm  autocomplete-lab" name="lab-nombres" required>
-			  </div>
-			  <div class="col-2  columna-${n}-3">
-				<input type="text"  maxlength="10" class="form-control form-control-sm  autocomplete-lab" name="lab-grupo" >
-			  </div>
-			  <div class="col-2 columna-${n}-4">
-				<input type="number"  class="form-control form-control-sm" name="lab-monto" required>
-			  </div>
-			  <div class="col-1  columna-${n}-5">
-				<center><input type="checkbox" class="form-check"  /></center>
-			  </div>
-			  <div class="col-1  columna-${n}-6">
-				 <div  class="btn-group btn-group-sm">
-					<button type="button" class="btn btn-sm btn-outline-warning" onclick="limpiarRowLab(this)"><i class="fa-solid fa-broom"></i></button>
-					<button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarLab(this)"><i class="fa fa-trash"></i></button>
-				  </div>
-			  </div>
-			  <div class="col-2 row_codigo_sap columna-${n}-7" style="display:none">
-					<input type="number" class="codigo_sap" readonly  />
-			  </div>
-			  <div class="col-2 columna-${n}-8" style="display:none">
-					<input type="number" class="id-lab" readonly value="0" >
-			  </div>
-		  </div>
-		`
+           <div class="row rows-lab" id="row-lab-${n}">
+              <div class="col-1 columna-${n}-0">
+                  ${n}
+              </div>
+              <div class="col-2 columna-${n}-1">
+                  <input type="text" onkeypress="return vnumeros(event)" class="form-control autocomplete-lab form-control-sm" name="lab-nit" minlength="6" maxlength="15" required>
+              </div>
+              <div class="col-3  columna-${n}-2">
+                  <input type="text" minlength="3" maxlength="50" class="form-control form-control-sm  autocomplete-lab" name="lab-nombres" required>
+              </div>
+              <div class="col-2  columna-${n}-3">
+                  <input type="text" maxlength="10" class="form-control form-control-sm  autocomplete-lab" name="lab-grupo">
+              </div>
+              <div class="col-2 columna-${n}-4">
+                  <input type="number" class="form-control form-control-sm" name="lab-monto" required>
+              </div>
+              <div class="col-1  columna-${n}-5">
+                  <center><input type="checkbox" class="form-check" /></center>
+              </div>
+              <div class="col-1  columna-${n}-6">
+                  <div class="btn-group btn-group-sm">
+                      <button type="button" class="btn btn-sm btn-outline-warning" onclick="limpiarRowLab(this)"><i class="fa-solid fa-broom"></i></button>
+                      <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarLab(this)"><i class="fa fa-trash"></i></button>
+                  </div>
+              </div>
+              <div class="col-2 row_codigo_sap columna-${n}-7" style="display:none">
+                  <input type="number" class="codigo_sap" readonly />
+              </div>
+              <div class="col-2 columna-${n}-8" style="display:none">
+                  <input type="number" class="id-lab" readonly value="0">
+              </div>
+          </div>`;
   $("#" + id).append(fila);
 
 
