@@ -23,11 +23,13 @@
         #tablaDatos thead tr th {
             font-weight: 500;
             color: #055160;
+            font-size: medium;
         }
 
         #tablaDatosDetalle thead tr th {
             font-weight: 500;
             color: #055160;
+            font-size: medium;
         }
 
         .btn-guardar {
@@ -79,6 +81,11 @@
             background-color: #ffcccc !important;
         }
 
+        .bg-label {
+            background-color: #cff4fc;
+            color: #055160;
+            width: 80%;
+        }
     </style>
 </head>
 
@@ -114,15 +121,13 @@
                                 <div class="form-group">
                                     <label for="proceso">Proceso</label>
                                     <select name="PROCESO" id="proceso" class="form-select form-select-sm">
-                                        <option value="">Seleccione el proceso</option>
-                                        <option value="1">Prueba 1</option>
-                                        <option value="2">Prueba 2</option>
+
                                     </select>
                                 </div>
                                 <div class="form-group mt-2">
                                     <label for="periodo">Periodo</label>
                                     <select name="PERIODO" id="periodo" class="form-select form-select-sm">
-                                        <option value="">Seleccione el periodo</option>
+                                        <option value="">Seleccione el Periodo</option>
                                         <option value="DIARIO">DIARIO</option>
                                         <option value="MENSUAL">MENSUAL</option>
                                         <option value="BIMESTRAL">BIMESTRAL</option>
@@ -138,8 +143,8 @@
                                 <div class="form-group mt-2">
                                     <label for="rango">Rango %</label>
                                     <div class="d-flex gap-2">
-                                        <input type="text" class="form-control form-control-sm" name="RANGO_INICIAL" id="rangoIni" placeholder="% Rango inicial">
-                                        <input type="text" class="form-control form-control-sm" name="RANGO_FINAL" id="rangoFin" placeholder="% Rango final">
+                                        <input type="text" class="form-control form-control-sm" name="RANGO_INICIAL" id="rangoIni" placeholder="% Rango Inicial">
+                                        <input type="text" class="form-control form-control-sm" name="RANGO_FINAL" id="rangoFin" placeholder="% Rango Final">
                                     </div>
                                 </div>
                             </div>
@@ -203,8 +208,8 @@
                     </div>
                 </div>
                 <div class="modal-body">
-                    <div style="overflow: auto;" id="tablaDetallePlan">                               
-                 
+                    <div style="overflow: auto;" id="tablaDetallePlan">
+
                     </div>
                     <div class="d-flex justify-content-center">
                         <button class="btn-guardar" id="guardarAcciones">

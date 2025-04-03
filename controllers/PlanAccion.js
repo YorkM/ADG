@@ -13,6 +13,21 @@ const confirmAlert = async (title, text) => {
     return result;
 }
 
+const getProcesos = async () => {
+    try {
+        const resp = await enviarPeticion({ op: "G_PROCESOS", link: "../models/PlanAccion.php" });
+        let elements = `<option value="">Seleccione un Proceso</option>`;
+        if (resp.length) {
+            resp.forEach(elem => {
+                elements += `<option value="${elem.PROCESO.trim()}">${elem.PROCESO}</option>`;
+            });
+        }
+        $("#proceso").html(elements);
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 const agregarAcciones = () => {
     const contenedor = document.getElementById("contenedorAcciones");
     const nuevoCampo = `
@@ -20,16 +35,28 @@ const agregarAcciones = () => {
             <div class="col-md-10">
                 <div class="row">
                     <div class="col">
-                        <input type="text" class="form-control form-control-sm accion" placeholder="Acción">
+                        <div class="form-group">
+                            <label>Acción</label>
+                            <input type="text" class="form-control form-control-sm accion" placeholder="Acción">
+                        </div>
                     </div>
                     <div class="col">
-                        <input type="date" class="form-control form-control-sm fecha-inicio" placeholder="Fecha Inicio">
+                        <div class="form-group">
+                            <label>Fecha Inicio</label>
+                            <input type="date" class="form-control form-control-sm fecha-inicio" placeholder="Fecha Inicio">
+                        </div>
                     </div>
                     <div class="col">
-                        <input type="date" class="form-control form-control-sm fecha-final" placeholder="Fecha Final">
+                        <div class="form-group">
+                            <label>Fecha Final</label>
+                            <input type="date" class="form-control form-control-sm fecha-final" placeholder="Fecha Final">
+                        </div>
                     </div>
                     <div class="col">
-                        <input type="text" class="form-control form-control-sm responsable" placeholder="Responsable">
+                        <div class="form-group">
+                            <label>Responsable</label>
+                            <input type="text" class="form-control form-control-sm responsable" placeholder="Responsable">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -127,19 +154,31 @@ const getDetallePlanesAccion = async (id) => {
                     <tr data-id="${item.ID}">
                         <td>
                             <p style="display: inline; width: 50%; color: #055160;">${item.ACCIONES}</p>
-                            <input type="text" class="form-control form-control-sm w-input" value="${item.INDICE}" id="" placeholder="Indice">
+                            <div class="form-group mt-2">
+                                <label class="bg-label" for="indice">Indice</label>
+                                <input type="text" class="form-control form-control-sm w-input" value="${item.INDICE}" id="indice" placeholder="Indice">
+                            </div>
                         </td>
                         <td>
                             <p style="display: inline; width: 50%; color: #055160;">${item.FECHA_INICIO}</p>
-                            <input type="text" class="form-control form-control-sm w-input" value="${item.AVANCE}" id="" placeholder="Avance">
+                            <div class="form-group mt-2">
+                                <label class="bg-label" for="avance">Avance</label>
+                                <input type="text" class="form-control form-control-sm w-input" value="${item.AVANCE}" id="avance" placeholder="Avance">
+                            </div>
                         </td>
                         <td>
                             <p style="display: inline; width: 50%; color: #055160;">${item.FECHA_FINAL}</p>
-                            <input type="text" class="form-control form-control-sm w-input" value="${item.RESULTADOS}" id="" placeholder="Resultado">
+                            <div class="form-group mt-2">
+                                <label class="bg-label" for="resultado">Resultado</label>
+                                <input type="text" class="form-control form-control-sm w-input" value="${item.RESULTADOS}" id="resultado" placeholder="Resultado">
+                            </div>
                         </td>
                         <td>
                             <p style="display: inline; width: 50%; color: #055160;">${item.RESPONSABLE}</p>
-                            <input type="text" class="form-control form-control-sm w-input" value="${item.ESTADO}" id="" placeholder="Estado">
+                            <div class="form-group mt-2">
+                                <label class="bg-label" for="estado">Estado</label>
+                                <input type="text" class="form-control form-control-sm w-input" value="${item.ESTADO}" id="estado" placeholder="Estado">
+                            </div>
                         </td>
                     </tr>`;
             });
@@ -156,9 +195,16 @@ const getDetallePlanesAccion = async (id) => {
 }
 
 const guardarAcciones = async () => {
+    const usuario = $('#usuario_ses').val();
     const idPlan = $('#idPlan').val();
     let filasValidas = true;
     let datosCapturados = [];
+    
+    const resp = await enviarPeticion({ op: "G_DIAS_MES", link: "../models/PlanAccion.php" });
+    if (resp[0].DIAS_MES === "FALSE") {
+        Swal.fire("Guardar acciones", "Ya pasaron los primeros 5 días del mes... Por lo tanto no es posible realizar esta acción", "warning");
+        return;
+    }
 
     $('#tablaDatosDetalle tbody tr').each(function () {
         let id = $(this).data('id');
@@ -169,7 +215,8 @@ const guardarAcciones = async () => {
             indice: inputs.eq(0).val().trim(),
             avance: inputs.eq(1).val().trim(),
             resultado: inputs.eq(2).val().trim(),
-            estado: inputs.eq(3).val().trim()
+            estado: inputs.eq(3).val().trim(),
+            usuario
         };
 
         let filaValida = Object.values(filaData).every(valor => valor !== "");
@@ -185,8 +232,11 @@ const guardarAcciones = async () => {
     });
 
     if (!filasValidas) {
-        Swal.fire("Guardar acciones", "Hay campos vacíos en la tabla. Completa todos los campos antes de guardar", "error");
+        Swal.fire("Guardar acciones", "Se deben diligenciar todos los campos antes de guardar", "error");
     } else {
+        const result = await confirmAlert("Guardar acciones", "Se guardarán los datos ingresados en cada campo... ¿Se verificarón los datos antes de guardar?");
+        if (!result.isConfirmed) return;
+
         const { ok } = await enviarPeticion({ op: "U_DETALLE_PLAN", link: "../models/PlanAccion.php", datos: JSON.stringify(datosCapturados) });
         if (ok) {
             setTimeout(() => {
@@ -199,60 +249,107 @@ const guardarAcciones = async () => {
 
 const guardarPlanAccion = async () => {
     try {
-        const result = await confirmAlert("Guardar plan de acción", "Se guardarán los datos del plan de acción... ¿Se verificaron correctamente los datos?");
-        if (!result.isConfirmed) return;
-
         const usuario = $('#usuario_ses').val();
+        const organizacion = $('#org_ses').val();
         const data = $("#formulario").serializeArrayAll();
         const dataRequest = formatearArrayRequest(data);
         dataRequest.USUARIO = usuario;
+        dataRequest.SOCIEDAD = organizacion;
         dataRequest.op = "I_PLAN_ACCION";
         dataRequest.link = "../models/PlanAccion.php";
+
+        const resp = await enviarPeticion({ op: "G_DIAS_MES", link: "../models/PlanAccion.php" });
+        if (resp[0].DIAS_MES === "FALSE") {
+            Swal.fire("Guardar plan de acción", "Ya pasaron los primeros 5 días del mes... Por lo tanto no es posible realizar esta acción", "warning");
+            return;
+        }
+
+        const camposVacios = data.some(obj =>
+            Object.values(obj).some(valor => valor === "" || valor === null || valor === undefined)
+        );
+
+        if (camposVacios) {
+            setTimeout(() => {
+                Swal.fire("Guardar plan de acción", "Se deben diligenciar todos los campos de formulario", "error");
+            }, 100);
+            return;
+        }
 
         const allAccion = document.querySelectorAll('.accion');
         const allFechaIni = document.querySelectorAll('.fecha-inicio');
         const allFechaFin = document.querySelectorAll('.fecha-final');
         const allResponsables = document.querySelectorAll('.responsable');
 
-        $('#formulario').trigger('reset');
-        $('#contenedorAcciones').html(``);
-
-        showLoadingSwalAlert2("Guardando los datos...", false, true);
-
-        const { id, ok } = await enviarPeticion(dataRequest);
-        console.log(id);
+        if (!allAccion.length) {
+            Swal.fire("Guardar plan de acciones", "No hay acciones asociadas al plan... Se debe agregar al menos una", "error");
+            return;
+        }        
 
         let planArray = [];
 
-        if (ok) {
-            allAccion.forEach((item, index) => {
-                planArray.push({
-                    idPlan: id,
-                    accion: item.value,
-                    fechaInicio: allFechaIni[index]?.value || "",
-                    fechaFinal: allFechaFin[index]?.value || "",
-                    responsable: allResponsables[index]?.value || ""
-                });
-            });
+        allAccion.forEach((item, index) => {
+            const accion = item.value?.trim() || "";
+            const fechaInicio = allFechaIni[index]?.value?.trim() || "";
+            const fechaFinal = allFechaFin[index]?.value?.trim() || "";
+            const responsable = allResponsables[index]?.value?.trim() || "";
 
-            const { ok } = await enviarPeticion({ op: "I_DETALLE_PLAN_ACCION", link: "../models/PlanAccion.php", planArray: JSON.stringify(planArray) });
-            if (ok) {
-                setTimeout(() => {
-                    Swal.fire("Guardar plan de acción", "Se guardaron los datos del plan de acción correctamente", "success");
-                }, 100);
+            if (accion && fechaInicio && fechaFinal && responsable) {
+                planArray.push({
+                    accion,
+                    fechaInicio,
+                    fechaFinal,
+                    responsable
+                });
             }
-            await getPlanesAccion();
+        });
+
+        if (planArray.length === 0) {
+            Swal.fire("Guardar plan de acción", "Todos los campos de las acciones son obligatorios", "error");
+            return;
         }
+
+        const result = await confirmAlert("Guardar plan de acción", "Se guardarán los datos del plan de acción... ¿Se verificaron correctamente los datos?");
+        if (!result.isConfirmed) return;
+
+        const { id, ok } = await enviarPeticion(dataRequest);
+        if (ok) {
+            planArray = planArray.map(item => {
+                let objAcciones = {
+                    accion: item.accion,
+                    fechaInicio: item.fechaInicio,
+                    fechaFinal: item.fechaFinal,
+                    responsable: item.responsable,
+                    idPlan: id
+                }
+                return objAcciones;
+            });
+        }
+
+        const resp2 = await enviarPeticion({
+            op: "I_DETALLE_PLAN_ACCION",
+            link: "../models/PlanAccion.php",
+            planArray: JSON.stringify(planArray)
+        });
+
+        if (resp2.ok) {
+            setTimeout(() => {
+                Swal.fire("Guardar plan de acción", "Se guardaron los datos del plan de acción correctamente", "success");
+            }, 100);
+            $('#formulario').trigger('reset');
+            $('#contenedorAcciones').html(``);
+        }
+
+        await getPlanesAccion();
 
     } catch (error) {
         console.log(error);
-    } finally {
-        dissminSwal();
     }
 }
 
 // EJECUCIÓN DE FUNCIONALIDADES
 $(function () {
+    getProcesos();
+
     getPlanesAccion();
 
     $("#meta, #rangoIni, #rangoFin").on("input", function () {

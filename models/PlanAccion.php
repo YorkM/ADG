@@ -19,10 +19,10 @@ switch ($_POST['op']) {
 
             foreach ($datos as $fila) {
                 $id_plan = intval($fila["idPlan"]);
-                $accion = $fila["accion"];
+                $accion = utf8_decode( $fila["accion"]);
                 $fecha_inicio = $fila["fechaInicio"];
                 $fecha_final = $fila["fechaFinal"];
-                $responsable = $fila["responsable"];
+                $responsable = utf8_decode($fila["responsable"]);
 
                 $valores[] = "($id_plan, '$accion', '$fecha_inicio', '$fecha_final', '$responsable')";
             }
@@ -64,10 +64,10 @@ switch ($_POST['op']) {
                 $id = intval($fila["id"]);
                 $indice = $fila["indice"];
                 $avance = $fila["avance"];
-                $resultado = $fila["resultado"];
-                $estado = $fila["estado"];
+                $resultado = utf8_decode($fila["resultado"]);
+                $estado = utf8_decode($fila["estado"]);
+                $usuario = $fila["usuario"];
 
-                // Validar que ID es correcto antes de actualizar
                 if ($id <= 0) {
                     $errores[] = "ID inválido: $id";
                     continue;
@@ -77,7 +77,9 @@ switch ($_POST['op']) {
                             SET INDICE = '$indice', 
                                 RESULTADOS = '$resultado', 
                                 AVANCE = '$avance', 
-                                ESTADO = '$estado' 
+                                ESTADO = '$estado', 
+                                USUARIO = '$usuario', 
+                                FECHA_REGISTRO = GETDATE() 
                             WHERE ID = $id";
 
                 $result = mssql_query($sql);
@@ -94,5 +96,17 @@ switch ($_POST['op']) {
         } else {
             echo json_encode(["ok" => false, "msg" => "No hay datos"]);
         }
+        break;
+
+    case "G_DIAS_MES":
+        $sql = "SELECT CASE WHEN DAY(GETDATE()) > 5 THEN 'FALSE' ELSE 'TRUE' END AS DIAS_MES";
+        $resultado = GenerarArray($sql, '');
+
+        echo json_encode($resultado);
+        break;
+
+    case "G_PROCESOS":
+        $sql = GenerarArray("SELECT * FROM T_CAL_PROCESOS_INDICADORES", '');
+        echo json_encode($sql);
         break;
 }
