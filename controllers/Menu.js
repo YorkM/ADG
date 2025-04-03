@@ -216,37 +216,34 @@ const eventosRecientes =async()=>{
 
 }
 
-const notificacionesWorkFlow = async() => {
-	const rolId = parseInt($('#Rol').val());
-	const resp = await enviarPeticion({op: 'G_CONTEOESTADOS', link: '../models/WorkFlow.php'});
-	let cantS = "", cantA = "", cantC = "", cantP = "", cantF = "", cantR = "";
-	for (let i = 0; i < resp.length; i++) {
-      if (resp[i].ESTADO === 'S') cantS = resp[i].CONTEOESTADOS; 
-      if (resp[i].ESTADO === 'A') cantA = resp[i].CONTEOESTADOS; 
-      if (resp[i].ESTADO === 'C') cantC = resp[i].CONTEOESTADOS; 
-      if (resp[i].ESTADO === 'P') cantP = resp[i].CONTEOESTADOS; 
-      if (resp[i].ESTADO === 'F') cantF = resp[i].CONTEOESTADOS; 
-      if (resp[i].ESTADO === 'R') cantR = resp[i].CONTEOESTADOS; 
-	}
+// const notificacionesWorkFlow = async() => {
+// 	const rolId = parseInt($('#Rol').val());
+// 	const resp = await enviarPeticion({op: 'G_CONTEOESTADOS', link: '../models/WorkFlow.php'});
+// 	let cantS = "", cantA = "", cantC = "", cantP = "", cantF = "", cantR = "";
+// 	for (let i = 0; i < resp.length; i++) {
+//       if (resp[i].ESTADO === 'S') cantS = resp[i].CONTEOESTADOS; 
+//       if (resp[i].ESTADO === 'A') cantA = resp[i].CONTEOESTADOS; 
+//       if (resp[i].ESTADO === 'C') cantC = resp[i].CONTEOESTADOS; 
+//       if (resp[i].ESTADO === 'P') cantP = resp[i].CONTEOESTADOS; 
+//       if (resp[i].ESTADO === 'F') cantF = resp[i].CONTEOESTADOS; 
+//       if (resp[i].ESTADO === 'R') cantR = resp[i].CONTEOESTADOS; 
+// 	}
 
-	if (rolId === 1 || rolId === 73 && cantS !== "") {		
-		$("#notiworkFlow").text(cantS);
-		$("#itemNotiworkFlow").removeClass('d-none'); 
-	}
+// 	if (rolId === 1 || rolId === 73 && cantS !== "") {		
+// 		$("#notiworkFlow").text(cantS);
+// 		$("#itemNotiworkFlow").removeClass('d-none'); 
+// 	}
 
-	if (rolId === 26 || rolId === 69 && cantA !== "") { 
-		$("#notiworkFlow").text(cantA);
-		$("#itemNotiworkFlow").removeClass('d-none');
-	}
+// 	if (rolId === 26 || rolId === 69 && cantA !== "") { 
+// 		$("#notiworkFlow").text(cantA);
+// 		$("#itemNotiworkFlow").removeClass('d-none');
+// 	}
 
-	if (rolId === 4 && cantC !== "") { 
-		$("#notiworkFlow").text(cantC);
-		$("#itemNotiworkFlow").removeClass('d-none');
-	}
-     
-	// console.log({rolId});
-	// console.log({cantS, cantA, cantC, cantP, cantF, cantR});
-}
+// 	if (rolId === 4 && cantC !== "") { 
+// 		$("#notiworkFlow").text(cantC);
+// 		$("#itemNotiworkFlow").removeClass('d-none');
+// 	}     
+// }
 
 const cargarGruposModulos =async ()=>{
 

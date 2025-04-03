@@ -26,7 +26,7 @@ const getProcesos = async () => {
     } catch (error) {
         console.log(error);
     }
-}
+}  
 
 const agregarAcciones = () => {
     const contenedor = document.getElementById("contenedorAcciones");
@@ -36,14 +36,14 @@ const agregarAcciones = () => {
                 <div class="row">
                     <div class="col">
                         <div class="form-group">
-                            <label>Acción</label>
-                            <input type="text" class="form-control form-control-sm accion" placeholder="Acción">
+                            <label>Acciones concretas</label>
+                            <input type="text" class="form-control form-control-sm accion" placeholder="Acciones concretas">
                         </div>
                     </div>
                     <div class="col">
                         <div class="form-group">
                             <label>Fecha Inicio</label>
-                            <input type="date" class="form-control form-control-sm fecha-inicio" placeholder="Fecha Inicio">
+                            <input type="date" class="form-control form-control-sm validar fecha-inicio" placeholder="Fecha Inicio">
                         </div>
                     </div>
                     <div class="col">
@@ -67,6 +67,14 @@ const agregarAcciones = () => {
             </div>
         </div>`;
     contenedor.insertAdjacentHTML("beforeend", nuevoCampo);
+
+    const fechaInicio = document.querySelectorAll(".validar");
+    const fechaActual = new Date().toISOString().split("T")[0];
+    fechaInicio.forEach(item => {
+        item.min = fechaActual;
+    });
+    
+    // .min = fechaActual;   
 }
 
 const getPlanesAccion = async () => {
@@ -76,7 +84,7 @@ const getPlanesAccion = async () => {
         const { data } = await enviarPeticion({ op: "G_PLANES_ACCION", link: "../models/PlanAccion.php" });
 
         let tabla = `
-             <h2 class="text-center mt-2 mb-4" style="color: #055160; font-weight: 400;">Listado plan mensual de acciones</h2>
+             <h3 class="text-center mt-2 mb-4" style="color: #055160; font-weight: 400;">Listado plan mensual de acciones</h3>
              <table id="tablaDatos" class="table table-sm table-bordered table-hover" style="width: 100%;">
                 <thead class="table-info">
                     <tr>
@@ -124,7 +132,7 @@ const getPlanesAccion = async () => {
                 await getDetallePlanesAccion(id);
                 $('#modalPlanes').modal('show');
             });
-        }
+        } else $('#contenedorTablaPlanes').html(`<p style="text-align: center; font-size: x-large;">No hay planes disponibles</p>`);
     } catch (error) {
         console.log(error);
     }
@@ -153,31 +161,38 @@ const getDetallePlanesAccion = async (id) => {
                 tabla += `
                     <tr data-id="${item.ID}">
                         <td>
-                            <p style="display: inline; width: 50%; color: #055160;">${item.ACCIONES}</p>
+                            <p class="text-primary font-weight-bold">${item.ACCIONES}</p>
                             <div class="form-group mt-2">
-                                <label class="bg-label" for="indice">Indice</label>
-                                <input type="text" class="form-control form-control-sm w-input" value="${item.INDICE}" id="indice" placeholder="Indice">
+                                <label class="bg-label" for="indice-${item.ID}">Índice</label>
+                                <input type="text" id="indice-${item.ID}" class="form-control form-control-sm w-input" 
+                                    value="${item.INDICE}" placeholder="Índice de acción concreta">
                             </div>
                         </td>
+
                         <td>
-                            <p style="display: inline; width: 50%; color: #055160;">${item.FECHA_INICIO}</p>
+                            <p class="text-primary font-weight-bold">${item.FECHA_INICIO}</p>
                             <div class="form-group mt-2">
-                                <label class="bg-label" for="avance">Avance</label>
-                                <input type="text" class="form-control form-control-sm w-input" value="${item.AVANCE}" id="avance" placeholder="Avance">
+                                <label class="bg-label" for="avance-${item.ID}">Avance</label>
+                                <input type="text" id="avance-${item.ID}" class="form-control form-control-sm w-input" 
+                                    value="${item.AVANCE}" placeholder="Avance">
                             </div>
                         </td>
+
                         <td>
-                            <p style="display: inline; width: 50%; color: #055160;">${item.FECHA_FINAL}</p>
+                            <p class="text-primary font-weight-bold">${item.FECHA_FINAL}</p>
                             <div class="form-group mt-2">
-                                <label class="bg-label" for="resultado">Resultado</label>
-                                <input type="text" class="form-control form-control-sm w-input" value="${item.RESULTADOS}" id="resultado" placeholder="Resultado">
+                                <label class="bg-label" for="resultado-${item.ID}">Resultado</label>
+                                <input type="text" id="resultado-${item.ID}" class="form-control form-control-sm w-input" 
+                                    value="${item.RESULTADOS}" placeholder="Resultado">
                             </div>
                         </td>
+
                         <td>
-                            <p style="display: inline; width: 50%; color: #055160;">${item.RESPONSABLE}</p>
+                            <p class="text-primary font-weight-bold">${item.RESPONSABLE}</p>
                             <div class="form-group mt-2">
-                                <label class="bg-label" for="estado">Estado</label>
-                                <input type="text" class="form-control form-control-sm w-input" value="${item.ESTADO}" id="estado" placeholder="Estado">
+                                <label class="bg-label" for="estado-${item.ID}">Estado</label>
+                                <input type="text" id="estado-${item.ID}" class="form-control form-control-sm w-input" 
+                                    value="${item.ESTADO}" placeholder="Estado">
                             </div>
                         </td>
                     </tr>`;
@@ -347,7 +362,7 @@ const guardarPlanAccion = async () => {
 }
 
 // EJECUCIÓN DE FUNCIONALIDADES
-$(function () {
+$(function () {    
     getProcesos();
 
     getPlanesAccion();

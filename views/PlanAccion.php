@@ -21,29 +21,41 @@
         }
 
         #tablaDatos thead tr th {
-            font-weight: 500;
+            font-weight: 400;
             color: #055160;
-            font-size: medium;
+            font-size: larger;
         }
 
         #tablaDatosDetalle thead tr th {
-            font-weight: 500;
+            font-weight: 400;
             color: #055160;
-            font-size: medium;
+            font-size: larger;
+        }
+
+        th,
+        td {
+            padding: 0;
+            line-height: 2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .btn-guardar {
-            background-color: #055160;
-            color: white;
-            padding: 3px 0;
+            background-color: #cff4fc;
+            color: #055160;
             font-size: medium;
-            width: 30%;
-            border: none;
-            border-radius: 5px;
+            width: 15%;
+            border: 1px solid #055160;
+            border-radius: 3px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
         }
 
         .btn-guardar:hover {
-            background-color: rgb(3, 76, 90);
+            background-color: #013f4b;
             color: rgb(183, 232, 241);
         }
 
@@ -61,7 +73,7 @@
             color: white;
             padding: 3px 7px;
             font-size: 12px;
-            border-radius: 5px;
+            border-radius: 2px;
         }
 
         .btn-accion-style:hover {
@@ -82,9 +94,10 @@
         }
 
         .bg-label {
-            background-color: #cff4fc;
-            color: #055160;
+            background-color: #055160;
+            color: #cff4fc;
             width: 80%;
+            padding-left: 8px;
         }
     </style>
 </head>
@@ -97,24 +110,24 @@
     <input type="hidden" id="idPlan">
     <!-- VISTA GENERAL CREACIÓN - SEGUIMIENTO -->
     <div>
-        <div class="alert alert-info mb-2" style="font-weight: 500;"><i class="fa-solid fa-star fa-flip"></i>&nbsp;11414 - PLAN MENSUAL DE ACCIONES</div>
+        <div class="alert alert-info mb-2" style="font-weight: 500; font-size: larger;"><i class="fa-solid fa-star fa-flip"></i>&nbsp;11414 - PLAN MENSUAL DE ACCIONES</div>
         <nav class="row p-1">
             <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true"><i class="fa fa-pencil"></i>&nbsp;Creación</button>
+                <button class="nav-link active" style="color: #055160;" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true"><i class="fa fa-pencil"></i>&nbsp;Creación</button>
 
-                <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false"><i class="fa-solid fa-eye"></i>&nbsp;Seguimiento</button>
+                <button class="nav-link" id="nav-profile-tab" style="color: #055160;" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false"><i class="fa-solid fa-eye"></i>&nbsp;Seguimiento</button>
             </div>
         </nav>
         <div class="tab-content " id="nav-tabContent">
             <div class="tab-pane fade show active " id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
                 <div class="alert alert-danger d-flex justify-content-center align-items-center gap-3 mb-3 mt-2" role="alert">
                     <i class="fa-solid fa-triangle-exclamation fa-xl"></i>
-                    <div style="font-weight: 500;">
+                    <div style="font-weight: 500; font-size: medium;">
                         Vigencia en los primeros 5 días del mes !!!
                     </div>
                 </div>
                 <div style="width: 95%; margin: 0 auto;">
-                    <h2 class="text-center mt-2 mb-4" style="color: #055160; font-weight: 400;">Creación plan mensual de acciones</h2>
+                    <h3 class="text-center mt-2 mb-4" style="color: #055160; font-weight: 400;">Creación plan mensual de acciones</h3>
                     <form class="" id="formulario">
                         <div class="row shadow-sm px-3 py-4" style="background-color: whitesmoke;">
                             <div class="col-md-6">
@@ -185,7 +198,7 @@
             <div class="tab-pane fade p-2" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
                 <div class="alert alert-danger d-flex justify-content-center align-items-center gap-3 mb-3 mt-2" role="alert">
                     <i class="fa-solid fa-triangle-exclamation fa-xl"></i>
-                    <div style="font-weight: 500;">
+                    <div style="font-weight: 500; font-size: medium;">
                         Vigencia en los primeros 5 días del mes !!!
                     </div>
                 </div>
@@ -195,7 +208,7 @@
             </div>
         </div>
     </div>
-    <!-- MODAL -->
+    <!-- MODAL DETALLE ACCIONES -->
     <div class="modal fade" id="modalPlanes" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-scrollable" style="min-width: 90%;">
             <div class="modal-content">
