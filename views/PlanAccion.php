@@ -27,7 +27,7 @@
         }
 
         #tablaDatosDetalle thead tr th {
-            font-weight: 400;
+            font-weight: 700;
             color: #055160;
             font-size: larger;
         }
@@ -87,6 +87,12 @@
 
         .w-input {
             width: 80%;
+            background-color: #EEF7FF;
+        }
+
+        .w-input:focus {
+            width: 80%;
+            background-color: #EEF7FF;
         }
 
         .error {
@@ -94,10 +100,7 @@
         }
 
         .bg-label {
-            background-color: #055160;
-            color: #cff4fc;
-            width: 80%;
-            padding-left: 8px;
+            font-weight: 500;
         }
     </style>
 </head>
@@ -119,15 +122,15 @@
             </div>
         </nav>
         <div class="tab-content " id="nav-tabContent">
-            <div class="tab-pane fade show active " id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
-                <div class="alert alert-danger d-flex justify-content-center align-items-center gap-3 mb-3 mt-2" role="alert">
+            <div class="tab-pane fade show active p-2" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+                <div class="alert alert-danger d-none align-items-center gap-3 mb-3 mt-2" role="alert" id="alert1">
                     <i class="fa-solid fa-triangle-exclamation fa-xl"></i>
                     <div style="font-weight: 500; font-size: medium;">
                         Vigencia en los primeros 5 días del mes !!!
                     </div>
                 </div>
                 <div style="width: 95%; margin: 0 auto;">
-                    <h3 class="text-center mt-2 mb-4" style="color: #055160; font-weight: 400;">Creación plan mensual de acciones</h3>
+                    <!-- <h3 class="text-center mt-2 mb-4" style="color: #055160; font-weight: 400;">Creación plan mensual de acciones</h3> -->
                     <form class="" id="formulario">
                         <div class="row shadow-sm px-3 py-4" style="background-color: whitesmoke;">
                             <div class="col-md-6">
@@ -196,7 +199,7 @@
                 </div>
             </div>
             <div class="tab-pane fade p-2" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
-                <div class="alert alert-danger d-flex justify-content-center align-items-center gap-3 mb-3 mt-2" role="alert">
+                <div class="alert alert-danger d-none align-items-center gap-3 mb-3 mt-2" role="alert" id="alert2">
                     <i class="fa-solid fa-triangle-exclamation fa-xl"></i>
                     <div style="font-weight: 500; font-size: medium;">
                         Vigencia en los primeros 5 días del mes !!!

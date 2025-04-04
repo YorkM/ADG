@@ -43,7 +43,7 @@ const agregarAcciones = () => {
                     <div class="col">
                         <div class="form-group">
                             <label>Fecha Inicio</label>
-                            <input type="date" class="form-control form-control-sm validar fecha-inicio" placeholder="Fecha Inicio">
+                            <input type="date" class="form-control form-control-sm fecha-inicio" placeholder="Fecha Inicio">
                         </div>
                     </div>
                     <div class="col">
@@ -68,13 +68,16 @@ const agregarAcciones = () => {
         </div>`;
     contenedor.insertAdjacentHTML("beforeend", nuevoCampo);
 
-    const fechaInicio = document.querySelectorAll(".validar");
+    const fechaInicio = document.querySelectorAll(".fecha-inicio");
     const fechaActual = new Date().toISOString().split("T")[0];
     fechaInicio.forEach(item => {
         item.min = fechaActual;
     });
-    
-    // .min = fechaActual;   
+
+    const fechaFinal = document.querySelectorAll(".fecha-final");
+    fechaFinal.forEach(item => {
+        item.min = fechaActual;
+    });    
 }
 
 const getPlanesAccion = async () => {
@@ -84,7 +87,6 @@ const getPlanesAccion = async () => {
         const { data } = await enviarPeticion({ op: "G_PLANES_ACCION", link: "../models/PlanAccion.php" });
 
         let tabla = `
-             <h3 class="text-center mt-2 mb-4" style="color: #055160; font-weight: 400;">Listado plan mensual de acciones</h3>
              <table id="tablaDatos" class="table table-sm table-bordered table-hover" style="width: 100%;">
                 <thead class="table-info">
                     <tr>
@@ -138,6 +140,17 @@ const getPlanesAccion = async () => {
     }
 }
 
+const getDiasMes = async () => {
+    const resp = await enviarPeticion({ op: "G_DIAS_MES", link: "../models/PlanAccion.php" });
+    if (resp[0].DIAS_MES === "TRUE") {
+        $('#alert1').removeClass('d-flex').addClass('d-none');
+        $('#alert2').removeClass('d-flex').addClass('d-none');
+    } else {
+        $('#alert1').addClass('d-flex').removeClass('d-none');
+        $('#alert2').addClass('d-flex').removeClass('d-none');
+    }
+}
+
 const getDetallePlanesAccion = async (id) => {
     try {
         $('#tablaDetallePlan').html(``);
@@ -159,42 +172,41 @@ const getDetallePlanesAccion = async (id) => {
         if (data.length) {
             data.forEach(item => {
                 tabla += `
+                    <tr>
+                        <td style="background-color: #304463; color: #96C9F4;">${item.ACCIONES}</td>
+                        <td style="background-color: #304463; color: #96C9F4;">${item.FECHA_INICIO}</td>
+                        <td style="background-color: #304463; color: #96C9F4;">${item.FECHA_FINAL}</td>
+                        <td style="background-color: #304463; color: #96C9F4;">${item.RESPONSABLE}</td>
+                    </tr>                    
                     <tr data-id="${item.ID}">
-                        <td>
-                            <p class="text-primary font-weight-bold">${item.ACCIONES}</p>
-                            <div class="form-group mt-2">
+                        <td style="background-color: whitesmoke;">
+                            <div class="form-group mt-2 m-none">
                                 <label class="bg-label" for="indice-${item.ID}">Índice</label>
                                 <input type="text" id="indice-${item.ID}" class="form-control form-control-sm w-input" 
                                     value="${item.INDICE}" placeholder="Índice de acción concreta">
-                            </div>
-                        </td>
-
-                        <td>
-                            <p class="text-primary font-weight-bold">${item.FECHA_INICIO}</p>
-                            <div class="form-group mt-2">
+                            </div>                           
+                        </td>                       
+                        <td style="background-color: whitesmoke;">                           
+                            <div class="form-group mt-2 m-none">
                                 <label class="bg-label" for="avance-${item.ID}">Avance</label>
                                 <input type="text" id="avance-${item.ID}" class="form-control form-control-sm w-input" 
                                     value="${item.AVANCE}" placeholder="Avance">
-                            </div>
-                        </td>
-
-                        <td>
-                            <p class="text-primary font-weight-bold">${item.FECHA_FINAL}</p>
-                            <div class="form-group mt-2">
+                            </div>                            
+                        </td>                       
+                        <td style="background-color: whitesmoke;">                           
+                            <div class="form-group mt-2 m-none">
                                 <label class="bg-label" for="resultado-${item.ID}">Resultado</label>
                                 <input type="text" id="resultado-${item.ID}" class="form-control form-control-sm w-input" 
                                     value="${item.RESULTADOS}" placeholder="Resultado">
-                            </div>
-                        </td>
-
-                        <td>
-                            <p class="text-primary font-weight-bold">${item.RESPONSABLE}</p>
-                            <div class="form-group mt-2">
+                            </div>                           
+                        </td>                       
+                        <td style="background-color: whitesmoke;">                           
+                             <div class="form-group mt-2 m-none">
                                 <label class="bg-label" for="estado-${item.ID}">Estado</label>
                                 <input type="text" id="estado-${item.ID}" class="form-control form-control-sm w-input" 
                                     value="${item.ESTADO}" placeholder="Estado">
                             </div>
-                        </td>
+                        </td>                       
                     </tr>`;
             });
 
@@ -212,8 +224,9 @@ const getDetallePlanesAccion = async (id) => {
 const guardarAcciones = async () => {
     const usuario = $('#usuario_ses').val();
     const idPlan = $('#idPlan').val();
-    let filasValidas = true;
-    let datosCapturados = [];
+    const rows = document.querySelectorAll('tr[data-id]');
+    const datos = [];
+    let hayErrores = false;
     
     const resp = await enviarPeticion({ op: "G_DIAS_MES", link: "../models/PlanAccion.php" });
     if (resp[0].DIAS_MES === "FALSE") {
@@ -221,38 +234,36 @@ const guardarAcciones = async () => {
         return;
     }
 
-    $('#tablaDatosDetalle tbody tr').each(function () {
-        let id = $(this).data('id');
-        let inputs = $(this).find('input');
-
-        let filaData = {
-            id: id,
-            indice: inputs.eq(0).val().trim(),
-            avance: inputs.eq(1).val().trim(),
-            resultado: inputs.eq(2).val().trim(),
-            estado: inputs.eq(3).val().trim(),
-            usuario
-        };
-
-        let filaValida = Object.values(filaData).every(valor => valor !== "");
-
-        if (!filaValida) {
-            filasValidas = false;
-            $(this).addClass('error');
+    rows.forEach(row => {
+        const id = row.getAttribute('data-id');
+        const indice = document.querySelector(`#indice-${id}`)?.value.trim();
+        const avance = document.querySelector(`#avance-${id}`)?.value.trim();
+        const resultado = document.querySelector(`#resultado-${id}`)?.value.trim();
+        const estado = document.querySelector(`#estado-${id}`)?.value.trim();
+       
+        if (!indice || !avance || !resultado || !estado) {
+            hayErrores = true;
+            row.style.backgroundColor = '#F95454';
         } else {
-            $(this).removeClass('error');
+            row.style.backgroundColor = '';
+            datos.push({
+                id,
+                indice,
+                avance,
+                resultado,
+                estado,
+                usuario
+            });
         }
-
-        datosCapturados.push(filaData);
     });
 
-    if (!filasValidas) {
+    if (hayErrores) {
         Swal.fire("Guardar acciones", "Se deben diligenciar todos los campos antes de guardar", "error");
     } else {
         const result = await confirmAlert("Guardar acciones", "Se guardarán los datos ingresados en cada campo... ¿Se verificarón los datos antes de guardar?");
         if (!result.isConfirmed) return;
 
-        const { ok } = await enviarPeticion({ op: "U_DETALLE_PLAN", link: "../models/PlanAccion.php", datos: JSON.stringify(datosCapturados) });
+        const { ok } = await enviarPeticion({ op: "U_DETALLE_PLAN", link: "../models/PlanAccion.php", datos: JSON.stringify(datos) });
         if (ok) {
             setTimeout(() => {
                 Swal.fire("Guardar acciones", "Se guardaron las acciones correctamente", "success");
@@ -362,7 +373,9 @@ const guardarPlanAccion = async () => {
 }
 
 // EJECUCIÓN DE FUNCIONALIDADES
-$(function () {    
+$(function () {
+    getDiasMes();
+        
     getProcesos();
 
     getPlanesAccion();
