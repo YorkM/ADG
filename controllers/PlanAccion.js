@@ -112,12 +112,12 @@ const getPlanesAccion = async () => {
                         <td class="align-tds">${item.META}</td>
                         <td class="align-tds">${item.RANGO_INICIAL}</td>
                         <td class="align-tds">${item.RANGO_FINAL}</td>
-                        <td class="align-tds">${item.OBJETIVOS}</td>
-                        <td class="align-tds">${item.CAUSA_RAIZ}</td>
-                        <td class="align-tds">${item.INDICADOR}</td>
+                        <td class="align-tds">${item.OBJETIVOS.toUpperCase()}</td>
+                        <td class="align-tds">${item.CAUSA_RAIZ.toUpperCase()}</td>
+                        <td class="align-tds">${item.INDICADOR.toUpperCase()}</td>
                         <td class="text-center">
-                            <button class="btn-accion-style btn-accion" data-item="${item.ID}">
-                                <i class="fa-solid fa-circle-plus"></i>
+                            <button class="btn btn-primary btn-sm btn-accion" data-item="${item.ID}">
+                                <i class="fa-solid fa-circle-plus 2xl"></i>
                             </button>
                         </td>
                     </tr>`;
@@ -173,34 +173,34 @@ const getDetallePlanesAccion = async (id) => {
             data.forEach(item => {
                 tabla += `
                     <tr>
-                        <td style="background-color: #304463; color: #96C9F4;">${item.ACCIONES}</td>
-                        <td style="background-color: #304463; color: #96C9F4;">${item.FECHA_INICIO}</td>
-                        <td style="background-color: #304463; color: #96C9F4;">${item.FECHA_FINAL}</td>
-                        <td style="background-color: #304463; color: #96C9F4;">${item.RESPONSABLE}</td>
+                        <td style="background-color: #E9EFEC; font-weight: 500">${item.ACCIONES.toUpperCase()}</td>
+                        <td style="background-color: #E9EFEC; font-weight: 500">${item.FECHA_INICIO}</td>
+                        <td style="background-color: #E9EFEC; font-weight: 500">${item.FECHA_FINAL}</td>
+                        <td style="background-color: #E9EFEC; font-weight: 500">${item.RESPONSABLE.toUpperCase()}</td>
                     </tr>                    
                     <tr data-id="${item.ID}">
-                        <td style="background-color: whitesmoke;">
+                        <td>
                             <div class="form-group mt-2 m-none">
                                 <label class="bg-label" for="indice-${item.ID}">Índice</label>
                                 <input type="text" id="indice-${item.ID}" class="form-control form-control-sm w-input" 
                                     value="${item.INDICE}" placeholder="Índice de acción concreta">
                             </div>                           
                         </td>                       
-                        <td style="background-color: whitesmoke;">                           
+                        <td>                           
                             <div class="form-group mt-2 m-none">
                                 <label class="bg-label" for="avance-${item.ID}">Avance</label>
                                 <input type="text" id="avance-${item.ID}" class="form-control form-control-sm w-input" 
                                     value="${item.AVANCE}" placeholder="Avance">
                             </div>                            
                         </td>                       
-                        <td style="background-color: whitesmoke;">                           
+                        <td>                           
                             <div class="form-group mt-2 m-none">
                                 <label class="bg-label" for="resultado-${item.ID}">Resultado</label>
                                 <input type="text" id="resultado-${item.ID}" class="form-control form-control-sm w-input" 
                                     value="${item.RESULTADOS}" placeholder="Resultado">
                             </div>                           
                         </td>                       
-                        <td style="background-color: whitesmoke;">                           
+                        <td>                           
                              <div class="form-group mt-2 m-none">
                                 <label class="bg-label" for="estado-${item.ID}">Estado</label>
                                 <input type="text" id="estado-${item.ID}" class="form-control form-control-sm w-input" 
@@ -250,8 +250,8 @@ const guardarAcciones = async () => {
                 id,
                 indice,
                 avance,
-                resultado,
-                estado,
+                resultado: resultado.toUpperCase(),
+                estado: estado.toUpperCase(),
                 usuario
             });
         }
@@ -321,10 +321,10 @@ const guardarPlanAccion = async () => {
 
             if (accion && fechaInicio && fechaFinal && responsable) {
                 planArray.push({
-                    accion,
+                    accion: accion.toUpperCase(),
                     fechaInicio,
                     fechaFinal,
-                    responsable
+                    responsable: responsable.toUpperCase()
                 });
             }
         });

@@ -116,9 +116,9 @@
         <div class="alert alert-info mb-2" style="font-weight: 500; font-size: larger;"><i class="fa-solid fa-star fa-flip"></i>&nbsp;11414 - PLAN MENSUAL DE ACCIONES</div>
         <nav class="row p-1">
             <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                <button class="nav-link active" style="color: #055160;" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true"><i class="fa fa-pencil"></i>&nbsp;Creación</button>
+                <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true"><i class="fa fa-pencil"></i>&nbsp;Creación</button>
 
-                <button class="nav-link" id="nav-profile-tab" style="color: #055160;" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false"><i class="fa-solid fa-eye"></i>&nbsp;Seguimiento</button>
+                <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false"><i class="fa-solid fa-eye"></i>&nbsp;Seguimiento</button>
             </div>
         </nav>
         <div class="tab-content " id="nav-tabContent">
@@ -179,7 +179,7 @@
                                 </div>
                                 <div class="d-flex align-items-baseline gap-5 mt-2">
                                     <p style="font-weight: 600;">ACCIONES</p>
-                                    <button type="button" class="btn-accion-style" id="btnAgregarAcciones" style="height: max-content;">
+                                    <button type="button" class="btn btn-primary btn-sm" id="btnAgregarAcciones" style="height: max-content;">
                                         <i class="fa-solid fa-circle-plus"></i>
                                         Agregar
                                     </button>
@@ -191,7 +191,7 @@
 
                     </div>
                     <div class="d-flex justify-content-center mt-3 mb-2">
-                        <button class="btn-guardar" id="btnGuardarPlan">
+                        <button class="btn btn-primary btn-sm w-50" id="btnGuardarPlan">
                             <i class="fa-solid fa-floppy-disk"></i>
                             Guardar plan
                         </button>
@@ -212,12 +212,12 @@
         </div>
     </div>
     <!-- MODAL DETALLE ACCIONES -->
-    <div class="modal fade" id="modalPlanes" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="modalPlanes" data-bs-backdrop="static" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-scrollable" style="min-width: 90%;">
             <div class="modal-content">
                 <div class="modal-header">
                     <div class="modal-title">
-                        <h5 style="color: #055160; font-weight: 500;">Listado de acciones</h5>
+                        <h4 style="color: #055160; font-weight: 500;">Listado de acciones</h4>
                     </div>
                     <div class="d-flex justify-content-between align-items-center gap-3">
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -227,8 +227,8 @@
                     <div style="overflow: auto;" id="tablaDetallePlan">
 
                     </div>
-                    <div class="d-flex justify-content-center">
-                        <button class="btn-guardar" id="guardarAcciones">
+                    <div class="d-flex justify-content-end">
+                        <button class="btn btn-primary btn-sm" id="guardarAcciones">
                             <i class="fa-solid fa-floppy-disk"></i>
                             Guardar acciones
                         </button>
