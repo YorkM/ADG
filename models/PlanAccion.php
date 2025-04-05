@@ -24,11 +24,23 @@ switch ($_POST['op']) {
                 $fecha_final = $fila["fechaFinal"];
                 $responsable = utf8_decode($fila["responsable"]);
 
-                $valores[] = "($id_plan, '$accion', '$fecha_inicio', '$fecha_final', '$responsable')";
+                $valores[] = "(
+                $id_plan,
+                '$accion',
+                '$fecha_inicio',
+                '$fecha_final',
+                '$responsable'
+                )";
             }
 
             if (!empty($valores)) {
-                $sql = "INSERT INTO T_DETALLE_PROCESO_PLAN_ACCION (ID_PROCESO, ACCIONES, FECHA_INICIO, FECHA_FINAL, RESPONSABLE) VALUES " . implode(",", $valores);
+                $sql = "INSERT INTO T_DETALLE_PROCESO_PLAN_ACCION (
+                ID_PROCESO, 
+                ACCIONES, 
+                FECHA_INICIO, 
+                FECHA_FINAL, 
+                RESPONSABLE) 
+                VALUES " . implode(",", $valores);
 
                 $result = mssql_query($sql);
 
@@ -44,7 +56,9 @@ switch ($_POST['op']) {
 
         $sql = "SELECT * FROM T_PROCESO_PLAN_ACCION 
                 WHERE CAST(FECHA_REGISTRO AS DATE) 
-                BETWEEN CAST('$fecha_desde' AS DATE) AND CAST('$fecha_hasta' AS DATE)";
+                BETWEEN CAST('$fecha_desde' AS DATE)
+                AND CAST('$fecha_hasta' AS DATE)";
+                
         $resultado = GenerarArray($sql, '');
 
         if ($resultado) echo json_encode(array('ok' => true, 'data' => $resultado));

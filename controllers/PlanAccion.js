@@ -141,14 +141,21 @@ const getPlanesAccion = async () => {
                 await getDetallePlanesAccion(id);
                 $('#modalPlanes').modal('show');
             });
-        } else $('#contenedorTablaPlanes').html(`<p style="text-align: center; font-size: x-large;">No hay planes disponibles para las fechas seleccionadas</p>`);
+        } else $('#contenedorTablaPlanes').html(`
+                <p style="text-align: center; font-size: x-large;">
+                    No hay planes disponibles para las fechas seleccionadas
+                </p>`);
     } catch (error) {
         console.log(error);
     }
 }
 
 const getDiasMes = async () => {
-    const resp = await enviarPeticion({ op: "G_DIAS_MES", link: "../models/PlanAccion.php" });
+    const resp = await enviarPeticion({ 
+        op: "G_DIAS_MES", 
+        link: "../models/PlanAccion.php" 
+    });
+
     if (resp[0].DIAS_MES === "TRUE") {
         $('#alert1').removeClass('d-flex').addClass('d-none');
         $('#alert2').removeClass('d-flex').addClass('d-none');
@@ -237,7 +244,10 @@ const guardarAcciones = async () => {
 
     const resp = await enviarPeticion({ op: "G_DIAS_MES", link: "../models/PlanAccion.php" });
     if (resp[0].DIAS_MES === "FALSE") {
-        Swal.fire("Guardar acciones", "Ya pasaron los primeros 5 días del mes... Por lo tanto no es posible realizar esta acción", "warning");
+        Swal.fire(
+            "Guardar acciones", 
+            "Ya pasaron los primeros 5 días del mes... Por lo tanto no es posible realizar esta acción", 
+            "warning");
         return;
     }
 
@@ -265,16 +275,29 @@ const guardarAcciones = async () => {
     });
 
     if (hayErrores) {
-        Swal.fire("Guardar acciones", "Se deben diligenciar todos los campos antes de guardar", "error");
+        Swal.fire(
+            "Guardar acciones", 
+            "Se deben diligenciar todos los campos antes de guardar", 
+            "error");
     } else {
-        const result = await confirmAlert("Guardar acciones", "Se guardarán los datos ingresados en cada campo... ¿Se verificarón los datos antes de guardar?");
+        const result = await confirmAlert(
+            "Guardar acciones", 
+            "Se guardarán los datos ingresados en cada campo... ¿Se verificarón los datos antes de guardar?");
         if (!result.isConfirmed) return;
 
-        const { ok } = await enviarPeticion({ op: "U_DETALLE_PLAN", link: "../models/PlanAccion.php", datos: JSON.stringify(datos) });
+        const { ok } = await enviarPeticion({ 
+            op: "U_DETALLE_PLAN", 
+            link: "../models/PlanAccion.php", 
+            datos: JSON.stringify(datos) });
+
         if (ok) {
             setTimeout(() => {
-                Swal.fire("Guardar acciones", "Se guardaron las acciones correctamente", "success");
+                Swal.fire(
+                    "Guardar acciones", 
+                    "Se guardaron las acciones correctamente", 
+                    "success");
             }, 100);
+
             await getDetallePlanesAccion(idPlan);
         }
     }
@@ -293,7 +316,10 @@ const guardarPlanAccion = async () => {
 
         const resp = await enviarPeticion({ op: "G_DIAS_MES", link: "../models/PlanAccion.php" });
         if (resp[0].DIAS_MES === "FALSE") {
-            Swal.fire("Guardar plan de acción", "Ya pasaron los primeros 5 días del mes... Por lo tanto no es posible realizar esta acción", "warning");
+            Swal.fire(
+                "Guardar plan de acción", 
+                "Ya pasaron los primeros 5 días del mes... Por lo tanto no es posible realizar esta acción", 
+                "warning");
             return;
         }
 
@@ -303,7 +329,10 @@ const guardarPlanAccion = async () => {
 
         if (camposVacios) {
             setTimeout(() => {
-                Swal.fire("Guardar plan de acción", "Se deben diligenciar todos los campos de formulario", "error");
+                Swal.fire(
+                    "Guardar plan de acción", 
+                    "Se deben diligenciar todos los campos de formulario", 
+                    "error");
             }, 100);
             return;
         }
@@ -314,7 +343,10 @@ const guardarPlanAccion = async () => {
         const allResponsables = document.querySelectorAll('.responsable');
 
         if (!allAccion.length) {
-            Swal.fire("Guardar plan de acciones", "No hay acciones asociadas al plan... Se debe agregar al menos una", "error");
+            Swal.fire(
+                "Guardar plan de acciones", 
+                "No hay acciones asociadas al plan... Se debe agregar al menos una", 
+                "error");
             return;
         }
 
@@ -337,11 +369,16 @@ const guardarPlanAccion = async () => {
         });
 
         if (planArray.length === 0) {
-            Swal.fire("Guardar plan de acción", "Todos los campos de las acciones son obligatorios", "error");
+            Swal.fire(
+                "Guardar plan de acción", 
+                "Todos los campos de las acciones son obligatorios", 
+                "error");
             return;
         }
 
-        const result = await confirmAlert("Guardar plan de acción", "Se guardarán los datos del plan de acción... ¿Se verificaron correctamente los datos?");
+        const result = await confirmAlert(
+            "Guardar plan de acción", 
+            "Se guardarán los datos del plan de acción... ¿Se verificaron correctamente los datos?");
         if (!result.isConfirmed) return;
 
         const { id, ok } = await enviarPeticion(dataRequest);
@@ -366,7 +403,10 @@ const guardarPlanAccion = async () => {
 
         if (resp2.ok) {
             setTimeout(() => {
-                Swal.fire("Guardar plan de acción", "Se guardaron los datos del plan de acción correctamente", "success");
+                Swal.fire(
+                    "Guardar plan de acción", 
+                    "Se guardaron los datos del plan de acción correctamente", 
+                    "success");
             }, 100);
             $('#formulario').trigger('reset');
             $('#contenedorAcciones').html(``);
