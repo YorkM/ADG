@@ -26,7 +26,7 @@ const getProcesos = async () => {
     } catch (error) {
         console.log(error);
     }
-}  
+}
 
 const agregarAcciones = () => {
     const contenedor = document.getElementById("contenedorAcciones");
@@ -37,25 +37,25 @@ const agregarAcciones = () => {
                     <div class="col">
                         <div class="form-group">
                             <label>Acciones concretas</label>
-                            <input type="text" class="form-control form-control-sm accion" placeholder="Acciones concretas">
+                            <input type="text" class="form-control accion" placeholder="Acciones concretas">
                         </div>
                     </div>
                     <div class="col">
                         <div class="form-group">
                             <label>Fecha Inicio</label>
-                            <input type="date" class="form-control form-control-sm fecha-inicio" placeholder="Fecha Inicio">
+                            <input type="date" class="form-control fecha-inicio" placeholder="Fecha Inicio">
                         </div>
                     </div>
                     <div class="col">
                         <div class="form-group">
                             <label>Fecha Final</label>
-                            <input type="date" class="form-control form-control-sm fecha-final" placeholder="Fecha Final">
+                            <input type="date" class="form-control fecha-final" placeholder="Fecha Final">
                         </div>
                     </div>
                     <div class="col">
                         <div class="form-group">
                             <label>Responsable</label>
-                            <input type="text" class="form-control form-control-sm responsable" placeholder="Responsable">
+                            <input type="text" class="form-control responsable" placeholder="Responsable">
                         </div>
                     </div>
                 </div>
@@ -77,14 +77,21 @@ const agregarAcciones = () => {
     const fechaFinal = document.querySelectorAll(".fecha-final");
     fechaFinal.forEach(item => {
         item.min = fechaActual;
-    });    
+    });
 }
 
 const getPlanesAccion = async () => {
     try {
+        const fechaDesde = $('#desde').val();
+        const fechaHasta = $('#hasta').val();
         $('#contenedorTablaPlanes').html(``);
 
-        const { data } = await enviarPeticion({ op: "G_PLANES_ACCION", link: "../models/PlanAccion.php" });
+        const { data } = await enviarPeticion({
+            op: "G_PLANES_ACCION",
+            link: "../models/PlanAccion.php",
+            fechaDesde,
+            fechaHasta
+        });
 
         let tabla = `
              <table id="tablaDatos" class="table table-sm table-bordered table-hover" style="width: 100%;">
@@ -134,7 +141,7 @@ const getPlanesAccion = async () => {
                 await getDetallePlanesAccion(id);
                 $('#modalPlanes').modal('show');
             });
-        } else $('#contenedorTablaPlanes').html(`<p style="text-align: center; font-size: x-large;">No hay planes disponibles</p>`);
+        } else $('#contenedorTablaPlanes').html(`<p style="text-align: center; font-size: x-large;">No hay planes disponibles para las fechas seleccionadas</p>`);
     } catch (error) {
         console.log(error);
     }
@@ -182,28 +189,28 @@ const getDetallePlanesAccion = async (id) => {
                         <td>
                             <div class="form-group mt-2 m-none">
                                 <label class="bg-label" for="indice-${item.ID}">Índice</label>
-                                <input type="text" id="indice-${item.ID}" class="form-control form-control-sm w-input" 
+                                <input type="text" id="indice-${item.ID}" class="form-control w-input" 
                                     value="${item.INDICE}" placeholder="Índice de acción concreta">
                             </div>                           
                         </td>                       
                         <td>                           
                             <div class="form-group mt-2 m-none">
                                 <label class="bg-label" for="avance-${item.ID}">Avance</label>
-                                <input type="text" id="avance-${item.ID}" class="form-control form-control-sm w-input" 
+                                <input type="text" id="avance-${item.ID}" class="form-control w-input" 
                                     value="${item.AVANCE}" placeholder="Avance">
                             </div>                            
                         </td>                       
                         <td>                           
                             <div class="form-group mt-2 m-none">
                                 <label class="bg-label" for="resultado-${item.ID}">Resultado</label>
-                                <input type="text" id="resultado-${item.ID}" class="form-control form-control-sm w-input" 
+                                <input type="text" id="resultado-${item.ID}" class="form-control w-input" 
                                     value="${item.RESULTADOS}" placeholder="Resultado">
                             </div>                           
                         </td>                       
                         <td>                           
                              <div class="form-group mt-2 m-none">
                                 <label class="bg-label" for="estado-${item.ID}">Estado</label>
-                                <input type="text" id="estado-${item.ID}" class="form-control form-control-sm w-input" 
+                                <input type="text" id="estado-${item.ID}" class="form-control w-input" 
                                     value="${item.ESTADO}" placeholder="Estado">
                             </div>
                         </td>                       
@@ -227,7 +234,7 @@ const guardarAcciones = async () => {
     const rows = document.querySelectorAll('tr[data-id]');
     const datos = [];
     let hayErrores = false;
-    
+
     const resp = await enviarPeticion({ op: "G_DIAS_MES", link: "../models/PlanAccion.php" });
     if (resp[0].DIAS_MES === "FALSE") {
         Swal.fire("Guardar acciones", "Ya pasaron los primeros 5 días del mes... Por lo tanto no es posible realizar esta acción", "warning");
@@ -240,10 +247,10 @@ const guardarAcciones = async () => {
         const avance = document.querySelector(`#avance-${id}`)?.value.trim();
         const resultado = document.querySelector(`#resultado-${id}`)?.value.trim();
         const estado = document.querySelector(`#estado-${id}`)?.value.trim();
-       
+
         if (!indice || !avance || !resultado || !estado) {
             hayErrores = true;
-            row.style.backgroundColor = '#F95454';
+            // row.style.backgroundColor = '#F95454';
         } else {
             row.style.backgroundColor = '';
             datos.push({
@@ -309,7 +316,7 @@ const guardarPlanAccion = async () => {
         if (!allAccion.length) {
             Swal.fire("Guardar plan de acciones", "No hay acciones asociadas al plan... Se debe agregar al menos una", "error");
             return;
-        }        
+        }
 
         let planArray = [];
 
@@ -372,10 +379,35 @@ const guardarPlanAccion = async () => {
     }
 }
 
+const filtrar = (filtro) => {    
+    const filas = document.querySelectorAll('#tablaDatos tbody tr');
+
+    filas.forEach(fila => {
+        const celdas = fila.querySelectorAll('td');
+        const coincide = Array.from(celdas).some(td => td.textContent.toLowerCase().includes(filtro));
+
+        fila.style.display = coincide ? '' : 'none';
+    });
+}
+
 // EJECUCIÓN DE FUNCIONALIDADES
 $(function () {
+    const fechaActual = new Date().toISOString().split('T')[0];
+    document.querySelector('#desde').value = fechaActual;
+    document.querySelector('#hasta').value = fechaActual;
+
+    $('#desde, #hasta').change(function () {
+        getPlanesAccion();
+    });
+
+    $('#buscar').keyup(function () {
+        const filtro = this.value.toLowerCase();
+        filtrar(filtro);
+    });
+
+
     getDiasMes();
-        
+
     getProcesos();
 
     getPlanesAccion();

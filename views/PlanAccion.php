@@ -136,13 +136,13 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="proceso">Proceso</label>
-                                    <select name="PROCESO" id="proceso" class="form-select form-select-sm">
+                                    <select name="PROCESO" id="proceso" class="form-select">
 
                                     </select>
                                 </div>
                                 <div class="form-group mt-2">
                                     <label for="periodo">Periodo</label>
-                                    <select name="PERIODO" id="periodo" class="form-select form-select-sm">
+                                    <select name="PERIODO" id="periodo" class="form-select">
                                         <option value="">Seleccione el Periodo</option>
                                         <option value="DIARIO">DIARIO</option>
                                         <option value="MENSUAL">MENSUAL</option>
@@ -154,13 +154,13 @@
                                 </div>
                                 <div class="form-group mt-2">
                                     <label for="meta">Meta %</label>
-                                    <input type="text" class="form-control form-control-sm" name="META" id="meta" placeholder="% Meta">
+                                    <input type="text" class="form-control" name="META" id="meta" placeholder="% Meta">
                                 </div>
                                 <div class="form-group mt-2">
                                     <label for="rango">Rango %</label>
                                     <div class="d-flex gap-2">
-                                        <input type="text" class="form-control form-control-sm" name="RANGO_INICIAL" id="rangoIni" placeholder="% Rango Inicial">
-                                        <input type="text" class="form-control form-control-sm" name="RANGO_FINAL" id="rangoFin" placeholder="% Rango Final">
+                                        <input type="text" class="form-control" name="RANGO_INICIAL" id="rangoIni" placeholder="% Rango Inicial">
+                                        <input type="text" class="form-control" name="RANGO_FINAL" id="rangoFin" placeholder="% Rango Final">
                                     </div>
                                 </div>
                             </div>
@@ -191,7 +191,7 @@
 
                     </div>
                     <div class="d-flex justify-content-center mt-3 mb-2">
-                        <button class="btn btn-primary btn-sm w-50" id="btnGuardarPlan">
+                        <button class="btn btn-primary w-50" id="btnGuardarPlan">
                             <i class="fa-solid fa-floppy-disk"></i>
                             Guardar plan
                         </button>
@@ -203,6 +203,27 @@
                     <i class="fa-solid fa-triangle-exclamation fa-xl"></i>
                     <div style="font-weight: 500; font-size: medium;">
                         Vigencia en los primeros 5 días del mes !!!
+                    </div>
+                </div>
+                <div class="mb-3" style="width: 98%; margin: 0 auto;">
+                    <div class="row justify-content-center shadow-sm py-3">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="bg-label" for="desde">Desde</label>
+                                <input type="date" class="form-control" id="desde">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="bg-label" for="hasta">Hasta</label>
+                                <input type="date" class="form-control" id="hasta">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div style="height: 100%; display: flex;">
+                                <input type="text" class="form-control" style="height: max-content; align-self: flex-end;" id="buscar" placeholder="Buscar plan de acción">
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div style="overflow: auto;" id="contenedorTablaPlanes">
@@ -228,7 +249,7 @@
 
                     </div>
                     <div class="d-flex justify-content-end">
-                        <button class="btn btn-primary btn-sm" id="guardarAcciones">
+                        <button class="btn btn-primary" id="guardarAcciones">
                             <i class="fa-solid fa-floppy-disk"></i>
                             Guardar acciones
                         </button>

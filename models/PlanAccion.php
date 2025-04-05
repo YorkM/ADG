@@ -39,7 +39,12 @@ switch ($_POST['op']) {
         break;
 
     case "G_PLANES_ACCION":
-        $sql = "SELECT * FROM T_PROCESO_PLAN_ACCION";
+        $fecha_desde = $_POST['fechaDesde'];
+        $fecha_hasta = $_POST['fechaHasta'];
+
+        $sql = "SELECT * FROM T_PROCESO_PLAN_ACCION 
+                WHERE CAST(FECHA_REGISTRO AS DATE) 
+                BETWEEN CAST('$fecha_desde' AS DATE) AND CAST('$fecha_hasta' AS DATE)";
         $resultado = GenerarArray($sql, '');
 
         if ($resultado) echo json_encode(array('ok' => true, 'data' => $resultado));
