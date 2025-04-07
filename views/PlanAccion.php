@@ -85,7 +85,7 @@
             vertical-align: middle;
         }
 
-        .w-input {
+        /* .w-input {
             width: 80%;
             background-color: #EEF7FF;
         }
@@ -93,7 +93,7 @@
         .w-input:focus {
             width: 80%;
             background-color: #EEF7FF;
-        }
+        } */
 
         .error {
             background-color: #ffcccc !important;
@@ -110,6 +110,7 @@
     <input type="hidden" id="Ofi" value="<?php echo (!empty($_SESSION["ses_OfcVentas"])) ? $_SESSION["ses_OfcVentas"] : "" ?>" readonly />
     <input type="hidden" id="org_ses" value="<?php echo (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : "" ?>" readonly />
     <input type="hidden" id="usuario_ses" value="<?php echo (!empty($_SESSION['ses_Login'])) ? $_SESSION['ses_Login'] : "" ?>" readonly />
+    <input type="hidden" id="rolId" value="<?php echo (!empty($_SESSION['ses_RolesId'])) ? $_SESSION['ses_RolesId'] : "" ?>" readonly />
     <input type="hidden" id="idPlan">
     <!-- VISTA GENERAL CREACIÓN - SEGUIMIENTO -->
     <div>
@@ -180,7 +181,7 @@
                                 <div class="d-flex align-items-baseline gap-5 mt-2">
                                     <p style="font-weight: 600;">ACCIONES</p>
                                     <button type="button" class="btn btn-primary btn-sm" id="btnAgregarAcciones" style="height: max-content;">
-                                        <i class="fa-solid fa-circle-plus"></i>
+                                        <!-- <i class="fa-solid fa-circle-plus"></i> -->
                                         Agregar
                                     </button>
                                 </div>
@@ -191,8 +192,8 @@
 
                     </div>
                     <div class="d-flex justify-content-center mt-3 mb-2">
-                        <button class="btn btn-primary w-50" id="btnGuardarPlan">
-                            <i class="fa-solid fa-floppy-disk"></i>
+                        <button class="btn btn-primary w-50" id="btnGuardarPlan" style="font-size: large;">
+                            <!-- <i class="fa-solid fa-floppy-disk"></i> -->
                             Guardar plan
                         </button>
                     </div>
@@ -249,8 +250,8 @@
 
                     </div>
                     <div class="d-flex justify-content-end">
-                        <button class="btn btn-primary" id="guardarAcciones">
-                            <i class="fa-solid fa-floppy-disk"></i>
+                        <button class="btn btn-primary" id="guardarAcciones" style="font-size: large;">
+                            <!-- <i class="fa-solid fa-floppy-disk"></i> -->
                             Guardar acciones
                         </button>
                     </div>
