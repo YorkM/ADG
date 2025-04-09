@@ -865,7 +865,7 @@
                                         </div>
                                         <div class="col-4">
                                             <div class="form-group">
-                                                <label for="valorFactura3">Total factura<span class="text-danger h5">*</span></label>
+                                                <label for="valorFactura3">Total factura</label>
                                                 <input type="text" class="form-control form-control-sm" id="valorFactura3" placeholder="Total factura">
                                             </div>
                                         </div>

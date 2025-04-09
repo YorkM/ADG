@@ -117,7 +117,11 @@ switch ($_POST['op']) {
 
     case "G_PRESUPUESTO_EVENTO":
         $id_evento = intval($_POST['idEvento']);
-        $sql = "SELECT * FROM T_PRESUPUESTO_EVENTO WHERE ID_EVENTO = $id_evento";
+        $sql = "SELECT PE.ID, PE.ID_EVENTO, PE.OFICINA_VENTAS,
+                OV.DESCRIPCION, PE.EVENTO_ANTERIOR, PE.PRESUPUESTO 
+                FROM T_PRESUPUESTO_EVENTO PE
+                INNER JOIN T_OFICINAS_VENTAS OV ON PE.OFICINA_VENTAS = OV.OFICINA_VENTAS 
+                WHERE ID_EVENTO = $id_evento";
         $resultado = GenerarArray($sql, '');
         if ($resultado) echo json_encode(array('ok' => true, 'data' => $resultado));
         else echo json_encode(array('ok' => false, 'data' => []));

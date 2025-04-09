@@ -1,11 +1,5 @@
 var miModal;
 const url_img = 'https://app.pwmultiroma.com/web/banners/eventoscomerciales/';
-const oficinas = {
-  "2100": "MEDELLÍN",
-  "2200": "BOGOTÁ",
-  "2300": "CALI",
-  "2400": "BARRANQUILLA"
-}
 
 const confirmAlert = async (title, text) => {
   const result = await Swal.fire({
@@ -1470,7 +1464,7 @@ const getPresupuestoEvento = async (idEvento) => {
     resp.data.forEach(item => {
       tabla += `
         <tr>
-          <td style="vertical-align: middle;">${item.OFICINA_VENTAS} - ${oficinas[item.OFICINA_VENTAS]}</td>
+          <td style="vertical-align: middle;">${item.OFICINA_VENTAS} - ${item.DESCRIPCION}</td>
           <td style="vertical-align: middle;">${formatNum(item.EVENTO_ANTERIOR, "$")}</td>
           <td style="vertical-align: middle;">${formatNum(item.PRESUPUESTO, "$")}</td>
           <td class="text-center">
