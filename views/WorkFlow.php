@@ -394,8 +394,8 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-primary" id="btnVerTablaGastos">Ver tabla de gastos</button>
                     <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-outline-primary" id="btnVerTablaGastos">Ver tabla de gastos</button>
                     <button type="button" class="btn btn-outline-success" id="btnGuardar">Guardar solicitud</button>
                 </div>
             </div>

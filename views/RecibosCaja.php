@@ -87,18 +87,14 @@ Redireccionar();
     .iframe {
       width: 99%;
       height: 85vh;
-      border: none
+      border: none;
     }
   </style>
 </head>
 
 <body>
-  <input type="hidden" id="RolId" value="<?php if (!empty($_SESSION["ses_RolesId"])) {
-                                            echo $_SESSION["ses_RolesId"];
-                                          } ?>" readonly>
-  <input type="hidden" id="UsrLogin" value="<?php if (!empty($_SESSION["ses_Login"])) {
-                                              echo $_SESSION["ses_Login"];
-                                            } ?>" readonly>
+  <input type="hidden" id="RolId" value="<?php echo (!empty($_SESSION["ses_RolesId"])) ? $_SESSION["ses_RolesId"] : "" ?>" readonly>
+  <input type="hidden" id="UsrLogin" value="<?php echo (!empty($_SESSION["ses_Login"])) ? $_SESSION["ses_Login"] : "" ?>" readonly>
   <div class="alert alert-info"><i class="fa-solid fa-star fa-flip"></i>&nbsp;0405 - RECIBOS DE PAGO</div>
   <div class="panel with-nav-tabs panel-info">
     <div class="panel-heading">
@@ -356,7 +352,7 @@ Redireccionar();
          <h2>LIQUIDADOR</h2>
         </div>
         <div class="tab-pane fade in" id="dvBancos">
-          <table width="100%">
+          <!-- <table width="100%">
             <tr>
               <td width="50%">
                 <input type="text" placeholder="Filtro de búsqueda" class="form-control" id="filtro2" name="filtro2">
@@ -374,7 +370,24 @@ Redireccionar();
                 </select>
               </td>             
             </tr>
-          </table>
+          </table> -->
+          <div class="row">
+              <div class="col-md-6">
+                <input type="text" placeholder="Filtro de búsqueda" class="form-control" id="filtro2" name="filtro2">
+              </div>
+              <div class="col-md-2">
+                <select id="MultiDay2" class="form-control">
+                </select>
+              </div>
+              <div class="col-md-2">
+                <select id="MultiMes2" class="form-control">
+                </select>
+              </div>
+              <div class="col-md-2">
+                <select id="MultiAnio2" class="form-control">
+                </select>
+              </div>             
+          </div>
           <!-- REVISAR TABLA -->
           <div id="dvResultMulticash2" style="overflow-y:scroll; overflow-x:hidden; height:500px;">
             <hr>

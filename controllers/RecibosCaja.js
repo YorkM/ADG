@@ -88,59 +88,7 @@ $(function () {
     }
   }).focusout(function () {
     $('#filtro').val('');
-  });
-
-  // $("#filtro2").autocomplete({
-  //   source: function (request, response) {
-  //     let Array_Cash = ArrayMulticashBanco;
-  //     let valor = $.trim($("#filtro2").val());
-  //     let div_cadena = valor;
-  //     div_cadena = div_cadena.split(" ");
-
-  //     for (var x = 0; x < div_cadena.length; x++) {
-  //       expr = $.trim(div_cadena[x]);
-  //       Array_Cash = FiltrarArray(expr, Array_Cash, 2);
-  //     }
-  //     response(Array_Cash.slice(0, 40));
-  //   },
-  //   maxResults: 40,
-  //   minLength: 3,
-  //   search: function () { },
-  //   open: function (event, ui) { },
-  //   select: function (event, ui) {
-  //     var sw = 0;
-  //     $("#tdDetalleMulticash2 tr").each(function (index, element) {
-  //       var id = $(this).find('td').eq(9).html();
-  //       if (ui.item.id == id) {
-  //         sw = 1;
-  //       }
-  //     });
-  //     if (sw == 0) {
-  //       if (ui.item.estado == 0) {
-  //         $("#tdDetalleMulticash2").append('<tr onDblClick="AddMulticash(this)">'
-  //           + '<td>' + ui.item.cuenta + '</td>'
-  //           + '<td>' + ui.item.descripcion + '</td>'
-  //           + '<td>' + ui.item.numero + '</td>'
-  //           + '<td>' + formatNum(ui.item.valor, '$') + '</td>'
-  //           + '<td>' + ui.item.texto + '</td>'
-  //           + '<td>' + ui.item.fecha_cont + '</td>'
-  //           + '<td>' + ui.item.fecha_val + '</td>'
-  //           + '<td>' + ui.item.estado + '</td>'
-  //           + '<td>' + ui.item.referencia + '</td>'
-  //           + '<td>' + ui.item.id + '</td>'
-  //           + '</tr>');
-  //       } else {
-  //         swal('Oops', 'Ya el valor se aplico en el recibo :' + ui.item.id_rc, 'error');
-  //       }
-  //     } else {
-  //       swal('Oops', 'Valor ya agregado', 'error');
-  //     }
-
-
-  //   }
-  // }).focusout(function () {
-  //   $('#filtro2').val('');
-  // });
+  });  
 
   //Carga de archivo PDF
   $("#DocPDF").change(function () {
@@ -966,6 +914,7 @@ function ConsultarMulticashBanco() {
 
         $('#tdPlanillas2').on('click', '.observacion', function () {
           const {codigo_sap, referencia} = JSON.parse($(this).attr('data-id'));
+          const MultiDay = $('#MultiDay2').val();
           $('#btnCliente').click();
           const valorBuscado = codigo_sap;
           const coincidencia = ArrCli.find(item => item.codigo_sap === valorBuscado);
@@ -981,8 +930,10 @@ function ConsultarMulticashBanco() {
               const coincidencia = ArrayMulticashBanco.find(item => item.referencia.trim() === valorBuscado);
               if (coincidencia) {
                 $('#filtro')
-                  .val(coincidencia.cuenta)
+                  .val(coincidencia.item_busqueda)
                   .data('ui-autocomplete')._trigger('select', null, { item: coincidencia });
+
+                $('#MultiDay').val(MultiDay).trigger('change');
               }
             }, 3000);
           }

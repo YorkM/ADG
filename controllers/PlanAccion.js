@@ -37,25 +37,25 @@ const agregarAcciones = () => {
         <div class="row justify-content-center align-items-center mt-2 py-2" style="background-color: whitesmoke;">
             <div class="col-md-10">
                 <div class="row">
-                    <div class="col">
+                    <div class="col-md-5">
                         <div class="form-group">
                             <label>Acciones concretas</label>
-                            <input type="text" class="form-control accion" placeholder="Acciones concretas">
+                            <textarea class="form-control accion" rows="1" placeholder="Acciones concretas"></textarea> 
                         </div>
                     </div>
-                    <div class="col">
+                    <div class="col-md-2">
                         <div class="form-group">
                             <label>Fecha Inicio</label>
                             <input type="date" class="form-control fecha-inicio" placeholder="Fecha Inicio">
                         </div>
                     </div>
-                    <div class="col">
+                    <div class="col-md-2">
                         <div class="form-group">
                             <label>Fecha Final</label>
                             <input type="date" class="form-control fecha-final" placeholder="Fecha Final">
                         </div>
                     </div>
-                    <div class="col">
+                    <div class="col-md-3">
                         <div class="form-group">
                             <label>Responsable</label>
                             <input type="text" class="form-control responsable" placeholder="Responsable">
@@ -123,9 +123,9 @@ const getPlanesAccion = async () => {
                     <tr>
                         <td class="align-tds">${item.PROCESO}</td>
                         <td class="align-tds">${item.PERIODO}</td>
-                        <td class="align-tds">${item.META}</td>
-                        <td class="align-tds">${item.RANGO_INICIAL}</td>
-                        <td class="align-tds">${item.RANGO_FINAL}</td>
+                        <td class="align-tds">${item.META}%</td>
+                        <td class="align-tds">${item.RANGO_INICIAL}%</td>
+                        <td class="align-tds">${item.RANGO_FINAL}%</td>
                         <td class="align-tds">${item.OBJETIVOS.toUpperCase()}</td>
                         <td class="align-tds">${item.CAUSA_RAIZ.toUpperCase()}</td>
                         <td class="align-tds">${item.INDICADOR.toUpperCase()}</td>
@@ -158,9 +158,9 @@ const getPlanesAccion = async () => {
 }
 
 const getDiasMes = async () => {
-    const resp = await enviarPeticion({ 
-        op: "G_DIAS_MES", 
-        link: "../models/PlanAccion.php" 
+    const resp = await enviarPeticion({
+        op: "G_DIAS_MES",
+        link: "../models/PlanAccion.php"
     });
 
     if (resp[0].DIAS_MES === "TRUE") {
@@ -191,41 +191,46 @@ const getDetallePlanesAccion = async (id) => {
                 <tbody id="tableBody">`;
 
         if (data.length) {
-            data.forEach(item => {
-                tabla += `
-                    <tr>
-                        <td style="background-color: #E9EFEC; font-weight: 500">${item.ACCIONES.toUpperCase()}</td>
-                        <td style="background-color: #E9EFEC; font-weight: 500">${item.FECHA_INICIO}</td>
-                        <td style="background-color: #E9EFEC; font-weight: 500">${item.FECHA_FINAL}</td>
-                        <td style="background-color: #E9EFEC; font-weight: 500">${item.RESPONSABLE.toUpperCase()}</td>
-                    </tr>                    
-                    <tr data-id="${item.ID}">
-                        <td colspan="4">
-                            <div class="row justify-content-center">
-                                <div class="col-md-4 form-group mt-2 m-none">
-                                    <label class="bg-label" for="indice-${item.ID}">Índice</label>
-                                    <input type="text" id="indice-${item.ID}" class="form-control" 
-                                        value="${item.INDICE}" placeholder="Índice de acción concreta">
-                                </div>
-                                <div class="col-md-2 form-group mt-2 m-none">
-                                    <label class="bg-label" for="avance-${item.ID}">Avance</label>
-                                    <input type="text" id="avance-${item.ID}" class="form-control" 
-                                        value="${item.AVANCE}" placeholder="Avance">
-                                </div>                              
-                                <div class="col-md-2 form-group mt-2 m-none">
-                                    <label class="bg-label" for="resultado-${item.ID}">Resultado</label>
-                                    <input type="text" id="resultado-${item.ID}" class="form-control" 
-                                        value="${item.RESULTADOS}" placeholder="Resultado">
-                                </div>
-                                <div class="col-md-4 form-group mt-2 m-none">
-                                    <label class="bg-label" for="estado-${item.ID}">Estado</label>
-                                    <input type="text" id="estado-${item.ID}" class="form-control" 
-                                        value="${item.ESTADO}" placeholder="Estado">
-                                </div>
-                            </div>   
-                        </td>                       
-                    </tr>`;
-            });
+                data.forEach(item => {
+                    tabla += `
+                        <tr>
+                            <td style="background-color: #E9EFEC; font-weight: 500">${item.ACCIONES.toUpperCase()}</td>
+                            <td style="background-color: #E9EFEC; font-weight: 500">${item.FECHA_INICIO}</td>
+                            <td style="background-color: #E9EFEC; font-weight: 500">${item.FECHA_FINAL}</td>
+                            <td style="background-color: #E9EFEC; font-weight: 500">${item.RESPONSABLE.toUpperCase()}</td>
+                        </tr>                    
+                        <tr data-id="${item.ID}">
+                            <td colspan="4">
+                                <div class="row justify-content-center">
+                                    <div class="col-md-4 form-group mt-2 m-none">
+                                        <label class="bg-label" for="indice-${item.ID}">Índice</label>
+                                        <input type="text" id="indice-${item.ID}" class="form-control" 
+                                            value="${item.INDICE}" placeholder="Índice de acción concreta">
+                                    </div>
+                                    <div class="col-md-2 form-group mt-2 m-none">
+                                        <label class="bg-label" for="avance-${item.ID}">Avance</label>
+                                        <input type="text" id="avance-${item.ID}" class="form-control" 
+                                            value="${item.AVANCE}" placeholder="Avance">
+                                    </div>                              
+                                    <div class="col-md-2 form-group mt-2 m-none">
+                                        <label class="bg-label" for="resultado-${item.ID}">Resultado</label>
+                                        <input type="text" id="resultado-${item.ID}" class="form-control" 
+                                            value="${item.RESULTADOS}" placeholder="Resultado">
+                                    </div>
+                                    <div class="col-md-4 form-group mt-2 m-none">
+                                        <label class="bg-label" for="estado-${item.ID}">Estado</label>
+                                        <select class="form-select" id="estado-${item.ID}">
+                                            <option value="">Seleccionar Estado</option>
+                                            <option value="NO INICIADO" ${item.ESTADO === 'NO INICIADO' ? 'selected' : ''}>NO INICIADO</option>
+                                            <option value="EN PROCESO" ${item.ESTADO === 'EN PROCESO' ? 'selected' : ''}>EN PROCESO</option>
+                                            <option value="COMPLETADO" ${item.ESTADO === 'COMPLETADO' ? 'selected' : ''}>COMPLETADO</option>
+                                            <option value="INCOMPLETO" ${item.ESTADO === 'INCOMPLETO' ? 'selected' : ''}>INCOMPLETO</option>
+                                        </select>                                    
+                                    </div>
+                                </div>   
+                            </td>                       
+                        </tr>`;
+                });
 
             tabla += `
                 </tbody>
@@ -269,25 +274,26 @@ const guardarAcciones = async () => {
 
     if (hayErrores) {
         Swal.fire(
-            "Guardar acciones", 
-            "Se deben diligenciar todos los campos antes de guardar", 
+            "Guardar acciones",
+            "Se deben diligenciar todos los campos antes de guardar",
             "error");
     } else {
         const result = await confirmAlert(
-            "Guardar acciones", 
+            "Guardar acciones",
             "Se guardarán los datos ingresados en cada campo... ¿Se verificarón los datos antes de guardar?");
         if (!result.isConfirmed) return;
 
-        const { ok } = await enviarPeticion({ 
-            op: "U_DETALLE_PLAN", 
-            link: "../models/PlanAccion.php", 
-            datos: JSON.stringify(datos) });
+        const { ok } = await enviarPeticion({
+            op: "U_DETALLE_PLAN",
+            link: "../models/PlanAccion.php",
+            datos: JSON.stringify(datos)
+        });
 
         if (ok) {
             setTimeout(() => {
                 Swal.fire(
-                    "Guardar acciones", 
-                    "Se guardaron las acciones correctamente", 
+                    "Guardar acciones",
+                    "Se guardaron las acciones correctamente",
                     "success");
             }, 100);
 
@@ -301,20 +307,25 @@ const guardarPlanAccion = async () => {
         const usuario = $('#usuario_ses').val();
         const organizacion = $('#org_ses').val();
         const data = $("#formulario").serializeArrayAll();
+        console.log(data);
         const dataRequest = formatearArrayRequest(data);
+        dataRequest.META = data[2].value.replace(/\%/g, "");
+        dataRequest.RANGO_INICIAL = data[3].value.replace(/\%/g, "");
+        dataRequest.RANGO_FINAL = data[4].value.replace(/\%/g, "");
         dataRequest.USUARIO = usuario;
         dataRequest.SOCIEDAD = organizacion;
         dataRequest.op = "I_PLAN_ACCION";
         dataRequest.link = "../models/PlanAccion.php";
+        console.log(dataRequest);
 
-        const resp = await enviarPeticion({ op: "G_DIAS_MES", link: "../models/PlanAccion.php" });
-        if (resp[0].DIAS_MES === "FALSE") {
-            Swal.fire(
-                "Guardar plan de acción", 
-                "Ya pasaron los primeros 5 días del mes... Por lo tanto no es posible realizar esta acción", 
-                "warning");
-            return;
-        }
+        // const resp = await enviarPeticion({ op: "G_DIAS_MES", link: "../models/PlanAccion.php" });
+        // if (resp[0].DIAS_MES === "FALSE") {
+        //     Swal.fire(
+        //         "Guardar plan de acción", 
+        //         "Ya pasaron los primeros 5 días del mes... Por lo tanto no es posible realizar esta acción", 
+        //         "warning");
+        //     return;
+        // }
 
         const camposVacios = data.some(obj =>
             Object.values(obj).some(valor => valor === "" || valor === null || valor === undefined)
@@ -323,8 +334,8 @@ const guardarPlanAccion = async () => {
         if (camposVacios) {
             setTimeout(() => {
                 Swal.fire(
-                    "Guardar plan de acción", 
-                    "Se deben diligenciar todos los campos del formulario", 
+                    "Guardar plan de acción",
+                    "Se deben diligenciar todos los campos del formulario",
                     "error");
             }, 100);
             return;
@@ -337,8 +348,8 @@ const guardarPlanAccion = async () => {
 
         if (!allAccion.length) {
             Swal.fire(
-                "Guardar plan de acción", 
-                "No hay acciones asociadas al plan... Se debe agregar al menos una", 
+                "Guardar plan de acción",
+                "No hay acciones asociadas al plan... Se debe agregar al menos una",
                 "error");
             return;
         }
@@ -363,14 +374,14 @@ const guardarPlanAccion = async () => {
 
         if (planArray.length === 0) {
             Swal.fire(
-                "Guardar plan de acción", 
-                "Todos los campos de las acciones son obligatorios", 
+                "Guardar plan de acción",
+                "Todos los campos de las acciones son obligatorios",
                 "error");
             return;
         }
 
         const result = await confirmAlert(
-            "Guardar plan de acción", 
+            "Guardar plan de acción",
             "Se guardarán los datos del plan de acción... ¿Se verificaron correctamente los datos?");
         if (!result.isConfirmed) return;
 
@@ -397,8 +408,8 @@ const guardarPlanAccion = async () => {
         if (resp2.ok) {
             setTimeout(() => {
                 Swal.fire(
-                    "Guardar plan de acción", 
-                    "Se guardaron los datos del plan de acción correctamente", 
+                    "Guardar plan de acción",
+                    "Se guardaron los datos del plan de acción correctamente",
                     "success");
             }, 100);
             $('#formulario').trigger('reset');
@@ -415,12 +426,12 @@ const guardarPlanAccion = async () => {
 const desHabilitarFormulario = async () => {
     const resp = await enviarPeticion({ op: "G_DIAS_MES", link: "../models/PlanAccion.php" });
     if (resp[0].DIAS_MES === "FALSE") {
-       $('#proceso, #periodo, #meta, #rangoIni, #rangoFin, #objetivos, #causaRaiz, #indicador, #btnAgregarAcciones, #btnGuardarPlan')
-       .attr('disabled', true);
+        $('#proceso, #periodo, #meta, #rangoIni, #rangoFin, #objetivos, #causaRaiz, #indicador, #btnAgregarAcciones, #btnGuardarPlan')
+            .attr('disabled', true);
     }
 }
 
-const filtrar = (filtro) => {    
+const filtrar = (filtro) => {
     const filas = document.querySelectorAll('#tablaDatos tbody tr');
 
     filas.forEach(fila => {
@@ -433,7 +444,7 @@ const filtrar = (filtro) => {
 
 // EJECUCIÓN DE FUNCIONALIDADES
 $(function () {
-    desHabilitarFormulario();
+    // desHabilitarFormulario();
 
     const fechaActual = new Date().toISOString().split('T')[0];
     document.querySelector('#desde').value = fechaActual;
@@ -456,6 +467,7 @@ $(function () {
 
     $("#meta, #rangoIni, #rangoFin").on("input", function () {
         this.value = this.value.replace(/\D/g, "");
+        this.value = `${this.value}%`;
     });
 
     $('#btnAgregarAcciones').click(function () {

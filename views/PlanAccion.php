@@ -240,7 +240,7 @@
                 <div class="modal-header">
                     <div class="modal-title">
                         <h4 style="color: #055160; font-weight: 500;">Listado de acciones</h4>
-                    </div>
+                    </div> 
                     <div class="d-flex justify-content-between align-items-center gap-3">
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
@@ -258,7 +258,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div>      
     <script type="text/javascript" src="../lib/js/jquery-2.1.1.min.js"></script>
     <script type="text/javascript" src="../lib/js/jquery-ui-1.9.2.custom.js"></script>
     <script type="text/javascript" src="../resources/bootstrap/bootstrap-5.0.2-dist/js/bootstrap.js"></script>
