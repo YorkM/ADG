@@ -782,6 +782,7 @@ const verConsolidadoEvento = async (id) => {
       hot2.render();
     }, 500);
     dissminSwal();
+    return consolidado;
   } catch (error) {
     console.log(error);
   }
@@ -916,7 +917,6 @@ const verDetalleEvento = async () => {
       autoWrapRow: true,
       licenseKey: "non-commercial-and-evaluation",
     });
-    console.log(hot1);
     $("#handsontable1").addClass("full-screen");
     dissminSwal();
   } catch (error) {
@@ -936,7 +936,7 @@ const verConsolidados2 = async () => {
           ...evento, 
           transito: match ? match.TRANSITO : "0"
       };
-    });  
+    });   
 
     const objResultado = resultado.map(item => {
       let diferencia = 0;
@@ -1818,9 +1818,12 @@ const buscarEventos = async () => {
     $('#tablaEventos').on('click', '.btn-seguimiento', async function () {
       const id = $(this).attr('data-id');
       $('#idEvento').val(id);
-      if (id === "200") {
-        await verConsolidadoEvento(id);
+      const resp = await verConsolidadoEvento(id);
+      console.log(resp);      
+      if (resp.ok) {
         $('#modalSeguimiento').modal('show');
+      } else {
+        Swal.fire("Seguimiento evento", "Ocurrió un error al obtener la información del evento... Posiblemente el evento no cuenta con información disponible", "error");
       }
     });
 

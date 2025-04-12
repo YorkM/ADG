@@ -35,13 +35,13 @@
         }
 
         #tablaSolicitudes tbody tr td {
-            font-size: .70rem !important;
+            font-size: 12px !important;
             vertical-align: middle;
         }
 
         table thead tr th {
-            font-size: .95rem !important;
-            font-weight: 500;
+            font-size: 16px !important;
+            font-weight: 400;
             vertical-align: middle;
             color: #055160;
         }
@@ -120,7 +120,7 @@
             padding: 5px 0;
             color: black;
             font-weight: 700;
-            font-size: 9px;
+            font-size: 10px;
         }
 
         .btn-gestionar {
@@ -152,23 +152,6 @@
             padding: 10px;
             margin: 10px auto;
         }
-
-        #btnModalAddSolic,
-        #btnRefrescar {
-            width: 120px;
-            padding: 5px 0;
-            background-color: #055160;
-            border: 1px solid #055160;
-            color: white;
-            font-size: 14px;
-            border-radius: 3px;
-            box-sizing: border-box;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            height: 28px;
-        } 
     </style>
 </head>
 
@@ -181,41 +164,39 @@
         <div class="alert alert-info mb-2" style="font-weight: 500;"><i class="fa-solid fa-star fa-flip"></i>&nbsp;0417 - WORKFLOW</div>
         <div class="row shadow-sm py-2 w-90 mx-auto mb-3 mt-2" id=barraFiltros>
             <div class="col-3">
-                <select class="form-select form-select-sm" id="filtroOficina">
+                <select class="form-select" id="filtroOficina">
 
                 </select>
             </div>
             <div class="col-2">
-                <select class="form-select form-select-sm" id="filtroDepartamentos">
+                <select class="form-select" id="filtroDepartamentos">
 
                 </select>
             </div>
             <div class="col-2">
                 <div class="input-group">
-                    <span style="background-color: #cff4fc; color: #055160; font-weight: bold; display: flex; align-items: center; gap: 8px; padding: 0 5px;">
+                    <span style="border: 1px solid #ccc; border-radius: 3px 0 0 3px; display: flex; align-items: center; gap: 8px; padding: 0 5px;">
                         <i class="fa-solid fa-calendar-days"></i>Desde
                     </span>
-                    <input type="text" id="fechaDesde" class="form-control form-control-sm" readonly>
+                    <input type="text" id="fechaDesde" class="form-control" readonly>
                 </div>
             </div>
             <div class="col-2">
                 <div class="input-group">
-                    <span style="background-color: #cff4fc; color: #055160; font-weight: bold; display: flex; align-items: center; gap: 8px; padding: 0 5px;">
+                    <span style="border: 1px solid #ccc; border-radius: 3px 0 0 3px; display: flex; align-items: center; gap: 8px; padding: 0 5px;">
                         <i class="fa-solid fa-calendar-days"></i>Hasta
                     </span>
-                    <input type="text" id="fechaHasta" class="form-control form-control-sm" readonly>
+                    <input type="text" id="fechaHasta" class="form-control" readonly>
                 </div>
             </div>
             <div class="col-3">        
-                <div class="d-flex justify-content-end gap-3">
-                    <button id="btnModalAddSolic">
-                        Agregar
-                        <i class="fa-solid fa-circle-plus"></i>
-                    </button>
-                    <button id="btnRefrescar">
-                        Refrescar
-                        <i class="fa-solid fa-rotate"></i>
-                    </button>
+                <div class="row">
+                    <div class="col-md-6">
+                        <button class="btn btn-primary w-100" id="btnModalAddSolic">Agregar</button>
+                    </div>
+                    <div class="col-md-6">
+                        <button class="btn btn-secondary w-100" id="btnRefrescar">Refrescar</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -227,7 +208,7 @@
 
             </tbody>
         </table>
-    </div>
+    </div> 
     <!-- MODAL CREAR SOLICITUD -->
     <div class="modal fade" id="modalAgregarSolicitud" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" style="min-width: 70%;">

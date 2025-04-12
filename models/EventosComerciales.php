@@ -61,7 +61,7 @@ switch ($_POST['op']) {
         $sql = "SELECT * FROM V_EVENTOS_SEGUIMIENTO_CONSOLIDADO WHERE ID_EVENTO = $id_evento";
         $resultado = GenerarArray($sql, '');
         if ($resultado) echo json_encode(array('ok' => true, 'data' => $resultado));
-        else echo json_encode(array('ok' => false, 'msg' => "Error al obtener los datos"));
+        else echo json_encode(array('ok' => false, 'data' => []));
         break;
 
     case "G_ZONA_EVENTO":

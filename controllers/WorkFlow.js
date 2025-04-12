@@ -102,7 +102,7 @@ function formatearFecha(fechaTexto) {
 const getDptos = async () => {
   try {
     const resp = await enviarPeticion({ op: "G_DTPOS", link: "../models/WorkFlow.php" });
-    let elements = `<option value="">Seleccione un Dpto</option>`;
+    let elements = `<option disabled selected>Seleccione un Dpto</option>`;
     if (resp.length) {
       resp.forEach(elem => {
         elements += `<option value="${elem.DESCRIPCION.trim()}">${elem.DESCRIPCION}</option>`;
@@ -474,8 +474,8 @@ const validarSeccionesXEstados = async (resp = [], rol) => {
     $('#btnVerFacturaDiv').removeClass('d-none');
     $("#numeroDocumento2").val(resp[0].NUMERO_DOCUMENTO);
     $("#razonSocial2").val(resp[0].NIT);
-    $("#valorFactura2").val(resp[0].VALOR_DOCUMENTO);
-    $("#subTotalFactura2").val(resp[0].SUBTOTAL_DOCUMENTO);
+    $("#valorFactura2").val(formatNum(resp[0].VALOR_DOCUMENTO, "$"));
+    $("#subTotalFactura2").val(formatNum(resp[0].SUBTOTAL_DOCUMENTO, "$"));
     $("#iva2").val(resp[0].IVA_DOCUMENTO);
     $("#sectionBtnGF").removeClass("d-flex").addClass("d-none");
     $("#sectionAprobarFactura").addClass('d-none');
@@ -786,8 +786,8 @@ const validarSeccionesXEstados = async (resp = [], rol) => {
     $("#fechaFactura2").val(formatearFecha(resp[0].FECHA_DOCUMENTO));
     $("#numeroDocumento2").val(resp[0].NUMERO_DOCUMENTO);
     $("#razonSocial2").val(resp[0].NIT);
-    $("#valorFactura2").val(resp[0].VALOR_DOCUMENTO);
-    $("#subTotalFactura2").val(resp[0].SUBTOTAL_DOCUMENTO);
+    $("#valorFactura2").val(formatNum(resp[0].VALOR_DOCUMENTO, "$"));
+    $("#subTotalFactura2").val(formatNum(resp[0].SUBTOTAL_DOCUMENTO, "$"));
     $("#iva2").val(resp[0].IVA_DOCUMENTO);
     $("#sectionBtnGF").removeClass("d-flex").addClass("d-none");
     $("#sectionAprobarFactura").removeClass('d-none');
@@ -962,8 +962,8 @@ const validarSeccionesXEstados = async (resp = [], rol) => {
     $('#btnVerFacturaDiv').addClass('d-flex').show();
     $("#numeroDocumento2").val(resp[0].NUMERO_DOCUMENTO);
     $("#razonSocial2").val(resp[0].NIT);
-    $("#valorFactura2").val(resp[0].VALOR_DOCUMENTO);
-    $("#subTotalFactura2").val(resp[0].SUBTOTAL_DOCUMENTO);
+    $("#valorFactura2").val(formatNum(resp[0].VALOR_DOCUMENTO, "$"));
+    $("#subTotalFactura2").val(formatNum(resp[0].SUBTOTAL_DOCUMENTO, "$"));
     $("#iva2").val(resp[0].IVA_DOCUMENTO);
     $("#sectionBtnGF").removeClass("d-flex").addClass("d-none");
     $("#sectionAprobarFactura").removeClass('d-none');
@@ -1027,8 +1027,8 @@ const validarSeccionesXEstados = async (resp = [], rol) => {
     $("#numeroDocumento2").val(resp[0].NUMERO_DOCUMENTO);
     $("#numeroPreliminar").val(resp[0].NUMERO_PRELIMINAR);
     $("#razonSocial2").val(resp[0].NIT);
-    $("#valorFactura2").val(resp[0].VALOR_DOCUMENTO);
-    $("#subTotalFactura2").val(resp[0].SUBTOTAL_DOCUMENTO);
+    $("#valorFactura2").val(formatNum(resp[0].VALOR_DOCUMENTO, "$"));
+    $("#subTotalFactura2").val(formatNum(resp[0].SUBTOTAL_DOCUMENTO, "$"));
     $("#iva2").val(resp[0].IVA_DOCUMENTO);
     $("#numeroPreliminar, #fechaFactura2, #numeroDocumento2, #razonSocial2, #valorFactura2, #iva2, #subTotalFactura2, #comentarioFactura").attr("disabled", true);
     $("#sectionAprobarFactura").removeClass('d-none');
@@ -1616,8 +1616,8 @@ const getSolicitudes = async () => {
         concepto: item.CONCEPTO || 'N/A',
         tipo: tipoGasto[item.TIPO_GASTO] || 'Desconocido',
         usuario: `<div>
-                      <p style="margin: 0; font-size: 0.7rem">${item.NOMBRE_USUARIO}</p>
-                      <small style="font-size: 0.5rem; margin: 0;">${item.USUARIO_SOLICITA || 'N/A'}</small>
+                      <p style="margin: 0; font-size: 12px">${item.NOMBRE_USUARIO}</p>
+                      <small style="font-size: 10px; margin: 0;">${item.USUARIO_SOLICITA || 'N/A'}</small>
                   </div>`,
         estado: `<div data-item="${item.ID}" class="btn-noti position-relative" style="width: 80px;">
                     <span class="badge estados" style="background-color:${estados[item.ESTADO].color}">${estados[item.ESTADO].texto}</span>
@@ -2391,7 +2391,7 @@ const restaurarSolicitud = async () => {
 }
 
 // EJECUCIÓN DE FUNCIONALIDADES
-$(function() {
+$(function() { 
   $('#btnVerFacturaDiv').removeClass('d-flex').hide();
   $('#verAdjPagoDiv').removeClass('d-flex').hide();
 
