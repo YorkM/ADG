@@ -192,15 +192,15 @@ Redireccionar();
             </tr>
             <tr>
               <td>Referencia</td>
-              <td><textarea maxlength="25" class="notas" id="Referencia" onKeyPress="return vletras_numeros(event)" placeholder="Solo letras y numeros, maximo 25 caracteres"></textarea></td>
+              <td><textarea maxlength="25" class="notas form-control" id="Referencia" onKeyPress="return vletras_numeros(event)" placeholder="Solo letras y numeros, maximo 25 caracteres"></textarea></td>
             </tr>
             <tr>
               <td>Texto Cabecera</td>
-              <td><textarea maxlength="25" class="notas" id="TextoCabecera" onKeyPress="return vletras_numeros(event)" placeholder="Solo letras y numeros, maximo 25 caracteres"></textarea></td>
+              <td><textarea maxlength="25" class="notas form-control" id="TextoCabecera" onKeyPress="return vletras_numeros(event)" placeholder="Solo letras y numeros, maximo 25 caracteres"></textarea></td>
             </tr>
             <tr>
               <td>Texto Compensación</td>
-              <td><textarea maxlength="25" class="notas" id="TextoCompensacion" onKeyPress="return vletras_numeros(event)" placeholder="Solo letras y numeros, maximo 25 caracteres"></textarea></td>
+              <td><textarea maxlength="25" class="notas form-control" id="TextoCompensacion" onKeyPress="return vletras_numeros(event)" placeholder="Solo letras y numeros, maximo 25 caracteres"></textarea></td>
             </tr>
           </table>
         </div>
@@ -402,6 +402,7 @@ Redireccionar();
                   <th>FECHA DOC.</th>
                   <th>REFERENCIA</th>
                   <th>SAP</th>
+                  <th>CLIENTE</th>
                   <th>OFICINA</th>
                   <th>ZONA</th>
                   <th>NOMBRE</th>
@@ -432,7 +433,7 @@ Redireccionar();
         </td>
       </tr>
     </table>
-  </div>  
+  </div>    
   <!---INICIO CONDICIONES DE DESCUENTOS DEL CLIENTE SELECCIONADO-->
   <div id="dvCondiciones" class="modal fade bd-example-modal-lg" role="dialog">
     <div class="modal-dialog modal-lg">
@@ -464,7 +465,7 @@ Redireccionar();
         </div>
       </div>
     </div>
-  </div>
+  </div> 
   <!---FIN CONDICIONES DE DESCUENTOS DEL CLIENTE SELECCIONADO-->
   <div id="dvSclAbono" class="modal fade bd-example-modal-lg" role="dialog">
     <div class="modal-dialog modal-lg">
@@ -807,6 +808,27 @@ Redireccionar();
           <button type="button" class="btn btn-danger" onClick="EliminarPDF()" id="btnEliminarPDF">Eliminar</button>
           <button type="button" class="btn btn-info" data-dismiss="modal">Cerrar</button>
         </div>
+      </div>
+    </div>
+  </div>
+  <!-------Modal LIQUIDADOR---->
+  <div id="modalLiquidador" class="modal fade bd-example-modal-lg" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" style="width: 40%;">
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title" id=""></h4>
+        </div>
+        <div class="modal-body">
+          <div style="width: 70%; margin: 0 auto;">
+            <h4>¿Cuál es la fecha de pago?</h4>
+            <input type="date" class="form-control">
+          </div>
+          <div style="display: flex; justify-content: flex-end; width: 70%; margin: 10px auto;">
+            <button class="btn btn-primary">Agregar</button>
+          </div>
+        </div>        
       </div>
     </div>
   </div>

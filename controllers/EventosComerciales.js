@@ -695,7 +695,7 @@ const verConsolidadoEvento = async (id) => {
       }
     });
 
-    const colHeadersArr = ['Oficina', 'Código Cliente', 'Nit Cliente', 'Nombre Cliente', 'Razón Cliente', 'Condición Pago', 'Pedido ADG', 'Nombre Vendedor', 'Valor Total', 'Valor Facturado', '% Cumplimiento'];
+    const colHeadersArr = ['Oficina', 'Código Cliente', 'Nit Cliente', 'Nombre Cliente', 'Razón Cliente', 'Condición Pago', 'Pedido ADG', 'Nombre Vendedor', 'Valor Total', 'Valor Facturado', '% Cumplimiento', 'Acciones'];
 
     const handsontable2 = document.getElementById("handsontable2");
     const colWidthsArr = [
@@ -709,7 +709,8 @@ const verConsolidadoEvento = async (id) => {
       220,  // 'Nombre vendedor'
       120,  // 'Valor total'
       130,  // 'Valor facturado'
-      125   // '% cumplimiento'
+      125,  // '% cumplimiento'
+      75   // 'Acciones'
     ];
 
     const columnsArr = [
@@ -730,6 +731,8 @@ const verConsolidadoEvento = async (id) => {
             <i class="fa-solid fa-eye text-primary"></i>
           </button>`;
           td.style.textAlign = "center";
+          td.style.padding = "0";
+          td.style.verticalAlign = "middle";
         }
       }
     ];
@@ -740,6 +743,8 @@ const verConsolidadoEvento = async (id) => {
       colWidths: colWidthsArr,
       colHeaders: colHeadersArr,
       columns: columnsArr,
+      rowHeights: 38,
+      autoRowSize: false,
       cells: function (row, col, prop) {
         let cellProperties = {};
         let cellValue = parseFloat(this.instance.getDataAtCell(row, col)) || 0;
@@ -756,17 +761,17 @@ const verConsolidadoEvento = async (id) => {
         return cellProperties;
       },
       afterChange: async function (changes, source) { },
-      dropdownMenu: true,
       hiddenColumns: {
         indicators: true,
       },
       contextMenu: true,
       multiColumnSorting: true,
+      plugins: ['Filters', 'DropdownMenu'],
       filters: true,
+      dropdownMenu: true,
+      columnSorting: true,
       rowHeaders: true,
       manualRowMove: true,
-      autoWrapCol: true,
-      autoWrapRow: true,
       licenseKey: "non-commercial-and-evaluation",
       afterOnCellMouseDown: async function (event, coords, TD) {
         if (TD.querySelector('.btn-eye')) {
@@ -779,7 +784,10 @@ const verConsolidadoEvento = async (id) => {
     });
     $("#handsontable2").addClass("full-screen");
     setTimeout(() => {
+      const filtroPlugin = hot2.getPlugin('filters');
+      filtroPlugin.enablePlugin();
       hot2.render();
+      hot2.refreshDimensions();
     }, 500);
     dissminSwal();
     return consolidado;
@@ -1099,8 +1107,8 @@ const verZonaEvento = async () => {
       colWidths: colWidthsArr,
       colHeaders: colHeadersArr,
       columns: columnsArr,
-      stretchH: 'all',
-      width: '100%',
+      rowHeights: 35,
+      autoRowSize: false,    
       cells: function (row, col, prop) {
         let cellProperties = {};
         let cellValue = parseFloat(this.instance.getDataAtCell(row, col)) || 0;
@@ -1126,8 +1134,10 @@ const verZonaEvento = async () => {
       filters: true,
       rowHeaders: true,
       manualRowMove: true,
-      autoWrapCol: true,
-      autoWrapRow: true,
+      // autoWrapCol: true,
+      // autoWrapRow: true,
+      stretchH: 'all',
+      width: '100%',
       licenseKey: "non-commercial-and-evaluation",
     });
     $("#handsontable3").addClass("full-screen");

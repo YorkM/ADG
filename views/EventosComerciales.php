@@ -556,7 +556,7 @@
           <div class="d-flex align-items-center gap-3">
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-        </div>
+        </div> 
         <div class="modal-body">
           <div class="alert alert-danger d-flex justify-content-center align-items-center gap-3 mb-3 mt-2" role="alert">
             <i class="fa-solid fa-triangle-exclamation fa-xl"></i>

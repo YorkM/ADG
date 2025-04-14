@@ -898,6 +898,10 @@ function ConsultarMulticashBanco() {
               <td>${item.fecha_cont}</td>
               <td>${item.referencia}</td>
               <td>${item.codigo_sap}</td>
+              <td>
+                <p>${item.nombres}</p>
+                <small class="text-primary">${item.razon_comercial}</small>
+              </td>
               <td>${item.bodega_desc.split(' ')[1]}</td>
               <td>${item.zona_ventas}</td>
               <td>${item.zona_descripcion}</td>
@@ -1515,14 +1519,14 @@ function Documentos() {
     dataType: "json",
     async: true,
     success: function (data) {
-      if (data != '' && data != null) {
-        var detalle = '';
-        var total = 0;
-        var mora = '';
-        var ver = '';
-        var cont = 0;
-        var vlrMora = 0;
-        for (var i = 0; i <= data.length - 1; i++) {
+      if (data !== '' && data !== null) {
+        let detalle = '';
+        let total = 0;
+        let mora = '';
+        let ver = '';
+        let cont = 0;
+        let vlrMora = 0;
+        for (let i = 0; i <= data.length - 1; i++) {
           if (parseInt(data[i].DEMORA_GRACIA) > 0) {
             mora = 'style="background-color:#F77577"';
             vlrMora = vlrMora + parseFloat(data[i].IMPORTE);
@@ -1535,104 +1539,78 @@ function Documentos() {
             ver = '';
           }
 
-          var cumple_img = '';
-          var cumple_pres = 'N';
+          let cumple_img = '';
+          let cumple_pres = 'N';
           if (parseFloat(data[i].CUMP_PRESUPUESTO) > 0) {
-            cumple_img = '<span class="glyphicon glyphicon-flag" aria-hidden="true" style="color:green"></span>';
+            cumple_img = `<span class="glyphicon glyphicon-flag" aria-hidden="true" style="color:green"></span>`;
             cumple_pres = 'S';
           }
-          detalle += '<tr >'
-            +
-            /*0*/
-            '<td>' + data[i].NUMERO_DOCUMENTO + '</td>'
-            +
-            /*1*/
-            '<td>' + data[i].REFERENCIA + '</td>'
-            +
-            /*2*/
-            '<td>' + data[i].CLASE_DOCUMENTO + '</td>'
-            +
-            /*3*/
-            '<td>' + ver + '</td>'
-            +
-            /*4*/
-            '<td>' + data[i].FECHA_BASE + '</td>'
-            +
-            /*5*/
-            '<td>' + data[i].FECHA_PAGO_GRACIA + '</td>'
-            +
-            /*6*/
-            '<td>' + data[i].CONDICION_PAGO + '</td>'
-            +
-            /*7*/
-            '<td ' + mora + '>' + data[i].DEMORA_GRACIA + '</td>'
-            +
-            /*8*/
-            '<td>' + data[i].DIAS + '</td>'
-            +
-            /*9*/
-            '<td>' + formatNum(data[i].IMPORTE, '$') + '</td>'
-            +
-            /*10*/
-            '<td>' + data[i].TEXTO + '</td>'
-            +
-            /*11*/
-            '<td>'
-            + '<input type="text" onKeyPress="return vnumeros(event)" onDblClick="AsignarValor(this);" size="15" class="form-control ClassNumero" onBlur="AddFactura(this,this.value,\'' + cumple_pres + '\')" value="$0">'
-            + '</td>'
-            +
-            /*12*/
-            '<td>'
-            + '<input type="text" onKeyPress="return vnumeros(event)"  size="15" class="form-control ClassNumero" onBlur="AddFactura(this,this.value,\'' + cumple_pres + '\')" disabled value="$0">'
-            + '</td>'
-            +
-            /*13*/
-            '<td>' + formatNum(parseFloat(data[i].BASE_PP), '$') + '</td>'
-            +
-            /*14*/
-            '<td style="display:none;">' + data[i].DESCUENTO + '</td>'
-            +
-            /*15*/
-            '<td>' + data[i].REFERENCIA_FACTURA + '</td>'
-            +
-            /*16*/
-            '<td align="center">' + cumple_img + '</td>'
-            + '</tr>';
+          detalle += 
+          `<tr>
+            <td>${data[i].NUMERO_DOCUMENTO}</td>
+            <td>${data[i].REFERENCIA}</td>
+            <td>${data[i].CLASE_DOCUMENTO}</td>
+            <td>${ver}</td>
+            <td>${data[i].FECHA_BASE}</td>
+            <td>${data[i].FECHA_PAGO_GRACIA}</td>
+            <td>${data[i].CONDICION_PAGO}</td>
+            <td ${mora}>${data[i].DEMORA_GRACIA}</td>
+            <td>${data[i].DIAS}</td>
+            <td>${formatNum(data[i].IMPORTE, '$')}</td>
+            <td>${data[i].TEXTO}</td>
+            <td>
+              <input type="text" onKeyPress="return vnumeros(event)" onDblClick="AsignarValor(this);" size="15" class="form-control ClassNumero" onBlur="AddFactura(this, this.value, '${cumple_pres}')" value="$0">
+            </td>
+            <td>
+              <input type="text" onKeyPress="return vnumeros(event)"  size="15" class="form-control ClassNumero" onBlur="AddFactura(this, this.value,  '${cumple_pres}')" disabled value="$0">
+            </td>
+            <td>${formatNum(parseFloat(data[i].BASE_PP), '$')}</td>
+            <td style="display:none;">${data[i].DESCUENTO}</td>
+            <td>${data[i].REFERENCIA_FACTURA}</td>
+            <td class="text-center">${cumple_img}</td>
+            <td class="text-center">
+              <button class="btn btn-primary btn-sm agregar-liquidacion">
+                <i class="fa-solid fa-plus"></i>
+              </button>
+            </td>
+          </tr>`;
           total += parseFloat(data[i].IMPORTE);
           cont++;
-
         }
-        var tabla = '<table class="form" width="100%" id="tdFacturas">'
-          + '<thead>'
-          + '<tr>'
-          + '<td colspan="3"><b>VALOR TOTAL : ' + formatNum(total, '$') + '</b></td>'
-          + '<td colspan="3"><b>PARTIDAS    : ' + cont + '</b></td>'
-          + '<td colspan="3"><b>VALOR MORA  : ' + formatNum(vlrMora, '$') + '</b></td>'
-          + '<td colspan="5"></td>'
-          + '</tr>'
-          + '<tr>'
-          + '<th>DOCUMENTO</th>'
-          + '<th>REF DOC</th>'
-          + '<th>CLASE</th>'
-          + '<th>VER</th>'
-          + '<th>FH BASE</th>'
-          + '<th>FH PAGO</th>'
-          + '<th>CONDICION</th>'
-          + '<th>DEMORA</th>'
-          + '<th>DIA</th>'
-          + '<th>IMPORTE</th>'
-          + '<th>TEXTO</th>'
-          + '<th>VALOR</th>'
-          + '<th>DCTO</th>'
-          + '<th>BASE PP</th>'
-          + '<th>REF FACT</th>'
-          + '<th>CUMP.PRES</th>'
-          + '</tr>'
-          + '</thead>'
-          + '<tbody>'
-          + detalle
-          + '</tbody>'
-          + '</table>';
+        
+        let tabla = 
+        `<table class="form" width="100%" id="tdFacturas">
+          <thead>
+            <tr>
+              <td colspan="3"><b>VALOR TOTAL : ${formatNum(total, '$')}</b></td>
+              <td colspan="3"><b>PARTIDAS    : ${cont}</b></td>
+              <td colspan="3"><b>VALOR MORA  : ${formatNum(vlrMora, '$')}</b></td>
+              <td colspan="5"></td>
+            </tr>
+            <tr>
+              <th>DOCUMENTO</th>
+              <th>REF DOC</th>
+              <th>CLASE</th>
+              <th>VER</th>
+              <th>FH BASE</th>
+              <th>FH PAGO</th>
+              <th>CONDICION</th>
+              <th>DEMORA</th>
+              <th>DIA</th>
+              <th>IMPORTE</th>
+              <th>TEXTO</th>
+              <th>VALOR</th>
+              <th>DCTO</th>
+              <th>BASE PP</th>
+              <th>REF FACT</th>
+              <th>CUMP.PRES</th>
+              <th>AGR. LIQUI</th>
+            </tr>
+          </thead>
+          <tbody>
+           ${detalle}
+          </tbody>
+        </table>`;
         $("#dvResultCartera").html(tabla);
         $(".ClassNumero").maskMoney({
           selectAllOnFocus: true, //evento onkeyup 
@@ -1642,10 +1620,15 @@ function Documentos() {
           allowZero: true,
           precision: 0
         });
+
+        $('#tdFacturas').on('click', '.agregar-liquidacion', function () {
+          $('#modalLiquidador').modal('show');
+        });
+
       } else {
-        $("#dvResultCartera").html('<div class="alert alert-danger" role="alert">'
-          + '<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>'
-          + '<span class="sr-only">Error:</span>NO EXISTEN DOCUMENTOS PARA EL CLIENTE SELECCIONADO' + '</div>');
+        $("#dvResultCartera").html(`<div class="alert alert-danger" role="alert">
+          <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+          <span class="sr-only">Error:</span>NO EXISTEN DOCUMENTOS PARA EL CLIENTE SELECCIONADO</div>`);
       }
     }
   }).always(function (data) {
