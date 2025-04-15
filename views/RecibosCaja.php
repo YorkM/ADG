@@ -18,7 +18,8 @@ Redireccionar();
   <title>Recibos de caja - SAP</title>
   <link type="text/css" rel="stylesheet" href="../lib/Bootstrap/V3/css/bootstrap.min.css?<?php echo (rand()); ?>">
   <link type="text/css" rel="stylesheet" href="../resources/css/start/jquery-ui-1.9.2.custom.css?<?php echo (rand()); ?>" />
-  <link type="text/css" rel="stylesheet" href="../lib/SweetAlert/sweet-alert.css?<?php echo (rand()); ?>" />
+  <link rel="stylesheet" href="../lib/SweetAlert2_V10/dist/sweetalert2.css">
+  <!-- <link type="text/css" rel="stylesheet" href="../lib/SweetAlert/sweet-alert.css?<?php echo (rand()); ?>" /> -->
   <link type="text/css" rel="stylesheet" href="../resources/css/Animate.css?<?php echo (rand()); ?>">
   <link type="text/css" rel="stylesheet" href="../resources/css/BootstrapTabs.css?<?php echo (rand()); ?>">
   <link type="text/css" rel="stylesheet" href="../resources/css/Animate.css?<?php echo (rand()); ?>">
@@ -27,7 +28,8 @@ Redireccionar();
   <script type="text/javascript" src="../lib/js/jquery-2.1.1.min.js?<?php echo (rand()); ?>"></script>
   <script type="text/javascript" src="../lib/js/jquery-ui-1.9.2.custom.js?<?php echo (rand()); ?>"></script>
   <script type="text/javascript" src="../lib/js/bootstrap.min.js?<?php echo (rand()); ?>"></script>
-  <script type="text/javascript" src="../lib/SweetAlert/sweet-alert.min.js?<?php echo (rand()); ?>"></script>
+  <!-- <script type="text/javascript" src="../lib/SweetAlert/sweet-alert.min.js?<?php echo (rand()); ?>"></script> -->
+  <script type="text/javascript" src="../lib/SweetAlert2_V10/dist/sweetalert2.min.js"></script>
   <script type="text/javascript" src="../lib/js/funciones.js?<?php echo (rand()); ?>"></script>
   <script type="text/javascript" src="../lib/js/servicios.js?<?php echo (rand()); ?>"></script>
   <script type="text/javascript" src="../lib/bootstrap-notify/bootstrap-notify.min.js"></script>
@@ -89,12 +91,42 @@ Redireccionar();
       height: 85vh;
       border: none;
     }
+
+    .font-size {
+      font-size: 14px !important;
+    }
+
+    .font-size-tf {
+      font-size: 16px !important;
+    }
+
+    .contenedor-valores {
+      display: flex;
+      justify-content: space-evenly;
+      border: 1px solid #ccc;
+      padding: 10px 0;
+      align-items: center;
+      margin-bottom: 10px;
+      border-radius: 5px;
+    }
+
+    .p-valores {
+      font-size: 16px;
+      margin: 0;
+    }
+
+    .span-valores {
+      color: #337ab7;
+      font-weight: 600;
+    }
   </style>
 </head>
 
 <body>
   <input type="hidden" id="RolId" value="<?php echo (!empty($_SESSION["ses_RolesId"])) ? $_SESSION["ses_RolesId"] : "" ?>" readonly>
   <input type="hidden" id="UsrLogin" value="<?php echo (!empty($_SESSION["ses_Login"])) ? $_SESSION["ses_Login"] : "" ?>" readonly>
+  <input type="hidden" value="" id="fechaPagoHide">
+
   <div class="alert alert-info"><i class="fa-solid fa-star fa-flip"></i>&nbsp;0405 - RECIBOS DE PAGO</div>
   <div class="panel with-nav-tabs panel-info">
     <div class="panel-heading">
@@ -129,80 +161,80 @@ Redireccionar();
     <div class="panel-body">
       <div class="tab-content">
         <div class="tab-pane fade in active" id="dvClientes">
-          <table class="form" width="100%">
-            <tr>
-              <td>Fecha Documento</td>
-              <td><input type="text" class="form-control" id="FechaDocumento"></td>
-            </tr>
-            <tr>
-              <td>Cliente</td>
-              <td><input type="text" class="form-control" id="Cliente" size="60"></td>
-            </tr>
-            <tr>
-              <td>Desactiva Descuentos</td>
-              <td style="float: left;">
-                <div class="material-switch">
-                  <input id="ActivaDcto" name="" type="checkbox" />
-                  <label for="ActivaDcto" class="label-success"></label>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>Codigo SAP</td>
-              <td><input type="text" class="form-control" id="CodigoSAP" readonly disabled></td>
-            </tr>
-            <tr>
-              <td>Sociedad / Oficina</td>
-              <td>
-                <div class="form-group row">
-                  <div class="col-xs-2">
-                    <input type="text" class="form-control" id="Sociedad" value="<?php if (!empty($_SESSION["ses_NumOrg"])) {
-                                                                                    echo  $_SESSION["ses_NumOrg"];
-                                                                                  } ?>" readonly disabled>
+          <div style="overflow-y: scroll; overflow-x: hidden; max-height: 460px;">
+            <table class="form" width="100%">
+              <tr>
+                <td>Fecha Documento</td>
+                <td><input type="text" class="form-control" id="FechaDocumento"></td>
+              </tr>
+              <tr>
+                <td>Cliente</td>
+                <td><input type="text" class="form-control" id="Cliente" size="60"></td>
+              </tr>
+              <tr>
+                <td>Desactiva Descuentos</td>
+                <td style="float: left;">
+                  <div class="material-switch">
+                    <input id="ActivaDcto" name="" type="checkbox" />
+                    <label for="ActivaDcto" class="label-success"></label>
                   </div>
-                  <div class="col-xs-10">
-                    <input type="text" class="form-control" id="Oficina" readonly disabled>
+                </td>
+              </tr>
+              <tr>
+                <td>Codigo SAP</td>
+                <td><input type="text" class="form-control" id="CodigoSAP" readonly disabled></td>
+              </tr>
+              <tr>
+                <td>Sociedad / Oficina</td>
+                <td>
+                  <div class="form-group row">
+                    <div class="col-xs-2">
+                      <input type="text" class="form-control" id="Sociedad" value="<?php echo (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : "" ?>" readonly disabled>
+                    </div>
+                    <div class="col-xs-10">
+                      <input type="text" class="form-control" id="Oficina" readonly disabled>
+                    </div>
                   </div>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>Grupo Cliente</td>
-              <td>
-                <div class="form-group row">
-                  <div class="col-xs-2">
-                    <input class="form-control" id="Grupo" type="text" readonly disabled>
+                </td>
+              </tr>
+              <tr>
+                <td>Grupo Cliente</td>
+                <td>
+                  <div class="form-group row">
+                    <div class="col-xs-2">
+                      <input class="form-control" id="Grupo" type="text" readonly disabled>
+                    </div>
+                    <div class="col-xs-10">
+                      <input class="form-control" id="DescGrupo" type="text" readonly disabled>
+                    </div>
                   </div>
-                  <div class="col-xs-10">
-                    <input class="form-control" id="DescGrupo" type="text" readonly disabled>
-                  </div>
-                </div>
-            </tr>
-            <tr>
-              <td>Lista</td>
-              <td><input type="text" class="form-control" id="Lista" readonly disabled></td>
-            </tr>
-            <tr>
-              <td>Email</td>
-              <td><input type="text" class="form-control" id="Email" readonly disabled></td>
-            </tr>
-            <tr>
-              <td>Email Zona</td>
-              <td><input type="text" class="form-control" id="EmailZona" readonly disabled></td>
-            </tr>
-            <tr>
-              <td>Referencia</td>
-              <td><textarea maxlength="25" class="notas form-control" id="Referencia" onKeyPress="return vletras_numeros(event)" placeholder="Solo letras y numeros, maximo 25 caracteres"></textarea></td>
-            </tr>
-            <tr>
-              <td>Texto Cabecera</td>
-              <td><textarea maxlength="25" class="notas form-control" id="TextoCabecera" onKeyPress="return vletras_numeros(event)" placeholder="Solo letras y numeros, maximo 25 caracteres"></textarea></td>
-            </tr>
-            <tr>
-              <td>Texto Compensación</td>
-              <td><textarea maxlength="25" class="notas form-control" id="TextoCompensacion" onKeyPress="return vletras_numeros(event)" placeholder="Solo letras y numeros, maximo 25 caracteres"></textarea></td>
-            </tr>
-          </table>
+              </tr>
+              <tr>
+                <td>Lista</td>
+                <td><input type="text" class="form-control" id="Lista" readonly disabled></td>
+              </tr>
+              <tr>
+                <td>Email</td>
+                <td><input type="text" class="form-control" id="Email" readonly disabled></td>
+              </tr>
+              <tr>
+                <td>Email Zona</td>
+                <td><input type="text" class="form-control" id="EmailZona" readonly disabled></td>
+              </tr>
+              <tr>
+                <td>Referencia</td>
+                <td><textarea maxlength="25" class="notas form-control" id="Referencia" onKeyPress="return vletras_numeros(event)" placeholder="Solo letras y numeros, maximo 25 caracteres"></textarea></td>
+              </tr>
+              <tr>
+                <td>Texto Cabecera</td>
+                <td><textarea maxlength="25" class="notas form-control" id="TextoCabecera" onKeyPress="return vletras_numeros(event)" placeholder="Solo letras y numeros, maximo 25 caracteres"></textarea></td>
+              </tr>
+              <tr>
+                <td>Texto Compensación</td>
+                <td><textarea maxlength="25" class="notas form-control" id="TextoCompensacion" onKeyPress="return vletras_numeros(event)" placeholder="Solo letras y numeros, maximo 25 caracteres"></textarea></td>
+              </tr>
+            </table>
+          </div>
         </div>
         <div class="tab-pane fade in" id="dvAbonos">
           <table class="form" width="100%" id="TablaAbonos">
@@ -245,7 +277,12 @@ Redireccionar();
           </div>
         </div>
         <div class="tab-pane fade in" id="dvFacturas">
-          <div id="dvResultCartera" style="overflow-y:scroll; overflow-x:hidden; height:500px;"></div>
+          <div class="contenedor-valores">
+            <p class="p-valores">VALOR TOTAL: <span class="span-valores" id="valorTotal">$0</span></p>
+            <p class="p-valores">PARTIDAS: <span class="span-valores" id="partidas">0</span></p>
+            <p class="p-valores">VALOR MORA: <span class="span-valores" id="valorMora">$0</span></p>
+          </div>
+          <div id="dvResultCartera" style="overflow-y: scroll; overflow-x: hidden; height: 406px;"></div>
         </div>
         <div class="tab-pane fade in" id="dvPlanilla">
           <table width="100%" class="form" id="tb_filtros_planilla">
@@ -349,7 +386,30 @@ Redireccionar();
           </div>
         </div>
         <div class="tab-pane fade in" id="dvLiquidador">
-         <h2>LIQUIDADOR</h2>
+          <div id="cotenedorTablaLiquidador">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>DOCUMENTO</th>
+                  <th>VALOR</th>
+                  <th>DESCUENTO</th>
+                  <th>VALOR TOTAL</th>
+                </tr>
+              </thead>
+              <tbody>
+                <td class="font-size">123456789</td>
+                <td class="font-size">$2.000.000</td>
+                <td class="font-size">10%</td>
+                <td class="font-size">$1.800.000</td>
+              </tbody>
+              <tfoot>
+                <td class="font-size-tf">TOTAL</td>
+                <td></td>
+                <td></td>
+                <td class="font-size-tf">$1.800.000</td>
+              </tfoot>
+            </table>
+          </div>
         </div>
         <div class="tab-pane fade in" id="dvBancos">
           <!-- <table width="100%">
@@ -372,24 +432,24 @@ Redireccionar();
             </tr>
           </table> -->
           <div class="row">
-              <div class="col-md-6">
-                <input type="text" placeholder="Filtro de búsqueda" class="form-control" id="filtro2" name="filtro2">
-              </div>
-              <div class="col-md-2">
-                <select id="MultiDay2" class="form-control">
-                </select>
-              </div>
-              <div class="col-md-2">
-                <select id="MultiMes2" class="form-control">
-                </select>
-              </div>
-              <div class="col-md-2">
-                <select id="MultiAnio2" class="form-control">
-                </select>
-              </div>             
+            <div class="col-md-6">
+              <input type="text" placeholder="Filtro de búsqueda" class="form-control" id="filtro2" name="filtro2">
+            </div>
+            <div class="col-md-2">
+              <select id="MultiDay2" class="form-control">
+              </select>
+            </div>
+            <div class="col-md-2">
+              <select id="MultiMes2" class="form-control">
+              </select>
+            </div>
+            <div class="col-md-2">
+              <select id="MultiAnio2" class="form-control">
+              </select>
+            </div>
           </div>
           <!-- REVISAR TABLA -->
-          <div id="dvResultMulticash2" style="overflow-y:scroll; overflow-x:hidden; height:500px;">
+          <div id="dvResultMulticash2" style="overflow-y: scroll; overflow-x: hidden; max-height: 428px;">
             <hr>
             <table class="table" width="100%" id="tdPlanillas2">
               <thead>
@@ -433,7 +493,7 @@ Redireccionar();
         </td>
       </tr>
     </table>
-  </div>    
+  </div>
   <!---INICIO CONDICIONES DE DESCUENTOS DEL CLIENTE SELECCIONADO-->
   <div id="dvCondiciones" class="modal fade bd-example-modal-lg" role="dialog">
     <div class="modal-dialog modal-lg">
@@ -465,7 +525,7 @@ Redireccionar();
         </div>
       </div>
     </div>
-  </div> 
+  </div>
   <!---FIN CONDICIONES DE DESCUENTOS DEL CLIENTE SELECCIONADO-->
   <div id="dvSclAbono" class="modal fade bd-example-modal-lg" role="dialog">
     <div class="modal-dialog modal-lg">
@@ -823,12 +883,12 @@ Redireccionar();
         <div class="modal-body">
           <div style="width: 70%; margin: 0 auto;">
             <h4>¿Cuál es la fecha de pago?</h4>
-            <input type="date" class="form-control">
+            <input type="date" class="form-control" id="fechaPago">
           </div>
           <div style="display: flex; justify-content: flex-end; width: 70%; margin: 10px auto;">
-            <button class="btn btn-primary">Agregar</button>
+            <button class="btn btn-primary" id="btnAgregarLiqui">Agregar</button>
           </div>
-        </div>        
+        </div>
       </div>
     </div>
   </div>

@@ -760,13 +760,11 @@ const verConsolidadoEvento = async (id) => {
         }
         return cellProperties;
       },
-      afterChange: async function (changes, source) { },
       hiddenColumns: {
         indicators: true,
       },
       contextMenu: true,
       multiColumnSorting: true,
-      plugins: ['Filters', 'DropdownMenu'],
       filters: true,
       dropdownMenu: true,
       columnSorting: true,

@@ -1,6 +1,7 @@
 let ArrayMulticash = new Array();
 let ArrayMulticashBanco = new Array();
 let ArrCli = new Array();
+let arrayLiquidador = new Array();
 $(function () {
   carga_anios('MultiAnio');
   carga_mes('MultiMes');
@@ -78,10 +79,10 @@ $(function () {
             + '<td>' + ui.item.id + '</td>'
             + '</tr>');
         } else {
-          swal('Oops', 'Ya el valor se aplico en el recibo :' + ui.item.id_rc, 'error');
+          Swal.fire('Oops', 'Ya el valor se aplico en el recibo :' + ui.item.id_rc, 'error');
         }
       } else {
-        swal('Oops', 'Valor ya agregado', 'error');
+        Swal.fire('Oops', 'Valor ya agregado', 'error');
       }
 
 
@@ -154,7 +155,7 @@ $(function () {
       if (valor != '') {
         ValidarDocumento(valor);
       } else {
-        swal('Error', 'Debe ingresar un número de documento válido.', 'error');
+        Swal.fire('Error', 'Debe ingresar un número de documento válido.', 'error');
       }
 
     }
@@ -320,7 +321,7 @@ $(function () {
     if ($("#CodigoSAP").val() != '') {
       $("#dvCondiciones").modal("show");
     } else {
-      swal('Error', 'Debe seleccionar un cliente!.', 'error');
+      Swal.fire('Error', 'Debe seleccionar un cliente!.', 'error');
     }
   });
   //----Botones de hipervinculos
@@ -355,7 +356,53 @@ $(function () {
   $("#btnCompensar").click(() => {
     compensarDocumentos();
   })
+
+  const fechaPago = document.querySelector('#fechaPago');
+  const fechaActual = new Date().toISOString().split("T")[0];
+  fechaPago.min = fechaActual;
+
+  $('#btnAgregarLiqui').click(function () {
+    const fechaPago = $('#fechaPago').val();
+    if (!fechaPago) {
+      Swal.fire("Fecha pago", "Debe seleccionar la fecha de pago", "error");
+      return;
+    }
+
+    const primerItem = JSON.parse(sessionStorage.PrimerItem);
+    delete sessionStorage.PrimerItem;
+
+    agregarLiquidador(primerItem);
+
+    $('#fechaPagoHide').val(fechaPago);
+    $('#fechaPago').val("");
+    $('#modalLiquidador').modal("hide");
+  });
+
+  // $('#modalLiquidador').on('hidden.bs.modal', function () {
+
+  // });
+
 });
+
+const confirmAlert = async (title, text) => {
+  const result = await Swal.fire({
+    title: `${title}`,
+    text: `${text}`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Aceptar',
+    cancelButtonText: 'Cancelar'
+  });
+
+  return result;
+}
+
+const agregarLiquidador = (item) => {
+  arrayLiquidador.push(item);
+  console.log(arrayLiquidador);  
+}
 
 
 //-------Permisos de accesos directos
@@ -439,9 +486,9 @@ function ValidarDocumento(valor) {
     },
     success: function (data) {
       if (data.length > 0) {
-        swal('Oops', 'El documento esta comprometido en el recibo #' + data[0].ID_RC + ', tomado por el usuario ' + data[0].USUARIO, 'error');
+        Swal.fire('Oops', 'El documento esta comprometido en el recibo #' + data[0].ID_RC + ', tomado por el usuario ' + data[0].USUARIO, 'error');
       } else {
-        swal('Excelente!', 'El documento se encuentra disponible', 'info');
+        Swal.fire('Excelente!', 'El documento se encuentra disponible', 'info');
       }
 
     }
@@ -620,7 +667,7 @@ function ConsultarZonas() {
 }
 
 function DelZonaEmail(zona) {
-  swal({
+  Swal.fire({
     title: 'Eliminar email de zona',
     text: "realmente desea eliminar la zona : " + zona + "'?",
     type: "warning",
@@ -646,7 +693,7 @@ function DelZonaEmail(zona) {
           zona: zona
         },
         success: function (data) { //console.log(data);
-          swal('Excelente', 'Zona eliminada con éxito', 'success');
+          Swal.fire('Excelente', 'Zona eliminada con éxito', 'success');
           ListarZonasEmail();
         }
       }).fail(function (data) {
@@ -668,7 +715,7 @@ function AddZonaEmail() {
       }
     });
     if (sw == 1) {
-      swal({
+      Swal.fire({
         title: 'Actualización de zona',
         text: "Esta zona ya tiene un correo asociado, desea actualizarlo?",
         type: "warning",
@@ -696,7 +743,7 @@ function AddZonaEmail() {
               zona: zona
             },
             success: function (data) {
-              swal('Excelente', 'Zona actualizada con éxito', 'success');
+              Swal.fire('Excelente', 'Zona actualizada con éxito', 'success');
               ListarZonasEmail();
             }
           }).fail(function (data) {
@@ -719,7 +766,7 @@ function AddZonaEmail() {
           zona: zona
         },
         success: function (data) {
-          swal('Excelente', 'Zona actualizada con éxito', 'success');
+          Swal.fire('Excelente', 'Zona actualizada con éxito', 'success');
           ListarZonasEmail();
         }
       }).fail(function (data) {
@@ -727,7 +774,7 @@ function AddZonaEmail() {
       });
     }
   } else {
-    swal('Error', 'Debe ingresar un mail válido', 'error');
+    Swal.fire('Error', 'Debe ingresar un mail válido', 'error');
   }
 }
 
@@ -762,9 +809,9 @@ function SubirCash() {
       async: false,
       success: function (data) {
         if (data == 0) {
-          swal('Carga Completa', 'La informacion ha sido subida.', 'success');
+          Swal.fire('Carga Completa', 'La informacion ha sido subida.', 'success');
         } else {
-          swal('Oops', 'Error al subir datos por favor verificar.', 'error');
+          Swal.fire('Oops', 'Error al subir datos por favor verificar.', 'error');
         }
         $("#tr_det_cash").html('');
         $("#filename").val('');
@@ -914,9 +961,13 @@ function ConsultarMulticashBanco() {
             </tr>`;
         });
 
+        // TODO: REVISAR DATA DEL ARRAY PARA VER DATOS DEL CALCULO
+
         $('#tdPlanillas2 tbody').html(elementos);
 
         $('#tdPlanillas2').on('click', '.observacion', function () {
+          arrayLiquidador.length = 0;
+          $('#fechaPagoHide').val(""); 
           const {codigo_sap, referencia} = JSON.parse($(this).attr('data-id'));
           const MultiDay = $('#MultiDay2').val();
           $('#btnCliente').click();
@@ -939,7 +990,7 @@ function ConsultarMulticashBanco() {
 
                 $('#MultiDay').val(MultiDay).trigger('change');
               }
-            }, 3000);
+            }, 2000);
           }
 
         });
@@ -1189,9 +1240,9 @@ function AddAbonoCash(pcuenta, pfecha, pvalor, num, id, ref) {
       $("#VlrSinAsignar").val(formatNum(vasignado, '$'));
     } else {
       if (sw == 1) {
-        swal('Operacion no permitida!', 'Ya se encuentra asignada la cuenta efectivo,viajero o ajuste al peso', 'error');
+        Swal.fire('Operacion no permitida!', 'Ya se encuentra asignada la cuenta efectivo,viajero o ajuste al peso', 'error');
       } else {
-        swal('Operacion no permitida!', 'El valor de ajuste al peso no puede superar los $1.000', 'error');
+        Swal.fire('Operacion no permitida!', 'El valor de ajuste al peso no puede superar los $1.000', 'error');
       }
       $("#ValorAbono").val('');
       $("#ValorAbono").focus();
@@ -1249,9 +1300,9 @@ function AddAbono() {
       $("#VlrSinAsignar").val(formatNum(vasignado, '$'));
     } else {
       if (sw == 1) {
-        swal('Operacion no permitida!', 'Ya se encuentra asignada la cuenta efectivo,viajero o ajuste al peso', 'error');
+        Swal.fire('Operacion no permitida!', 'Ya se encuentra asignada la cuenta efectivo,viajero o ajuste al peso', 'error');
       } else {
-        swal('Operacion no permitida!', 'El valor de ajuste al peso no puede superar los $1.000', 'error');
+        Swal.fire('Operacion no permitida!', 'El valor de ajuste al peso no puede superar los $1.000', 'error');
       }
       $("#ValorAbono").val('');
       $("#ValorAbono").focus();
@@ -1492,10 +1543,10 @@ function AddFactura(ob, valor, cumple_pres) {
     } else {
       $(ob).val('$0');
       $(ob).focus();
-      swal('Error', 'El valor ingresado no puede ser mayor al valor del documento', 'error');
+      Swal.fire('Error', 'El valor ingresado no puede ser mayor al valor del documento', 'error');
     }
   } else {
-    swal('Error', 'Primero se debe agregar un abono desde la pestaña de multicash.', 'error');
+    Swal.fire('Error', 'Primero se debe agregar un abono desde la pestaña de multicash.', 'error');
     $(ob).val('$0');
   }
 
@@ -1569,7 +1620,7 @@ function Documentos() {
             <td>${data[i].REFERENCIA_FACTURA}</td>
             <td class="text-center">${cumple_img}</td>
             <td class="text-center">
-              <button class="btn btn-primary btn-sm agregar-liquidacion">
+              <button class="btn btn-primary btn-sm agregar-liquidacion" data-item='${JSON.stringify(data[i])}'>
                 <i class="fa-solid fa-plus"></i>
               </button>
             </td>
@@ -1577,16 +1628,14 @@ function Documentos() {
           total += parseFloat(data[i].IMPORTE);
           cont++;
         }
+
+        $('#valorTotal').text(formatNum(total, '$'));
+        $('#partidas').text(cont);
+        $('#valorMora').text(formatNum(vlrMora, '$'));
         
         let tabla = 
         `<table class="form" width="100%" id="tdFacturas">
-          <thead>
-            <tr>
-              <td colspan="3"><b>VALOR TOTAL : ${formatNum(total, '$')}</b></td>
-              <td colspan="3"><b>PARTIDAS    : ${cont}</b></td>
-              <td colspan="3"><b>VALOR MORA  : ${formatNum(vlrMora, '$')}</b></td>
-              <td colspan="5"></td>
-            </tr>
+          <thead>            
             <tr>
               <th>DOCUMENTO</th>
               <th>REF DOC</th>
@@ -1621,8 +1670,26 @@ function Documentos() {
           precision: 0
         });
 
-        $('#tdFacturas').on('click', '.agregar-liquidacion', function () {
-          $('#modalLiquidador').modal('show');
+        $('#tdFacturas').on('click', '.agregar-liquidacion', async function () {
+          const fechaPago = $('#fechaPagoHide').val();
+          const item = JSON.parse($(this).attr('data-item'));
+
+          if (!arrayLiquidador.length) {
+            sessionStorage.PrimerItem = JSON.stringify(item);
+            $('#modalLiquidador').modal('show');           
+          }
+
+          if (!fechaPago) return;
+
+          const existeDocumento = arrayLiquidador.find(itemArray => itemArray.NUMERO_DOCUMENTO === item.NUMERO_DOCUMENTO);
+          if (existeDocumento) {
+            Swal.fire("Agregar Liquidación", "El documento ya existe en el liquidador", "warning");
+            return;
+          }
+
+          const result = await confirmAlert("Agregar liquidación", "Se agregará el documento al liquidador... ¿Desea continuar?");
+          if (!result.isConfirmed) return;          
+          agregarLiquidador(item);          
         });
 
       } else {
@@ -1667,7 +1734,7 @@ function VisualizarDocumento(num, tipo) {
     }
 
   } else {
-    swal('error', 'El pedido seleccionado no posee factura', 'error');
+    Swal.fire('error', 'El pedido seleccionado no posee factura', 'error');
   }
 }
 
@@ -1675,7 +1742,7 @@ function EliminarPDF() {
   var id = $.trim($("#txt_id_rc").html());
   var num = $.trim($("#txt_num").html());
   if (num == 0) {
-    swal({
+    Swal.fire({
       title: 'Realmente desea eliminar el documento asociado al recibo #' + id,
       text: "Despues de aceptar no podra reversar la operacion!",
       type: "warning",
@@ -1702,23 +1769,23 @@ function EliminarPDF() {
           async: true,
           success: function (data) {
             if (data == 1) {
-              swal('Excelente', 'El documento ha sido eliminado', 'success');
+              Swal.fire('Excelente', 'El documento ha sido eliminado', 'success');
               ConsultarPlanilla();
               $("#ModalPDF").modal("hide");
               $("#dvReciboCaja").modal("hide");
             } else {
-              swal('Error', 'No se pudo eliminar del documento', 'error');
+              Swal.fire('Error', 'No se pudo eliminar del documento', 'error');
             }
           }
         }).always(function (data) {
           //console.log(data);	
         });
       } else {
-        swal('Cancelado', 'No se ha realizado ninguna operacion', 'warning');
+        Swal.fire('Cancelado', 'No se ha realizado ninguna operacion', 'warning');
       }
     })
   } else {
-    swal('Oops', 'No es posible editar el documento de un recibo autorizado', 'error');
+    Swal.fire('Oops', 'No es posible editar el documento de un recibo autorizado', 'error');
   }
 
 }
@@ -1801,7 +1868,7 @@ function Guardar() {
         } else {
           titulo = 'Se generara saldo a favor, esta seguro de continuar?';
         }
-        swal({
+        Swal.fire({
           title: titulo,
           text: "Despues de aceptar no podra reversar la operacion!",
           type: "warning",
@@ -1817,19 +1884,19 @@ function Guardar() {
             //Aqui se envia l web service de generacion de recibo de caja
             EnviarTMP(cuentas, documen, vlrAsignar, codigoSap);
           } else {
-            swal("Cancelado", "La operacion  ha sido cancelada!", "error");
+            Swal.fire("Cancelado", "La operacion  ha sido cancelada!", "error");
           }
         });
 
       } else {
         //No se hizo abono
-        swal('Oops', 'La diferencia es demasiado grande para compensar!', 'warning')
+        Swal.fire('Oops', 'La diferencia es demasiado grande para compensar!', 'warning')
       }
     } else {
-      swal('Error', 'No se ha seleccionado ningun documento.', 'error')
+      Swal.fire('Error', 'No se ha seleccionado ningun documento.', 'error')
     }
   } else {
-    swal('Error', 'Debe cargar un cliente!', 'error');
+    Swal.fire('Error', 'Debe cargar un cliente!', 'error');
   }
 
 }
@@ -1904,11 +1971,11 @@ function EnviarTMP(cuentas, documentos, asignados, cliente) {
       async: false,
       success: function (data) {
         if (data > 0) {
-          swal("Excelente!", "Recibo de caja temporal #" + data + " creado satisfactoriamente", "success");
+          Swal.fire("Excelente!", "Recibo de caja temporal #" + data + " creado satisfactoriamente", "success");
           Limpiar();
           return false;
         } else {
-          swal("Oops..!", "Error al recibir respuesta :\n" + data, "error");
+          Swal.fire("Oops..!", "Error al recibir respuesta :\n" + data, "error");
           return false;
         }
       }
@@ -1916,7 +1983,7 @@ function EnviarTMP(cuentas, documentos, asignados, cliente) {
       UnloadImg();
     });
   } else {
-    swal('Oops :(', 'Uno de los documentos que intenta adicionar esta en el recibo #' + sw, 'error');
+    Swal.fire('Oops :(', 'Uno de los documentos que intenta adicionar esta en el recibo #' + sw, 'error');
   }
 
 }
@@ -1926,7 +1993,7 @@ function AutorizarRC(version) {
   var num = $.trim($("#txt_num").html());
   if (id != 0) {
     // if(num == 0){
-    swal({
+    Swal.fire({
       title: 'Realmente desea autorizar el recibo temporal #' + id,
       text: "Despues de aceptar no podra reversar la operacion!",
       type: "warning",
@@ -1956,10 +2023,10 @@ function AutorizarRC(version) {
             console.log(data);
             UnloadImg();
             if (data > 0) {
-              swal("Excelente!", "Recibo de caja :" + data + " creado satisfactoriamente", "success");
+              Swal.fire("Excelente!", "Recibo de caja :" + data + " creado satisfactoriamente", "success");
               EnviarMail($.trim(id));
             } else {
-              swal('Oops...', 'No fue posible enviar el RC, ' + data, 'error');
+              Swal.fire('Oops...', 'No fue posible enviar el RC, ' + data, 'error');
             }
             ConsultarPlanilla();
             $("#dvReciboCaja").modal("hide");
@@ -1969,14 +2036,14 @@ function AutorizarRC(version) {
           UnloadImg();
         });
       } else {
-        swal("Cancelado", "La operacion  ha sido cancelada!", "error");
+        Swal.fire("Cancelado", "La operacion  ha sido cancelada!", "error");
       }
     });
     /* }else{	  
-       swal('Oops...','El recibo fue previamente autorizado!','error');
+       Swal.fire('Oops...','El recibo fue previamente autorizado!','error');
      }*/
   } else {
-    swal('Oops...', 'No fue posible enviar el RC.', 'error');
+    Swal.fire('Oops...', 'No fue posible enviar el RC.', 'error');
   }
 }
 
@@ -2001,11 +2068,11 @@ function EnviarWS(cuentas, documen, asignados, cliente) {
     },
     success: function (data) {
       if (data > 0) {
-        swal("Excelente!", "Recibo de caja :" + data + " creado satisfactoriamente", "success");
+        Swal.fire("Excelente!", "Recibo de caja :" + data + " creado satisfactoriamente", "success");
         Limpiar();
         return false;
       } else {
-        swal("Oops..!", "Error al recibir respuesta :\n" + data, "error");
+        Swal.fire("Oops..!", "Error al recibir respuesta :\n" + data, "error");
         return false;
       }
     }
@@ -2236,7 +2303,7 @@ function AbrirRecibo(id, ob) {
 function EliminarRC() {
   var id = parseInt($.trim($("#txt_id_rc").html()));
   var num = parseInt($.trim($("#txt_num").html()));
-  swal({
+  Swal.fire({
     title: 'Realmente desea eliminar el recibo temporal #' + id,
     text: "Despues de aceptar no podra reversar la operacion!",
     type: "warning",
@@ -2263,9 +2330,9 @@ function EliminarRC() {
           },
           success: function (data) {
             if (data == 0) {
-              swal('Excelente', 'Recibo temporal eliminado', 'success');
+              Swal.fire('Excelente', 'Recibo temporal eliminado', 'success');
             } else {
-              swal('Oops...', 'No fue posible eliminar el RC.', 'error');
+              Swal.fire('Oops...', 'No fue posible eliminar el RC.', 'error');
             }
             ConsultarPlanilla();
             $("#dvReciboCaja").modal("hide");
@@ -2274,7 +2341,7 @@ function EliminarRC() {
           console.error(data);
         });
       } else {
-        swal('Oops...', 'No es posible eliminar un RC ya aplicado.', 'error');
+        Swal.fire('Oops...', 'No es posible eliminar un RC ya aplicado.', 'error');
       }
     } else {
 
@@ -2335,10 +2402,10 @@ function uploadAjax() {
     cache: false,
     success: function (data) {
       if (data == "true") {
-        swal('Documento Cargado!', 'Se han cargado los archivos correctamente', 'success');
+        Swal.fire('Documento Cargado!', 'Se han cargado los archivos correctamente', 'success');
         $("#tdDocPDF").html('<img src="../resources/icons/eye.png" align="absmiddle" onclick="VisualizarDocumento(\'' + $.trim(id) + '\',\'R\')">');
       } else {
-        swal('Error!', 'Se han producido un error cargado los archivos', 'error')
+        Swal.fire('Error!', 'Se han producido un error cargado los archivos', 'error')
       }
     }
   }).fail(function (data) {
@@ -2366,9 +2433,9 @@ function AgregarCondicionEspecial() {
       },
       success: function (data) {
         if (data > 0) {
-          swal('Excelente', 'Condicion especial guardada y en espera de autorización.', 'success');
+          Swal.fire('Excelente', 'Condicion especial guardada y en espera de autorización.', 'success');
         } else {
-          swal('Oops...', 'No fue posible crear la solicitud.', 'error');
+          Swal.fire('Oops...', 'No fue posible crear la solicitud.', 'error');
         }
         ConsultarCondicionEspecial();
         $("#txt_CondCodigo").val('');
@@ -2380,7 +2447,7 @@ function AgregarCondicionEspecial() {
       console.error(data);
     });
   } else {
-    swal('Error!', 'Campos vacios o inválidos, verifique e intente nuevamente', 'error');
+    Swal.fire('Error!', 'Campos vacios o inválidos, verifique e intente nuevamente', 'error');
   }
 }
 
@@ -2445,7 +2512,7 @@ function ConsultarCondicionEspecial() {
 function AutorizarCondicionEspecial(id) {
   var rol = $("#RolId").val();
   if (rol == 1 || rol == 18) { //Administrador - gerencia administrativa
-    swal({
+    Swal.fire({
       title: 'Autorizar condición de descuento #' + id,
       text: "Esta seguro?",
       type: "warning",
@@ -2471,9 +2538,9 @@ function AutorizarCondicionEspecial(id) {
           },
           success: function (data) {
             if (data == 1) {
-              swal('Excelente', 'Condicion autorizada con exito', 'success');
+              Swal.fire('Excelente', 'Condicion autorizada con exito', 'success');
             } else {
-              swal('Error', 'No fue posible autorizar!' + data, 'error');
+              Swal.fire('Error', 'No fue posible autorizar!' + data, 'error');
             }
             ConsultarCondicionEspecial();
           }
@@ -2483,7 +2550,7 @@ function AutorizarCondicionEspecial(id) {
       }
     });
   } else {
-    swal('Error', 'Usted no cuenta con los permisos para autorizar, este tipo de solicitudes.', 'error');
+    Swal.fire('Error', 'Usted no cuenta con los permisos para autorizar, este tipo de solicitudes.', 'error');
   }
 }
 
@@ -2492,7 +2559,7 @@ function AutorizarTodoCondicion() {
   var rol = $("#RolId").val();
   if (rol == 1 || rol == 18) { //Administrador - gerencia administrativa
     if (nFilas > 0) {
-      swal({
+      Swal.fire({
         title: 'Se autorizarán todas las condiciones',
         text: "Esta seguro de autorizar todo?",
         type: "warning",
@@ -2526,12 +2593,12 @@ function AutorizarTodoCondicion() {
               console.log(data);
             });
           });
-          swal('Excelente', 'Condiciones autorizadas con exito', 'success');
+          Swal.fire('Excelente', 'Condiciones autorizadas con exito', 'success');
           ConsultarCondicionEspecial();
         }
       });
     } else {
-      swal('Oops', 'No hay nada que autorizar', 'error');
+      Swal.fire('Oops', 'No hay nada que autorizar', 'error');
     }
   }
 
@@ -2892,7 +2959,7 @@ const compensarDocumentos = async () => {
       fhFin: fhFin,
       doc: doc
     }
-    swal({
+    Swal.fire({
       title: titulo,
       text: mensaje,
       type: "warning",
@@ -2907,13 +2974,13 @@ const compensarDocumentos = async () => {
       if (result.value) {
         let resp = await enviarPeticion(data);
         if (resp.estatus) {
-          swal('Excelente!', resp.msg, 'success');
+          Swal.fire('Excelente!', resp.msg, 'success');
           limpiarCompensar();
         } else {
-          swal('Error!', resp.msg, 'error');
+          Swal.fire('Error!', resp.msg, 'error');
         }
       } else {
-        swal('Correcto!', 'Compensación cancelada', 'warning');
+        Swal.fire('Correcto!', 'Compensación cancelada', 'warning');
       }
     });
 
