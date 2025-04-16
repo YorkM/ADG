@@ -378,10 +378,6 @@ $(function () {
     $('#modalLiquidador').modal("hide");
   });
 
-  // $('#modalLiquidador').on('hidden.bs.modal', function () {
-
-  // });
-
 });
 
 const confirmAlert = async (title, text) => {
@@ -401,9 +397,8 @@ const confirmAlert = async (title, text) => {
 
 const agregarLiquidador = (item) => {
   arrayLiquidador.push(item);
-  console.log(arrayLiquidador);  
+  console.table(arrayLiquidador);  
 }
-
 
 //-------Permisos de accesos directos
 function obtenerPermisos(modulo) {
@@ -967,9 +962,11 @@ function ConsultarMulticashBanco() {
 
         $('#tdPlanillas2').on('click', '.observacion', function () {
           arrayLiquidador.length = 0;
-          $('#fechaPagoHide').val(""); 
+          $('#fechaPagoHide').val("");
+          $("#tdPlanillas tbody").html(""); 
           const {codigo_sap, referencia} = JSON.parse($(this).attr('data-id'));
           const MultiDay = $('#MultiDay2').val();
+
           $('#btnCliente').click();
           const valorBuscado = codigo_sap;
           const coincidencia = ArrCli.find(item => item.codigo_sap === valorBuscado);
@@ -992,7 +989,6 @@ function ConsultarMulticashBanco() {
               }
             }, 2000);
           }
-
         });
       } else $('#tdPlanillas2 tbody').html(`<td class="text-center lead fw-bold" colspan="14">Multicash no disponible</td>`);
     }
@@ -1259,20 +1255,23 @@ function AddAbono() {
   var total = $("#VlrTotalAbono").val();
   var sw = 0;
   var tipov = $("#TipoValor").val();
-  if (cuenta == '2815050503' && parseFloat(unformatNum(valor)) > 1000) {
-    sw = 2;
-  }
+
+  if (cuenta == '2815050503' && parseFloat(unformatNum(valor)) > 1000) sw = 2;
+
   if (parseFloat(unformatNum(valor)) > 0) {
     $("#tdBody tr").each(function (index, element) {
       var c = $(this).find('td').eq(0).html();
+
       if ((c == '1105050108' || c == '1105050100') && (cuenta == '1105050108' || cuenta == '1105050100')) {
         sw = 1;
       }
+
       if (c == '2815050503' && cuenta == '2815050503') {
         sw = 1;
       }
 
     });
+
     if (sw == 0) {
 
       if (tipov == 'N') {
@@ -1293,6 +1292,7 @@ function AddAbono() {
         + '<td style="display:none">$0</td>'
         + '<td style="display:none">$0</td>'
         + '</tr>');
+
       $("#VlrTotalAbono").val(formatNum(parseFloat(unformatNum(valor)) + parseFloat(unformatNum(total)), '$'));
       $("#ValorAbono").val('');
       $("#ValorAbono").focus();
@@ -2797,7 +2797,7 @@ function ConsultarInformes() {
                        <td>${data[i].fecha_hora}</td>
                        <td>${data[i].fecha_hora_aprobacion}</td>
                        <td>${estado}</td>
-                      </tr>`;
+                    </tr>`;
         }
         tabla += `</tbody></table>`;
         //Consolidado
