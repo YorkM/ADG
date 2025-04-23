@@ -19,7 +19,6 @@ Redireccionar();
   <link type="text/css" rel="stylesheet" href="../lib/Bootstrap/V3/css/bootstrap.min.css?<?php echo (rand()); ?>">
   <link type="text/css" rel="stylesheet" href="../resources/css/start/jquery-ui-1.9.2.custom.css?<?php echo (rand()); ?>" />
   <link rel="stylesheet" href="../lib/SweetAlert2_V10/dist/sweetalert2.css">
-  <!-- <link type="text/css" rel="stylesheet" href="../lib/SweetAlert/sweet-alert.css?<?php echo (rand()); ?>" /> -->
   <link type="text/css" rel="stylesheet" href="../resources/css/Animate.css?<?php echo (rand()); ?>">
   <link type="text/css" rel="stylesheet" href="../resources/css/BootstrapTabs.css?<?php echo (rand()); ?>">
   <link type="text/css" rel="stylesheet" href="../resources/css/Animate.css?<?php echo (rand()); ?>">
@@ -28,8 +27,9 @@ Redireccionar();
   <script type="text/javascript" src="../lib/js/jquery-2.1.1.min.js?<?php echo (rand()); ?>"></script>
   <script type="text/javascript" src="../lib/js/jquery-ui-1.9.2.custom.js?<?php echo (rand()); ?>"></script>
   <script type="text/javascript" src="../lib/js/bootstrap.min.js?<?php echo (rand()); ?>"></script>
-  <!-- <script type="text/javascript" src="../lib/SweetAlert/sweet-alert.min.js?<?php echo (rand()); ?>"></script> -->
   <script type="text/javascript" src="../lib/SweetAlert2_V10/dist/sweetalert2.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
   <script type="text/javascript" src="../lib/js/funciones.js?<?php echo (rand()); ?>"></script>
   <script type="text/javascript" src="../lib/js/servicios.js?<?php echo (rand()); ?>"></script>
   <script type="text/javascript" src="../lib/bootstrap-notify/bootstrap-notify.min.js"></script>
@@ -93,11 +93,11 @@ Redireccionar();
     }
 
     .font-size {
-      font-size: 14px !important;
+      font-size: 13px !important;
     }
 
     .font-size-tf {
-      font-size: 16px !important;
+      font-size: 14px !important;
     }
 
     .contenedor-valores {
@@ -116,8 +116,18 @@ Redireccionar();
     }
 
     .span-valores {
-      color: #337ab7;
       font-weight: 600;
+    }
+
+    .custom-card {
+      border: 1.5px solid #ccc;
+      padding: 5px;
+      border-radius: 5px;
+    }
+
+    .custom-padding {
+      padding: 3px 8px;
+      font-size: 12px;
     }
   </style>
 </head>
@@ -363,7 +373,7 @@ Redireccionar();
               </td>
             </tr>
           </table>
-          <div id="dvResultMulticash" style="overflow-y:scroll; overflow-x:hidden; height:500px;">
+          <div id="dvResultMulticash" style="overflow-y: scroll; overflow-x: hidden; height: 500px;">
             <hr>
             <table class="table" width="100%" id="tdPlanillas">
               <thead>
@@ -386,51 +396,125 @@ Redireccionar();
           </div>
         </div>
         <div class="tab-pane fade in" id="dvLiquidador">
-          <div id="cotenedorTablaLiquidador">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>DOCUMENTO</th>
-                  <th>VALOR</th>
-                  <th>DESCUENTO</th>
-                  <th>VALOR TOTAL</th>
-                </tr>
-              </thead>
-              <tbody>
-                <td class="font-size">123456789</td>
-                <td class="font-size">$2.000.000</td>
-                <td class="font-size">10%</td>
-                <td class="font-size">$1.800.000</td>
-              </tbody>
-              <tfoot>
-                <td class="font-size-tf">TOTAL</td>
-                <td></td>
-                <td></td>
-                <td class="font-size-tf">$1.800.000</td>
-              </tfoot>
-            </table>
+          <img id="logoEmpresa" src="../resources/images/LogoRoma.png" style="display: none;" />
+          <div style="overflow-y: scroll; overflow-x: hidden; height: 67vh;">
+            <h4 class="text-center">Liquidación al 10% - 60 días</h4>
+            <div class="custom-card" id="cotenedorTablaLiquidador" style="width: 98%; margin: 20px auto;">
+              <table class="table" id="tablaLiquidador" style="margin-bottom: 5px;">
+                <thead>
+                  <tr>
+                    <th>Doc.</th>
+                    <th>Clase</th>
+                    <th>Fecha</th>
+                    <th>Fecha Venc.</th>
+                    <th>V Fact.</th>
+                    <th>Base PP</th>
+                    <th>Días</th>
+                    <th>% Desc.</th>
+                    <th>V Desc.</th>
+                    <th>V Pagar</th>
+                    <th>Obser.</th>
+                  </tr>
+                </thead>
+                <tbody>
+  
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td colspan="4" class="font-size-tf" style="text-align: center;">Total</td>
+                    <td class="font-size-tf" id="totalFacturas">$0</td>
+                    <td class="font-size-tf" id="totalProntoPago">$0</td>
+                    <td class="font-size-tf"></td>
+                    <td class="font-size-tf"></td>
+                    <td class="font-size-tf" id="totalDescuento">$0</td>
+                    <td class="font-size-tf" id="totalPagar">$0</td>
+                    <td class="font-size-tf"></td>
+                  </tr>
+                </tfoot>
+              </table>           
+              <div style="display: flex; justify-content: flex-end;">
+                <button class="btn btn-danger custom-padding" id="btnDescargarPDF">Descargar PDF</button>
+              </div>
+            </div>
+            <h4 class="text-center">Liquidación al 11% - 30 días</h4>
+            <div class="custom-card" id="cotenedorTablaLiquidador3" style="width: 98%; margin: 20px auto;">
+              <table class="table" id="tablaLiquidador3" style="margin-bottom: 5px;">
+                <thead>
+                  <tr>
+                    <th>Doc.</th>
+                    <th>Clase</th>
+                    <th>Fecha</th>
+                    <th>Fecha Venc.</th>
+                    <th>V Fact.</th>
+                    <th>Base PP</th>
+                    <th>Días</th>
+                    <th>% Desc.</th>
+                    <th>V Desc.</th>
+                    <th>V Pagar</th>
+                    <th>Obser.</th>
+                  </tr>
+                </thead>
+                <tbody>
+  
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td colspan="4" class="font-size-tf" style="text-align: center;">Total</td>
+                    <td class="font-size-tf" id="totalFacturas3">$0</td>
+                    <td class="font-size-tf" id="totalProntoPago3">$0</td>
+                    <td class="font-size-tf"></td>
+                    <td class="font-size-tf"></td>
+                    <td class="font-size-tf" id="totalDescuento3">$0</td>
+                    <td class="font-size-tf" id="totalPagar3">$0</td>
+                    <td class="font-size-tf"></td>
+                  </tr>
+                </tfoot>
+              </table>           
+              <div style="display: flex; justify-content: flex-end;">
+                <button class="btn btn-danger custom-padding" id="btnDescargarPDF3">Descargar PDF</button>
+              </div>
+            </div>
+            <h4 class="text-center">Liquidación al 12% - 7 días</h4>
+            <div class="custom-card" id="cotenedorTablaLiquidador2" style="width: 98%; margin: 0 auto;">
+              <table class="table" id="tablaLiquidador2" style="margin-bottom: 5px;">
+                <thead>
+                  <tr>
+                    <th>Doc.</th>
+                    <th>Clase</th>
+                    <th>Fecha</th>
+                    <th>Fecha Venc.</th>
+                    <th>V Fact.</th>
+                    <th>Base PP</th>
+                    <th>Días</th>
+                    <th>% Desc.</th>
+                    <th>V Desc.</th>
+                    <th>V Pagar</th>
+                    <th>Obser.</th>
+                  </tr>
+                </thead>
+                <tbody>
+  
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td colspan="4" class="font-size-tf" style="text-align: center;">Total</td>
+                    <td class="font-size-tf" id="totalFacturas2">$0</td>
+                    <td class="font-size-tf" id="totalProntoPago2">$0</td>
+                    <td class="font-size-tf"></td>
+                    <td class="font-size-tf"></td>
+                    <td class="font-size-tf" id="totalDescuento2">$0</td>
+                    <td class="font-size-tf" id="totalPagar2">$0</td>
+                    <td class="font-size-tf"></td>
+                  </tr>
+                </tfoot>
+              </table>           
+              <div style="display: flex; justify-content: flex-end;">
+                <button class="btn btn-danger custom-padding" id="btnDescargarPDF2">Descargar PDF</button>
+              </div>
+            </div>
           </div>
         </div>
         <div class="tab-pane fade in" id="dvBancos">
-          <!-- <table width="100%">
-            <tr>
-              <td width="50%">
-                <input type="text" placeholder="Filtro de búsqueda" class="form-control" id="filtro2" name="filtro2">
-              </td>
-              <td>
-                <select id="MultiDay2" class="form-control">
-                </select>
-              </td>
-              <td>
-                <select id="MultiMes2" class="form-control">
-                </select>
-              </td>
-              <td>
-                <select id="MultiAnio2" class="form-control">
-                </select>
-              </td>             
-            </tr>
-          </table> -->
           <div class="row">
             <div class="col-md-6">
               <input type="text" placeholder="Filtro de búsqueda" class="form-control" id="filtro2" name="filtro2">
@@ -479,7 +563,7 @@ Redireccionar();
       </div>
     </div>
   </div>
-  <div id="dvTotalAbono" style="width: 99%; position: fixed; bottom: 0; left: 0;">
+  <div id="dvTotalAbono" style="width: 100%; position: fixed; bottom: 0; left: 0;">
     <table class="form" width="100%" style="margin-top:10px;">
       <tr>
         <td>Total Abonado :
@@ -493,7 +577,7 @@ Redireccionar();
         </td>
       </tr>
     </table>
-  </div>
+  </div>  
   <!---INICIO CONDICIONES DE DESCUENTOS DEL CLIENTE SELECCIONADO-->
   <div id="dvCondiciones" class="modal fade bd-example-modal-lg" role="dialog">
     <div class="modal-dialog modal-lg">
@@ -870,28 +954,7 @@ Redireccionar();
         </div>
       </div>
     </div>
-  </div>
-  <!-------Modal LIQUIDADOR---->
-  <div id="modalLiquidador" class="modal fade bd-example-modal-lg" role="dialog">
-    <div class="modal-dialog modal-dialog-centered" style="width: 40%;">
-      <!-- Modal content-->
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title" id=""></h4>
-        </div>
-        <div class="modal-body">
-          <div style="width: 70%; margin: 0 auto;">
-            <h4>¿Cuál es la fecha de pago?</h4>
-            <input type="date" class="form-control" id="fechaPago">
-          </div>
-          <div style="display: flex; justify-content: flex-end; width: 70%; margin: 10px auto;">
-            <button class="btn btn-primary" id="btnAgregarLiqui">Agregar</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+  </div> 
   <!----------------------------------->
   <div id="ModalHipervinculo" class="modal" role="dialog" style="z-index: 99999; margin-top: 0; background-color: #C0C0C0; padding: 0"
     aria-hidden="true"
