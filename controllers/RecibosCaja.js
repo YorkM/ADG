@@ -388,14 +388,35 @@ $(function () {
     generarPDF("tablaLiquidador3");
   });
 
+  $('#btnSeleccionarTodas').click(async function () {
+    arrayLiquidador.length = 0;
+    arrayLiquidador2.length = 0;
+    arrayLiquidador3.length = 0;
+
+    if (!$("#tdFacturas tbody tr").length) {
+      Swal.fire("Agregar documentos", "No hay documentos para agregar al liquidador", "warning");
+      return;
+    }
+
+    const result = await confirmAlert("Agregar documentos", "Se agregarán todos los documentos disponibles al liquidador", "info");
+    if (!result.isConfirmed) return;
+
+    $("#tdFacturas tbody tr").each(function () {
+      let fila = $(this).find('td');
+      let item = JSON.parse($(fila.eq(17)).find('button').attr('data-item'));
+
+      agregarLiquidador(item);
+    });
+  });
+
 });
 
 //? FUNCIONES GENERALES
-const confirmAlert = async (title, text) => {
+const confirmAlert = async (title, text, icon = 'warning') => {
   const result = await Swal.fire({
     title: `${title}`,
     text: `${text}`,
-    icon: 'warning',
+    icon,
     showCancelButton: true,
     confirmButtonColor: '#3085d6',
     cancelButtonColor: '#d33',
@@ -724,7 +745,7 @@ const generarFilaHTML = (item, fechaVenc, diasKey, porcentajeKey, descuentoKey, 
     <td class="font-size">${item[porcentajeKey]}%</td>        
     <td class="font-size">${formatNum(item[descuentoKey], "$")}</td>        
     <td class="font-size">${formatNum(item[pagarKey], "$")}</td>        
-    <td class="font-size"><input type="text" class="form-control input-sm input-obser"></td>        
+    <td class="font-size td-text"><input type="text" maxlength="25" class="form-control input-sm input-obser"></td>        
   </tr>`;
 
 const renderTabla = (idTabla, idTotales, items, fechaVencKey, diasKey, porcentajeKey, descuentoKey, pagarKey) => {
@@ -790,9 +811,9 @@ const agregarLiquidador = (item) => {
     pagar: "totalPagar"
   }, arrayLiquidador, "fechaVencimientoFactura", "DIAS", "porcentajeDescuento", "valorDescuento", "valorPagar");
 
-  // Procesamiento adicional si hay 2 condiciones de descuento
-  if ($("#tableCondicionesListaPlazo tbody tr").length === 2) {
-    const filas = $("#tableCondicionesListaPlazo tbody tr");
+  //? PROCESAR CONDICIONES DE DESCUENTO SI HAY AL MENOS UNA FILA
+  const filas = $("#tableCondicionesListaPlazo tbody tr");
+  if (filas.length >= 1) {
     const condiciones = [arrayLiquidador2, arrayLiquidador3];
     const tablaIDs = ["tablaLiquidador2", "tablaLiquidador3"];
     const totalesIDs = [
@@ -801,6 +822,8 @@ const agregarLiquidador = (item) => {
     ];
 
     filas.each((i, fila) => {
+      if (i >= condiciones.length) return;
+
       const celdas = $(fila).find("td");
       const dias = parseInt($(celdas[1]).text());
       const porcentaje = parseFloat($(celdas[2]).text());
@@ -812,21 +835,21 @@ const agregarLiquidador = (item) => {
         numeroDoc: NUMERO_DOCUMENTO.trim(),
         referencia: REFERENCIA.trim(),
         claseDoc,
-        [`dias${i+2}`]: dias,
+        [`dias${i + 2}`]: dias,
         fechaFactura,
-        [`fechaVencimientoFactura${i+2}`]: fechaVencimiento,
+        [`fechaVencimientoFactura${i + 2}`]: fechaVencimiento,
         basePP,
         importe,
-        [`porcentajeDescuento${i+2}`]: p,
-        [`valorDescuento${i+2}`]: d,
-        [`valorPagar${i+2}`]: pay
+        [`porcentajeDescuento${i + 2}`]: p,
+        [`valorDescuento${i + 2}`]: d,
+        [`valorPagar${i + 2}`]: pay
       };
 
       condiciones[i].push(nuevo);
 
       renderTabla(tablaIDs[i], totalesIDs[i], condiciones[i],
-        `fechaVencimientoFactura${i+2}`, `dias${i+2}`,
-        `porcentajeDescuento${i+2}`, `valorDescuento${i+2}`, `valorPagar${i+2}`);
+        `fechaVencimientoFactura${i + 2}`, `dias${i + 2}`,
+        `porcentajeDescuento${i + 2}`, `valorDescuento${i + 2}`, `valorPagar${i + 2}`);
     });
   }
 };

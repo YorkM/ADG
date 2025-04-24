@@ -35,7 +35,7 @@ const agregarAcciones = () => {
     const contenedor = document.getElementById("contenedorAcciones");
     const nuevoCampo = `
         <div class="row justify-content-center align-items-center mt-2 py-2" style="background-color: whitesmoke;">
-            <div class="col-md-10">
+            <div class="col-md-11">
                 <div class="row">
                     <div class="col-md-5">
                         <div class="form-group">
@@ -57,14 +57,14 @@ const agregarAcciones = () => {
                     </div>
                     <div class="col-md-3">
                         <div class="form-group">
-                            <label>Responsable</label>
-                            <input type="text" class="form-control responsable" placeholder="Responsable">
+                            <label title="El colaborador directamente responsable del proceso">Responsable</label>
+                            <input type="text" title="El colaborador directamente responsable del proceso" class="form-control responsable" placeholder="Responsable">
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-2 text-center">
-                <button class="btn btn-outline-danger btn-sm btn-eliminar" onclick="this.parentElement.parentElement.remove()">
+            <div class="col-md-1 text-center" style="align-self: end;">
+                <button class="btn btn-outline-danger btn-eliminar" style="font-size: 14px;" onclick="this.parentElement.parentElement.remove()">
                     <i class="fa-regular fa-trash-can"></i>
                 </button>
             </div>
@@ -105,11 +105,11 @@ const getPlanesAccion = async () => {
                 <thead class="table-info">
                     <tr>
                         <th>Proceso</th>
-                        <th>Periodo</th>
+                        <th>Período a cumplir</th>
                         <th>Meta %</th>
                         <th>Rango Inicial %</th>
                         <th>Rango Final %</th>
-                        <th>Objetivos</th>
+                        <th>Objetivos esenciales</th>
                         <th>Causa Raíz</th>
                         <th>Indicador</th>
                         <th class="text-center">Acción</th>
@@ -182,7 +182,7 @@ const getDetallePlanesAccion = async (id) => {
              <table id="tablaDatosDetalle" class="table table-sm table-bordered table-hover" style="width: 100%;">
                 <thead class="table-info">
                     <tr>
-                        <th>Acciones</th>
+                        <th>Acciones concretas</th>
                         <th>Fecha inicio</th>
                         <th>Fecha final</th>
                         <th>Responsable</th>
@@ -202,22 +202,22 @@ const getDetallePlanesAccion = async (id) => {
                         <tr data-id="${item.ID}">
                             <td colspan="4">
                                 <div class="row justify-content-center">
-                                    <div class="col-md-4 form-group mt-2 m-none">
-                                        <label class="bg-label" for="indice-${item.ID}">Índice</label>
-                                        <input type="text" id="indice-${item.ID}" class="form-control" 
-                                            value="${item.INDICE}" placeholder="Índice de acción concreta">
+                                    <div class="col-md-2 form-group mt-2 m-none">
+                                        <label class="bg-label" for="indice-${item.ID}">Peso ponderación %</label>
+                                        <input type="text" id="indice-${item.ID}" class="form-control indice" 
+                                            value="${item.INDICE}" placeholder="Peso ponderación">
                                     </div>
                                     <div class="col-md-2 form-group mt-2 m-none">
                                         <label class="bg-label" for="avance-${item.ID}">Avance</label>
-                                        <input type="text" id="avance-${item.ID}" class="form-control" 
+                                        <input type="text" id="avance-${item.ID}" class="form-control avance" 
                                             value="${item.AVANCE}" placeholder="Avance">
                                     </div>                              
-                                    <div class="col-md-2 form-group mt-2 m-none">
-                                        <label class="bg-label" for="resultado-${item.ID}">Resultado</label>
+                                    <div class="col-md-3 form-group mt-2 m-none">
+                                        <label class="bg-label" for="resultado-${item.ID}">Resultado obtenido</label>
                                         <input type="text" id="resultado-${item.ID}" class="form-control" 
                                             value="${item.RESULTADOS}" placeholder="Resultado">
                                     </div>
-                                    <div class="col-md-4 form-group mt-2 m-none">
+                                    <div class="col-md-2 form-group mt-2 m-none">
                                         <label class="bg-label" for="estado-${item.ID}">Estado</label>
                                         <select class="form-select" id="estado-${item.ID}">
                                             <option value="">Seleccionar Estado</option>
@@ -225,7 +225,13 @@ const getDetallePlanesAccion = async (id) => {
                                             <option value="EN PROCESO" ${item.ESTADO === 'EN PROCESO' ? 'selected' : ''}>EN PROCESO</option>
                                             <option value="COMPLETADO" ${item.ESTADO === 'COMPLETADO' ? 'selected' : ''}>COMPLETADO</option>
                                             <option value="INCOMPLETO" ${item.ESTADO === 'INCOMPLETO' ? 'selected' : ''}>INCOMPLETO</option>
+                                            <option value="REPROGRAMADO" ${item.ESTADO === 'REPROGRAMADO' ? 'selected' : ''}>REPROGRAMADO</option>
                                         </select>                                    
+                                    </div>
+                                    <div class="col-md-3 form-group mt-2 m-none">
+                                        <label class="bg-label" for="explicacion-${item.ID}">Explicación</label>
+                                        <input type="text" id="explicacion-${item.ID}" class="form-control" 
+                                            value="${item.EXPLICACION}" placeholder="Explicación ¿por qué no se completó?">
                                     </div>
                                 </div>   
                             </td>                       
@@ -237,12 +243,18 @@ const getDetallePlanesAccion = async (id) => {
             </table>`;
 
             $('#tablaDetallePlan').html(tabla);
+
+            $(".indice, .avance").on("input", function () {
+                this.value = this.value.replace(/\D/g, "");
+                this.value = `${this.value}%`;
+            });
         }
     } catch (error) {
         console.log(error);
     }
 }
 
+// TODO: REALIZAR AJUSTE EN FUNCIONALIDAD, GUARDAR ACCIONES, AGREGAR NUEVO CAMPO EXPLICACIÓN EN MODELO Y CONTROLADOR
 const guardarAcciones = async () => {
     const usuario = $('#usuario_ses').val();
     const idPlan = $('#idPlan').val();
@@ -256,6 +268,7 @@ const guardarAcciones = async () => {
         const avance = document.querySelector(`#avance-${id}`)?.value.trim();
         const resultado = document.querySelector(`#resultado-${id}`)?.value.trim();
         const estado = document.querySelector(`#estado-${id}`)?.value.trim();
+        const explicacion = document.querySelector(`#explicacion-${id}`)?.value.trim();
 
         if (!indice || !avance || !resultado || !estado) {
             hayErrores = true;
@@ -382,7 +395,7 @@ const guardarPlanAccion = async () => {
 
         const result = await confirmAlert(
             "Guardar plan de acción",
-            "Se guardarán los datos del plan de acción... ¿Se verificaron correctamente los datos?");
+            "Se guardarán los datos del plan de acción... ¿Se verificaron correctamente los datos? Recuerda: Despúes de guardado no permite ningún tipo de modificación");
         if (!result.isConfirmed) return;
 
         const { id, ok } = await enviarPeticion(dataRequest);
@@ -442,7 +455,7 @@ const filtrar = (filtro) => {
     });
 }
 
-// EJECUCIÓN DE FUNCIONALIDADES
+//? EJECUCIÓN DE FUNCIONALIDADES
 $(function () {
     // desHabilitarFormulario();
 

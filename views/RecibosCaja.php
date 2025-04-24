@@ -102,21 +102,24 @@ Redireccionar();
 
     .contenedor-valores {
       display: flex;
-      justify-content: space-evenly;
-      border: 1px solid #ccc;
-      padding: 10px 0;
+      /* justify-content: space-evenly; */
+      flex: 1;
+      gap: 120px;
+      /* border: 1px solid #ccc; */
+      /* padding: 10px 0; */
       align-items: center;
-      margin-bottom: 10px;
-      border-radius: 5px;
+      /* margin-bottom: 10px; */
+      /* border-radius: 5px; */
     }
 
     .p-valores {
-      font-size: 16px;
+      font-size: 20px;
       margin: 0;
     }
 
     .span-valores {
       font-weight: 600;
+      color: #337ab7;
     }
 
     .custom-card {
@@ -287,10 +290,15 @@ Redireccionar();
           </div>
         </div>
         <div class="tab-pane fade in" id="dvFacturas">
-          <div class="contenedor-valores">
-            <p class="p-valores">VALOR TOTAL: <span class="span-valores" id="valorTotal">$0</span></p>
-            <p class="p-valores">PARTIDAS: <span class="span-valores" id="partidas">0</span></p>
-            <p class="p-valores">VALOR MORA: <span class="span-valores" id="valorMora">$0</span></p>
+          <div style="display: flex; justify-content: space-between; align-items: end; margin-bottom: 8px;">
+            <div class="contenedor-valores">
+              <p class="p-valores">Valor Total: <span class="span-valores" id="valorTotal">$0</span></p>
+              <p class="p-valores">Partidas: <span class="span-valores" id="partidas">0</span></p>
+              <p class="p-valores">Valor Mora: <span class="span-valores" id="valorMora">$0</span></p>
+            </div>
+            <div style="display: flex; justify-content: flex-end;">
+              <button class="btn btn-primary" id="btnSeleccionarTodas">Seleccionar todas</button>
+            </div>
           </div>
           <div id="dvResultCartera" style="overflow-y: scroll; overflow-x: hidden; height: 406px;"></div>
         </div>
@@ -356,15 +364,23 @@ Redireccionar();
           </div>
         </div>
         <div class="tab-pane fade in" id="dvMulticash">
-          <table width="100%">
+          <!-- <table width="100%">
             <tr>
-              <td width="50%"><input type="text" placeholder="Filtro de búsqueda" class="form-control" id="filtro" name="filtro"></td>
-              <td><select id="MultiDay" class="form-control">
-                </select></td>
-              <td><select id="MultiMes" class="form-control">
-                </select></td>
-              <td><select id="MultiAnio" class="form-control">
-                </select></td>
+              <td width="50%">
+                <input type="text" placeholder="Filtro de búsqueda" class="form-control" id="filtro" name="filtro">
+              </td>
+              <td>
+                <select id="MultiDay" class="form-control">
+                </select>
+              </td>
+              <td>
+                <select id="MultiMes" class="form-control">
+                </select>
+              </td>
+              <td>
+                <select id="MultiAnio" class="form-control">
+                </select>
+              </td>
               <td>
                 <div class="input-group">
                   <input type="text" class="form-control" placeholder="Validar Multicash" id="txtValidaDocumento" onKeyPress="return vnumeros(event)">
@@ -372,7 +388,30 @@ Redireccionar();
                 </div>
               </td>
             </tr>
-          </table>
+          </table> -->
+          <div class="row">
+            <div class="col-md-6">
+              <input type="text" placeholder="Filtro de búsqueda" class="form-control" id="filtro" name="filtro">
+            </div>
+            <div class="col-md-1">
+              <select id="MultiDay" class="form-control">
+              </select>
+            </div>
+            <div class="col-md-2">
+              <select id="MultiMes" class="form-control">
+              </select>
+            </div>
+            <div class="col-md-1">
+              <select id="MultiAnio" class="form-control">
+              </select>
+            </div>
+            <div class="col-md-2">
+              <div class="input-group">
+                <input type="text" class="form-control" placeholder="Validar Multicash" id="txtValidaDocumento" onKeyPress="return vnumeros(event)">
+                <span class="input-group-addon"> <span class="glyphicon glyphicon-search" aria-hidden="true"></span></span>
+              </div>
+            </div>
+          </div>
           <div id="dvResultMulticash" style="overflow-y: scroll; overflow-x: hidden; height: 500px;">
             <hr>
             <table class="table" width="100%" id="tdPlanillas">
@@ -417,7 +456,7 @@ Redireccionar();
                   </tr>
                 </thead>
                 <tbody>
-  
+
                 </tbody>
                 <tfoot>
                   <tr>
@@ -431,7 +470,7 @@ Redireccionar();
                     <td class="font-size-tf"></td>
                   </tr>
                 </tfoot>
-              </table>           
+              </table>
               <div style="display: flex; justify-content: flex-end;">
                 <button class="btn btn-danger custom-padding" id="btnDescargarPDF">Descargar PDF</button>
               </div>
@@ -455,7 +494,7 @@ Redireccionar();
                   </tr>
                 </thead>
                 <tbody>
-  
+
                 </tbody>
                 <tfoot>
                   <tr>
@@ -469,7 +508,7 @@ Redireccionar();
                     <td class="font-size-tf"></td>
                   </tr>
                 </tfoot>
-              </table>           
+              </table>
               <div style="display: flex; justify-content: flex-end;">
                 <button class="btn btn-danger custom-padding" id="btnDescargarPDF3">Descargar PDF</button>
               </div>
@@ -493,7 +532,7 @@ Redireccionar();
                   </tr>
                 </thead>
                 <tbody>
-  
+
                 </tbody>
                 <tfoot>
                   <tr>
@@ -507,7 +546,7 @@ Redireccionar();
                     <td class="font-size-tf"></td>
                   </tr>
                 </tfoot>
-              </table>           
+              </table>
               <div style="display: flex; justify-content: flex-end;">
                 <button class="btn btn-danger custom-padding" id="btnDescargarPDF2">Descargar PDF</button>
               </div>
@@ -577,7 +616,7 @@ Redireccionar();
         </td>
       </tr>
     </table>
-  </div>  
+  </div>
   <!---INICIO CONDICIONES DE DESCUENTOS DEL CLIENTE SELECCIONADO-->
   <div id="dvCondiciones" class="modal fade bd-example-modal-lg" role="dialog">
     <div class="modal-dialog modal-lg">
@@ -954,7 +993,7 @@ Redireccionar();
         </div>
       </div>
     </div>
-  </div> 
+  </div>
   <!----------------------------------->
   <div id="ModalHipervinculo" class="modal" role="dialog" style="z-index: 99999; margin-top: 0; background-color: #C0C0C0; padding: 0"
     aria-hidden="true"

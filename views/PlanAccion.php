@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Eventos comerciales</title>
+    <title>Eventos Comerciales</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="../resources/css/start/jquery-ui-1.9.2.custom.css?<?php echo (rand()); ?>" />
     <link rel="stylesheet" href="../resources/bootstrap/bootstrap-5.0.2-dist/css/bootstrap.min.css">
@@ -85,22 +85,16 @@
             vertical-align: middle;
         }
 
-        /* .w-input {
-            width: 80%;
-            background-color: #EEF7FF;
-        }
-
-        .w-input:focus {
-            width: 80%;
-            background-color: #EEF7FF;
-        } */
-
         .error {
             background-color: #ffcccc !important;
         }
 
         .bg-label {
             font-weight: 500;
+        }
+
+        .label-form {
+            font-size: 15px;
         }
     </style>
 </head>
@@ -114,7 +108,7 @@
     <input type="hidden" id="idPlan">
     <!-- VISTA GENERAL CREACIÓN - SEGUIMIENTO -->
     <div>
-        <div class="alert alert-info mb-2" style="font-weight: 500; font-size: larger;"><i class="fa-solid fa-star fa-flip"></i>&nbsp;11414 - PLAN MENSUAL DE ACCIONES</div>
+        <div class="alert alert-info mb-2" style="font-weight: 500; font-size: larger;"><i class="fa-solid fa-star fa-flip"></i>&nbsp;11414 - PLAN OBJETIVOS ESENCIALES</div>
         <nav class="row p-1">
             <div class="nav nav-tabs" id="nav-tab" role="tablist">
                 <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true"><i class="fa fa-pencil"></i>&nbsp;Creación</button>
@@ -131,21 +125,22 @@
                     </div>
                 </div>
                 <div style="width: 95%; margin: 0 auto;">
-                    <!-- <h3 class="text-center mt-2 mb-4" style="color: #055160; font-weight: 400;">Creación plan mensual de acciones</h3> -->
                     <form class="" id="formulario">
                         <div class="row shadow-sm px-3 py-4" style="background-color: whitesmoke;">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="proceso">Proceso</label>
+                                    <label class="label-form" for="proceso">Proceso</label>
                                     <select name="PROCESO" id="proceso" class="form-select">
 
                                     </select>
                                 </div>
                                 <div class="form-group mt-2">
-                                    <label for="periodo">Periodo</label>
+                                    <label class="label-form" for="periodo">Período a cumplir</label>
                                     <select name="PERIODO" id="periodo" class="form-select">
                                         <option value="">Seleccione el Periodo</option>
                                         <option value="DIARIO">DIARIO</option>
+                                        <option value="SEMANAL">SEMANAL</option>
+                                        <option value="QUINCENAL">QUINCENAL</option>
                                         <option value="MENSUAL">MENSUAL</option>
                                         <option value="BIMESTRAL">BIMESTRAL</option>
                                         <option value="TRIMESTRAL">TRIMESTRAL</option>
@@ -154,11 +149,11 @@
                                     </select>
                                 </div>
                                 <div class="form-group mt-2">
-                                    <label for="meta">Meta %</label>
+                                    <label class="label-form" for="meta">Meta %</label>
                                     <input type="text" class="form-control" name="META" id="meta" placeholder="% Meta">
                                 </div>
                                 <div class="form-group mt-2">
-                                    <label for="rango">Rango %</label>
+                                    <label class="label-form" for="rango">Rango %</label>
                                     <div class="d-flex gap-2">
                                         <input type="text" class="form-control" name="RANGO_INICIAL" id="rangoIni" placeholder="% Rango Inicial">
                                         <input type="text" class="form-control" name="RANGO_FINAL" id="rangoFin" placeholder="% Rango Final">
@@ -167,21 +162,20 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="objetivos">Objetivos</label>
+                                    <label class="label-form" for="objetivos">Objetivos esenciales</label>
                                     <textarea name="OBJETIVOS" class="form-control form-control-sm bg-custom-input" id="objetivos"></textarea>
                                 </div>
                                 <div class="form-group">
-                                    <label for="causaRaiz">Causa raíz</label>
+                                    <label class="label-form" for="causaRaiz">Causa raíz: <span>Es el factor específico y controlable que si lo eliminas previene la recurrencia o mejora significativa del indicador</span></label>
                                     <textarea name="CAUSA_RAIZ" class="form-control form-control-sm bg-custom-input" id="causaRaiz"></textarea>
                                 </div>
                                 <div class="form-group">
-                                    <label for="indicador">Indicador</label>
+                                    <label class="label-form" for="indicador">Indicador: <span>Relación del resultado obtenido entre el objetivo a alcanzar</span></label>
                                     <textarea name="INDICADOR" class="form-control form-control-sm bg-custom-input" id="indicador"></textarea>
                                 </div>
                                 <div class="d-flex align-items-baseline gap-5 mt-2">
                                     <p style="font-weight: 600;">ACCIONES</p>
                                     <button type="button" class="btn btn-primary btn-sm" id="btnAgregarAcciones" style="height: max-content;">
-                                        <!-- <i class="fa-solid fa-circle-plus"></i> -->
                                         Agregar
                                     </button>
                                 </div>
@@ -193,7 +187,6 @@
                     </div>
                     <div class="d-flex justify-content-center mt-3 mb-2">
                         <button class="btn btn-primary w-50" id="btnGuardarPlan" style="font-size: large;">
-                            <!-- <i class="fa-solid fa-floppy-disk"></i> -->
                             Guardar plan
                         </button>
                     </div>
@@ -251,7 +244,6 @@
                     </div>
                     <div class="d-flex justify-content-end">
                         <button class="btn btn-primary" id="guardarAcciones" style="font-size: large;">
-                            <!-- <i class="fa-solid fa-floppy-disk"></i> -->
                             Guardar acciones
                         </button>
                     </div>
