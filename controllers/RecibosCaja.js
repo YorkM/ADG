@@ -1,9 +1,8 @@
 let ArrayMulticash = new Array();
 let ArrayMulticashBanco = new Array();
 let ArrCli = new Array();
+let ArrDctos = new Array();
 let arrayLiquidador = new Array();
-let arrayLiquidador2 = new Array();
-let arrayLiquidador3 = new Array();
 
 //? EJECUCIÓN DE FUNCIONALIDADES
 $(function () {
@@ -187,6 +186,8 @@ $(function () {
     search: function () { },
     open: function (event, ui) { },
     select: function (event, ui) {
+      limpiarDatos();
+
       $("#CodigoSAP").val(ui.item.codigo_sap);
       $("#Email").val(ui.item.email);
       $("#EmailZona").val(ui.item.email_zona);
@@ -207,7 +208,6 @@ $(function () {
       CondicionesDcto();
       Documentos();
       ConsultarCondicionLista();
-
     }
   });
   //-------------------------------------------------------------------------------
@@ -352,7 +352,6 @@ $(function () {
     $(".iframe").attr('src', url).show();
   });
 
-
   $("#btnCompensaciones").click(() => {
     $("#modalCompensaciones").modal('show');
   })
@@ -361,37 +360,8 @@ $(function () {
     compensarDocumentos();
   })
 
-  $('#btnDescargarPDF').click(function () {
-    const contenidoLiquidador = $("#tablaLiquidador tbody tr").length;
-    if (!contenidoLiquidador) {
-      Swal.fire("Descargar PDF liquidador", "No hay datos para descargar, agregar las facturas", "warning");
-      return;
-    }
-    generarPDF("tablaLiquidador");
-  });
-
-  $('#btnDescargarPDF2').click(function () {
-    const contenidoLiquidador = $("#tablaLiquidador2 tbody tr").length;
-    if (!contenidoLiquidador) {
-      Swal.fire("Descargar PDF liquidador", "No hay datos para descargar, agregar las facturas", "warning");
-      return;
-    }
-    generarPDF("tablaLiquidador2");
-  });
-
-  $('#btnDescargarPDF3').click(function () {
-    const contenidoLiquidador = $("#tablaLiquidador3 tbody tr").length;
-    if (!contenidoLiquidador) {
-      Swal.fire("Descargar PDF liquidador", "No hay datos para descargar, agregar las facturas", "warning");
-      return;
-    }
-    generarPDF("tablaLiquidador3");
-  });
-
   $('#btnSeleccionarTodas').click(async function () {
     arrayLiquidador.length = 0;
-    arrayLiquidador2.length = 0;
-    arrayLiquidador3.length = 0;
 
     if (!$("#tdFacturas tbody tr").length) {
       Swal.fire("Agregar documentos", "No hay documentos para agregar al liquidador", "warning");
@@ -408,10 +378,10 @@ $(function () {
       agregarLiquidador(item);
     });
   });
-
 });
 
-//? FUNCIONES GENERALES
+// FUNCIONES GENERALES
+
 const confirmAlert = async (title, text, icon = 'warning') => {
   const result = await Swal.fire({
     title: `${title}`,
@@ -428,9 +398,8 @@ const confirmAlert = async (title, text, icon = 'warning') => {
 }
 
 const limpiarDatos = () => {
+  ArrDctos.length = 0;
   arrayLiquidador.length = 0;
-  arrayLiquidador2.length = 0;
-  arrayLiquidador3.length = 0;
 
   $('#tdPlanillas tbody').html("");
 
@@ -454,7 +423,7 @@ const limpiarDatos = () => {
   $('#totalPagar3').text("$0");
 }
 
-//? FUNCIÓN AGREGAR DIAS FECHA BASE
+// FUNCIÓN AGREGAR DIAS FECHA BASE
 function agregarDias(fechaBase, diasAgregar) {
   const [anio, mes, dia] = fechaBase.split('-').map(Number);
   const fecha = new Date(anio, mes - 1, dia);
@@ -468,7 +437,7 @@ function agregarDias(fechaBase, diasAgregar) {
   return `${nuevoDia}/${nuevoMes}/${nuevoAnio}`;
 }
 
-//? FUNCIÓN VERIFICAR VIGENCIA FECHA
+// FUNCIÓN VERIFICAR VIGENCIA FECHA
 function verificarVencimientoDescuento(fechaVencimientoFactura) {
   const [d1, m1, y1] = fechaVencimientoFactura.split('/').map(Number);
   const fechaVencimiento = new Date(y1, m1 - 1, d1);
@@ -479,7 +448,7 @@ function verificarVencimientoDescuento(fechaVencimientoFactura) {
   return fechaVencimiento < fechaReferencia;
 }
 
-//? FUNCIÓN GENERAR PDF LIQUIDADOR
+// FUNCIÓN GENERAR PDF LIQUIDADOR
 async function generarPDF(tabla) {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF('landscape');
@@ -518,210 +487,7 @@ async function generarPDF(tabla) {
   doc.save('liquidacion.pdf');
 }
 
-//? FUNCIÓN AGREGAR ITEM AL LIQUIDADOR
-// const agregarLiquidador = (item) => {
-//   console.log(item);
-//   const {
-//     BASE_PP,
-//     CLASE_DOCUMENTO,
-//     FECHA_BASE,
-//     DESCUENTO,
-//     DIAS,
-//     IMPORTE,
-//     NUMERO_DOCUMENTO,
-//     REFERENCIA
-//   } = item;
-
-//   const basePP = parseFloat(BASE_PP);
-//   const importe = parseFloat(IMPORTE);
-//   let porcentajeDescuento = parseFloat(DESCUENTO);
-//   let valorDescuento = 0;
-//   let valorPagar = 0;
-//   let FB = FECHA_BASE.split('-');
-//   const claseDoc = CLASE_DOCUMENTO.trim();
-
-//   const fechaVencimientoFactura = agregarDias(FECHA_BASE, parseInt(DIAS));
-//   const fechaDescuentoVencida = verificarVencimientoDescuento(fechaVencimientoFactura);
-
-//   if (fechaDescuentoVencida || claseDoc === "NC" || claseDoc === "ND") {
-//     porcentajeDescuento = 0;
-//     valorPagar = importe;
-//   } else {
-//     valorDescuento = Math.round(basePP * (porcentajeDescuento / 100));
-//     valorPagar = Math.round(importe - valorDescuento);
-//   }
-
-//   let itemProcesado = {
-//     numeroDoc: NUMERO_DOCUMENTO.trim(),
-//     referencia: REFERENCIA.trim(),
-//     claseDoc,
-//     DIAS,
-//     fechaFactura: `${FB[2]}/${FB[1]}/${FB[0]}`,
-//     fechaVencimientoFactura,
-//     basePP,
-//     importe,
-//     porcentajeDescuento,
-//     valorDescuento,
-//     valorPagar
-//   };
-
-//   arrayLiquidador.push(itemProcesado);
-//   Swal.fire("Agregar documento", "Documento agregado correctamente al liquidador", "success");
-
-//   const totalFacturas = arrayLiquidador.reduce((total, item) => total + item.importe, 0);
-//   const totalBasePP = arrayLiquidador.reduce((total, item) => total + item.basePP, 0);
-//   const totalDescuento = arrayLiquidador.reduce((total, item) => total + item.valorDescuento, 0);
-//   const totalPagar = arrayLiquidador.reduce((total, item) => total + item.valorPagar, 0);
-
-//   let elementos = ``;
-//   arrayLiquidador.forEach(item => {
-//     elementos += `
-//       <tr>
-//         <td class="font-size">${item.numeroDoc}</td>        
-//         <td class="font-size">${item.claseDoc}</td>        
-//         <td class="font-size">${item.fechaFactura}</td>        
-//         <td class="font-size">${item.fechaVencimientoFactura}</td>        
-//         <td class="font-size">${formatNum(item.importe, "$")}</td>        
-//         <td class="font-size">${formatNum(item.basePP, "$")}</td>        
-//         <td class="font-size">${item.DIAS}</td>        
-//         <td class="font-size">${item.porcentajeDescuento}%</td>        
-//         <td class="font-size">${formatNum(item.valorDescuento, "$")}</td>        
-//         <td class="font-size">${formatNum(item.valorPagar, "$")}</td>        
-//       </tr>`;
-//   });
-//   $('#tablaLiquidador tbody').html(elementos);
-//   $('#totalFacturas').text(formatNum(totalFacturas, "$"));
-//   $('#totalProntoPago').text(formatNum(totalBasePP, "$"));
-//   $('#totalDescuento').text(formatNum(totalDescuento, "$"));
-//   $('#totalPagar').text(formatNum(totalPagar, "$"));
-
-//   //? CALCULOS LIQUIDADOR FACTURA DESCUENTOS ADG
-//   const contenidoDescuentosADG = $("#tableCondicionesListaPlazo tbody tr").length;
-//   if (contenidoDescuentosADG === 2) {
-//     const fila1 = $("#tableCondicionesListaPlazo tbody tr").eq(0);
-//     const fila2 = $("#tableCondicionesListaPlazo tbody tr").eq(1);
-
-//     let valorDescuento = 0;
-//     let valorPagar = 0;
-//     let valorDescuento2 = 0;
-//     let valorPagar2 = 0;
-
-//     const dias2 = parseInt($(fila1.find('td')[1]).text());
-//     let porcentajeDescuento2 = parseFloat($(fila1.find('td')[2]).text());
-//     const dias3 = parseInt($(fila2.find('td')[1]).text());
-//     let porcentajeDescuento3 = parseFloat($(fila2.find('td')[2]).text());
-
-//     const fechaVencimientoFactura2 = agregarDias(FECHA_BASE, parseInt(dias2));
-//     const fechaDescuentoVencida2 = verificarVencimientoDescuento(fechaVencimientoFactura2);
-
-//     if (fechaDescuentoVencida2 || claseDoc === "NC" || claseDoc === "ND") {
-//       porcentajeDescuento2 = 0;
-//       valorPagar = importe;
-//     } else {
-//       valorDescuento = Math.round(basePP * (porcentajeDescuento2 / 100));
-//       valorPagar = Math.round(importe - valorDescuento);
-//     }
-
-//     let itemProcesado = {
-//       numeroDoc: NUMERO_DOCUMENTO.trim(),
-//       referencia: REFERENCIA.trim(),
-//       claseDoc,
-//       dias2,
-//       fechaFactura: `${FB[2]}/${FB[1]}/${FB[0]}`,
-//       fechaVencimientoFactura2,
-//       basePP,
-//       importe,
-//       porcentajeDescuento2,
-//       valorDescuento,
-//       valorPagar
-//     };
-
-//     arrayLiquidador2.push(itemProcesado);
-
-//     const totalFacturas = arrayLiquidador2.reduce((total, item) => total + item.importe, 0);
-//     const totalBasePP = arrayLiquidador2.reduce((total, item) => total + item.basePP, 0);
-//     const totalDescuento = arrayLiquidador2.reduce((total, item) => total + item.valorDescuento, 0);
-//     const totalPagar = arrayLiquidador2.reduce((total, item) => total + item.valorPagar, 0);
-
-//     let elementos = ``;
-//     arrayLiquidador2.forEach(item => {
-//       elementos += `
-//       <tr>
-//         <td class="font-size">${item.numeroDoc}</td>        
-//         <td class="font-size">${item.claseDoc}</td>        
-//         <td class="font-size">${item.fechaFactura}</td>        
-//         <td class="font-size">${item.fechaVencimientoFactura2}</td>        
-//         <td class="font-size">${formatNum(item.importe, "$")}</td>        
-//         <td class="font-size">${formatNum(item.basePP, "$")}</td>        
-//         <td class="font-size">${item.dias2}</td>        
-//         <td class="font-size">${item.porcentajeDescuento2}%</td>        
-//         <td class="font-size">${formatNum(item.valorDescuento, "$")}</td>        
-//         <td class="font-size">${formatNum(item.valorPagar, "$")}</td>        
-//       </tr>`;
-//     });
-//     $('#tablaLiquidador2 tbody').html(elementos);
-//     $('#totalFacturas2').text(formatNum(totalFacturas, "$"));
-//     $('#totalProntoPago2').text(formatNum(totalBasePP, "$"));
-//     $('#totalDescuento2').text(formatNum(totalDescuento, "$"));
-//     $('#totalPagar2').text(formatNum(totalPagar, "$"));
-
-//     //? CALCULOS AL 11% - 30 DIAS
-//     const fechaVencimientoFactura3 = agregarDias(FECHA_BASE, parseInt(dias3));
-//     const fechaDescuentoVencida3 = verificarVencimientoDescuento(fechaVencimientoFactura3);
-
-//     if (fechaDescuentoVencida3 || claseDoc === "NC" || claseDoc === "ND") {
-//       porcentajeDescuento3 = 0;
-//       valorPagar2 = importe;
-//     } else {
-//       valorDescuento2 = Math.round(basePP * (porcentajeDescuento3 / 100));
-//       valorPagar2 = Math.round(importe - valorDescuento2);
-//     }
-
-//     let itemProcesado2 = {
-//       numeroDoc: NUMERO_DOCUMENTO.trim(),
-//       referencia: REFERENCIA.trim(),
-//       claseDoc,
-//       dias3,
-//       fechaFactura: `${FB[2]}/${FB[1]}/${FB[0]}`,
-//       fechaVencimientoFactura3,
-//       basePP,
-//       importe,
-//       porcentajeDescuento3,
-//       valorDescuento2,
-//       valorPagar2
-//     };
-
-//     arrayLiquidador3.push(itemProcesado2);
-
-//     const totalFacturas2 = arrayLiquidador3.reduce((total, item) => total + item.importe, 0);
-//     const totalBasePP2 = arrayLiquidador3.reduce((total, item) => total + item.basePP, 0);
-//     const totalDescuento2 = arrayLiquidador3.reduce((total, item) => total + item.valorDescuento2, 0);
-//     const totalPagar2 = arrayLiquidador3.reduce((total, item) => total + item.valorPagar2, 0);
-
-//     let elementos2 = ``;
-//     arrayLiquidador3.forEach(item => {
-//       elementos2 += `
-//       <tr>
-//         <td class="font-size">${item.numeroDoc}</td>        
-//         <td class="font-size">${item.claseDoc}</td>        
-//         <td class="font-size">${item.fechaFactura}</td>        
-//         <td class="font-size">${item.fechaVencimientoFactura3}</td>        
-//         <td class="font-size">${formatNum(item.importe, "$")}</td>        
-//         <td class="font-size">${formatNum(item.basePP, "$")}</td>        
-//         <td class="font-size">${item.dias3}</td>        
-//         <td class="font-size">${item.porcentajeDescuento3}%</td>        
-//         <td class="font-size">${formatNum(item.valorDescuento2, "$")}</td>        
-//         <td class="font-size">${formatNum(item.valorPagar2, "$")}</td>        
-//       </tr>`;
-//     });
-//     $('#tablaLiquidador3 tbody').html(elementos2);
-//     $('#totalFacturas3').text(formatNum(totalFacturas2, "$"));
-//     $('#totalProntoPago3').text(formatNum(totalBasePP2, "$"));
-//     $('#totalDescuento3').text(formatNum(totalDescuento2, "$"));
-//     $('#totalPagar3').text(formatNum(totalPagar2, "$"));
-//   }
-// }
-
+// FUNCIÓN PARA REALIZAR LOS CÁLCULOS DE DESCUENTO
 const calcularDescuento = (basePP, importe, porcentaje, claseDoc, fechaVencimiento) => {
   const vencido = verificarVencimientoDescuento(fechaVencimiento);
   if (vencido || ["NC", "ND"].includes(claseDoc)) {
@@ -733,126 +499,161 @@ const calcularDescuento = (basePP, importe, porcentaje, claseDoc, fechaVencimien
   return { porcentaje, descuento, pagar };
 };
 
-const generarFilaHTML = (item, fechaVenc, diasKey, porcentajeKey, descuentoKey, pagarKey) => `
-  <tr>
-    <td class="font-size">${item.numeroDoc}</td>        
-    <td class="font-size">${item.claseDoc}</td>        
-    <td class="font-size">${item.fechaFactura}</td>        
-    <td class="font-size">${item[fechaVenc]}</td>        
-    <td class="font-size">${formatNum(item.importe, "$")}</td>        
-    <td class="font-size">${formatNum(item.basePP, "$")}</td>        
-    <td class="font-size">${item[diasKey]}</td>        
-    <td class="font-size">${item[porcentajeKey]}%</td>        
-    <td class="font-size">${formatNum(item[descuentoKey], "$")}</td>        
-    <td class="font-size">${formatNum(item[pagarKey], "$")}</td>        
-    <td class="font-size td-text"><input type="text" maxlength="25" class="form-control input-sm input-obser"></td>        
-  </tr>`;
+// CREACIÓN DE LAS TABLAS DEL LIQUIDADOR
+function crearTablasPorDias(datos) {
+  const agrupadoPorDias = {};
 
-const renderTabla = (idTabla, idTotales, items, fechaVencKey, diasKey, porcentajeKey, descuentoKey, pagarKey) => {
-  let html = "";
-  let totalFacturas = 0, totalBasePP = 0, totalDescuento = 0, totalPagar = 0;
-
-  items.forEach(item => {
-    html += generarFilaHTML(item, fechaVencKey, diasKey, porcentajeKey, descuentoKey, pagarKey);
-    totalFacturas += item.importe;
-    totalBasePP += item.basePP;
-    totalDescuento += item[descuentoKey];
-    totalPagar += item[pagarKey];
+  datos.forEach(item => {
+    const dias = item.dias;
+    if (!agrupadoPorDias[dias]) {
+      agrupadoPorDias[dias] = [];
+    }
+    agrupadoPorDias[dias].push(item);
   });
 
-  $(`#${idTabla} tbody`).html(html);
-  $(`#${idTotales.facturas}`).text(formatNum(totalFacturas, "$"));
-  $(`#${idTotales.basePP}`).text(formatNum(totalBasePP, "$"));
-  $(`#${idTotales.descuento}`).text(formatNum(totalDescuento, "$"));
-  $(`#${idTotales.pagar}`).text(formatNum(totalPagar, "$"));
+  const contenedor = document.querySelector("#contenedorTablasLiquidador");
+  contenedor.innerHTML = "";
 
-  $(`#${idTabla} tbody`).on('blur', '.input-obser', function() {
-    const valor = $(this).val();
-    const td = $(this).closest('td');
-    td.text(valor);
-  });
-};
+  for (const dias in agrupadoPorDias) {
+    const grupo = agrupadoPorDias[dias];
 
+    let count = 0;
+
+    const titulo = document.createElement("h3");
+    titulo.classList.add('text-center');
+    titulo.textContent = `Liquidación a ${dias} días`;
+    contenedor.appendChild(titulo);
+
+    const tabla = document.createElement("table");
+    tabla.setAttribute('id', `tabla${count + 1}`);
+    tabla.classList.add('table');
+    tabla.classList.add('table-liquidador');
+    tabla.style.width = "100%";
+
+    const cardContenedor = document.createElement('div');
+    cardContenedor.classList.add('custom-card');
+    cardContenedor.style.width = '98%';
+    cardContenedor.style.margin = '20px auto';
+
+    const btnContenedor = document.createElement('div');
+    btnContenedor.classList.add('btn-pdf')
+    btnContenedor.style.display = 'flex';
+    btnContenedor.style.justifyContent = 'flex-end';
+
+    const btnDescargarPDF = document.createElement('button');
+    btnDescargarPDF.textContent = "Descargar PDF";
+    btnDescargarPDF.classList.add('btn');
+    btnDescargarPDF.classList.add('btn-danger');
+    btnDescargarPDF.classList.add('custom-padding');
+
+    btnContenedor.appendChild(btnDescargarPDF);
+
+    const thead = document.createElement("thead");
+    const encabezado = `
+      <tr>
+        <th>Doc.</th>
+        <th>Clase</th>
+        <th>Fecha</th>
+        <th>Fecha Venc.</th>
+        <th>V Fact.</th>
+        <th>Base PP</th>
+        <th>Días</th>
+        <th>% Desc.</th>
+        <th>V Desc.</th>
+        <th>V Pagar</th>
+        <th>Observación</th>
+      </tr>`;
+    thead.innerHTML = encabezado;
+    tabla.appendChild(thead);
+
+    const tbody = document.createElement("tbody");
+    grupo.forEach(item => {
+      const fila = document.createElement("tr");
+      fila.innerHTML = `
+        <td class="font-size">${item.numeroDoc}</td>
+        <td class="font-size">${item.claseDoc}</td>
+        <td class="font-size">${item.fechaFactura}</td>
+        <td class="font-size">${item.fechaVencimientoFactura}</td>
+        <td class="font-size">${formatNum(item.importe, "$")}</td>
+        <td class="font-size">${formatNum(item.basePP, "$")}</td>
+        <td class="font-size">${item.dias}</td>
+        <td class="font-size">${item.porcentajeDescuento}%</td>
+        <td class="font-size">${formatNum(item.valorDescuento, "$")}</td>
+        <td class="font-size">${formatNum(item.valorPagar, "$")}</td>
+        <td class="font-size td-text"><input type="text" maxlength="25" class="form-control input-sm input-obser"></td>`;
+      tbody.appendChild(fila);
+    });
+    tabla.appendChild(tbody);
+
+    const totalBasePP = grupo.reduce((sum, item) => sum + item.basePP, 0);
+    const totalImporte = grupo.reduce((sum, item) => sum + item.importe, 0);
+    const totalDescuento = grupo.reduce((sum, item) => sum + item.valorDescuento, 0);
+    const totalPagar = grupo.reduce((sum, item) => sum + item.valorPagar, 0);
+
+    const tfoot = document.createElement("tfoot");
+    const totales = `
+      <tr>
+        <td colspan="4" class="font-size-tf" style="text-align: center;">Totales</td>
+        <td class="font-size-tf">${formatNum(totalImporte, "$")}</td>
+        <td class="font-size-tf">${formatNum(totalBasePP, "$")}</td>
+        <td class="font-size-tf"></td>
+        <td class="font-size-tf"></td>
+        <td class="font-size-tf">${formatNum(totalDescuento, "$")}</td>
+        <td class="font-size-tf">${formatNum(totalPagar, "$")}</td>
+        <td class="font-size-tf"></td>
+      </tr>`;
+
+    tfoot.innerHTML = totales;
+    tabla.appendChild(tfoot);
+    cardContenedor.appendChild(tabla);
+    cardContenedor.appendChild(btnContenedor);
+    contenedor.appendChild(cardContenedor);
+
+    $('.table-liquidador tbody').on('blur', '.input-obser', function() {
+      const valor = $(this).val();
+      const td = $(this).closest('td');
+      td.text(valor);
+    });
+
+    $('.btn-pdf').off().on('click', '.custom-padding', function (e) {
+      e.stopPropagation();
+      console.log($(this).parent().parent());
+      // generarPDF("tablaLiquidador");
+    });
+  }
+}
+
+//? FUNCIÓN AGREGAR ITEM AL LIQUIDADOR
 const agregarLiquidador = (item) => {
-  const {
-    BASE_PP, CLASE_DOCUMENTO, FECHA_BASE, DESCUENTO, DIAS,
-    IMPORTE, NUMERO_DOCUMENTO, REFERENCIA
-  } = item;
+  const { BASE_PP, CLASE_DOCUMENTO, FECHA_BASE, IMPORTE, NUMERO_DOCUMENTO, REFERENCIA } = item;
 
   const basePP = parseFloat(BASE_PP);
   const importe = parseFloat(IMPORTE);
   const claseDoc = CLASE_DOCUMENTO.trim();
   const FB = FECHA_BASE.split("-");
   const fechaFactura = `${FB[2]}/${FB[1]}/${FB[0]}`;
-  const fechaVencimientoFactura = agregarDias(FECHA_BASE, parseInt(DIAS));
-  const { porcentaje, descuento, pagar } = calcularDescuento(basePP, importe, parseFloat(DESCUENTO), claseDoc, fechaVencimientoFactura);
+  
+  ArrDctos.forEach(item => {
+    const fechaVencimientoFactura = agregarDias(FECHA_BASE, parseInt(item.dias));
+    const { porcentaje, descuento, pagar } = calcularDescuento(basePP, importe, parseFloat(item.descuento), claseDoc, fechaVencimientoFactura);
 
-  const procesado = {
-    numeroDoc: NUMERO_DOCUMENTO.trim(),
-    referencia: REFERENCIA.trim(),
-    claseDoc,
-    DIAS,
-    fechaFactura,
-    fechaVencimientoFactura,
-    basePP,
-    importe,
-    porcentajeDescuento: porcentaje,
-    valorDescuento: descuento,
-    valorPagar: pagar
-  };
-
-  arrayLiquidador.push(procesado);
-  Swal.fire("Agregar documento", "Documento agregado correctamente al liquidador", "success");
-
-  renderTabla("tablaLiquidador", {
-    facturas: "totalFacturas",
-    basePP: "totalProntoPago",
-    descuento: "totalDescuento",
-    pagar: "totalPagar"
-  }, arrayLiquidador, "fechaVencimientoFactura", "DIAS", "porcentajeDescuento", "valorDescuento", "valorPagar");
-
-  //? PROCESAR CONDICIONES DE DESCUENTO SI HAY AL MENOS UNA FILA
-  const filas = $("#tableCondicionesListaPlazo tbody tr");
-  if (filas.length >= 1) {
-    const condiciones = [arrayLiquidador2, arrayLiquidador3];
-    const tablaIDs = ["tablaLiquidador2", "tablaLiquidador3"];
-    const totalesIDs = [
-      { facturas: "totalFacturas2", basePP: "totalProntoPago2", descuento: "totalDescuento2", pagar: "totalPagar2" },
-      { facturas: "totalFacturas3", basePP: "totalProntoPago3", descuento: "totalDescuento3", pagar: "totalPagar3" }
-    ];
-
-    filas.each((i, fila) => {
-      if (i >= condiciones.length) return;
-
-      const celdas = $(fila).find("td");
-      const dias = parseInt($(celdas[1]).text());
-      const porcentaje = parseFloat($(celdas[2]).text());
-
-      const fechaVencimiento = agregarDias(FECHA_BASE, dias);
-      const { porcentaje: p, descuento: d, pagar: pay } = calcularDescuento(basePP, importe, porcentaje, claseDoc, fechaVencimiento);
-
-      const nuevo = {
-        numeroDoc: NUMERO_DOCUMENTO.trim(),
-        referencia: REFERENCIA.trim(),
-        claseDoc,
-        [`dias${i + 2}`]: dias,
-        fechaFactura,
-        [`fechaVencimientoFactura${i + 2}`]: fechaVencimiento,
-        basePP,
-        importe,
-        [`porcentajeDescuento${i + 2}`]: p,
-        [`valorDescuento${i + 2}`]: d,
-        [`valorPagar${i + 2}`]: pay
-      };
-
-      condiciones[i].push(nuevo);
-
-      renderTabla(tablaIDs[i], totalesIDs[i], condiciones[i],
-        `fechaVencimientoFactura${i + 2}`, `dias${i + 2}`,
-        `porcentajeDescuento${i + 2}`, `valorDescuento${i + 2}`, `valorPagar${i + 2}`);
+    arrayLiquidador.push({
+      numeroDoc: NUMERO_DOCUMENTO.trim(),
+      referencia: REFERENCIA.trim(),
+      claseDoc,
+      dias: item.dias,
+      fechaFactura,
+      fechaVencimientoFactura,
+      basePP,
+      importe,
+      porcentajeDescuento: porcentaje,
+      valorDescuento: descuento,
+      valorPagar: pagar
     });
-  }
-};
+  });
+
+  crearTablasPorDias(arrayLiquidador);
+}
 
 //-------Permisos de accesos directos
 function obtenerPermisos(modulo) {
@@ -1037,6 +838,11 @@ function CondicionesDcto() {
           + '<td>' + data[i].tipo + '</td>'
           + '<td>' + data[i].sujeto_cump + '</td>'
           + '</tr>';
+          ArrDctos.push({
+            dias: data[i].dias,
+            descuento : data[i].descuento,
+            tipo : data[i].tipo
+          })
       }
       tabla += '</tbody></table>';
 
@@ -1545,6 +1351,8 @@ function Enter(ob, tipo) {
 
 function Limpiar() {
   var rol = $("#RolId").val();
+
+  limpiarDatos();
 
   $("#CodigoSAP").val('');
   $("#Cliente").val('');
@@ -3104,6 +2912,11 @@ function ConsultarCondicionLista() {
         for (var i = 0; i <= data.length - 1; i++) {
 
           if (lista == data[i].lista) {
+            ArrDctos.push({
+              dias: data[i].dias,
+              descuento : data[i].descuento,
+              tipo : 'ADG'
+            })
             if (data[i].sujeto_ppto == 'S') {
               cont++;
               tabla2 += '<tr>'
@@ -3130,6 +2943,8 @@ function ConsultarCondicionLista() {
             + '<td>' + data[i].sujeto_ppto + '</td>'
             + '<td>' + data[i].oficina_ventas + '</td>'
             + '</tr>';
+
+           
         }
         tabla += '</tbody></table>';
         tabla2 += '</tbody></table>';

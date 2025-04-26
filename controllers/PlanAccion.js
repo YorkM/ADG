@@ -106,9 +106,9 @@ const getPlanesAccion = async () => {
                     <tr>
                         <th>Proceso</th>
                         <th>Período a cumplir</th>
-                        <th>Meta %</th>
-                        <th>Rango Inicial %</th>
-                        <th>Rango Final %</th>
+                        <th>Meta</th>
+                        <th>Rango Inicial</th>
+                        <th>Rango Final</th>
                         <th>Objetivos esenciales</th>
                         <th>Causa Raíz</th>
                         <th>Indicador</th>
@@ -166,9 +166,11 @@ const getDiasMes = async () => {
     if (resp[0].DIAS_MES === "TRUE") {
         $('#alert1').removeClass('d-flex').addClass('d-none');
         $('#alert2').removeClass('d-flex').addClass('d-none');
+        $('#alert3').removeClass('d-flex').addClass('d-none');
     } else {
         $('#alert1').addClass('d-flex').removeClass('d-none');
         $('#alert2').addClass('d-flex').removeClass('d-none');
+        $('#alert3').addClass('d-flex').removeClass('d-none');
     }
 }
 
@@ -205,12 +207,12 @@ const getDetallePlanesAccion = async (id) => {
                                     <div class="col-md-2 form-group mt-2 m-none">
                                         <label class="bg-label" for="indice-${item.ID}">Peso ponderación %</label>
                                         <input type="text" id="indice-${item.ID}" class="form-control indice" 
-                                            value="${item.INDICE}" placeholder="Peso ponderación">
+                                            value="${item.INDICE}%" placeholder="Peso ponderación">
                                     </div>
                                     <div class="col-md-2 form-group mt-2 m-none">
                                         <label class="bg-label" for="avance-${item.ID}">Avance</label>
                                         <input type="text" id="avance-${item.ID}" class="form-control avance" 
-                                            value="${item.AVANCE}" placeholder="Avance">
+                                            value="${item.AVANCE}%" placeholder="Avance">
                                     </div>                              
                                     <div class="col-md-3 form-group mt-2 m-none">
                                         <label class="bg-label" for="resultado-${item.ID}">Resultado obtenido</label>
@@ -254,7 +256,6 @@ const getDetallePlanesAccion = async (id) => {
     }
 }
 
-// TODO: REALIZAR AJUSTE EN FUNCIONALIDAD, GUARDAR ACCIONES, AGREGAR NUEVO CAMPO EXPLICACIÓN EN MODELO Y CONTROLADOR
 const guardarAcciones = async () => {
     const usuario = $('#usuario_ses').val();
     const idPlan = $('#idPlan').val();
@@ -276,11 +277,12 @@ const guardarAcciones = async () => {
             row.style.backgroundColor = '';
             datos.push({
                 id,
-                indice,
-                avance,
+                indice: indice.replace(/\%/g, ""),
+                avance: avance.replace(/\%/g, ""),
                 resultado: resultado.toUpperCase(),
                 estado: estado.toUpperCase(),
-                usuario
+                usuario,
+                explicacion: explicacion.toUpperCase()
             });
         }
     });

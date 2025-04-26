@@ -114,6 +114,8 @@
                 <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true"><i class="fa fa-pencil"></i>&nbsp;Creación</button>
 
                 <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false"><i class="fa-solid fa-eye"></i>&nbsp;Seguimiento</button>
+
+                <button class="nav-link" id="btnReportes" data-bs-toggle="tab" data-bs-target="#reportes" type="button" role="tab" aria-controls="nav-profile" aria-selected="false"><i class="fa-solid fa-chart-simple"></i>&nbsp;Reportes</button>
             </div>
         </nav>
         <div class="tab-content " id="nav-tabContent">
@@ -223,6 +225,14 @@
                 <div style="overflow: auto;" id="contenedorTablaPlanes">
 
                 </div>
+            </div>
+            <div class="tab-pane fade p-2" id="reportes" role="tabpanel" aria-labelledby="nav-profile-tab">
+                <div class="alert alert-danger d-none align-items-center gap-3 mb-3 mt-2" role="alert" id="alert3">
+                    <i class="fa-solid fa-triangle-exclamation fa-xl"></i>
+                    <div style="font-weight: 500; font-size: medium;">
+                        Vigencia en los primeros 5 días del mes !!!
+                    </div>
+                </div>                
             </div>
         </div>
     </div>

@@ -86,6 +86,7 @@ switch ($_POST['op']) {
                 $resultado = utf8_decode($fila["resultado"]);
                 $estado = utf8_decode($fila["estado"]);
                 $usuario = $fila["usuario"];
+                $explicacion = utf8_decode($fila["explicacion"]);
 
                 if ($id <= 0) {
                     $errores[] = "ID inválido: $id";
@@ -98,7 +99,8 @@ switch ($_POST['op']) {
                                 AVANCE = '$avance', 
                                 ESTADO = '$estado', 
                                 USUARIO = '$usuario', 
-                                FECHA_REGISTRO = GETDATE() 
+                                FECHA_REGISTRO = GETDATE(), 
+                                EXPLICACION = '$explicacion' 
                             WHERE ID = $id";
 
                 $result = mssql_query($sql);

@@ -102,14 +102,9 @@ Redireccionar();
 
     .contenedor-valores {
       display: flex;
-      /* justify-content: space-evenly; */
       flex: 1;
       gap: 120px;
-      /* border: 1px solid #ccc; */
-      /* padding: 10px 0; */
       align-items: center;
-      /* margin-bottom: 10px; */
-      /* border-radius: 5px; */
     }
 
     .p-valores {
@@ -164,9 +159,6 @@ Redireccionar();
             <button class="btn btn-info" id="btnLimpiar" onClick="Limpiar();" title="Nuevo RC"> <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> </button>
             <button class="btn btn-default" id="btnEmailZona" title="Email Zonas"> <span class="glyphicon glyphicon-cog" aria-hidden="true"></span> </button>
             <button class="btn btn-danger" id="btnCondicionDcto" title="Condiciones cliente"> <span class="glyphicon glyphicon-piggy-bank" aria-hidden="true"></span> </button>
-            <!-- <button class="btn btn-warning" id="btnSubirMulticash" title="Subir Multicash"><span class="glyphicon glyphicon-open" aria-hidden="true"></span></button>-->
-            <!--<button class="btn btn-warning" id="btnValidarDocumento" title="Validar Documento MultiCash"> <span class="glyphicon glyphicon-search" aria-hidden="true"></span> 
-		 </button> -->
           </div>
         </li>
       </ul>
@@ -436,121 +428,8 @@ Redireccionar();
         </div>
         <div class="tab-pane fade in" id="dvLiquidador">
           <img id="logoEmpresa" src="../resources/images/LogoRoma.png" style="display: none;" />
-          <div style="overflow-y: scroll; overflow-x: hidden; height: 67vh;">
-            <h4 class="text-center">Liquidación al 10% - 60 días</h4>
-            <div class="custom-card" id="cotenedorTablaLiquidador" style="width: 98%; margin: 20px auto;">
-              <table class="table" id="tablaLiquidador" style="margin-bottom: 5px;">
-                <thead>
-                  <tr>
-                    <th>Doc.</th>
-                    <th>Clase</th>
-                    <th>Fecha</th>
-                    <th>Fecha Venc.</th>
-                    <th>V Fact.</th>
-                    <th>Base PP</th>
-                    <th>Días</th>
-                    <th>% Desc.</th>
-                    <th>V Desc.</th>
-                    <th>V Pagar</th>
-                    <th>Obser.</th>
-                  </tr>
-                </thead>
-                <tbody>
-
-                </tbody>
-                <tfoot>
-                  <tr>
-                    <td colspan="4" class="font-size-tf" style="text-align: center;">Total</td>
-                    <td class="font-size-tf" id="totalFacturas">$0</td>
-                    <td class="font-size-tf" id="totalProntoPago">$0</td>
-                    <td class="font-size-tf"></td>
-                    <td class="font-size-tf"></td>
-                    <td class="font-size-tf" id="totalDescuento">$0</td>
-                    <td class="font-size-tf" id="totalPagar">$0</td>
-                    <td class="font-size-tf"></td>
-                  </tr>
-                </tfoot>
-              </table>
-              <div style="display: flex; justify-content: flex-end;">
-                <button class="btn btn-danger custom-padding" id="btnDescargarPDF">Descargar PDF</button>
-              </div>
-            </div>
-            <h4 class="text-center">Liquidación al 11% - 30 días</h4>
-            <div class="custom-card" id="cotenedorTablaLiquidador3" style="width: 98%; margin: 20px auto;">
-              <table class="table" id="tablaLiquidador3" style="margin-bottom: 5px;">
-                <thead>
-                  <tr>
-                    <th>Doc.</th>
-                    <th>Clase</th>
-                    <th>Fecha</th>
-                    <th>Fecha Venc.</th>
-                    <th>V Fact.</th>
-                    <th>Base PP</th>
-                    <th>Días</th>
-                    <th>% Desc.</th>
-                    <th>V Desc.</th>
-                    <th>V Pagar</th>
-                    <th>Obser.</th>
-                  </tr>
-                </thead>
-                <tbody>
-
-                </tbody>
-                <tfoot>
-                  <tr>
-                    <td colspan="4" class="font-size-tf" style="text-align: center;">Total</td>
-                    <td class="font-size-tf" id="totalFacturas3">$0</td>
-                    <td class="font-size-tf" id="totalProntoPago3">$0</td>
-                    <td class="font-size-tf"></td>
-                    <td class="font-size-tf"></td>
-                    <td class="font-size-tf" id="totalDescuento3">$0</td>
-                    <td class="font-size-tf" id="totalPagar3">$0</td>
-                    <td class="font-size-tf"></td>
-                  </tr>
-                </tfoot>
-              </table>
-              <div style="display: flex; justify-content: flex-end;">
-                <button class="btn btn-danger custom-padding" id="btnDescargarPDF3">Descargar PDF</button>
-              </div>
-            </div>
-            <h4 class="text-center">Liquidación al 12% - 7 días</h4>
-            <div class="custom-card" id="cotenedorTablaLiquidador2" style="width: 98%; margin: 0 auto;">
-              <table class="table" id="tablaLiquidador2" style="margin-bottom: 5px;">
-                <thead>
-                  <tr>
-                    <th>Doc.</th>
-                    <th>Clase</th>
-                    <th>Fecha</th>
-                    <th>Fecha Venc.</th>
-                    <th>V Fact.</th>
-                    <th>Base PP</th>
-                    <th>Días</th>
-                    <th>% Desc.</th>
-                    <th>V Desc.</th>
-                    <th>V Pagar</th>
-                    <th>Obser.</th>
-                  </tr>
-                </thead>
-                <tbody>
-
-                </tbody>
-                <tfoot>
-                  <tr>
-                    <td colspan="4" class="font-size-tf" style="text-align: center;">Total</td>
-                    <td class="font-size-tf" id="totalFacturas2">$0</td>
-                    <td class="font-size-tf" id="totalProntoPago2">$0</td>
-                    <td class="font-size-tf"></td>
-                    <td class="font-size-tf"></td>
-                    <td class="font-size-tf" id="totalDescuento2">$0</td>
-                    <td class="font-size-tf" id="totalPagar2">$0</td>
-                    <td class="font-size-tf"></td>
-                  </tr>
-                </tfoot>
-              </table>
-              <div style="display: flex; justify-content: flex-end;">
-                <button class="btn btn-danger custom-padding" id="btnDescargarPDF2">Descargar PDF</button>
-              </div>
-            </div>
+          <div style="overflow-y: scroll; overflow-x: hidden; height: 67vh;" id="contenedorTablasLiquidador">            
+           
           </div>
         </div>
         <div class="tab-pane fade in" id="dvBancos">
@@ -720,7 +599,6 @@ Redireccionar();
           <h4 class="modal-title">CONFIGURACIÓN</h4>
         </div>
         <div class="modal-body">
-
           <div class="panel with-nav-tabs panel-info">
             <div class="panel-heading">
               <ul class="nav nav-tabs">
@@ -800,9 +678,6 @@ Redireccionar();
     </div>
   </div>
   <!--------------------------------------------------------------------------------------------------->
-
-
-
   <div id="dvPDFRecibo" class="modal fade bd-example-modal-lg" role="dialog">
     <div class="modal-dialog modal-lg">
       <!-- Modal content-->
@@ -877,7 +752,6 @@ Redireccionar();
               <div class="panel panel-info">
                 <div class="panel-heading"> <a data-toggle="collapse" href="#BodyCliente">DATOS DE CLIENTE</a></div>
                 <div class="panel-body collapse in" id="BodyCliente">
-
                   <div class="row">
                     <div class="col-md-6">
                       <table class="form" width="100%">
@@ -947,8 +821,6 @@ Redireccionar();
                       </table>
                     </div>
                   </div>
-
-
                 </div>
               </div>
             </div>
@@ -969,9 +841,6 @@ Redireccionar();
               </div>
             </div>
           </div>
-
-
-
         </div>
       </div>
     </div>
