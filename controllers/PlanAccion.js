@@ -26,6 +26,7 @@ const getProcesos = async () => {
             });
         }
         $("#proceso").html(elements);
+        $("#procesoReporte").html(elements);
     } catch (error) {
         console.log(error);
     }
@@ -256,6 +257,48 @@ const getDetallePlanesAccion = async (id) => {
     }
 }
 
+const getReporte = async () => {
+    const proceso = $('#procesoReporte').val();
+
+    // TODO: REALIZAR FILTRO PROCESO
+
+    const resp = await enviarPeticion({
+        op: "G_REPORTE",
+        link: "../models/PlanAccion.php",
+        proceso
+    });
+
+    const {
+        acciones_completadas,
+        acciones_en_proceso,
+        acciones_incompletas,
+        acciones_no_iniciadas,
+        acciones_reprogramadas,
+        cantidad_procesos,
+        cantidad_total_acciones,
+        porcentaje_completado,
+        porcentaje_en_proceso,
+        porcentaje_incompleto,
+        porcentaje_no_iniciado,
+        porcentaje_reprogramado,
+        promedio_avance_acciones,
+    } = resp[0];
+
+    $('#cantComple').text(acciones_completadas);
+    $('#cantEnPro').text(acciones_en_proceso);
+    $('#cantNoComple').text(acciones_incompletas);
+    $('#cantNoIni').text(acciones_no_iniciadas);
+    $('#cantRepro').text(acciones_reprogramadas);
+    $('#cantObj').text(cantidad_procesos);
+    $('#cantAcc').text(cantidad_total_acciones);
+    $('#porcComple').text(porcentaje_completado + "%");
+    $('#porcEnPro').text(porcentaje_en_proceso + "%");
+    $('#porcNoComple').text(porcentaje_incompleto + "%");
+    $('#porcNoIni').text(porcentaje_no_iniciado + "%");
+    $('#porcRepro').text(porcentaje_reprogramado + "%");
+    $('#promeAvanc').text(promedio_avance_acciones + "%");
+}
+
 const guardarAcciones = async () => {
     const usuario = $('#usuario_ses').val();
     const idPlan = $('#idPlan').val();
@@ -313,6 +356,7 @@ const guardarAcciones = async () => {
             }, 100);
 
             await getDetallePlanesAccion(idPlan);
+            await getReporte();
         }
     }
 }
@@ -322,7 +366,6 @@ const guardarPlanAccion = async () => {
         const usuario = $('#usuario_ses').val();
         const organizacion = $('#org_ses').val();
         const data = $("#formulario").serializeArrayAll();
-        console.log(data);
         const dataRequest = formatearArrayRequest(data);
         dataRequest.META = data[2].value.replace(/\%/g, "");
         dataRequest.RANGO_INICIAL = data[3].value.replace(/\%/g, "");
@@ -331,7 +374,6 @@ const guardarPlanAccion = async () => {
         dataRequest.SOCIEDAD = organizacion;
         dataRequest.op = "I_PLAN_ACCION";
         dataRequest.link = "../models/PlanAccion.php";
-        console.log(dataRequest);
 
         // const resp = await enviarPeticion({ op: "G_DIAS_MES", link: "../models/PlanAccion.php" });
         // if (resp[0].DIAS_MES === "FALSE") {
@@ -432,6 +474,7 @@ const guardarPlanAccion = async () => {
         }
 
         await getPlanesAccion();
+        await getReporte();
 
     } catch (error) {
         console.log(error);
@@ -459,7 +502,7 @@ const filtrar = (filtro) => {
 
 //? EJECUCIÓN DE FUNCIONALIDADES
 $(function () {
-    // desHabilitarFormulario();
+    desHabilitarFormulario();
 
     const fechaActual = new Date().toISOString().split('T')[0];
     document.querySelector('#desde').value = fechaActual;
@@ -479,6 +522,8 @@ $(function () {
     getProcesos();
 
     getPlanesAccion();
+
+    getReporte();
 
     $("#meta, #rangoIni, #rangoFin").on("input", function () {
         this.value = this.value.replace(/\D/g, "");

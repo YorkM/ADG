@@ -130,4 +130,35 @@ switch ($_POST['op']) {
         $sql = GenerarArray("SELECT * FROM T_CAL_PROCESOS_INDICADORES", '');
         echo json_encode($sql);
         break;
+
+    case "G_REPORTE":
+        $proceso = $_POST['procesoReporte'];
+        $query = "SELECT
+                    COUNT(DISTINCT P.ID) AS cantidad_procesos,
+                    COUNT(D.ID) AS cantidad_total_acciones,
+                    CAST(AVG(D.AVANCE) AS DECIMAL(20, 2)) AS promedio_avance_acciones,
+                    CAST(AVG(D.INDICE) AS DECIMAL(20, 2)) AS promedio_participacion,
+
+                    SUM(CASE WHEN D.ESTADO = 'COMPLETADO' THEN 1 ELSE 0 END) AS acciones_completadas,
+                    SUM(CASE WHEN D.ESTADO = 'EN PROCESO' THEN 1 ELSE 0 END) AS acciones_en_proceso,
+                    SUM(CASE WHEN D.ESTADO = 'NO INICIADO' THEN 1 ELSE 0 END) AS acciones_no_iniciadas,
+                    SUM(CASE WHEN D.ESTADO = 'INCOMPLETO' THEN 1 ELSE 0 END) AS acciones_incompletas,
+                    SUM(CASE WHEN D.ESTADO = 'REPROGRAMADO' THEN 1 ELSE 0 END) AS acciones_reprogramadas,
+
+                    CAST(ROUND((SUM(CASE WHEN D.ESTADO = 'COMPLETADO' THEN 1 ELSE 0 END) * 100.0) / COUNT(D.ID), 2) AS DECIMAL(20, 2)) AS porcentaje_completado,    
+                    CAST(ROUND((SUM(CASE WHEN D.ESTADO = 'EN PROCESO' THEN 1 ELSE 0 END) * 100.0) / COUNT(D.ID), 2) AS DECIMAL(20, 2)) AS porcentaje_en_proceso,
+                    CAST(ROUND((SUM(CASE WHEN D.ESTADO = 'NO INICIADO' THEN 1 ELSE 0 END) * 100.0) / COUNT(D.ID), 2) AS DECIMAL(20, 2)) AS porcentaje_no_iniciado,
+                    CAST(ROUND((SUM(CASE WHEN D.ESTADO = 'INCOMPLETO' THEN 1 ELSE 0 END) * 100.0) / COUNT(D.ID), 2) AS DECIMAL(20, 2)) AS porcentaje_incompleto,
+                    CAST(ROUND((SUM(CASE WHEN D.ESTADO = 'REPROGRAMADO' THEN 1 ELSE 0 END) * 100.0) / COUNT(D.ID), 2) AS DECIMAL(20, 2)) AS porcentaje_reprogramado
+
+                FROM T_PROCESO_PLAN_ACCION P
+                LEFT JOIN T_DETALLE_PROCESO_PLAN_ACCION D ON P.ID = D.ID_PROCESO";
+        
+        if ($proceso !== '') {
+            $sql . 
+        }
+        // TODO: REALIZAR FILTRO PROCESO
+        $sql = GenerarArray($query, '');
+        echo json_encode($sql);
+        break;
 }

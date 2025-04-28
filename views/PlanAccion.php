@@ -26,6 +26,24 @@
             font-size: larger;
         }
 
+        #tablaReportes tbody tr th {
+            font-weight: 400;
+            color: #055160;
+            font-size: larger;
+        }
+
+        #tablaReportesDos thead tr th {
+            font-weight: 400;
+            color: #055160;
+            font-size: larger;
+        }
+
+        #tablaReportesDos tbody tr th {
+            font-weight: 400;
+            color: #055160;
+            font-size: larger;
+        }
+
         #tablaDatosDetalle thead tr th {
             font-weight: 700;
             color: #055160;
@@ -90,6 +108,10 @@
         }
 
         .bg-label {
+            font-weight: 500;
+        }
+
+        .fw-bold-custom {
             font-weight: 500;
         }
 
@@ -227,12 +249,86 @@
                 </div>
             </div>
             <div class="tab-pane fade p-2" id="reportes" role="tabpanel" aria-labelledby="nav-profile-tab">
-                <div class="alert alert-danger d-none align-items-center gap-3 mb-3 mt-2" role="alert" id="alert3">
-                    <i class="fa-solid fa-triangle-exclamation fa-xl"></i>
-                    <div style="font-weight: 500; font-size: medium;">
-                        Vigencia en los primeros 5 días del mes !!!
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card p-3">
+                            <div class="form-group">
+                                <label class="label-form" for="procesoReporte">Proceso</label>
+                                <select id="procesoReporte" class="form-select">
+    
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="bg-label" for="fechaReporte">Fecha</label>
+                                <input type="date" class="form-control" id="fechaReporte">
+                            </div>
+                        </div>
                     </div>
-                </div>                
+                    <div class="col-md-8">
+                        <div class="row">
+                            <div class="col-md-5">
+                                <div class="card p-3">
+                                    <table class="table table-bordered" id="tablaReportes">
+                                        <tbody>
+                                            <tr>
+                                                <th class="table-info">Cantidad objetivos esenciales</th>
+                                                <td class="text-center fw-bold-custom bg-bold" id="cantObj"></td>
+                                            </tr>
+                                            <tr>
+                                                <th class="table-info">Promedio de avance</th>
+                                                <td class="text-center fw-bold-custom bg-bold" id="promeAvanc"></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="col-md-7">
+                                <div class="card p-3">
+                                    <table class="table table-bordered table-sm" id="tablaReportesDos">
+                                        <thead>
+                                            <tr>
+                                                <th class="table-info">Cantidad de acciones</th>
+                                                <td colspan="2" class="text-center fw-bold-custom bg-bold" id="cantAcc"></td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <th class="table-info">Estados</th>
+                                                <th class="table-info text-center">Cantidad</th>
+                                                <th class="table-info text-center">% Participación</th>
+                                            </tr>
+                                            <tr>
+                                                <td>NO INICIADO</td>
+                                                <td class="text-center fw-bold-custom bg-bold" id="cantNoIni"></td>
+                                                <td class="text-center fw-bold-custom bg-bold" id="porcNoIni"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>EN PROCESO</td>
+                                                <td class="text-center fw-bold-custom bg-bold" id="cantEnPro"></td>
+                                                <td class="text-center fw-bold-custom bg-bold" id="porcEnPro"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>COMPLETADO</td>
+                                                <td class="text-center fw-bold-custom bg-bold" id="cantComple"></td>
+                                                <td class="text-center fw-bold-custom bg-bold" id="porcComple"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>NO COMPLETADO</td>
+                                                <td class="text-center fw-bold-custom bg-bold" id="cantNoComple"></td>
+                                                <td class="text-center fw-bold-custom bg-bold" id="porcNoComple"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>REPROGRAMADO</td>
+                                                <td class="text-center fw-bold-custom bg-bold" id="cantRepro"></td>
+                                                <td class="text-center fw-bold-custom bg-bold" id="porcRepro"></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>                       
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -243,7 +339,7 @@
                 <div class="modal-header">
                     <div class="modal-title">
                         <h4 style="color: #055160; font-weight: 500;">Listado de acciones</h4>
-                    </div> 
+                    </div>
                     <div class="d-flex justify-content-between align-items-center gap-3">
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
@@ -260,7 +356,7 @@
                 </div>
             </div>
         </div>
-    </div>      
+    </div>
     <script type="text/javascript" src="../lib/js/jquery-2.1.1.min.js"></script>
     <script type="text/javascript" src="../lib/js/jquery-ui-1.9.2.custom.js"></script>
     <script type="text/javascript" src="../resources/bootstrap/bootstrap-5.0.2-dist/js/bootstrap.js"></script>

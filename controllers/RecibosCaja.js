@@ -380,7 +380,7 @@ $(function () {
   });
 });
 
-// FUNCIONES GENERALES
+// DECLARACIÓN DE FUNCIONES GENERALES
 
 const confirmAlert = async (title, text, icon = 'warning') => {
   const result = await Swal.fire({
@@ -449,7 +449,7 @@ function verificarVencimientoDescuento(fechaVencimientoFactura) {
 }
 
 // FUNCIÓN GENERAR PDF LIQUIDADOR
-async function generarPDF(tabla) {
+async function generarPDF(idTabla) {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF('landscape');
 
@@ -471,7 +471,7 @@ async function generarPDF(tabla) {
   doc.text('LIQUIDACIÓN FACTURAS', 14, 20);
 
   doc.autoTable({
-    html: `#${tabla}`,
+    html: `#${idTabla}`,
     startY: 35,
     theme: 'grid',
     headStyles: { fillColor: [22, 160, 133] },
@@ -514,10 +514,12 @@ function crearTablasPorDias(datos) {
   const contenedor = document.querySelector("#contenedorTablasLiquidador");
   contenedor.innerHTML = "";
 
+  let count = 0;
+
   for (const dias in agrupadoPorDias) {
     const grupo = agrupadoPorDias[dias];
 
-    let count = 0;
+    count ++;
 
     const titulo = document.createElement("h3");
     titulo.classList.add('text-center');
@@ -525,7 +527,7 @@ function crearTablasPorDias(datos) {
     contenedor.appendChild(titulo);
 
     const tabla = document.createElement("table");
-    tabla.setAttribute('id', `tabla${count + 1}`);
+    tabla.setAttribute('id', `tabla${count}`);
     tabla.classList.add('table');
     tabla.classList.add('table-liquidador');
     tabla.style.width = "100%";
@@ -543,7 +545,7 @@ function crearTablasPorDias(datos) {
     const btnDescargarPDF = document.createElement('button');
     btnDescargarPDF.textContent = "Descargar PDF";
     btnDescargarPDF.classList.add('btn');
-    btnDescargarPDF.classList.add('btn-danger');
+    btnDescargarPDF.classList.add('btn-primary');
     btnDescargarPDF.classList.add('custom-padding');
 
     btnContenedor.appendChild(btnDescargarPDF);
@@ -562,6 +564,7 @@ function crearTablasPorDias(datos) {
         <th>V Desc.</th>
         <th>V Pagar</th>
         <th>Observación</th>
+        <th>Eliminar</th>
       </tr>`;
     thead.innerHTML = encabezado;
     tabla.appendChild(thead);
@@ -580,10 +583,15 @@ function crearTablasPorDias(datos) {
         <td class="font-size">${item.porcentajeDescuento}%</td>
         <td class="font-size">${formatNum(item.valorDescuento, "$")}</td>
         <td class="font-size">${formatNum(item.valorPagar, "$")}</td>
-        <td class="font-size td-text"><input type="text" maxlength="25" class="form-control input-sm input-obser"></td>`;
+        <td class="font-size td-text"><input type="text" maxlength="25" class="form-control input-sm input-obser"></td>
+        <td class="text-center">
+          <button class="btn btn-danger btn-sm eliminar-liquidacion" data-item='${item.numeroDoc}'>
+            <i class="fa-solid fa-trash-can"></i>
+          </button>
+        </td>`;
       tbody.appendChild(fila);
     });
-    tabla.appendChild(tbody);
+    tabla.appendChild(tbody);    
 
     const totalBasePP = grupo.reduce((sum, item) => sum + item.basePP, 0);
     const totalImporte = grupo.reduce((sum, item) => sum + item.importe, 0);
@@ -601,6 +609,7 @@ function crearTablasPorDias(datos) {
         <td class="font-size-tf">${formatNum(totalDescuento, "$")}</td>
         <td class="font-size-tf">${formatNum(totalPagar, "$")}</td>
         <td class="font-size-tf"></td>
+        <td class="font-size-tf"></td>
       </tr>`;
 
     tfoot.innerHTML = totales;
@@ -615,15 +624,23 @@ function crearTablasPorDias(datos) {
       td.text(valor);
     });
 
+    $('.table-liquidador').off().on('click', '.eliminar-liquidacion', async function () {
+      const result = await confirmAlert("Eliminar item", "¿Está seguro(a) de eliminar el item del liquidador?");
+      if (!result.isConfirmed) return;
+
+      const numeroDoc = $(this).attr('data-item');
+      arrayLiquidador = arrayLiquidador.filter(item => item.numeroDoc !== numeroDoc);
+      crearTablasPorDias(arrayLiquidador);
+    });
+
     $('.btn-pdf').off().on('click', '.custom-padding', function (e) {
-      e.stopPropagation();
-      console.log($(this).parent().parent());
-      // generarPDF("tablaLiquidador");
+      const idTabla = $(this).closest('.custom-card').find('table').attr('id');
+      generarPDF(idTabla);
     });
   }
 }
 
-//? FUNCIÓN AGREGAR ITEM AL LIQUIDADOR
+// FUNCIÓN AGREGAR ITEM AL LIQUIDADOR
 const agregarLiquidador = (item) => {
   const { BASE_PP, CLASE_DOCUMENTO, FECHA_BASE, IMPORTE, NUMERO_DOCUMENTO, REFERENCIA } = item;
 
@@ -634,14 +651,15 @@ const agregarLiquidador = (item) => {
   const fechaFactura = `${FB[2]}/${FB[1]}/${FB[0]}`;
   
   ArrDctos.forEach(item => {
-    const fechaVencimientoFactura = agregarDias(FECHA_BASE, parseInt(item.dias));
+    const dias = (parseInt(item.dias) > 60 && parseInt(item.dias) <= 65) ? 60 : parseInt(item.dias);  
+    const fechaVencimientoFactura = agregarDias(FECHA_BASE, dias);
     const { porcentaje, descuento, pagar } = calcularDescuento(basePP, importe, parseFloat(item.descuento), claseDoc, fechaVencimientoFactura);
 
     arrayLiquidador.push({
       numeroDoc: NUMERO_DOCUMENTO.trim(),
       referencia: REFERENCIA.trim(),
       claseDoc,
-      dias: item.dias,
+      dias,
       fechaFactura,
       fechaVencimientoFactura,
       basePP,
