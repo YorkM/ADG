@@ -22,7 +22,7 @@ const getProcesos = async () => {
         let elements = `<option value="">Seleccione un Proceso</option>`;
         if (resp.length) {
             resp.forEach(elem => {
-                elements += `<option value="${elem.PROCESO.trim()}">${elem.PROCESO}</option>`;
+                elements += `<option value="${elem.ID}">${elem.PROCESO}</option>`;
             });
         }
         $("#proceso").html(elements);
@@ -122,7 +122,7 @@ const getPlanesAccion = async () => {
             data.forEach(item => {
                 tabla += `
                     <tr>
-                        <td class="align-tds">${item.PROCESO}</td>
+                        <td class="align-tds">${item.PROCESO_T}</td>
                         <td class="align-tds">${item.PERIODO}</td>
                         <td class="align-tds">${item.META}%</td>
                         <td class="align-tds">${item.RANGO_INICIAL}%</td>
@@ -259,8 +259,6 @@ const getDetallePlanesAccion = async (id) => {
 
 const getReporte = async () => {
     const proceso = $('#procesoReporte').val();
-
-    // TODO: REALIZAR FILTRO PROCESO
 
     const resp = await enviarPeticion({
         op: "G_REPORTE",
@@ -515,6 +513,10 @@ $(function () {
     $('#buscar').keyup(function () {
         const filtro = this.value.toLowerCase();
         filtrar(filtro);
+    });
+
+    $('#procesoReporte').change(function () {
+        getReporte();
     });
 
     getDiasMes();

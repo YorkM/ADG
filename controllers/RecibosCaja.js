@@ -453,39 +453,77 @@ async function generarPDF(idTabla) {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF('landscape');
 
-  const logoImg = document.getElementById('logoEmpresa');
+  const organizacion = $('#NumOrg').val();
+
+  const logoImg = (organizacion === "2000") ? document.getElementById('logoEmpresa') : document.getElementById('logoEmpresa2');
   const canvas = document.createElement('canvas');
   canvas.width = logoImg.naturalWidth;
   canvas.height = logoImg.naturalHeight;
   const ctx = canvas.getContext('2d');
   ctx.drawImage(logoImg, 0, 0);
   const logoDataURL = canvas.toDataURL('image/png');
-
   const pageWidth = doc.internal.pageSize.getWidth();
   const logoWidth = 40;
   const xRight = pageWidth - logoWidth - 10;
-
   doc.addImage(logoDataURL, 'PNG', xRight, 10, logoWidth, 20);
 
   doc.setFontSize(16);
   doc.text('LIQUIDACIÓN FACTURAS', 14, 20);
 
+  const tablaOriginal = document.getElementById(idTabla);
+  const tablaClon = tablaOriginal.cloneNode(true);
+
+  ['thead', 'tbody', 'tfoot'].forEach(seccion => {
+    const seccionTabla = tablaClon.querySelector(seccion);
+    if (seccionTabla) {
+      seccionTabla.querySelectorAll('tr').forEach(tr => {
+        tr.lastElementChild?.remove();
+      });
+    }
+  });
+
+  tablaClon.style.display = 'none';
+  document.body.appendChild(tablaClon); 
+
   doc.autoTable({
-    html: `#${idTabla}`,
+    html: tablaClon,
     startY: 35,
     theme: 'grid',
-    headStyles: { fillColor: [22, 160, 133] },
-    styles: { cellPadding: 3, fontSize: 12, font: 'helvetica', fontStyle: 'bold' }
-  });
+    headStyles: {
+      fillColor: [44, 62, 80],
+      textColor: 255,
+      halign: 'center'
+    },
+    footStyles: {
+      fillColor: [44, 62, 80],
+      textColor: 255,
+      halign: 'center'
+    },
+    bodyStyles: {
+      fillColor: [245, 245, 245],
+      textColor: [33, 37, 41],
+    },
+    alternateRowStyles: {
+      fillColor: [220, 220, 220]
+    },
+    styles: {
+      fontSize: 11,
+      cellPadding: 3,
+      font: 'helvetica',
+      fontStyle: 'normal'
+    }
+  });  
+
+  document.body.removeChild(tablaClon);
 
   const finalY = doc.lastAutoTable.finalY || 45;
   doc.setFontSize(12);
   doc.text('NOTA: El descuento pronto pago aplica pagando las facturas dentro de la fecha establecida', pageWidth / 2, finalY + 10, { align: 'center' });
-  doc.text('', 14, finalY + 16);
   doc.text('RECUERDE: SOLO ESTÁ PERMITIDO CANCELAR A LAS CUENTAS DE D.F ROMA', pageWidth / 2, finalY + 22, { align: 'center' });
 
   doc.save('liquidacion.pdf');
 }
+
 
 // FUNCIÓN PARA REALIZAR LOS CÁLCULOS DE DESCUENTO
 const calcularDescuento = (basePP, importe, porcentaje, claseDoc, fechaVencimiento) => {

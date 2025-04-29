@@ -133,6 +133,7 @@ Redireccionar();
 <body>
   <input type="hidden" id="RolId" value="<?php echo (!empty($_SESSION["ses_RolesId"])) ? $_SESSION["ses_RolesId"] : "" ?>" readonly>
   <input type="hidden" id="UsrLogin" value="<?php echo (!empty($_SESSION["ses_Login"])) ? $_SESSION["ses_Login"] : "" ?>" readonly>
+  <input type="hidden" id="NumOrg" value="<?php echo (!empty($_SESSION ["ses_NumOrg"])) ? $_SESSION ["ses_NumOrg"] : "" ?>" readonly>
   <input type="hidden" value="" id="fechaPagoHide">
 
   <div class="alert alert-info"><i class="fa-solid fa-star fa-flip"></i>&nbsp;0405 - RECIBOS DE PAGO</div>
@@ -428,6 +429,7 @@ Redireccionar();
         </div>
         <div class="tab-pane fade in" id="dvLiquidador">
           <img id="logoEmpresa" src="../resources/images/LogoRoma.png" style="display: none;" />
+          <img id="logoEmpresa2" src="../resources/images/LogoCM.png" style="display: none;" />
           <div style="overflow-y: scroll; overflow-x: hidden; height: 67vh;" id="contenedorTablasLiquidador">            
            
           </div>

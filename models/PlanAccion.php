@@ -54,7 +54,10 @@ switch ($_POST['op']) {
         $fecha_desde = $_POST['fechaDesde'];
         $fecha_hasta = $_POST['fechaHasta'];
 
-        $sql = "SELECT * FROM T_PROCESO_PLAN_ACCION 
+        $sql = "SELECT P.SOCIEDAD, P.PROCESO, I.PROCESO AS PROCESO_T, P.PERIODO, P.META,
+                P.RANGO_INICIAL, P.RANGO_FINAL, P.OBJETIVOS, P.CAUSA_RAIZ, P.INDICADOR
+                FROM T_PROCESO_PLAN_ACCION P
+                INNER JOIN T_CAL_PROCESOS_INDICADORES I ON P.PROCESO = I.ID 
                 WHERE CAST(FECHA_REGISTRO AS DATE) 
                 BETWEEN CAST('$fecha_desde' AS DATE)
                 AND CAST('$fecha_hasta' AS DATE)";
@@ -132,32 +135,31 @@ switch ($_POST['op']) {
         break;
 
     case "G_REPORTE":
-        $proceso = $_POST['procesoReporte'];
+        $proceso = $_POST['proceso'];
         $query = "SELECT
                     COUNT(DISTINCT P.ID) AS cantidad_procesos,
                     COUNT(D.ID) AS cantidad_total_acciones,
-                    CAST(AVG(D.AVANCE) AS DECIMAL(20, 2)) AS promedio_avance_acciones,
-                    CAST(AVG(D.INDICE) AS DECIMAL(20, 2)) AS promedio_participacion,
+                    ISNULL(CAST(AVG(D.AVANCE) AS DECIMAL(20, 2)), 0) AS promedio_avance_acciones,
+                    ISNULL(CAST(AVG(D.INDICE) AS DECIMAL(20, 2)), 0) AS promedio_participacion,
 
-                    SUM(CASE WHEN D.ESTADO = 'COMPLETADO' THEN 1 ELSE 0 END) AS acciones_completadas,
-                    SUM(CASE WHEN D.ESTADO = 'EN PROCESO' THEN 1 ELSE 0 END) AS acciones_en_proceso,
-                    SUM(CASE WHEN D.ESTADO = 'NO INICIADO' THEN 1 ELSE 0 END) AS acciones_no_iniciadas,
-                    SUM(CASE WHEN D.ESTADO = 'INCOMPLETO' THEN 1 ELSE 0 END) AS acciones_incompletas,
-                    SUM(CASE WHEN D.ESTADO = 'REPROGRAMADO' THEN 1 ELSE 0 END) AS acciones_reprogramadas,
+                    ISNULL(SUM(CASE WHEN D.ESTADO = 'COMPLETADO' THEN 1 ELSE 0 END), 0) AS acciones_completadas,
+                    ISNULL(SUM(CASE WHEN D.ESTADO = 'EN PROCESO' THEN 1 ELSE 0 END), 0) AS acciones_en_proceso,
+                    ISNULL(SUM(CASE WHEN D.ESTADO = 'NO INICIADO' THEN 1 ELSE 0 END), 0) AS acciones_no_iniciadas,
+                    ISNULL(SUM(CASE WHEN D.ESTADO = 'INCOMPLETO' THEN 1 ELSE 0 END), 0) AS acciones_incompletas,
+                    ISNULL(SUM(CASE WHEN D.ESTADO = 'REPROGRAMADO' THEN 1 ELSE 0 END), 0) AS acciones_reprogramadas,
 
-                    CAST(ROUND((SUM(CASE WHEN D.ESTADO = 'COMPLETADO' THEN 1 ELSE 0 END) * 100.0) / COUNT(D.ID), 2) AS DECIMAL(20, 2)) AS porcentaje_completado,    
-                    CAST(ROUND((SUM(CASE WHEN D.ESTADO = 'EN PROCESO' THEN 1 ELSE 0 END) * 100.0) / COUNT(D.ID), 2) AS DECIMAL(20, 2)) AS porcentaje_en_proceso,
-                    CAST(ROUND((SUM(CASE WHEN D.ESTADO = 'NO INICIADO' THEN 1 ELSE 0 END) * 100.0) / COUNT(D.ID), 2) AS DECIMAL(20, 2)) AS porcentaje_no_iniciado,
-                    CAST(ROUND((SUM(CASE WHEN D.ESTADO = 'INCOMPLETO' THEN 1 ELSE 0 END) * 100.0) / COUNT(D.ID), 2) AS DECIMAL(20, 2)) AS porcentaje_incompleto,
-                    CAST(ROUND((SUM(CASE WHEN D.ESTADO = 'REPROGRAMADO' THEN 1 ELSE 0 END) * 100.0) / COUNT(D.ID), 2) AS DECIMAL(20, 2)) AS porcentaje_reprogramado
+                    ISNULL(CAST(ROUND((SUM(CASE WHEN D.ESTADO = 'COMPLETADO' THEN 1 ELSE 0 END) * 100.0) / COUNT(D.ID), 2) AS DECIMAL(20, 2)), 0) AS porcentaje_completado,    
+                    ISNULL(CAST(ROUND((SUM(CASE WHEN D.ESTADO = 'EN PROCESO' THEN 1 ELSE 0 END) * 100.0) / COUNT(D.ID), 2) AS DECIMAL(20, 2)), 0) AS porcentaje_en_proceso,
+                    ISNULL(CAST(ROUND((SUM(CASE WHEN D.ESTADO = 'NO INICIADO' THEN 1 ELSE 0 END) * 100.0) / COUNT(D.ID), 2) AS DECIMAL(20, 2)), 0) AS porcentaje_no_iniciado,
+                    ISNULL(CAST(ROUND((SUM(CASE WHEN D.ESTADO = 'INCOMPLETO' THEN 1 ELSE 0 END) * 100.0) / COUNT(D.ID), 2) AS DECIMAL(20, 2)), 0) AS porcentaje_incompleto,
+                    ISNULL(CAST(ROUND((SUM(CASE WHEN D.ESTADO = 'REPROGRAMADO' THEN 1 ELSE 0 END) * 100.0) / COUNT(D.ID), 2) AS DECIMAL(20, 2)), 0) AS porcentaje_reprogramado
 
                 FROM T_PROCESO_PLAN_ACCION P
                 LEFT JOIN T_DETALLE_PROCESO_PLAN_ACCION D ON P.ID = D.ID_PROCESO";
         
-        if ($proceso !== '') {
-            $sql . 
+        if ($proceso != '') {
+            $query .= " WHERE P.PROCESO = '$proceso'";
         }
-        // TODO: REALIZAR FILTRO PROCESO
         $sql = GenerarArray($query, '');
         echo json_encode($sql);
         break;

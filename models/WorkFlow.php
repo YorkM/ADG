@@ -46,34 +46,34 @@ switch ($_POST['op']) {
         $departamento = $_POST['departamento'];
         $oficina = $_POST['oficina'];
         $sql = "SELECT 
-        WF.ID,
-       WF.ORGANIZACION_VENTAS,
-       CASE
-         WHEN WF.ORGANIZACION_VENTAS = '2000' THEN 'ROMA'
-         ELSE 'MULTIDROGAS'
-       END AS ORGANIZACION_VENTAS_T,
-       WF.OFICINA_VENTAS,
-       OV.DESCRIPCION AS OFICINA_VENTAS_T,
-       WF.CONCEPTO_GASTO,
-       WF.TIPO_GASTO,
-       WF.USUARIO_SOLICITA,
-       WF.FECHA_SOLICITA,
-       WF.COMENTARIO_SOLICITA,
-       ISNULL(WF.ADJUNTO_SOLICITA_1, '') AS ADJUNTO_SOLICITA_1,
-       ISNULL(WF.ADJUNTO_SOLICITA_2, '') AS ADJUNTO_SOLICITA_2,
-       ISNULL(WF.ADJUNTO_SOLICITA_3, '') AS ADJUNTO_SOLICITA_3,
-       ISNULL(WF.NOTA, '0') AS INDICADORNOTA,
-       U.EMAIL,
-       D.DESCRIPCION AS DPTO,
-       WF.ESTADO,
-       CG.CONCEPTO,
-	   CONCAT(U.NOMBRES, ' ', U.APELLIDOS) AS NOMBRE_USUARIO
-        FROM T_WORKFLOW WF
-        INNER JOIN T_USUARIOS U ON WF.USUARIO_SOLICITA = U.[LOGIN]
-        INNER JOIN T_DPTO D ON U.ID_DPTO = D.ID
-        INNER JOIN T_OFICINAS_VENTAS OV ON WF.OFICINA_VENTAS = OV.OFICINA_VENTAS
-        INNER JOIN T_CONCEPTOS_GASTOS CG ON WF.CONCEPTO_GASTO = CG.ID
-        WHERE CAST(WF.FECHA_SOLICITA AS DATE) between CAST('$fecha_desde' AS DATE) and CAST('$fecha_hasta' AS DATE)";
+                    WF.ID,
+                WF.ORGANIZACION_VENTAS,
+                CASE
+                    WHEN WF.ORGANIZACION_VENTAS = '2000' THEN 'ROMA'
+                    ELSE 'MULTIDROGAS'
+                END AS ORGANIZACION_VENTAS_T,
+                WF.OFICINA_VENTAS,
+                OV.DESCRIPCION AS OFICINA_VENTAS_T,
+                WF.CONCEPTO_GASTO,
+                WF.TIPO_GASTO,
+                WF.USUARIO_SOLICITA,
+                WF.FECHA_SOLICITA,
+                WF.COMENTARIO_SOLICITA,
+                ISNULL(WF.ADJUNTO_SOLICITA_1, '') AS ADJUNTO_SOLICITA_1,
+                ISNULL(WF.ADJUNTO_SOLICITA_2, '') AS ADJUNTO_SOLICITA_2,
+                ISNULL(WF.ADJUNTO_SOLICITA_3, '') AS ADJUNTO_SOLICITA_3,
+                ISNULL(WF.NOTA, '0') AS INDICADORNOTA,
+                U.EMAIL,
+                D.DESCRIPCION AS DPTO,
+                WF.ESTADO,
+                CG.CONCEPTO,
+                CONCAT(U.NOMBRES, ' ', U.APELLIDOS) AS NOMBRE_USUARIO
+                FROM T_WORKFLOW WF
+                INNER JOIN T_USUARIOS U ON WF.USUARIO_SOLICITA = U.[LOGIN]
+                INNER JOIN T_DPTO D ON U.ID_DPTO = D.ID
+                INNER JOIN T_OFICINAS_VENTAS OV ON WF.OFICINA_VENTAS = OV.OFICINA_VENTAS
+                INNER JOIN T_CONCEPTOS_GASTOS CG ON WF.CONCEPTO_GASTO = CG.ID
+                WHERE CAST(WF.FECHA_SOLICITA AS DATE) between CAST('$fecha_desde' AS DATE) and CAST('$fecha_hasta' AS DATE)";
 
         if ($departamento != '' ) {
             $sql .= " AND D.DESCRIPCION = '$departamento'";

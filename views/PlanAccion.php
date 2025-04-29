@@ -249,8 +249,9 @@
                 </div>
             </div>
             <div class="tab-pane fade p-2" id="reportes" role="tabpanel" aria-labelledby="nav-profile-tab">
+                <h4 class="text-center" style="margin-bottom: 20px; font-weight: 400;">REPORTE - OBJETIVOS ESENCIALES</h4>
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <div class="card p-3">
                             <div class="form-group">
                                 <label class="label-form" for="procesoReporte">Proceso</label>
@@ -264,9 +265,9 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-8">
+                    <div class="col-md-9">
                         <div class="row">
-                            <div class="col-md-5">
+                            <div class="col-md-4">
                                 <div class="card p-3">
                                     <table class="table table-bordered" id="tablaReportes">
                                         <tbody>
@@ -282,46 +283,40 @@
                                     </table>
                                 </div>
                             </div>
-                            <div class="col-md-7">
+                            <div class="col-md-8">
                                 <div class="card p-3">
-                                    <table class="table table-bordered table-sm" id="tablaReportesDos">
+                                    <table class="table table-bordered table-sm" id="tablaReportesDos" style="margin-bottom: 0; padding: 0;">
                                         <thead>
                                             <tr>
-                                                <th class="table-info">Cantidad de acciones</th>
+                                                <th colspan="4" class="table-info">Cantidad de acciones</th>
                                                 <td colspan="2" class="text-center fw-bold-custom bg-bold" id="cantAcc"></td>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <tr>
                                                 <th class="table-info">Estados</th>
-                                                <th class="table-info text-center">Cantidad</th>
-                                                <th class="table-info text-center">% Participación</th>
-                                            </tr>
-                                            <tr>
                                                 <td>NO INICIADO</td>
-                                                <td class="text-center fw-bold-custom bg-bold" id="cantNoIni"></td>
-                                                <td class="text-center fw-bold-custom bg-bold" id="porcNoIni"></td>
-                                            </tr>
-                                            <tr>
                                                 <td>EN PROCESO</td>
-                                                <td class="text-center fw-bold-custom bg-bold" id="cantEnPro"></td>
-                                                <td class="text-center fw-bold-custom bg-bold" id="porcEnPro"></td>
-                                            </tr>
-                                            <tr>
                                                 <td>COMPLETADO</td>
-                                                <td class="text-center fw-bold-custom bg-bold" id="cantComple"></td>
-                                                <td class="text-center fw-bold-custom bg-bold" id="porcComple"></td>
-                                            </tr>
-                                            <tr>
                                                 <td>NO COMPLETADO</td>
-                                                <td class="text-center fw-bold-custom bg-bold" id="cantNoComple"></td>
-                                                <td class="text-center fw-bold-custom bg-bold" id="porcNoComple"></td>
+                                                <td>REPROGRAMADO</td>
                                             </tr>
                                             <tr>
-                                                <td>REPROGRAMADO</td>
+                                                <th class="table-info">Cantidad</th>
+                                                <td class="text-center fw-bold-custom bg-bold" id="cantNoIni"></td>
+                                                <td class="text-center fw-bold-custom bg-bold" id="cantEnPro"></td>
+                                                <td class="text-center fw-bold-custom bg-bold" id="cantComple"></td>
+                                                <td class="text-center fw-bold-custom bg-bold" id="cantNoComple"></td>
                                                 <td class="text-center fw-bold-custom bg-bold" id="cantRepro"></td>
-                                                <td class="text-center fw-bold-custom bg-bold" id="porcRepro"></td>
                                             </tr>
+                                            <tr>
+                                                <th class="table-info">% Participación</th>
+                                                <td class="text-center fw-bold-custom bg-bold" id="porcNoIni"></td>
+                                                <td class="text-center fw-bold-custom bg-bold" id="porcEnPro"></td>
+                                                <td class="text-center fw-bold-custom bg-bold" id="porcComple"></td>
+                                                <td class="text-center fw-bold-custom bg-bold" id="porcNoComple"></td>
+                                                <td class="text-center fw-bold-custom bg-bold" id="porcRepro"></td>
+                                            </tr>                                           
                                         </tbody>
                                     </table>
                                 </div>
