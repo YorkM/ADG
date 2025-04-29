@@ -54,7 +54,7 @@ switch ($_POST['op']) {
         $fecha_desde = $_POST['fechaDesde'];
         $fecha_hasta = $_POST['fechaHasta'];
 
-        $sql = "SELECT P.SOCIEDAD, P.PROCESO, I.PROCESO AS PROCESO_T, P.PERIODO, P.META,
+        $sql = "SELECT P.ID, P.SOCIEDAD, P.PROCESO, I.PROCESO AS PROCESO_T, P.PERIODO, P.META,
                 P.RANGO_INICIAL, P.RANGO_FINAL, P.OBJETIVOS, P.CAUSA_RAIZ, P.INDICADOR
                 FROM T_PROCESO_PLAN_ACCION P
                 INNER JOIN T_CAL_PROCESOS_INDICADORES I ON P.PROCESO = I.ID 
@@ -160,6 +160,49 @@ switch ($_POST['op']) {
         if ($proceso != '') {
             $query .= " WHERE P.PROCESO = '$proceso'";
         }
+        $sql = GenerarArray($query, '');
+        echo json_encode($sql);
+        break;
+
+    case "G_REPORTE_2":
+        $proceso = $_POST['proceso'];
+        $query = "SELECT 
+                    p.ID AS proceso_id,
+                    p.SOCIEDAD,
+                    p.PROCESO,
+                    p.PERIODO,
+                    p.META,
+                    p.RANGO_INICIAL,
+                    p.RANGO_FINAL,
+                    p.OBJETIVOS,
+                    p.CAUSA_RAIZ,
+                    p.INDICADOR,
+                    p.USUARIO AS usuario_proceso,
+                    p.FECHA_REGISTRO AS fecha_registro_proceso,
+                    i.PROCESO AS PROCESO_T,
+
+                    d.ID AS accion_id,
+                    d.ACCIONES,
+                    d.FECHA_INICIO,
+                    d.FECHA_FINAL,
+                    d.RESPONSABLE,
+                    d.INDICE,
+                    d.RESULTADOS,
+                    d.AVANCE,
+                    d.ESTADO,
+                    d.USUARIO AS usuario_accion,
+                    d.FECHA_REGISTRO AS fecha_registro_accion,
+                    d.EXPLICACION
+                FROM T_PROCESO_PLAN_ACCION p
+                LEFT JOIN T_DETALLE_PROCESO_PLAN_ACCION d ON d.ID_PROCESO = p.ID
+                INNER JOIN T_CAL_PROCESOS_INDICADORES i ON p.PROCESO = i.ID";
+                
+        if ($proceso != '') {
+            $query .= " WHERE p.PROCESO = '$proceso'";
+        }
+
+        $query .= " ORDER BY p.ID, d.ID";
+
         $sql = GenerarArray($query, '');
         echo json_encode($sql);
         break;

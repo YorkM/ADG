@@ -297,6 +297,95 @@ const getReporte = async () => {
     $('#promeAvanc').text(promedio_avance_acciones + "%");
 }
 
+const getReporte2 = async () => {
+    const proceso = $('#procesoReporte').val();
+
+    const resp = await enviarPeticion({
+        op: "G_REPORTE_2",
+        link: "../models/PlanAccion.php",
+        proceso
+    });
+
+    const resultado = [];
+
+    resp.forEach(row => {
+        let proceso = resultado.find(p => p.proceso_id === row.proceso_id);
+
+        if (!proceso) {
+            proceso = {
+                proceso_id: row.proceso_id,
+                SOCIEDAD: row.SOCIEDAD,
+                PROCESO: row.PROCESO,
+                PERIODO: row.PERIODO,
+                META: row.META,
+                RANGO_INICIAL: row.RANGO_INICIAL,
+                RANGO_FINAL: row.RANGO_FINAL,
+                OBJETIVOS: row.OBJETIVOS,
+                CAUSA_RAIZ: row.CAUSA_RAIZ,
+                INDICADOR: row.INDICADOR,
+                acciones: [],
+                suma_indice: 0,
+                total_avance: 0,
+                cantidad_acciones: 0
+            };
+            resultado.push(proceso);
+        }
+
+        if (row.accion_id) {
+            proceso.acciones.push({
+                id: row.accion_id,
+                ACCIONES: row.ACCIONES,
+                FECHA_INICIO: row.FECHA_INICIO,
+                FECHA_FINAL: row.FECHA_FINAL,
+                RESPONSABLE: row.RESPONSABLE,
+                INDICE: row.INDICE,
+                RESULTADOS: row.RESULTADOS,
+                AVANCE: row.AVANCE,
+                ESTADO: row.ESTADO,
+                EXPLICACION: row.EXPLICACION
+            });
+
+            proceso.suma_indice += parseFloat(row.INDICE);
+            proceso.total_avance += parseFloat(row.AVANCE);
+            proceso.cantidad_acciones++;
+        }
+    });
+
+    resultado.forEach(p => {
+        p.promedio_avance = p.cantidad_acciones > 0
+            ? parseFloat((p.total_avance / p.cantidad_acciones).toFixed(2))
+            : 0;
+    });
+
+    let elementos = ``;
+
+    resultado.forEach(item => {
+        elementos += `
+                    <tr>
+                    <th style="background-color: #DDD;">${item.OBJETIVOS.toUpperCase()}</th>
+                    <th style="background-color: #DDD;">${item.suma_indice}%</th>
+                    <th style="background-color: #DDD;">${item.promedio_avance}%</th>
+                    <th style="background-color: #DDD;" colspan="5"></th>
+                    </tr>`;
+
+        item.acciones.forEach(accion => {
+            elementos += `
+                    <tr>
+                        <td>${accion.ACCIONES.toUpperCase()}</td>
+                        <td>${accion.INDICE}%</td>
+                        <td>${accion.AVANCE}%</td>
+                        <td>${accion.RESULTADOS}</td>
+                        <td>${accion.ESTADO}</td>
+                        <td>${accion.FECHA_INICIO}</td>
+                        <td>${accion.FECHA_FINAL}</td>
+                        <td>${accion.RESPONSABLE}</td>
+                    </tr>`;
+        });
+    });
+
+    $('#tablaAccionesReporte tbody').html(elementos);
+}
+
 const guardarAcciones = async () => {
     const usuario = $('#usuario_ses').val();
     const idPlan = $('#idPlan').val();
@@ -355,6 +444,7 @@ const guardarAcciones = async () => {
 
             await getDetallePlanesAccion(idPlan);
             await getReporte();
+            await getReporte2();
         }
     }
 }
@@ -473,6 +563,7 @@ const guardarPlanAccion = async () => {
 
         await getPlanesAccion();
         await getReporte();
+        await getReporte2();
 
     } catch (error) {
         console.log(error);
@@ -517,6 +608,7 @@ $(function () {
 
     $('#procesoReporte').change(function () {
         getReporte();
+        getReporte2();
     });
 
     getDiasMes();
@@ -526,6 +618,8 @@ $(function () {
     getPlanesAccion();
 
     getReporte();
+
+    getReporte2();
 
     $("#meta, #rangoIni, #rangoFin").on("input", function () {
         this.value = this.value.replace(/\D/g, "");

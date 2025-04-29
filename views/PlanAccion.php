@@ -50,6 +50,12 @@
             font-size: larger;
         }
 
+        #tablaAccionesReporte thead tr th {
+            font-weight: 400;
+            color: #055160;
+            font-size: larger;
+        }
+
         th,
         td {
             padding: 0;
@@ -113,6 +119,10 @@
 
         .fw-bold-custom {
             font-weight: 500;
+        }
+
+        .bg-bold {
+            background-color: #DDD !important;
         }
 
         .label-form {
@@ -249,9 +259,9 @@
                 </div>
             </div>
             <div class="tab-pane fade p-2" id="reportes" role="tabpanel" aria-labelledby="nav-profile-tab">
-                <h4 class="text-center" style="margin-bottom: 20px; font-weight: 400;">REPORTE - OBJETIVOS ESENCIALES</h4>
+                <h5 class="text-center" style="margin-bottom: 20px; font-weight: 400;">REPORTE - OBJETIVOS ESENCIALES</h5>
                 <div class="row">
-                    <div class="col-md-3">
+                    <div class="col-md-6">
                         <div class="card p-3">
                             <div class="form-group">
                                 <label class="label-form" for="procesoReporte">Proceso</label>
@@ -265,64 +275,82 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-9">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="card p-3">
-                                    <table class="table table-bordered" id="tablaReportes">
-                                        <tbody>
-                                            <tr>
-                                                <th class="table-info">Cantidad objetivos esenciales</th>
-                                                <td class="text-center fw-bold-custom bg-bold" id="cantObj"></td>
-                                            </tr>
-                                            <tr>
-                                                <th class="table-info">Promedio de avance</th>
-                                                <td class="text-center fw-bold-custom bg-bold" id="promeAvanc"></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            <div class="col-md-8">
-                                <div class="card p-3">
-                                    <table class="table table-bordered table-sm" id="tablaReportesDos" style="margin-bottom: 0; padding: 0;">
-                                        <thead>
-                                            <tr>
-                                                <th colspan="4" class="table-info">Cantidad de acciones</th>
-                                                <td colspan="2" class="text-center fw-bold-custom bg-bold" id="cantAcc"></td>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <th class="table-info">Estados</th>
-                                                <td>NO INICIADO</td>
-                                                <td>EN PROCESO</td>
-                                                <td>COMPLETADO</td>
-                                                <td>NO COMPLETADO</td>
-                                                <td>REPROGRAMADO</td>
-                                            </tr>
-                                            <tr>
-                                                <th class="table-info">Cantidad</th>
-                                                <td class="text-center fw-bold-custom bg-bold" id="cantNoIni"></td>
-                                                <td class="text-center fw-bold-custom bg-bold" id="cantEnPro"></td>
-                                                <td class="text-center fw-bold-custom bg-bold" id="cantComple"></td>
-                                                <td class="text-center fw-bold-custom bg-bold" id="cantNoComple"></td>
-                                                <td class="text-center fw-bold-custom bg-bold" id="cantRepro"></td>
-                                            </tr>
-                                            <tr>
-                                                <th class="table-info">% Participación</th>
-                                                <td class="text-center fw-bold-custom bg-bold" id="porcNoIni"></td>
-                                                <td class="text-center fw-bold-custom bg-bold" id="porcEnPro"></td>
-                                                <td class="text-center fw-bold-custom bg-bold" id="porcComple"></td>
-                                                <td class="text-center fw-bold-custom bg-bold" id="porcNoComple"></td>
-                                                <td class="text-center fw-bold-custom bg-bold" id="porcRepro"></td>
-                                            </tr>                                           
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>                       
+                    <div class="col-md-6">
+                        <div class="card p-3">
+                            <table class="table table-bordered" id="tablaReportes" style="border-color: #9ba0a5;">
+                                <tbody>
+                                    <tr>
+                                        <th class="table-info" style="border-color: #9ba0a5;">Cantidad objetivos esenciales</th>
+                                        <td class="text-center fw-bold-custom bg-bold" id="cantObj"></td>
+                                    </tr>
+                                    <tr>
+                                        <th class="table-info" style="border-color: #9ba0a5;">Promedio de avance</th>
+                                        <td class="text-center fw-bold-custom bg-bold" id="promeAvanc"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
+                </div>
+                <div class="row mt-3" style="margin-bottom: 30px;">
+                    <div class="col-12">
+                        <!-- <div class="card p-3"> -->
+                            <table class="table table-bordered table-sm" id="tablaReportesDos" style="margin-bottom: 0; padding: 0; border-color: #9ba0a5;">
+                                <thead>
+                                    <tr>
+                                        <th colspan="4" class="table-info" style="border-color: #9ba0a5;">Cantidad de acciones</th>
+                                        <td colspan="2" class="text-center fw-bold-custom bg-bold" id="cantAcc"></td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <th class="table-info" style="border-color: #9ba0a5;">Estados</th>
+                                        <td class="text-center">NO INICIADO</td>
+                                        <td class="text-center">EN PROCESO</td>
+                                        <td class="text-center">COMPLETADO</td>
+                                        <td class="text-center">NO COMPLETADO</td>
+                                        <td class="text-center">REPROGRAMADO</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="table-info" style="border-color: #9ba0a5;">Cantidad</th>
+                                        <td class="text-center fw-bold-custom bg-bold" id="cantNoIni"></td>
+                                        <td class="text-center fw-bold-custom bg-bold" id="cantEnPro"></td>
+                                        <td class="text-center fw-bold-custom bg-bold" id="cantComple"></td>
+                                        <td class="text-center fw-bold-custom bg-bold" id="cantNoComple"></td>
+                                        <td class="text-center fw-bold-custom bg-bold" id="cantRepro"></td>
+                                    </tr>
+                                    <tr>
+                                        <th class="table-info" style="border-color: #9ba0a5;">% Participación</th>
+                                        <td class="text-center fw-bold-custom bg-bold" id="porcNoIni"></td>
+                                        <td class="text-center fw-bold-custom bg-bold" id="porcEnPro"></td>
+                                        <td class="text-center fw-bold-custom bg-bold" id="porcComple"></td>
+                                        <td class="text-center fw-bold-custom bg-bold" id="porcNoComple"></td>
+                                        <td class="text-center fw-bold-custom bg-bold" id="porcRepro"></td>
+                                    </tr>                                           
+                                </tbody>
+                            </table>
+                        <!-- </div> -->
+                    </div>
+                </div>
+                <div style="margin-top: 30px;">
+                    <h5 class="text-center" style="margin-bottom: 20px; font-weight: 400;">REPORTE - ACCIONES CONCRETAS</h5>
+                    <table class="table table-bordered table-sm" id="tablaAccionesReporte" style="border-color: #9ba0a5;">
+                        <thead class="table-info" style="border-color: #9ba0a5;">
+                            <tr>
+                                <th>Acciones</th>
+                                <th>Índice</th>
+                                <th>Avance</th>
+                                <th>Resultado</th>
+                                <th>Estado</th>
+                                <th>Fecha Inicial</th>
+                                <th>Fecha Final</th>
+                                <th>Responsable</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

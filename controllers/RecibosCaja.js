@@ -381,7 +381,6 @@ $(function () {
 });
 
 // DECLARACIÓN DE FUNCIONES GENERALES
-
 const confirmAlert = async (title, text, icon = 'warning') => {
   const result = await Swal.fire({
     title: `${title}`,
