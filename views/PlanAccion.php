@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Eventos Comerciales</title>
+    <title>Plan Objetivos Esenciales</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="../resources/css/start/jquery-ui-1.9.2.custom.css?<?php echo (rand()); ?>" />
     <link rel="stylesheet" href="../resources/bootstrap/bootstrap-5.0.2-dist/css/bootstrap.min.css">

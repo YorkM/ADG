@@ -313,7 +313,7 @@ $(function () {
       reader.readAsText(e.target.files.item(0));
     }
     return false;
-  });
+  }); 
   //------------------------------------------------------------
   $("#btnEmailZona").click(function () {
     ConsultarZonas();
@@ -378,6 +378,11 @@ $(function () {
       agregarLiquidador(item);
     });
   });
+
+  $('#filtro2').keyup(function () {
+    const filtro = this.value.toLowerCase();
+    filtrar(filtro);
+  });
 });
 
 // DECLARACIÓN DE FUNCIONES GENERALES
@@ -396,9 +401,24 @@ const confirmAlert = async (title, text, icon = 'warning') => {
   return result;
 }
 
+const filtrar = (filtro) => {
+  const filas = document.querySelectorAll('#tdPlanillas2 tbody tr');
+
+  filas.forEach(fila => {
+      const celdas = fila.querySelectorAll('td');
+      const coincide = Array.from(celdas).some(td => td.textContent.toLowerCase().includes(filtro));
+
+      fila.style.display = coincide ? '' : 'none';
+  });
+}
+
 const limpiarDatos = () => {
   ArrDctos.length = 0;
   arrayLiquidador.length = 0;
+
+  $("#VlrTotalAbono").val(formatNum(0, '$'));
+  $("#VlrTotalFacturas").val(formatNum(0, '$'));
+  $("#VlrSinAsignar").val(formatNum(0, '$'));
 
   $('#tdPlanillas tbody').html("");
 
@@ -482,7 +502,7 @@ async function generarPDF(idTabla) {
   });
 
   tablaClon.style.display = 'none';
-  document.body.appendChild(tablaClon); 
+  document.body.appendChild(tablaClon);  
 
   doc.autoTable({
     html: tablaClon,
@@ -518,7 +538,8 @@ async function generarPDF(idTabla) {
   const finalY = doc.lastAutoTable.finalY || 45;
   doc.setFontSize(12);
   doc.text('NOTA: El descuento pronto pago aplica pagando las facturas dentro de la fecha establecida', pageWidth / 2, finalY + 10, { align: 'center' });
-  doc.text('RECUERDE: SOLO ESTÁ PERMITIDO CANCELAR A LAS CUENTAS DE D.F ROMA', pageWidth / 2, finalY + 22, { align: 'center' });
+  doc.text('Las facturas deben ser canceladas en orden consecutivo', pageWidth / 2, finalY + 20, { align: 'center' });
+  doc.text('RECUERDE: SOLO ESTÁ PERMITIDO CANCELAR A LAS CUENTAS DE D.F ROMA', pageWidth / 2, finalY + 30, { align: 'center' });
 
   doc.save('liquidacion.pdf');
 }
@@ -526,6 +547,7 @@ async function generarPDF(idTabla) {
 
 // FUNCIÓN PARA REALIZAR LOS CÁLCULOS DE DESCUENTO
 const calcularDescuento = (basePP, importe, porcentaje, claseDoc, fechaVencimiento) => {
+  // TODO: REALIZAR VALIDACIÓN PARA HACER CÁLCULO CORRECTO DE LAS DA
   const vencido = verificarVencimientoDescuento(fechaVencimiento);
   if (vencido || ["NC", "ND"].includes(claseDoc)) {
     return { porcentaje: 0, descuento: 0, pagar: importe };
@@ -688,7 +710,12 @@ const agregarLiquidador = (item) => {
   const fechaFactura = `${FB[2]}/${FB[1]}/${FB[0]}`;
   
   ArrDctos.forEach(item => {
-    const dias = (parseInt(item.dias) > 60 && parseInt(item.dias) <= 65) ? 60 : parseInt(item.dias);  
+    let dias = 0;
+    if (parseInt(item.dias) > 60 && parseInt(item.dias) <= 65) dias = 60;
+    else if (parseInt(item.dias) > 45 && parseInt(item.dias) <= 50) dias = 45;
+    else if (parseInt(item.dias) > 30 && parseInt(item.dias) <= 35) dias = 30;
+    else dias = parseInt(item.dias); 
+ 
     const fechaVencimientoFactura = agregarDias(FECHA_BASE, dias);
     const { porcentaje, descuento, pagar } = calcularDescuento(basePP, importe, parseFloat(item.descuento), claseDoc, fechaVencimientoFactura);
 
