@@ -29,50 +29,6 @@ const validaEstadoDesbloqueo = async () => {
   }
 };
 
-function truncateTextOnSmallScreens() {
-  if (window.innerWidth < 801) {
-      $('#prodOfer').text("Prod. Ofertados");
-      $('#prodNuevos').text("Prod. Nuevos");
-  } else {
-    $('#prodOfer').text("Productos Ofertados");
-    $('#prodNuevos').text("Productos Nuevos (90 Dias)");
-  }
-}
-
-const getProductosMasVendidosDia = async () => {
-  showLoadingSwalAlert2("Cargando la información...", false, true);
-  $('#tablaProductosMasVendidos').html(``);
-  const { data } = await enviarPeticion({op: "G_PROD_MAS_VENDIDO_DIA", link: "../models/PW-SAP.php"});
-  let table = `<table id="tablaDatos" class="table table-sm table-bordered table-hover" style="width: 100%;">
-    <thead class="table-info">
-        <tr>
-          <th>N°</th>
-          <th>Código Producto</th>
-          <th>Descripción Producto</th>
-          <th>Stock Disponible</th>
-          <th>Cantidad Vendida</th>
-        </tr>
-    </thead>
-    <tbody>`;
-
-    data.forEach((item, index) => {
-      table += `
-        <tr>
-          <td>${index + 1}</td>
-          <td>${item.CODIGO_MATERIAL}</td>
-          <td>${item.DESCRIPCION_MATERIAL}</td>
-          <td>${item.STOCK_DISPONIBLE}</td>
-          <td>${item.CANTIDAD_VENDIDA}</td>
-        </tr>
-      `;
-    });
-
-  table += `</tbody>
-          </table>`;
-
-  $('#tablaProductosMasVendidos').html(table);
-  dissminSwal();
-}
 
 const SolDesbloqueo = async () => {
   /*2024-10-04 Christian Bula 
@@ -183,21 +139,6 @@ const cerrarAlertaDesbloqueoPedidos = () => {
 }
 
 $(function () {
-  truncateTextOnSmallScreens();
-  window.addEventListener("resize", truncateTextOnSmallScreens);
-
-  $('#btnProductosMasVendidos').click(async function () { 
-    await getProductosMasVendidosDia();
-  });
-
-  $('#btnLimpiarProductos').click(function () { 
-    $('#tablaProductosMasVendidos').html(``);
-  });
-
-  if ($('#txtGrp1').val() === "100") {
-    $('#divBotonesProductos').show();
-  } else $('#divBotonesProductos').hide();
-
   /*
     setInterval(function(){
       dataPedidosDesbloqueo()
@@ -341,6 +282,7 @@ $(function () {
   });
   $("#btnEventos").click(function () {
 
+
     ListarEvento();
   });
   $("#btListaFacts").click(function () {
@@ -395,11 +337,12 @@ $(function () {
     },
     maxResults: 10,
     minLength: 3,
-    search: function () { },
-    open: function (event, ui) { },
+    search: function () {},
+    open: function (event, ui) {},
 
     select: function (event, ui) {
       $("#txtCodigoSAP").val(ui.item.codigo_sap);
+
     }
   });
 
@@ -432,8 +375,8 @@ $(function () {
     },
     maxResults: 10,
     minLength: 3,
-    search: function () { },
-    open: function (event, ui) { },
+    search: function () {},
+    open: function (event, ui) {},
     select: function (event, ui) {
       $("#CodigoSAPEntregas").val(ui.item.codigo_sap);
     }
@@ -464,8 +407,8 @@ $(function () {
     },
     maxResults: 10,
     minLength: 3,
-    search: function () { },
-    open: function (event, ui) { },
+    search: function () {},
+    open: function (event, ui) {},
     select: function (event, ui) {
       $("#txtFactCodigoCliente").val(ui.item.codigo_sap);
     }
@@ -490,8 +433,8 @@ $(function () {
     },
     maxResults: 10,
     minLength: 3,
-    search: function () { },
-    open: function (event, ui) { },
+    search: function () {},
+    open: function (event, ui) {},
     select: function (event, ui) {
       $("#txtFaltanteCodigoCliente").val(ui.item.codigo_sap);
     }
@@ -549,8 +492,8 @@ $(function () {
       },
       maxResults: 10,
       minLength: 3,
-      search: function () { },
-      open: function (event, ui) { },
+      search: function () {},
+      open: function (event, ui) {},
       select: function (event, ui) {
         $("#TxtIntegracion").attr('disabled', true);
         $("#txt_nit").val(ui.item.nit);
@@ -579,6 +522,8 @@ $(function () {
         $("#txt_descuento").val(ui.item.descuento_financiero);
         $("#txt_plazo").val(ui.item.dias_pago + ' dias');
         Destinatarios(ui.item.codigo_sap, ui.item.ciudad, ui.item.direccion);
+        Presupuesto_datos();
+        Cartera_edades();
         if (ui.item.institucional == 1) {
           $("#txt_institucional").val('SI');
         } else {
@@ -596,12 +541,6 @@ $(function () {
         $("#txtGrp1").val(ui.item.grupo1);
         $("#txtGrp2").val(ui.item.grupo2);
         $("#txtGrp1,#txtGrp2").prop('disabled', true)
-
-
-        if ($('#txtGrp1').val() === "100") {
-          $('#divBotonesProductos').show();
-        } else $('#divBotonesProductos').hide();
-        
         //-----------------------------------
         CargarEvento();
         BuscarProductos();
@@ -626,7 +565,7 @@ $(function () {
       BuscarProductos();
     }
 
-    //if($("#txt_bproductos").val()!=''){.
+    //if($("#txt_bproductos").val()!=''){
     var n = 0;
     var sto = 0;
     if (validarSiNumero(valor) == 1) {
@@ -770,7 +709,7 @@ $(function () {
             name: 'valores',
             data: resp.datos
 
-          },]
+          }, ]
         });
 
       })
@@ -1025,7 +964,7 @@ $(function () {
                   if ((reg > 0) && (reg > cant)) {
                     UnloadImg()
                     if (confirm("El producto " + $.trim(d.descripcion) + " presenta bonificado,"
-                      + "desea aumentar la cantidad a " + reg + " unidades para ganarlo?")) {
+                        + "desea aumentar la cantidad a " + reg + " unidades para ganarlo?")) {
                       cant = reg;
                     }
                     LoadImg("Subiendo CSV");
@@ -1162,10 +1101,11 @@ $(function () {
     crearPedidoRedencion();
   })
 
-  // if ($('#txtGrp1').val() === "100") {
-  //   $('#divBotonesProductos').show();
-  // } else $('#divBotonesProductos').hide();
+  var valor_rol = $("#Rol").val(); // Obtiene el valor del input
+  var valoresPermitidosrol = ["12", "1", "44", "72", "13", "14"];
 
+  // Mostrar u ocultar los divs según el valor de Rol
+  $("#cartera_edades, #Presupuesto_datos").toggle(valoresPermitidosrol.includes(valor_rol));
 });
 
 const preLoadCliente = (codigo_sap) => {
@@ -1264,92 +1204,95 @@ function GruposArticulos() {
 //
 /*
 function datos_cupo(){
-  $.ajax({
-    type    : "POST",
-    encoding: "UTF-8",
-    url     : "../models/PW-SAP.php",
-    async   : false,
-    dataType: "json",
-    error   : function(OBJ, ERROR, JQERROR){
-    },
-    beforeSend : function(){
-    },
-    data: {
-      op     : "S_CUPO_CREDITO",
-      org    : $.trim($("#Organizacion").val()),
-      codigo : $.trim($("#txt_codigoSap").val())
-    },
-    success: function(data){
-      var datos = '';
-  	
-      if(data.length>0){
-        datos = [{
-            name: 'Disponible',
-            y: parseInt(data[0].DISPONIBLE),
-            sliced: true,
-            selected: true
-             }, {
-            name: 'Comprometido',
-            y: parseInt(data[0].COMPROMETIDO)
-            }];
-        $("#cupo_txt1").text('COMPROMETIDO : '+formatNum(data[0].COMPROMETIDO,'$'));
-        $("#cupo_txt2").text('DISPONIBLE   : '+formatNum(data[0].DISPONIBLE,'$'));
-      }else{
-        datos = [{
-            name: 'Disponible',
-            y: 100,
-            sliced: true,
-            selected: true
-             }, {
-            name: 'Comprometido',
-            y: 0
-            }];
-        $("#cupo_txt1").text('COMPROMETIDO : '+formatNum(0,'$'));
-        $("#cupo_txt2").text('DISPONIBLE   : '+$("#txt_cupo").val());
-      }
-    	
-             Highcharts.chart('container3', {
-          chart: {
-            plotBackgroundColor: null,
-            plotBorderWidth: null,
-            plotShadow: false,
-            type: 'pie'
-          },
-          title: {
-            text: 'CUPO DE CRÉDITO'
-          },
-          tooltip: {
-            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-          },
-          accessibility: {
-            point: {
-              valueSuffix: '%'
-            }
-          },
-          plotOptions: {
-            pie: {
-              allowPointSelect: true,
-              cursor: 'pointer',
-              dataLabels: {
-                enabled: true,
-                format: '<b>{point.name}</b>: {point.percentage:.1f} %'
-              }
-            }
-          },
-          series: [{
-            name: 'Brands',
-             // colorByPoint: true,
-            data: datos
-          }]
-        });	
-    }
-  }).fail(function(data){
-      console.error(data);
-  });	
+	$.ajax({
+		type    : "POST",
+		encoding: "UTF-8",
+		url     : "../models/PW-SAP.php",
+		async   : false,
+		dataType: "json",
+		error   : function(OBJ, ERROR, JQERROR){
+		},
+		beforeSend : function(){
+		},
+		data: {
+			op     : "S_CUPO_CREDITO",
+			org    : $.trim($("#Organizacion").val()),
+			codigo : $.trim($("#txt_codigoSap").val())
+		},
+		success: function(data){
+			var datos = '';
+		
+			if(data.length>0){
+				datos = [{
+						name: 'Disponible',
+						y: parseInt(data[0].DISPONIBLE),
+						sliced: true,
+						selected: true
+					   }, {
+						name: 'Comprometido',
+						y: parseInt(data[0].COMPROMETIDO)
+					  }];
+				$("#cupo_txt1").text('COMPROMETIDO : '+formatNum(data[0].COMPROMETIDO,'$'));
+				$("#cupo_txt2").text('DISPONIBLE   : '+formatNum(data[0].DISPONIBLE,'$'));
+			}else{
+				datos = [{
+						name: 'Disponible',
+						y: 100,
+						sliced: true,
+						selected: true
+					   }, {
+						name: 'Comprometido',
+						y: 0
+					  }];
+				$("#cupo_txt1").text('COMPROMETIDO : '+formatNum(0,'$'));
+				$("#cupo_txt2").text('DISPONIBLE   : '+$("#txt_cupo").val());
+			}
+			
+	     	   Highcharts.chart('container3', {
+					chart: {
+						plotBackgroundColor: null,
+						plotBorderWidth: null,
+						plotShadow: false,
+						type: 'pie'
+					},
+					title: {
+						text: 'CUPO DE CRÉDITO'
+					},
+					tooltip: {
+						pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+					},
+					accessibility: {
+						point: {
+							valueSuffix: '%'
+						}
+					},
+					plotOptions: {
+						pie: {
+							allowPointSelect: true,
+							cursor: 'pointer',
+							dataLabels: {
+								enabled: true,
+								format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+							}
+						}
+					},
+					series: [{
+						name: 'Brands',
+					   // colorByPoint: true,
+						data: datos
+					}]
+				});	
+		}
+	}).fail(function(data){
+	    console.error(data);
+	});	
 
 }
 */
-function consultaOpciones(pedido) {
+function consultaOpciones(pedido, alm, rdespacho, rpuntoventa) {
+  alm = alm || undefined;
+  rdespacho = rdespacho || undefined;
+  rpuntoventa = rpuntoventa || undefined;
   $.ajax({
     type: "POST",
     encoding: "UTF-8",
@@ -1358,7 +1301,7 @@ function consultaOpciones(pedido) {
     error: function (OBJ, ERROR, JQERROR) {
       alert(JQERROR);
     },
-    beforeSend: function () { },
+    beforeSend: function () {},
     data: ({
       op: "S_GESTION_PEDIDOS_UNICO",
       pedido: pedido
@@ -1378,6 +1321,9 @@ function consultaOpciones(pedido) {
       $("#ped_ot").val(data[0].ot);
       $("#ped_factura").val(data[0].factura);
       $("#NotasRapidas").val(data[0].notas);
+      if (data[0].ot > 0) {
+        Prioridad_ot(data[0].ot, alm ?? "", rdespacho ?? "", rpuntoventa ?? "");
+      }
       if (data[0].entrega == 0) {
         $("#NotasRapidas").attr('disabled', false);
         $("#btnNotaRapida").attr('disabled', false);
@@ -1396,22 +1342,22 @@ function Notificaciones() {
   //Ventas 14
   //Administradores 1
   /*if(rol == 14 || rol == 12 || rol == 1){
-   if(ofi == 2100 || ofi == 2200 || ofi == 2300){
-    $.notify({// options
-      icon:    'glyphicon glyphicon-warning-sign',
-      title: '<strong>CONVENCIÓN</strong></br>',
-      message: '¡Vamos con toda! Convención 2022 ARUBA'+
-           '  tú puedes ¡ANIMO!',
-      url: '',
-      target: '_blank' 
-    },{// settings	
-      delay : 10000,
-      type: 'warning',
-      animate: {
-        enter: 'animated fadeInDown',
-        exit: 'animated fadeOutUp'
-      },
-    });
+	 if(ofi == 2100 || ofi == 2200 || ofi == 2300){
+		$.notify({// options
+			icon:    'glyphicon glyphicon-warning-sign',
+			title: '<strong>CONVENCIÓN</strong></br>',
+			message: '¡Vamos con toda! Convención 2022 ARUBA'+
+					 '  tú puedes ¡ANIMO!',
+			url: '',
+			target: '_blank' 
+		},{// settings	
+			delay : 10000,
+			type: 'warning',
+			animate: {
+				enter: 'animated fadeInDown',
+				exit: 'animated fadeOutUp'
+			},
+		});
      }
  }*/
   //DESCUENTOS ESPECIALES PAGINA WEB
@@ -1445,8 +1391,8 @@ function PermisosZonas() {
     url: "../models/PW-SAP.php",
     async: false,
     dataType: "json",
-    error: function (OBJ, ERROR, JQERROR) { },
-    beforeSend: function () { },
+    error: function (OBJ, ERROR, JQERROR) {},
+    beforeSend: function () {},
     data: {
       op: "S_PERMISO_ZONA",
       rol: rol
@@ -1472,8 +1418,8 @@ function ZonasVentas() {
     url: "../models/PW-SAP.php",
     async: false,
     dataType: "json",
-    error: function (OBJ, ERROR, JQERROR) { },
-    beforeSend: function () { },
+    error: function (OBJ, ERROR, JQERROR) {},
+    beforeSend: function () {},
     data: {
       op: "S_ZONAS_VENTA",
       sw: sw,
@@ -1868,12 +1814,12 @@ function Limpiar() {
     $('[href="#dvEventos"]').closest('li').hide();
     $("#separadorEventos").hide();
   }
-  if ($.trim($("#Rol").val()) == 9 || $.trim($("#Rol").val()) == 11) { //Transferencistas y proveedores
+  if ($.trim($("#Rol").val()) == 9 || $.trim($("#Rol").val()) == 11 || $.trim($("#Rol").val()) == 120) { //Transferencistas y proveedores
     $("#btnEditar").hide();
     $("#btnTempTerceros").hide();
     $("#btnAddEntregas").hide();
     $("#separadorEntregas").hide();
-    //$("#btListaFacts").hide();
+    $("#btListaFacts").hide();
     $("#separadorFacturas").hide();
     $("#btnMenu5").hide();
     $("#btnMenu6").hide();
@@ -1905,11 +1851,14 @@ function Limpiar() {
   $("#n_resultados").text("");
   $("#OficinaEntregas").html(OfcN);
   $("#TxtIntegracion").val('N');
+
   $("#TxtIntegracion").attr('disabled', false);
+
 
   if ($("#link_pro").val() != '0') {
     $("#btnLimpiar").attr("disabled", true)
   }
+  $('#cartera_edades, #Presupuesto_datos').empty();
 
 }
 
@@ -2433,8 +2382,8 @@ function CargarEan() {
     url: "../models/PW-SAP.php",
     async: true,
     dataType: "json",
-    error: function (OBJ, ERROR, JQERROR) { },
-    beforeSend: function () { },
+    error: function (OBJ, ERROR, JQERROR) {},
+    beforeSend: function () {},
     data: {
       op: "B_EAN"
     },
@@ -2493,11 +2442,11 @@ function BuscarProductos() {
   /*
  //valido si se abre desde la ventana de 0102 y selecciono por defecto el valor enviado en $_GET["pedido_integracion"]	
   if($("#pedido_integracion").val()!=''){
-   if($("#pedido_integracion").val()=='S'){
-    $("#TxtIntegracion").val('S');
-   }else{
-     $("#TxtIntegracion").val('N');
-   }
+	 if($("#pedido_integracion").val()=='S'){
+		$("#TxtIntegracion").val('S');
+	 }else{
+		 $("#TxtIntegracion").val('N');
+	 }
   }*/
 
   var TipoPed = $("#TxtIntegracion").val();
@@ -2571,7 +2520,7 @@ function BuscarProductos() {
           'img2': d.img2,
           'op_inf': d.op_inf
           /*,
-                     'codigos_ean'          :d.codigos_ean */
+          					 'codigos_ean'          :d.codigos_ean */
         } //det={
         ArrProd.push(det);
 
@@ -2651,7 +2600,7 @@ function InfoMaterial(pcodigo, pvalor, piva, pdcto, pdesc, pstock, op) {
   //alert(pcodigo+' - '+pvalor+' - '+piva+' - '+pdcto+' - '+pdesc+' - '+pstock+' - '+op);
   /*
      op : 0 informacion de material
-   op : 1 informacion de kits
+	 op : 1 informacion de kits
    */
   var vdfinanbase = 0;
   var cod = pcodigo;
@@ -2836,9 +2785,9 @@ function InfoMaterial(pcodigo, pvalor, piva, pdcto, pdesc, pstock, op) {
         tabla += '</tbody>'
           + '</table>'
         '</div>'
-          + '</div>'
-          + '</div>'
-          + '</div>';
+        + '</div>'
+        + '</div>'
+        + '</div>';
 
 
       } else { //tabla de contenido de kits
@@ -2877,11 +2826,11 @@ function InfoMaterial(pcodigo, pvalor, piva, pdcto, pdesc, pstock, op) {
 
       /*
       setTimeout(function(){
-         $('div .img-material').each(function(){
-          if($(this)[0].naturalHeight == 0){
-           $(this).attr('src','https://dfnas.pwmultiroma.com/imagenesMateriales/no_imagen.png');
-          }
-        });				
+      	 $('div .img-material').each(function(){
+      		if($(this)[0].naturalHeight == 0){
+      		 $(this).attr('src','https://dfnas.pwmultiroma.com/imagenesMateriales/no_imagen.png');
+      		}
+      	});				
       },500)	*/
 
     }
@@ -3016,6 +2965,7 @@ function AddProducto(pcodigo,
 function Destinatarios(codSap, ciudad, direccion) {
   $.ajax({
     encoding: "UTF-8",
+
     url: "../models/PW-SAP.php",
     global: false,
     type: "POST",
@@ -3128,7 +3078,7 @@ function InsertarDetalle(NumPed, codigo, cant, vlr_unitario, descuento, totalfil
         ModificarArray(cant, totalfila, numero, codigo);
       } else {
         /* alert('ERROR: Al insertar el producto - '+codigo);
-       alert(data);*/
+			 alert(data);*/
         Swal.fire({
           toast: true,
           icon: 'success',
@@ -3157,7 +3107,7 @@ function ActualizarDetalle(idfila, cant, totalfila, codigo) {
     url: "../models/PW-SAP.php",
     global: false,
     type: "POST",
-    error: function (OBJ, ERROR, JQERROR) { },
+    error: function (OBJ, ERROR, JQERROR) {},
     data: ({
       op: "U_PEDIDO_DETALLE",
       idfila: idfila,
@@ -3210,7 +3160,7 @@ function EliminarDetalle(idfila, codigo) {
           InserUpdateSAP('MODIFICAR', numero, numeroSAP);
         }
         ModificarArray(0, 0, 0, codigo);
-      } else { }
+      } else {}
       VerificaPedido();
     }
   });
@@ -3661,7 +3611,7 @@ function Temporales() {
                 </button>`;
               }
             } else {
-              if ($.trim(data[i].sol_desbloqueo) != '' /*&& data[i].sol_desbloqueo!='3'*/) {
+              if ($.trim(data[i].sol_desbloqueo) != '' /*&& data[i].sol_desbloqueo!='3'*/ ) {
                 let estado_sol_des = "";
                 let color = "";
 
@@ -3888,7 +3838,7 @@ function EnviarMail(tipo, numero) {
     }),
     dataType: "html",
     async: true,
-    success: function (data) { }
+    success: function (data) {}
   }).fail(function (data) {
     console.log(data);
   });
@@ -3911,7 +3861,7 @@ function EnviarMailAnulacion(tipo, numero, texto) {
     }),
     dataType: "html",
     async: true,
-    success: function (data) { }
+    success: function (data) {}
   }).fail(function (data) {
     console.log(data);
   });
@@ -4506,6 +4456,37 @@ function ModificarEntrega() {
   //alert(JSON.stringify(detalle));
 }
 
+function Prioridad_ot(ot, almacen, despacho, punto) {
+  $.ajax({
+    type: "POST",
+    encoding: "UTF-8",
+    url: "../models/PW-SAP.php",
+    global: false,
+    error: function (OBJ, ERROR, JQERROR) {
+      //alert(JQERROR + " ");
+    },
+    data: {
+      op: 'Prioridad_ot',
+      ot: ot,
+      almacen: almacen,
+      recojeDespachos: despacho, // Cambiado de 'despacho' a 'recojeDespachos'
+      recojePuntoVenta: punto // Cambiado de 'punto' a 'recojePuntoVenta'
+    },
+    dataType: "json",
+    async: false,
+    success: function (data) {
+      if (data.Tipo != 'S') {
+        console.log("Error" + data.Msj);
+      } else {
+        console.log("Exito" + data.Msj);
+      }
+    }
+  }).fail(function (data) {
+    console.log(data);
+    // Swal.fire("Error", "Ocurrió un error al actualizar la prioridad", "error");
+  });
+}
+
 function Ordenes() {
   var entrega = $.trim($("#ped_entrega").val());
   var NumTmp = $.trim($("#ped_numero").val());
@@ -4532,7 +4513,7 @@ function Ordenes() {
   }
   if (entrega != 0 && entrega != '') {
     var Num = $.trim($("#ped_ot").val());
-    if (Num == '0') {
+    /*if (Num == '0') {
       Swal.fire({
         title: "El pedido no posee Orden de transporte, desea crearla?",
         text: "Despues de aceptar no podra reversar la operacion!",
@@ -4586,6 +4567,95 @@ function Ordenes() {
         }
       });
 
+    } */
+    if (Num == '0') {
+      // Configuración inicial del Swal con checkboxes dinámicos
+      let swalOptions = {
+        title: "El pedido no posee Orden de transporte, desea crearla?",
+        text: "Despues de aceptar no podra reversar la operacion!",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonColor: "#82ED81",
+        cancelButtonColor: "#FFA3A4",
+        confirmButtonText: "Aceptar",
+        cancelButtonText: "Cancelar",
+        closeOnConfirm: false,
+        closeOnCancel: false,
+        html: `
+                <div style="text-align: left; margin-top: 20px;">
+                    <label style="display: block; margin-bottom: 10px;">
+                        <input type="checkbox" id="recojeDespachos" name="recojeDespachos"> 
+                        Recoge en Despachos
+                    </label>
+                    ${$.trim($("#ped_bodega").val()) == '1100' ? 
+                    `<label style="display: block;">
+                        <input type="checkbox" id="recojePuntoVenta" name="recojePuntoVenta"> 
+                        Recoge en Punto de venta
+                    </label>` : ''}
+                </div>
+            `,
+        preConfirm: () => {
+          return {
+            recojeDespachos: document.getElementById('recojeDespachos').checked,
+            recojePuntoVenta: $.trim($("#ped_bodega").val()) == '1100'
+              ? document.getElementById('recojePuntoVenta').checked : false
+          }
+        }
+      };
+
+      Swal.fire(swalOptions).then((result) => {
+        if (result.value) {
+          const opcionesRecojo = result.value;
+          console.log('Opciones seleccionadas:', opcionesRecojo);
+
+          $.ajax({
+            type: "POST",
+            encoding: "UTF-8",
+            url: "../models/WS-PW.php",
+            global: false,
+            error: function (OBJ, ERROR, JQERROR) {
+              alert(JQERROR + " ");
+            },
+            data: ({
+              op: 'CREA_ORDENES',
+              almacen: almacen,
+              entrega: entrega,
+              recojeDespachos: opcionesRecojo.recojeDespachos ? '1' : '0',
+              recojePuntoVenta: opcionesRecojo.recojePuntoVenta ? '1' : '0'
+            }),
+            dataType: "json",
+            async: false,
+            success: function (data) {
+              if (data.Tipo != 'S') {
+                Swal.fire("Error", data.Msj, "error");
+              } else {
+                // Extraer el número de OT del mensaje
+                //debugger;
+                let nueva_ot = '';
+                let rdespa = opcionesRecojo.recojeDespachos ? '1' : '0';
+                let rpunto = opcionesRecojo.recojePuntoVenta ? '1' : '0';
+                Swal.fire("Excelente", data.Msj, "success");
+
+                var delayInMilliseconds = 2000; //1 segundo
+                setTimeout(function () {
+                  //Temporales propios
+                  Temporales();
+                  //Temporales de terceros
+                  GestionPedidos();
+                  //Actualizacion de datos en modal
+                  consultaOpciones(NumTmp, almacen, rdespa, rpunto);
+                  //-----------------------------------//
+
+                }, delayInMilliseconds);
+              }
+            }
+          }).fail(function (data) {
+            console.log(data);
+          });
+        } else {
+          Swal.fire("Cancelado", "La operacion ha sido cancelada!", "error");
+        }
+      });
     } else {
       $.ajax({
         type: "POST",
@@ -4768,7 +4838,7 @@ function GestionPedidos() {
                   btnText = 'E';
                 }
               } else {
-                if ($.trim(data[i].sol_desbloqueo) != '' /* && data[i].sol_desbloqueo!='3'*/) {
+                if ($.trim(data[i].sol_desbloqueo) != '' /* && data[i].sol_desbloqueo!='3'*/ ) {
                   estado_sol_des = "";
 
                   switch (data[i].sol_desbloqueo) {
@@ -5542,8 +5612,8 @@ function VerficarPedido(numTMP) {
     encoding: "UTF-8",
     url: "../models/PW-SAP.php",
     global: false,
-    error: function (OBJ, ERROR, JQERROR) { },
-    beforeSend: function () { },
+    error: function (OBJ, ERROR, JQERROR) {},
+    beforeSend: function () {},
     data: ({
       op: 'VERIFY_PEDIDO',
       numTMP: numTMP
@@ -5566,8 +5636,8 @@ function NumeroSAP(numTMP) {
     encoding: "UTF-8",
     url: "../models/PW-SAP.php",
     global: false,
-    error: function (OBJ, ERROR, JQERROR) { },
-    beforeSend: function () { },
+    error: function (OBJ, ERROR, JQERROR) {},
+    beforeSend: function () {},
     data: ({
       op: 'NUMERO_SAP',
       numTMP: numTMP
@@ -5583,99 +5653,99 @@ function NumeroSAP(numTMP) {
 
 /*
 function top10_materiales(){
-  var ano  = new Date().getFullYear();
-  var mes  = new Date().getMonth()+1;
-  var pluginArrayArg = new Array();
-  var jsonArray = '';
+	var ano  = new Date().getFullYear();
+	var mes  = new Date().getMonth()+1;
+	var pluginArrayArg = new Array();
+	var jsonArray = '';
 	
-  $.ajax({ 
-    type: "POST",
-    url: "../models/PW-SAP.php",
-    beforeSend: function(){
-    },
-    data : ({
-      op  : 'B_TOP20_MATERIALES',
-      cod : $("#txt_codigoSap").val(),
-      org : $("#Organizacion").val(),
-      ano : ano,
-      mes : mes
-    }),
-    dataType: "json",
-    async:false,
-    success: function(data){ console.log(data);
-         //console.log(data);
-          
-        for(var i=0; i<=data.length-1; i++){
-         var dato = new Object();
-           dato.name = '('+data[i].codigo_material+') '+data[i].descripcion;
-           dato.y    = Math.round(data[i].frecuencia);
-           pluginArrayArg.push(dato);
-        }
-        jsonArray = JSON.parse(JSON.stringify(pluginArrayArg));
-    }
-  }).fail(function(data){
-    console.error(data)
-  });
+	$.ajax({ 
+		type: "POST",
+		url: "../models/PW-SAP.php",
+		beforeSend: function(){
+		},
+		data : ({
+			op  : 'B_TOP20_MATERIALES',
+			cod : $("#txt_codigoSap").val(),
+			org : $("#Organizacion").val(),
+			ano : ano,
+			mes : mes
+		}),
+		dataType: "json",
+		async:false,
+		success: function(data){ console.log(data);
+			   //console.log(data);
+			    
+				for(var i=0; i<=data.length-1; i++){
+				 var dato = new Object();
+					 dato.name = '('+data[i].codigo_material+') '+data[i].descripcion;
+					 dato.y    = Math.round(data[i].frecuencia);
+					 pluginArrayArg.push(dato);
+				}
+				jsonArray = JSON.parse(JSON.stringify(pluginArrayArg));
+		}
+	}).fail(function(data){
+		console.error(data)
+	});
    // Create the chart
 	
-  if(pluginArrayArg.length>0){
-  	
-    Highcharts.chart('container2', {
-      chart: {
-        type: 'column'
-      },
-      title: {
-        text: 'TOP 10 DE PRODUCTOS MAS COMPRADOS'
-      },
-      subtitle: {
-        text: 'Frecuencia de compra : '+ano
-      },
-      accessibility: {
-        announceNewData: {
-          enabled: true
-        }
-      },
-      xAxis: {
-        type: 'category'
-      },
-      yAxis: {
-        title: {
-          text: 'Frecuencia de compra'
-        }
+	if(pluginArrayArg.length>0){
+		
+		Highcharts.chart('container2', {
+			chart: {
+				type: 'column'
+			},
+			title: {
+				text: 'TOP 10 DE PRODUCTOS MAS COMPRADOS'
+			},
+			subtitle: {
+				text: 'Frecuencia de compra : '+ano
+			},
+			accessibility: {
+				announceNewData: {
+					enabled: true
+				}
+			},
+			xAxis: {
+				type: 'category'
+			},
+			yAxis: {
+				title: {
+					text: 'Frecuencia de compra'
+				}
 
-      },
-      legend: {
-        enabled: false
-      },
-      plotOptions: {
-        series: {
-          borderWidth: 0,
-          dataLabels: {
-            enabled: true,
-            format: '{point.y:f}'
-          }
-        }
-      },
+			},
+			legend: {
+				enabled: false
+			},
+			plotOptions: {
+				series: {
+					borderWidth: 0,
+					dataLabels: {
+						enabled: true,
+						format: '{point.y:f}'
+					}
+				}
+			},
 
-      tooltip: {
-        headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
-        pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:f}</b> <br/>'
-      },
+			tooltip: {
+				headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+				pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:f}</b> <br/>'
+			},
 
-      series: [
-        {
-          name: "Browsers",
-          colorByPoint: true,
-          data: jsonArray
-        }
-      ]
+			series: [
+				{
+					name: "Browsers",
+					colorByPoint: true,
+					data: jsonArray
+				}
+			]
 
-    });	   
-  }else{
-  	
-    $("#container2").html('<h4>TOP 10 DE PRODUCTOS MAS COMPRADOS</h4><br><div class="alert alert-danger">Sin resultados!</div>');
-  	
-  }
+		});	   
+	}else{
+		
+		$("#container2").html('<h4>TOP 10 DE PRODUCTOS MAS COMPRADOS</h4><br><div class="alert alert-danger">Sin resultados!</div>');
+		
+	}
 
 }*/
 
@@ -5689,299 +5759,299 @@ var ano       = new Date().getFullYear();
 var mes       = new Date().getMonth()+1;
 var ano_ant   = new Date().getFullYear()-1;
 $.ajax({ 
-    type: "POST",
-    url: "../models/PW-SAP.php",
-    beforeSend: function(){
-    },
-    data : ({
-      op  : 'B_FACTURACION_MES',
-      cod : $("#txt_codigoSap").val(),
-      org : $("#Organizacion").val(),
-      ano : ano,
-      mes : mes
-    }),
-    dataType: "json",
-    async:false,
-    success: function(data){ console.log({'Comportamiento':data});
-      for(var i=0; i<=data.length-1; i++){
-        switch(mes){
-        case 1:{  datos.push(parseFloat(data[i].Ene));
-          }break
-        case 2:{  datos.push(parseFloat(data[i].Ene));
-                    datos.push(parseFloat(data[i].Feb));
-        }break
-        case 3:{  datos.push(parseFloat(data[i].Ene));
-              datos.push(parseFloat(data[i].Feb));
-              datos.push(parseFloat(data[i].Mar));
-        }break
-        case 4:{  datos.push(parseFloat(data[i].Ene));
-              datos.push(parseFloat(data[i].Feb));
-              datos.push(parseFloat(data[i].Mar));
-              datos.push(parseFloat(data[i].Abr));
-        }break
-        case 5:{  datos.push(parseFloat(data[i].Ene));
-              datos.push(parseFloat(data[i].Feb));
-              datos.push(parseFloat(data[i].Mar));
-              datos.push(parseFloat(data[i].Abr));
-              datos.push(parseFloat(data[i].May));
-        }break
-        case 6:{  datos.push(parseFloat(data[i].Ene));
-              datos.push(parseFloat(data[i].Feb));
-              datos.push(parseFloat(data[i].Mar));
-              datos.push(parseFloat(data[i].Abr));
-              datos.push(parseFloat(data[i].May));
-              datos.push(parseFloat(data[i].Jun));
-        }break
-        case 7:{  datos.push(parseFloat(data[i].Ene));
-              datos.push(parseFloat(data[i].Feb));
-              datos.push(parseFloat(data[i].Mar));
-              datos.push(parseFloat(data[i].Abr));
-              datos.push(parseFloat(data[i].May));
-              datos.push(parseFloat(data[i].Jun));
-              datos.push(parseFloat(data[i].Jul));
-        }break
-        case 8:{  datos.push(parseFloat(data[i].Ene));
-              datos.push(parseFloat(data[i].Feb));
-              datos.push(parseFloat(data[i].Mar));
-              datos.push(parseFloat(data[i].Abr));
-              datos.push(parseFloat(data[i].May));
-              datos.push(parseFloat(data[i].Jun));
-              datos.push(parseFloat(data[i].Jul));
-              datos.push(parseFloat(data[i].Ago));
-        }break
-        case 9:{  datos.push(parseFloat(data[i].Ene));
-              datos.push(parseFloat(data[i].Feb));
-              datos.push(parseFloat(data[i].Mar));
-              datos.push(parseFloat(data[i].Abr));
-              datos.push(parseFloat(data[i].May));
-              datos.push(parseFloat(data[i].Jun));
-              datos.push(parseFloat(data[i].Jul));
-              datos.push(parseFloat(data[i].Ago));
-              datos.push(parseFloat(data[i].Sep));
-          }break
-        case 10:{ datos.push(parseFloat(data[i].Ene));
-              datos.push(parseFloat(data[i].Feb));
-              datos.push(parseFloat(data[i].Mar));
-              datos.push(parseFloat(data[i].Abr));
-              datos.push(parseFloat(data[i].May));
-              datos.push(parseFloat(data[i].Jun));
-              datos.push(parseFloat(data[i].Jul));
-              datos.push(parseFloat(data[i].Ago));
-              datos.push(parseFloat(data[i].Sep));
-              datos.push(parseFloat(data[i].Oct));
-          }break
-        case 11:{ datos.push(parseFloat(data[i].Ene));
-              datos.push(parseFloat(data[i].Feb));
-              datos.push(parseFloat(data[i].Mar));
-              datos.push(parseFloat(data[i].Abr));
-              datos.push(parseFloat(data[i].May));
-              datos.push(parseFloat(data[i].Jun));
-              datos.push(parseFloat(data[i].Jul));
-              datos.push(parseFloat(data[i].Ago));
-              datos.push(parseFloat(data[i].Sep));
-              datos.push(parseFloat(data[i].Oct));
-              datos.push(parseFloat(data[i].Nov));
-          }break
-        case 12:{ datos.push(parseFloat(data[i].Ene));
-              datos.push(parseFloat(data[i].Feb));
-              datos.push(parseFloat(data[i].Mar));
-              datos.push(parseFloat(data[i].Abr));
-              datos.push(parseFloat(data[i].May));
-              datos.push(parseFloat(data[i].Jun));
-              datos.push(parseFloat(data[i].Jul));
-              datos.push(parseFloat(data[i].Ago));
-              datos.push(parseFloat(data[i].Sep));
-              datos.push(parseFloat(data[i].Oct));
-              datos.push(parseFloat(data[i].Nov));
-              datos.push(parseFloat(data[i].Dic));
-         }break
-      }
-      }
-      JSON.parse(JSON.stringify(datos));
-    	
-    }
+		type: "POST",
+		url: "../models/PW-SAP.php",
+		beforeSend: function(){
+		},
+		data : ({
+			op  : 'B_FACTURACION_MES',
+			cod : $("#txt_codigoSap").val(),
+			org : $("#Organizacion").val(),
+			ano : ano,
+			mes : mes
+		}),
+		dataType: "json",
+		async:false,
+		success: function(data){ console.log({'Comportamiento':data});
+			for(var i=0; i<=data.length-1; i++){
+				switch(mes){
+				case 1:{  datos.push(parseFloat(data[i].Ene));
+			    }break
+				case 2:{  datos.push(parseFloat(data[i].Ene));
+			              datos.push(parseFloat(data[i].Feb));
+				}break
+				case 3:{  datos.push(parseFloat(data[i].Ene));
+						  datos.push(parseFloat(data[i].Feb));
+						  datos.push(parseFloat(data[i].Mar));
+				}break
+				case 4:{  datos.push(parseFloat(data[i].Ene));
+						  datos.push(parseFloat(data[i].Feb));
+						  datos.push(parseFloat(data[i].Mar));
+						  datos.push(parseFloat(data[i].Abr));
+				}break
+				case 5:{  datos.push(parseFloat(data[i].Ene));
+						  datos.push(parseFloat(data[i].Feb));
+						  datos.push(parseFloat(data[i].Mar));
+						  datos.push(parseFloat(data[i].Abr));
+						  datos.push(parseFloat(data[i].May));
+				}break
+				case 6:{  datos.push(parseFloat(data[i].Ene));
+						  datos.push(parseFloat(data[i].Feb));
+						  datos.push(parseFloat(data[i].Mar));
+						  datos.push(parseFloat(data[i].Abr));
+						  datos.push(parseFloat(data[i].May));
+						  datos.push(parseFloat(data[i].Jun));
+				}break
+				case 7:{  datos.push(parseFloat(data[i].Ene));
+						  datos.push(parseFloat(data[i].Feb));
+						  datos.push(parseFloat(data[i].Mar));
+						  datos.push(parseFloat(data[i].Abr));
+						  datos.push(parseFloat(data[i].May));
+						  datos.push(parseFloat(data[i].Jun));
+						  datos.push(parseFloat(data[i].Jul));
+				}break
+				case 8:{  datos.push(parseFloat(data[i].Ene));
+						  datos.push(parseFloat(data[i].Feb));
+						  datos.push(parseFloat(data[i].Mar));
+						  datos.push(parseFloat(data[i].Abr));
+						  datos.push(parseFloat(data[i].May));
+						  datos.push(parseFloat(data[i].Jun));
+						  datos.push(parseFloat(data[i].Jul));
+						  datos.push(parseFloat(data[i].Ago));
+				}break
+				case 9:{  datos.push(parseFloat(data[i].Ene));
+						  datos.push(parseFloat(data[i].Feb));
+						  datos.push(parseFloat(data[i].Mar));
+						  datos.push(parseFloat(data[i].Abr));
+						  datos.push(parseFloat(data[i].May));
+						  datos.push(parseFloat(data[i].Jun));
+						  datos.push(parseFloat(data[i].Jul));
+						  datos.push(parseFloat(data[i].Ago));
+						  datos.push(parseFloat(data[i].Sep));
+			    }break
+				case 10:{ datos.push(parseFloat(data[i].Ene));
+						  datos.push(parseFloat(data[i].Feb));
+						  datos.push(parseFloat(data[i].Mar));
+						  datos.push(parseFloat(data[i].Abr));
+						  datos.push(parseFloat(data[i].May));
+						  datos.push(parseFloat(data[i].Jun));
+						  datos.push(parseFloat(data[i].Jul));
+						  datos.push(parseFloat(data[i].Ago));
+						  datos.push(parseFloat(data[i].Sep));
+						  datos.push(parseFloat(data[i].Oct));
+			    }break
+				case 11:{ datos.push(parseFloat(data[i].Ene));
+						  datos.push(parseFloat(data[i].Feb));
+						  datos.push(parseFloat(data[i].Mar));
+						  datos.push(parseFloat(data[i].Abr));
+						  datos.push(parseFloat(data[i].May));
+						  datos.push(parseFloat(data[i].Jun));
+						  datos.push(parseFloat(data[i].Jul));
+						  datos.push(parseFloat(data[i].Ago));
+						  datos.push(parseFloat(data[i].Sep));
+						  datos.push(parseFloat(data[i].Oct));
+						  datos.push(parseFloat(data[i].Nov));
+			    }break
+				case 12:{ datos.push(parseFloat(data[i].Ene));
+						  datos.push(parseFloat(data[i].Feb));
+						  datos.push(parseFloat(data[i].Mar));
+						  datos.push(parseFloat(data[i].Abr));
+						  datos.push(parseFloat(data[i].May));
+						  datos.push(parseFloat(data[i].Jun));
+						  datos.push(parseFloat(data[i].Jul));
+						  datos.push(parseFloat(data[i].Ago));
+						  datos.push(parseFloat(data[i].Sep));
+						  datos.push(parseFloat(data[i].Oct));
+						  datos.push(parseFloat(data[i].Nov));
+						  datos.push(parseFloat(data[i].Dic));
+			   }break
+			}
+			}
+			JSON.parse(JSON.stringify(datos));
+			
+		}
  }).fail(function(data){
    console.error(data);
  });
 	
  $.ajax({ 
-    type: "POST",
-    url: "../models/PW-SAP.php",
-    beforeSend: function(){
-    },
-    data : ({
-      op  : 'B_FACTURACION_MES',
-      cod : $("#txt_codigoSap").val(),
-      org : $("#Organizacion").val(),
-      ano : ano_ant,
-      mes : mes
-    }),
-    dataType: "json",
-    async:false,
-    success: function(data){ 
-      console.log({data});
-      for(var i=0; i<=data.length-1; i++){
-       switch(mes){
-        case 1:{  datos_ant.push(parseFloat(data[i].Ene));
-          }break
-        case 2:{  datos_ant.push(parseFloat(data[i].Ene));
-                    datos_ant.push(parseFloat(data[i].Feb));
-        }break
-        case 3:{  datos_ant.push(parseFloat(data[i].Ene));
-              datos_ant.push(parseFloat(data[i].Feb));
-              datos_ant.push(parseFloat(data[i].Mar));
-        }break
-        case 4:{  datos_ant.push(parseFloat(data[i].Ene));
-              datos_ant.push(parseFloat(data[i].Feb));
-              datos_ant.push(parseFloat(data[i].Mar));
-              datos_ant.push(parseFloat(data[i].Abr));
-        }break
-        case 5:{  datos_ant.push(parseFloat(data[i].Ene));
-              datos_ant.push(parseFloat(data[i].Feb));
-              datos_ant.push(parseFloat(data[i].Mar));
-              datos_ant.push(parseFloat(data[i].Abr));
-              datos_ant.push(parseFloat(data[i].May));
-        }break
-        case 6:{  datos_ant.push(parseFloat(data[i].Ene));
-              datos_ant.push(parseFloat(data[i].Feb));
-              datos_ant.push(parseFloat(data[i].Mar));
-              datos_ant.push(parseFloat(data[i].Abr));
-              datos_ant.push(parseFloat(data[i].May));
-              datos_ant.push(parseFloat(data[i].Jun));
-        }break
-        case 7:{  datos_ant.push(parseFloat(data[i].Ene));
-              datos_ant.push(parseFloat(data[i].Feb));
-              datos_ant.push(parseFloat(data[i].Mar));
-              datos_ant.push(parseFloat(data[i].Abr));
-              datos_ant.push(parseFloat(data[i].May));
-              datos_ant.push(parseFloat(data[i].Jun));
-              datos_ant.push(parseFloat(data[i].Jul));
-        }break
-        case 8:{  datos_ant.push(parseFloat(data[i].Ene));
-              datos_ant.push(parseFloat(data[i].Feb));
-              datos_ant.push(parseFloat(data[i].Mar));
-              datos_ant.push(parseFloat(data[i].Abr));
-              datos_ant.push(parseFloat(data[i].May));
-              datos_ant.push(parseFloat(data[i].Jun));
-              datos_ant.push(parseFloat(data[i].Jul));
-              datos_ant.push(parseFloat(data[i].Ago));
-        }break
-        case 9:{  datos_ant.push(parseFloat(data[i].Ene));
-              datos_ant.push(parseFloat(data[i].Feb));
-              datos_ant.push(parseFloat(data[i].Mar));
-              datos_ant.push(parseFloat(data[i].Abr));
-              datos_ant.push(parseFloat(data[i].May));
-              datos_ant.push(parseFloat(data[i].Jun));
-              datos_ant.push(parseFloat(data[i].Jul));
-              datos_ant.push(parseFloat(data[i].Ago));
-              datos_ant.push(parseFloat(data[i].Sep));
-          }break
-        case 10:{ datos_ant.push(parseFloat(data[i].Ene));
-              datos_ant.push(parseFloat(data[i].Feb));
-              datos_ant.push(parseFloat(data[i].Mar));
-              datos_ant.push(parseFloat(data[i].Abr));
-              datos_ant.push(parseFloat(data[i].May));
-              datos_ant.push(parseFloat(data[i].Jun));
-              datos_ant.push(parseFloat(data[i].Jul));
-              datos_ant.push(parseFloat(data[i].Ago));
-              datos_ant.push(parseFloat(data[i].Sep));
-              datos_ant.push(parseFloat(data[i].Oct));
-          }break
-        case 11:{ datos_ant.push(parseFloat(data[i].Ene));
-              datos_ant.push(parseFloat(data[i].Feb));
-              datos_ant.push(parseFloat(data[i].Mar));
-              datos_ant.push(parseFloat(data[i].Abr));
-              datos_ant.push(parseFloat(data[i].May));
-              datos_ant.push(parseFloat(data[i].Jun));
-              datos_ant.push(parseFloat(data[i].Jul));
-              datos_ant.push(parseFloat(data[i].Ago));
-              datos_ant.push(parseFloat(data[i].Sep));
-              datos_ant.push(parseFloat(data[i].Oct));
-              datos_ant.push(parseFloat(data[i].Nov));
-          }break
-        case 12:{ datos_ant.push(parseFloat(data[i].Ene));
-              datos_ant.push(parseFloat(data[i].Feb));
-              datos_ant.push(parseFloat(data[i].Mar));
-              datos_ant.push(parseFloat(data[i].Abr));
-              datos_ant.push(parseFloat(data[i].May));
-              datos_ant.push(parseFloat(data[i].Jun));
-              datos_ant.push(parseFloat(data[i].Jul));
-              datos_ant.push(parseFloat(data[i].Ago));
-              datos_ant.push(parseFloat(data[i].Sep));
-              datos_ant.push(parseFloat(data[i].Oct));
-              datos_ant.push(parseFloat(data[i].Nov));
-              datos_ant.push(parseFloat(data[i].Dic));
-         }break
-       }
-      }
-      JSON.parse(JSON.stringify(datos_ant));
+		type: "POST",
+		url: "../models/PW-SAP.php",
+		beforeSend: function(){
+		},
+		data : ({
+			op  : 'B_FACTURACION_MES',
+			cod : $("#txt_codigoSap").val(),
+			org : $("#Organizacion").val(),
+			ano : ano_ant,
+			mes : mes
+		}),
+		dataType: "json",
+		async:false,
+		success: function(data){ 
+			console.log({data});
+			for(var i=0; i<=data.length-1; i++){
+			 switch(mes){
+				case 1:{  datos_ant.push(parseFloat(data[i].Ene));
+			    }break
+				case 2:{  datos_ant.push(parseFloat(data[i].Ene));
+			              datos_ant.push(parseFloat(data[i].Feb));
+				}break
+				case 3:{  datos_ant.push(parseFloat(data[i].Ene));
+						  datos_ant.push(parseFloat(data[i].Feb));
+						  datos_ant.push(parseFloat(data[i].Mar));
+				}break
+				case 4:{  datos_ant.push(parseFloat(data[i].Ene));
+						  datos_ant.push(parseFloat(data[i].Feb));
+						  datos_ant.push(parseFloat(data[i].Mar));
+						  datos_ant.push(parseFloat(data[i].Abr));
+				}break
+				case 5:{  datos_ant.push(parseFloat(data[i].Ene));
+						  datos_ant.push(parseFloat(data[i].Feb));
+						  datos_ant.push(parseFloat(data[i].Mar));
+						  datos_ant.push(parseFloat(data[i].Abr));
+						  datos_ant.push(parseFloat(data[i].May));
+				}break
+				case 6:{  datos_ant.push(parseFloat(data[i].Ene));
+						  datos_ant.push(parseFloat(data[i].Feb));
+						  datos_ant.push(parseFloat(data[i].Mar));
+						  datos_ant.push(parseFloat(data[i].Abr));
+						  datos_ant.push(parseFloat(data[i].May));
+						  datos_ant.push(parseFloat(data[i].Jun));
+				}break
+				case 7:{  datos_ant.push(parseFloat(data[i].Ene));
+						  datos_ant.push(parseFloat(data[i].Feb));
+						  datos_ant.push(parseFloat(data[i].Mar));
+						  datos_ant.push(parseFloat(data[i].Abr));
+						  datos_ant.push(parseFloat(data[i].May));
+						  datos_ant.push(parseFloat(data[i].Jun));
+						  datos_ant.push(parseFloat(data[i].Jul));
+				}break
+				case 8:{  datos_ant.push(parseFloat(data[i].Ene));
+						  datos_ant.push(parseFloat(data[i].Feb));
+						  datos_ant.push(parseFloat(data[i].Mar));
+						  datos_ant.push(parseFloat(data[i].Abr));
+						  datos_ant.push(parseFloat(data[i].May));
+						  datos_ant.push(parseFloat(data[i].Jun));
+						  datos_ant.push(parseFloat(data[i].Jul));
+						  datos_ant.push(parseFloat(data[i].Ago));
+				}break
+				case 9:{  datos_ant.push(parseFloat(data[i].Ene));
+						  datos_ant.push(parseFloat(data[i].Feb));
+						  datos_ant.push(parseFloat(data[i].Mar));
+						  datos_ant.push(parseFloat(data[i].Abr));
+						  datos_ant.push(parseFloat(data[i].May));
+						  datos_ant.push(parseFloat(data[i].Jun));
+						  datos_ant.push(parseFloat(data[i].Jul));
+						  datos_ant.push(parseFloat(data[i].Ago));
+						  datos_ant.push(parseFloat(data[i].Sep));
+			    }break
+				case 10:{ datos_ant.push(parseFloat(data[i].Ene));
+						  datos_ant.push(parseFloat(data[i].Feb));
+						  datos_ant.push(parseFloat(data[i].Mar));
+						  datos_ant.push(parseFloat(data[i].Abr));
+						  datos_ant.push(parseFloat(data[i].May));
+						  datos_ant.push(parseFloat(data[i].Jun));
+						  datos_ant.push(parseFloat(data[i].Jul));
+						  datos_ant.push(parseFloat(data[i].Ago));
+						  datos_ant.push(parseFloat(data[i].Sep));
+						  datos_ant.push(parseFloat(data[i].Oct));
+			    }break
+				case 11:{ datos_ant.push(parseFloat(data[i].Ene));
+						  datos_ant.push(parseFloat(data[i].Feb));
+						  datos_ant.push(parseFloat(data[i].Mar));
+						  datos_ant.push(parseFloat(data[i].Abr));
+						  datos_ant.push(parseFloat(data[i].May));
+						  datos_ant.push(parseFloat(data[i].Jun));
+						  datos_ant.push(parseFloat(data[i].Jul));
+						  datos_ant.push(parseFloat(data[i].Ago));
+						  datos_ant.push(parseFloat(data[i].Sep));
+						  datos_ant.push(parseFloat(data[i].Oct));
+						  datos_ant.push(parseFloat(data[i].Nov));
+			    }break
+				case 12:{ datos_ant.push(parseFloat(data[i].Ene));
+						  datos_ant.push(parseFloat(data[i].Feb));
+						  datos_ant.push(parseFloat(data[i].Mar));
+						  datos_ant.push(parseFloat(data[i].Abr));
+						  datos_ant.push(parseFloat(data[i].May));
+						  datos_ant.push(parseFloat(data[i].Jun));
+						  datos_ant.push(parseFloat(data[i].Jul));
+						  datos_ant.push(parseFloat(data[i].Ago));
+						  datos_ant.push(parseFloat(data[i].Sep));
+						  datos_ant.push(parseFloat(data[i].Oct));
+						  datos_ant.push(parseFloat(data[i].Nov));
+						  datos_ant.push(parseFloat(data[i].Dic));
+			   }break
+			 }
+			}
+			JSON.parse(JSON.stringify(datos_ant));
 	
-    }
+		}
  }).fail(function(data){
-   console.error(data);
+	 console.error(data);
  });
-   
-  if(datos.length>0){
+	 
+	if(datos.length>0){
 
-    Highcharts.chart('container', {
-      chart: {
-      type: 'spline'
-      },
-      title: {
-      text: 'COMPORTAMIENTO DE VENTAS AÑO '+ano_ant+' - '+ano
-      },
-      subtitle: {
-      text: ''
-      },
-      xAxis: {
-      categories: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun','Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
-      },
-      yAxis: {
-      title: {
-        text: 'Ventas'
-      },
-      labels: {
-        formatter: function () {
-        return formatNum(this.value,'$');
-        }
-      }
-      },
-      tooltip: {
-      crosshairs: true,
-      shared: true
-      },
-      plotOptions: {
-      spline: {
-        marker: {
-        radius: 4,
-        lineColor: '#666666',
-        lineWidth: 1
-        }
-      }
-      },
-      series: [
-         {
-          name: ano,
-          marker: {
-            symbol: 'square'
-          },
-          data: datos
+		Highcharts.chart('container', {
+		  chart: {
+			type: 'spline'
+		  },
+		  title: {
+			text: 'COMPORTAMIENTO DE VENTAS AÑO '+ano_ant+' - '+ano
+		  },
+		  subtitle: {
+			text: ''
+		  },
+		  xAxis: {
+			categories: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun','Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+		  },
+		  yAxis: {
+			title: {
+			  text: 'Ventas'
+			},
+			labels: {
+			  formatter: function () {
+				return formatNum(this.value,'$');
+			  }
+			}
+		  },
+		  tooltip: {
+			crosshairs: true,
+			shared: true
+		  },
+		  plotOptions: {
+			spline: {
+			  marker: {
+				radius: 4,
+				lineColor: '#666666',
+				lineWidth: 1
+			  }
+			}
+		  },
+		  series: [
+				 {
+					name: ano,
+					marker: {
+					  symbol: 'square'
+					},
+					data: datos
 
-          }, 
-         {
-          name: ano_ant,
-          marker: {
-            symbol: 'diamond'
-          },
-          data: datos_ant
-          }
-        ]
-    });		
-  	
-     
-  }else{
-    $("#container").html('<h4>COMPORTAMIENTO DE VENTAS AÑO '+ano_ant+' - '+ano+'</h4><div class="alert alert-danger">Sin resultados!</div>')
-  }
+				  }, 
+				 {
+					name: ano_ant,
+					marker: {
+					  symbol: 'diamond'
+					},
+					data: datos_ant
+				  }
+				]
+		});		
+		
+	   
+	}else{
+		$("#container").html('<h4>COMPORTAMIENTO DE VENTAS AÑO '+ano_ant+' - '+ano+'</h4><div class="alert alert-danger">Sin resultados!</div>')
+	}
 
 }
 */
@@ -6020,7 +6090,7 @@ function top10_materiales() {
     $.ajax({
       type: "POST",
       url: "../models/PW-SAP.php",
-      beforeSend: function () { },
+      beforeSend: function () {},
       data: ({
         op: 'B_TOP20_MATERIALES',
         cod: $("#txt_codigoSap").val(),
@@ -6066,7 +6136,7 @@ function dataComportamiento() {
     $.ajax({
       type: "POST",
       url: "../models/PW-SAP.php",
-      beforeSend: function () { },
+      beforeSend: function () {},
       data: ({
         op: 'B_FACTURACION_MES',
         cod: $("#txt_codigoSap").val(),
@@ -6309,7 +6379,7 @@ function QueryFeria(grupo) {
             + '</tr>'
             + '</tbody>'
             + '</table>';
-        } else { }
+        } else {}
 
       } else {
         tabla = '<div class="alert alert-danger" role="alert">'
@@ -6480,7 +6550,7 @@ function CargaGruposClientes(grupo) {
     url: "../models/CRM.php",
     async: false,
     dataType: "json",
-    beforeSend: function () { },
+    beforeSend: function () {},
     data: {
       op: "S_GRUPOS_CLIENTES",
       grupo: grupo
@@ -6583,12 +6653,12 @@ const consultarObsequios = async () => {
   try {
     const resp = await enviarPeticion(data);
     var html = '';
-    for (let i = 0; i < resp.length; i++) {
-      if (i % 4 === 0) { // Cada cuatro elementos, abrir una nueva fila
-        html += '<div class="row">';
-      }
-
-      html += `
+    if (resp.length > 0) {
+      for (let i = 0; i < resp.length; i++) {
+        if (i % 4 === 0) {
+          html += '<div class="row">';
+        }
+        html += `
         <div class="col-sm-6 col-md-3">
           <div class="thumbnail">
             <img src="https://app.pwmultiroma.com/web/imagenesMateriales/${resp[i].codigo_material}.png" alt="${resp[i].descripcion}">
@@ -6604,11 +6674,17 @@ const consultarObsequios = async () => {
           </div>
         </div>
       `;
-      if ((i + 1) % 4 === 0 || (i + 1) === resp.length) { // Cada cuatro elementos, o si es el último elemento, cerrar la fila
-        html += '</div>';
+        if ((i + 1) % 4 === 0 || (i + 1) === resp.length) { // Cada cuatro elementos, o si es el último elemento, cerrar la fila
+          html += '</div>';
+        }
       }
+
+    } else {
+      html = '<div class="alert alert-danger"><i class="fa-solid fa-circle-info"></i> Sin resultados para mostrar.</div>';
     }
+
     $("#dvMaterialespuntos").html(html);
+
     $("#ModalPP").modal('show');
   } catch (error) {
     console.log(error);
@@ -6668,29 +6744,29 @@ const crearPedidoRedencion = async () => {
       }
 
       try {
+        $("#ModalPP").modal('hide');
+        $("#ModalPPDetalle").modal('hide');
+        LoadImg('Generando solicitud, por favor espere...');
         const resp = await enviarPeticion(data);
         if (!resp.error) {
-
           if (resp.cod_error == 0) {
-            //Crear Pedido en SAP
-            var numPedSAP = await crearPedidoRedencionSAP(resp.numero);
-            //Crea Entrega en SAP
-            if (numPedSAP > 0) {
-              var numEntregaSAP = await crearEntregaRedencionSAP(numPedSAP);
-            }
-            //Crea OT en SAP
-
-            //Confirma OT y genera factura
-
+            await enviarPeticion({
+              link: "../models/PW-SAP.php",
+              op: "MAIL_REDENCIONES",
+              id: resp.numero
+            });
+            Swal.fire('Excelente!', 'Redención realizada con éxito.', 'success');
           } else {
             Swal.fire('Error', resp.mensaje, 'error');
           }
         } else {
           Swal.fire('Error', 'No fue posible crear su solicitud. Por favor, verifique e intente nuevamente. En caso de persistir el error, por favor, comuníquese con su ejecutivo comercial.', 'error');
         }
+        UnloadImg();
 
       } catch (error) {
         console.log(error);
+        UnloadImg();
       }
     } else {
       Swal.fire('Cancelado', 'ha cancelado la operación', 'warning');
@@ -6731,4 +6807,498 @@ const crearEntregaRedencionSAP = async (numero) => {
     console.log(error);
   }
   return numEntregaSAP;
+}
+
+function Cartera_edades() {
+  $.ajax({
+    type: "POST",
+    encoding: "UTF-8",
+    url: "../models/PW-SAP.php",
+    dataType: "json",
+    error: function (OBJ, ERROR, JQERROR) {
+      alert(JQERROR);
+    },
+    data: {
+      op: "Cartera_edades",
+      org: $("#Organizacion").val(),
+      codigo_sap: $("#txt_codigoSap").val()
+    },
+    async: true,
+    success: function (resp) {
+      let cardHtml = `
+      <div class="panel panel-info">
+        <div class="panel-heading">
+          <h3 class="panel-title" style="font-size: 14px;  font-weight: bold;">CARTERA EDADES</h3>
+        </div>
+        <div class="panel-body" style="padding: 5px;">
+          <div class="row">`;
+
+      // Definir valores por defecto (0) si no hay respuesta
+      const data = resp.length > 0 ? resp[0] : {
+        C_SIN_VENCER: 0,
+        C_1_30: 0,
+        C_31_60: 0,
+        C_61_90: 0,
+        C_91_120: 0,
+        C_120: 0
+      };
+
+      cardHtml += `
+            <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2" >
+              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+                <div class="panel-body" style="padding: 5px;">
+                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">SIN VENCER</h5>
+                  <p style="font-size: 12px; margin: 0;">${formatNum(data.C_SIN_VENCER, '$')}</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2" >
+              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+                <div class="panel-body" style="padding: 5px;">
+                  <h5 style="font-size: 12px; margin: 0 0 5px 0; ">1-30 DÍAS</h5>
+                  <p style="font-size: 12px; margin: 0;">${formatNum(data.C_1_30, '$')}</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2">
+              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+                <div class="panel-body" style="padding: 5px;">
+                  <h5 style="font-size: 12px; margin: 0 0 5px 0; ">31-60 DÍAS</h5>
+                  <p style="font-size: 12px; margin: 0;">${formatNum(data.C_31_60, '$')}</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2">
+              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+                <div class="panel-body" style="padding: 5px;">
+                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">61-90 DÍAS</h5>
+                  <p style="font-size: 12px; margin: 0;">${formatNum(data.C_61_90, '$')}</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2">
+              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+                <div class="panel-body" style="padding: 5px;">
+                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">91-120 DÍAS</h5>
+                  <p style="font-size: 12px; margin: 0;">${formatNum(data.C_91_120, '$')}</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2">
+              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+                <div class="panel-body" style="padding: 5px;">
+                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">+120 DÍAS</h5>
+                  <p style="font-size: 12px; margin: 0;">${formatNum(data.C_120, '$')}</p>
+                </div>
+              </div>
+            </div>`;
+
+      cardHtml += `</div></div></div>`;
+      $("#cartera_edades").html(cardHtml);
+    }
+  });
+}
+
+function Presupuesto_datos() {
+  $.ajax({
+    type: "POST",
+    encoding: "UTF-8",
+    url: "../models/PW-SAP.php",
+    dataType: "json",
+    error: function (OBJ, ERROR, JQERROR) {
+      alert("Error: " + JQERROR);
+    },
+    data: {
+      op: "Presupuesto_datos",
+      org: $("#Organizacion").val(),
+      codigo_sap: $("#txt_codigoSap").val()
+    },
+    async: true,
+    success: function (resp) {
+      let cardHtml = `
+      <div class="panel panel-info">
+        <div class="panel-heading">
+          <h3 class="panel-title" style="font-size: 13px;  font-weight: bold;">DATOS DE PRESUPUESTO</h3>
+        </div>
+        <div class="panel-body" style="padding: 5px;">
+          <div class="row">`;
+
+      if (!resp || resp.length === 0) {
+        // Si no hay datos, mostrar valores cero
+        cardHtml += `
+            <div class="col-xs-12 col-sm-6 col-md-4">
+              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+                <div class="panel-body" style="padding: 5px;">
+                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">VALOR PRESUPUESTO</h5>
+                  <p style="font-size: 12px; margin: 0;">${(0).toLocaleString()}</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+                <div class="panel-body" style="padding: 5px;">
+                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">VALOR NETO TOTAL</h5>
+                  <p style="font-size: 12px; margin: 0;">${(0).toLocaleString()}</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+                <div class="panel-body" style="padding: 5px;">
+                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">% CUMP. PRESUPUESTO</h5>
+                  <p style="font-size: 12px; margin: 0;">0.00%</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+                <div class="panel-body" style="padding: 5px;">
+                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">FALTA</h5>
+                  <p style="font-size: 12px; margin: 0;">${(0).toLocaleString()}</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+                <div class="panel-body" style="padding: 5px;">
+                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">DEBERÍA LLEVAR</h5>
+                  <p style="font-size: 12px; margin: 0;">${(0).toLocaleString()}</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+                <div class="panel-body" style="padding: 5px;">
+                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">% D. LLEVAR</h5>
+                  <p style="font-size: 12px; margin: 0;">0.00%</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+                <div class="panel-body" style="padding: 5px;">
+                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">% EXCESO/DÉFICIT</h5>
+                  <p style="font-size: 12px; margin: 0;">0.00%</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+                <div class="panel-body" style="padding: 5px;">
+                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">PROY. VS PROM.</h5>
+                  <p style="font-size: 12px; margin: 0;">${(0).toLocaleString()}</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+                <div class="panel-body" style="padding: 5px;">
+                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">% PROY. VS PROM.</h5>
+                  <p style="font-size: 12px; margin: 0;">0.00%</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+                <div class="panel-body" style="padding: 5px;">
+                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">PROY. DIARIA (100%)</h5>
+                  <p style="font-size: 12px; margin: 0;">${(0).toLocaleString()}</p>
+                </div>
+              </div>
+            </div>`;
+      } else {
+        resp.forEach(row => {
+          // Convertir las cadenas a números, si son null o undefined, asignar 0
+          const VALOR_PRESUPUESTO = parseFloat(row.VALOR_PRESUPUESTO) || 0;
+          const VlrNetoTotal = parseFloat(row.VlrNetoTotal) || 0;
+          const porCumpPpto = parseFloat(row["%CumpPpto"]) || 0;
+          const Falta = parseFloat(row.Falta) || 0;
+          const DeberiaLlevar = parseFloat(row.DeberiaLlevar) || 0;
+          const por_D_LLV = parseFloat(row["%_D_LLV"]) || 0;
+          const por_ExcesoDeficit = parseFloat(row["%_ExcesoODéficit"]) || 0;
+          const ProyVsProm = parseFloat(row.ProyVsProm) || 0;
+          const por_ProyVsProm = parseFloat(row["%_ProyVsProm"]) || 0;
+          const ProyDiaria = parseFloat(row["ProyDiaria(100%)"]) || 0;
+
+          cardHtml += `
+            <div class="col-xs-12 col-sm-6 col-md-4" >
+              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+                <div class="panel-body" style="padding: 5px;">
+                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">VALOR PRESUPUESTO</h5>
+                  <p style="font-size: 12px; margin: 0;">${VALOR_PRESUPUESTO.toLocaleString()}</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+                <div class="panel-body" style="padding: 5px;">
+                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">VALOR NETO TOTAL</h5>
+                  <p style="font-size: 12px; margin: 0;">${VlrNetoTotal.toLocaleString()}</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+                <div class="panel-body" style="padding: 5px;">
+                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">% CUMP. PRESUPUESTO</h5>
+                  <p style="font-size: 12px; margin: 0;">${porCumpPpto.toFixed(2)}%</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+                <div class="panel-body" style="padding: 5px;">
+                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">FALTA</h5>
+                  <p style="font-size: 12px; margin: 0;">${Falta.toLocaleString()}</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+                <div class="panel-body" style="padding: 5px;">
+                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">DEBERÍA LLEVAR</h5>
+                  <p style="font-size: 12px; margin: 0;">${DeberiaLlevar.toLocaleString()}</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+                <div class="panel-body" style="padding: 5px;">
+                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">% D. LLEVAR</h5>
+                  <p style="font-size: 12px; margin: 0;">${por_D_LLV.toFixed(2)}%</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+                <div class="panel-body" style="padding: 5px;">
+                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">% EXCESO/DÉFICIT</h5>
+                  <p style="font-size: 12px; margin: 0;">${por_ExcesoDeficit.toFixed(2)}%</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+                <div class="panel-body" style="padding: 5px;">
+                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">PROY. VS PROM.</h5>
+                  <p style="font-size: 12px; margin: 0;">${ProyVsProm.toLocaleString()}</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+                <div class="panel-body" style="padding: 5px;">
+                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">% PROY. VS PROM.</h5>
+                  <p style="font-size: 12px; margin: 0;">${por_ProyVsProm.toFixed(2)}%</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+                <div class="panel-body" style="padding: 5px;">
+                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">PROY. DIARIA (100%)</h5>
+                  <p style="font-size: 12px; margin: 0;">${ProyDiaria.toLocaleString()}</p>
+                </div>
+              </div>
+            </div>`;
+        });
+      }
+
+      cardHtml += `</div></div></div>`;
+      $("#Presupuesto_datos").html(cardHtml);
+    }
+  });
+}
+
+function toggleButton(button, checkboxDivId) {
+  // Alternar la clase 'btn-success' en el botón
+  $(button).toggleClass('btn-success');
+
+  // Alternar el estado visual del "checkbox" simulado
+  toggleDivCheckbox(checkboxDivId);
+}
+
+function toggleDivCheckbox(checkboxDivId) {
+  var checkboxDiv = $('#' + checkboxDivId);
+  var icon = checkboxDiv.find('.checkbox-icon'); // Buscar el icono dentro del div
+
+  // Verificar si el div tiene la clase 'DivCheckBoxTrue'
+  if (checkboxDiv.hasClass('DivCheckBoxTrue')) {
+    // Si ya tiene la clase, quitarla y cambiar el icono
+    checkboxDiv.removeClass('DivCheckBoxTrue');
+    icon.text('☐'); // Cambiar a desmarcado
+  } else {
+    // Si no tiene la clase, añadirla y cambiar el icono
+    checkboxDiv.addClass('DivCheckBoxTrue');
+    icon.text('✔'); // Cambiar a marcado
+  }
+}
+
+// Funciones específicas para cada botón
+function BotonBonificado(button) {
+  toggleButton(button, 'DvChkBonif');
+}
+
+function BotonOfertas(button) {
+  toggleButton(button, 'DvChkOfertado');
+}
+
+function BotonDescuentos(button) {
+  toggleButton(button, 'DvChkDctos');
+}
+
+/*function filtrarPorCodigos(objeto1, objeto2) {
+  const codigosFiltro = objeto2.map(item => item.CODIGO_MATERIAL);
+  const resultado = objeto1.filter(item => codigosFiltro.includes(item.codigo_material));
+  return resultado;
+}*/
+
+function filtrarPorCodigos(objeto1, objeto2) {
+  const mapaGrupo130 = new Map(objeto2.map(item => [item.CODIGO_MATERIAL, item.GRUPO_130]));
+
+  const resultado = objeto1
+    .filter(item => mapaGrupo130.has(item.codigo_material))
+    .map(item => ({
+      ...item,
+      GRUPO_130: mapaGrupo130.get(item.codigo_material)
+    }));
+
+  return resultado;
+}
+
+async function Top_20_mas_vendidos_con_copi() {
+  console.log('envio');
+  const resp = await enviarPeticion({
+    link: '../models/PW-SAP.php',
+    op: 'Top_20_mas_vendidos_con_copi',
+    org: $("#Organizacion").val(),
+    lista: $("#txt_lista").val(),
+    oficina: $("#txt_oficina").val()
+  });
+
+  console.log(resp);
+  let obj = filtrarPorCodigos(ArrProd, resp);
+  console.log(obj);
+
+  let $tabla = $('<table>', {
+    'class': 'table table-bordered table-hover table-sm',
+    'id': 'tablaTop20Productos'
+  });
+
+  const headers = [
+    'Código', 'Descripción', 'Valor Unitario', 'IVA', 'Descuento',
+    'Valor Neto', ''
+  ];
+
+  let $thead = $('<thead>').addClass('thead-dark');
+  let $headerRow = $('<tr>');
+
+  $.each(headers, function (i, header) {
+    $headerRow.append($('<th>').text(header));
+  });
+
+  $thead.append($headerRow);
+  $tabla.append($thead);
+
+  let $tbody = $('<tbody>');
+
+  $.each(obj, function (index, item) {
+    let $row = $('<tr>', {
+      'class': 'fila-producto',
+      'data-codigo': item.codigo_material,
+      'css': {
+        'cursor': 'pointer'
+      }
+    });
+
+    // Código
+    $row.append($('<td>').text(item.codigo_material));
+
+    // Descripción con icono si bonificado ≠ 0
+    let $descripcionCell = $('<td>');
+    let $contenedor = $('<div>').css({
+      display: 'flex',
+      alignItems: 'center'
+    });
+
+    if (parseFloat(item.bonificado) !== 0) {
+      let descripcionCompleta = item.descripcion;
+      let descBonificadoN = item.desc_bonificado_n || '';
+      let stock = item.stock || '0';
+      let stockBonificado = item.stock_bonificado || '0';
+      let condicion = item.condicion_b || '';
+      let stockPrepack = item.stock_prepack || '0';
+
+      let $img = $('<img>', {
+        src: '../resources/icons/regalo.png',
+        width: 24,
+        height: 24,
+        align: 'absmiddle',
+        // title: 'Código: ' + item.codigo_material + '\n' +
+        //         'Descripción: ' + item.descripcion + '\n' +
+        //         'Condición: ' + item.condicion_b,
+        onclick: `event.stopPropagation(); InfoBon('${descripcionCompleta.replace(/'/g, "\\'")}', '${descBonificadoN.replace(/'/g, "\\'")}', '${stock}', '${stockBonificado}', '${condicion}', '${stockPrepack}')`
+      }).css({
+        marginRight: '8px',
+        display: 'inline-block',
+        verticalAlign: 'middle',
+        cursor: 'pointer'
+      });
+
+      $contenedor.append($img);
+    }
+
+    let $textoDesc = $('<span>').text(item.descripcion).css({
+      display: 'inline-block',
+      verticalAlign: 'middle'
+    });
+
+    $contenedor.append($textoDesc);
+    $descripcionCell.append($contenedor);
+    $row.append($descripcionCell);
+
+    // Valor Unitario
+    $row.append($('<td>').text('$' + parseFloat(item.valor_unitario).toLocaleString('es-CO')));
+
+    // IVA
+    $row.append($('<td>').text(item.iva));
+
+    // Descuento
+    $row.append($('<td>').text(item.descuento));
+
+    // Valor Neto
+    $row.append($('<td>').text('$' + parseFloat(item.valor_neto).toLocaleString('es-CO')));
+
+    // Grupo 130 con estrella
+    let $grupoCell = $('<td>');
+    if (parseInt(item.GRUPO_130) === 1) {
+      let $estrella = $('<img>', {
+        src: '../resources/icons/estrella.png',
+        width: 24,
+        height: 24,
+        align: 'absmiddle'
+      });
+      $grupoCell.append($estrella);
+    }
+    $row.append($grupoCell);
+
+    $tbody.append($row);
+  });
+
+  $tabla.append($tbody);
+  $('#TablaTop20_100_130').empty().append($tabla);
+
+  // Evento click fila
+  $(document).off('click', '.fila-producto').on('click', '.fila-producto', function () {
+    const $fila = $(this);
+    const codigoMaterial = $fila.data('codigo');
+    $('#txt_bproductos').val(codigoMaterial);
+    BuscarProductoArr(0);
+    $('#ModalTop20_100_130').modal('hide');
+    $('.fila-producto').removeClass('table-active');
+    $fila.addClass('table-active');
+  });
+
+  // Mostrar modal
+  $('#ModalTop20_100_130').modal('show');
 }

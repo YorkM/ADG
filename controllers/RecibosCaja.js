@@ -547,15 +547,20 @@ async function generarPDF(idTabla) {
 
 // FUNCIÓN PARA REALIZAR LOS CÁLCULOS DE DESCUENTO
 const calcularDescuento = (basePP, importe, porcentaje, claseDoc, fechaVencimiento) => {
-  // TODO: REALIZAR VALIDACIÓN PARA HACER CÁLCULO CORRECTO DE LAS DA
-  const vencido = verificarVencimientoDescuento(fechaVencimiento);
-  if (vencido || ["NC", "ND"].includes(claseDoc)) {
-    return { porcentaje: 0, descuento: 0, pagar: importe };
+  if (claseDoc !== "DA") {
+    const vencido = verificarVencimientoDescuento(fechaVencimiento);
+    if (vencido || ["NC", "ND"].includes(claseDoc)) {
+      return { porcentaje: 0, descuento: 0, pagar: importe };
+    }
+  
+    const descuento = Math.round(basePP * (porcentaje / 100));
+    const pagar = Math.round(importe - descuento);
+    return { porcentaje, descuento, pagar };
+  } else {
+    const descuento = Math.round(importe * (porcentaje / 100));
+    const pagar = Math.round(importe - descuento);
+    return { porcentaje, descuento, pagar };
   }
-
-  const descuento = Math.round(basePP * (porcentaje / 100));
-  const pagar = Math.round(importe - descuento);
-  return { porcentaje, descuento, pagar };
 };
 
 // CREACIÓN DE LAS TABLAS DEL LIQUIDADOR

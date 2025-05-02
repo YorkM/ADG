@@ -186,8 +186,34 @@ $(function() {
 	$("#oficina").append(OfcS);
 	$("#oficina").change(function(){
 		CargarEjecutivos();
-	});	
+	});
+	
+	// AGREGADO NUEVO
+	$("#txtZonas, #FiltroOficinaVentas").select2();
+	$("#txtFecha1, #txtFecha2").val(FechaActual());
+	$("#txtFecha1, #txtFecha2").datepicker({
+		changeMonth: true,
+		changeYear: true,
+		monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+		monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+		dateFormat: 'dd-mm-yy',
+		width: 100,
+		heigth: 100
+	});
+
+	getZonasVentas();
+	const oficinas = OficinasVentas('S');
+	$("#FiltroOficinaVentas").html(oficinas);
 });
+
+const getZonasVentas = async () => {
+	const resp = await enviarPeticion({op: "G_ZONAS_VENTAS", link: "../models/SeguimientoVisitas.php"});
+	let  zonas = `<option value="0">000000 - TODAS</option>`;
+	resp.forEach(item => {
+		zonas += `<option value="${item.ZONA_VENTAS}">${item.ZONA_VENTAS} - ${item.ZONA_DESCRIPCION}</option>`;
+	});
+	$('#txtZonas').html(zonas);
+}
 
 
 /*VARIBLE EXPORTACION GLOBAL*/
@@ -228,7 +254,7 @@ function CargarEjecutivos(){//alert($("#Organizacion").val());
 		async		: false,	
 		success: function(data){
 			
-			console.log(data);//alert(data); return false;
+			// console.log(data);//alert(data); return false;
 		     var lista='<option value="0">TODOS</option>';
 			 for(var i=0;i<data.length;i++){
 				 lista +='<option value="'+data[i].ID+'">'+data[i].LOGIN+' - '+data[i].NOMBRES+'</option>';
@@ -598,26 +624,26 @@ function Consultar(){
 			var tabla='<table class="table" align="center" width="100%" id="datos_visitas">'+
 			           '<thead>'+
 					    '<tr>'+
-						  '<th>VENDEDOR</th>'+
-						  '<th>CLIENTE</th>'+
-						  '<th>RAZÓN</th>'+
-						  '<th>CIUDAD</th>'+
-						  '<th>FECHA</th>'+
-						  '<th>FH PROG.</th>'+
-						  '<th>INI_GESTION</th>'+
-						  '<th>FIN_GESTION</th>'+
-						  '<th>MINUTOS</th>'+
-						  '<th>ESTADO</th>'+
-						  '<th>REV.VENT</th>'+
-						  '<th>REV.CART</th>'+
-						  '<th>REV.JURI</th>'+
-						  '<th>GESTION</th>'+
-						  '<th>PROG</th>'+
-						  '<th>MOTIVO</th>'+ 
-						  '<th>UBICACION</th>'+ 
-						  '<th>TIPO</th>'+
-						  '<th>PEDIDO</th>'+
-						  '<th>PEDIDO FACTURADO</th>'+
+						  '<th class="custom-nowrap">VENDEDOR</th>'+
+						  '<th class="custom-nowrap">CLIENTE</th>'+
+						  '<th class="custom-nowrap">RAZÓN</th>'+
+						  '<th class="custom-nowrap">CIUDAD</th>'+
+						  '<th class="custom-nowrap">FECHA</th>'+
+						  '<th class="custom-nowrap">FH PROG.</th>'+
+						  '<th class="custom-nowrap">INI_GESTION</th>'+
+						  '<th class="custom-nowrap">FIN_GESTION</th>'+
+						  '<th class="custom-nowrap">MINUTOS</th>'+
+						  '<th class="custom-nowrap">ESTADO</th>'+
+						  '<th class="custom-nowrap">REV.VENT</th>'+
+						  '<th class="custom-nowrap">REV.CART</th>'+
+						  '<th class="custom-nowrap">REV.JURI</th>'+
+						  '<th class="custom-nowrap">GESTION</th>'+
+						  '<th class="custom-nowrap">PROG</th>'+
+						  '<th class="custom-nowrap">MOTIVO</th>'+ 
+						  '<th class="custom-nowrap">UBICACION</th>'+ 
+						  '<th class="custom-nowrap">TIPO</th>'+
+						  '<th class="custom-nowrap">PEDIDO</th>'+
+						  '<th class="custom-nowrap">PEDIDO FACTURADO</th>'+
  						 '</tr>'+
 						'</thead>'+
 						'<tbody>';
@@ -801,15 +827,15 @@ function Consultar(){
 			  }
 				
 			   
-			tabla+= '<td class="'+color_fila+'">'+data[i].VENDEDOR+'</td>'+/**0 */
-						'<td class="'+color_fila+'">'+data[i].CODIGO_SAP_CLI+' - '+data[i].CLIENTE+'</td>'+
-						'<td class="'+color_fila+'">'+data[i].RSOCIAL+'</td>'+
-						'<td class="'+color_fila+'">'+data[i].CIUDAD+'</td>'+
-						'<td class="'+color_fila+'">'+data[i].FECHA_VISITA+'</td>'+
-						'<td class="'+color_fila+'">'+data[i].FECHA_PROGRAMACION+'</td>'+						
-						'<td class="'+color_fila+'">'+data[i].FECHA_INI_GESTION+'</td>'+
-						'<td class="'+color_fila+'">'+data[i].FECHA_FIN_GESTION+'</td>'+ 
-						'<td class="'+color_fila+'">'+data[i].MINUTOS_GESTION+'</td>'+
+			tabla+= '<td class="custom-nowrap '+color_fila+'">'+data[i].VENDEDOR+'</td>'+/**0 */
+						'<td class="custom-nowrap '+color_fila+'">'+data[i].CODIGO_SAP_CLI+' - '+data[i].CLIENTE+'</td>'+
+						'<td class="custom-nowrap '+color_fila+'">'+data[i].RSOCIAL+'</td>'+
+						'<td class="custom-nowrap '+color_fila+'">'+data[i].CIUDAD+'</td>'+
+						'<td class="custom-nowrap '+color_fila+'">'+data[i].FECHA_VISITA+'</td>'+
+						'<td class="custom-nowrap '+color_fila+'">'+data[i].FECHA_PROGRAMACION+'</td>'+						
+						'<td class="custom-nowrap '+color_fila+'">'+data[i].FECHA_INI_GESTION+'</td>'+
+						'<td class="custom-nowrap '+color_fila+'">'+data[i].FECHA_FIN_GESTION+'</td>'+ 
+						'<td class="custom-nowrap '+color_fila+'">'+data[i].MINUTOS_GESTION+'</td>'+
 						'<td align="center" class="'+color_fila+'">'+es+'</td>'+
 						'<td align="center" class="'+color_fila+'">'+rv+'</td>'+
 						'<td align="center" class="'+color_fila+'">'+rc+'</td>'+

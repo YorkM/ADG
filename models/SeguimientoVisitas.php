@@ -304,7 +304,12 @@ switch($_POST['op']){
 		));
 
 	break;
-	
+
+	case "G_ZONAS_VENTAS":
+		$query = "SELECT ZONA_VENTAS, ZONA_DESCRIPCION FROM T_ZONAS_VENTAS";
+		$resultado = GenerarArray($query, '');
+		echo json_encode($resultado);
+	break;
 }
 
 ?>

@@ -386,7 +386,7 @@ switch ( $_POST[ 'op' ] ) {
       } else {
         $clase = 'ZPIC';
       }
-      $sql = "select
+      $sql = "select 
 			  m.codigo_material,
 			  m.descripcion,
 			  lote = (  select  top 1  
@@ -720,7 +720,7 @@ switch ( $_POST[ 'op' ] ) {
       $sql .= " and stock > 0 ";
 
       //validacion para que traiga solo los productos corresponientes al laboratorio para el caso de transferencistas y proveedores
-      if ( $_SESSION[ 'ses_RolesId' ] == 11 or $_SESSION[ 'ses_RolesId' ] == 9 ) {
+      if ( $_SESSION[ 'ses_RolesId' ] == 9 ) {
         switch ( $_SESSION[ "ses_NitPro" ] ) {
           //GENFAR-SANOFY-MEDLEY-BERHINGER
           case '817001644':
@@ -1537,6 +1537,7 @@ switch ( $_POST[ 'op' ] ) {
   case 'S_FACTURAS':
     {
       $sql = "SELECT 
+
 				  F.NUMERO_FACTURA,
 				  F.OFICINA_VENTAS,
 				  F.CODIGO_SAP,
@@ -1649,6 +1650,7 @@ switch ( $_POST[ 'op' ] ) {
 			  ROUND(((SUM(V.IMPORTE))*100)/ V.CUPO_CREDITO,0) AS PCJ_COMPROMETIDO
 			FROM V_CARTERA V 
 			WHERE 
+
 			  V.CLIENTE  = '" . $_POST[ 'codigo' ] . "' AND
 			  V.SOCIEDAD = '" . $_POST[ 'org' ] . "' AND 
 			  V.DOCUMENTO_COMPENSACION = '-' AND
@@ -1965,17 +1967,21 @@ switch ( $_POST[ 'op' ] ) {
 	 @cod_msg = 0 -- Todo ok
 	 @cod_msg = 1 -- Error al crear el pedido
 	 @cod_msg = 2 -- Error sin puntos disponibles
+     @cod_msg = 3 -- solicitudes abiertas con el mismo premio
    */
 
     switch ( $cod_msg ) {
       case '0':
-        $msg = 'Pedido creado correctamente';
+        $msg = 'Solicitud creada correctamente';
         break;
       case '1':
         $msg = 'No fue posible crear la solicitud';
         break;
       case '2':
         $msg = 'No cuenta con puntos disponibles para redimir este premio.';
+        break;
+      case '3':
+        $msg = 'Ya cuenta con solicitudes abiertas con el mismo premio, no es posible continuar.';
         break;
     }
     if ( $r ) {
@@ -2020,42 +2026,6 @@ switch ( $_POST[ 'op' ] ) {
     // Definir la hora y minutos objetivo
     $targetHour = 17; // 17:00 es 05:00 PM en formato 24 horas
     $targetMinute = 30; // 30 minutos
-
-    // Verificar si la hora actual es mayor que las 05:30 PM
-    /*    if ($currentHour > $targetHour || ($currentHour == $targetHour && $currentMinute > $targetMinute)) {
-              echo  json_encode(array(
-                'ok'=>true,
-                'solicitada'=>true,
-                'mensaje'=>'No se pueden enviar solicitudes despues de las 05:30 pm '
-              ));
-              return ;
-        }*/
-
-    /*
-          if(count($sol)>0){
-            $text_user = $sol[0]["ID"] ==  $usuario?' tú usuario ':' el usuario '.$sol[0]["USUARIO"];
-            $estado_pedido='';
-
-            switch($sol[0]["ESTADO"]){
-              case "1":
-                $estado_pedido='en estado de validación ';
-              break;
-              case "2":
-                $estado_pedido=' y fue rechazado';
-              break;
-              case "3":
-                $estado_pedido=' y fue aprobado!';
-              break;
-            }
-            echo json_encode(
-              array(
-                'ok'=>true,
-                'solicitada'=>true,
-                'mensaje'=>'Ya se envió una solicitud de desbloqueo para este número de pedido por '.$text_user.' ,  '.$estado_pedido.' !'
-              )
-            );
-            return;
-          }*/
 
     $fields = array(
       'pedido' => $pedido,
@@ -2103,40 +2073,310 @@ switch ( $_POST[ 'op' ] ) {
       FROM T_CAR_SOL_DESBLOQUEO_PEDIDOS 
       WHERE PEDIDO=' . $pedido . ' 
       AND CAST(FECHA_SOL AS DATE)=CAST(GETDATE() AS DATE)', '' ) );
-      mssql_close();
+    mssql_close();
     break;
   case "status_sol_desbloqueo":
     $pedido = $_POST[ 'pedido' ];
     $sql = "select count(*) as nsolicitud
-					from t_car_sol_desbloqueo_pedidos p
-					where p.estado in (0, 1) and
-						  p.pedido = $pedido";
-    echo json_encode( GenerarArray( $sql,'' ) );
+            from t_car_sol_desbloqueo_pedidos p
+            where p.estado in (0, 1) and
+                p.pedido = $pedido";
+    echo json_encode( GenerarArray( $sql, '' ) );
     mssql_close();
     break;
 
-  case "G_PROD_MAS_VENDIDO_DIA":
-    $sql = "SELECT TOP 20  
-    PD.CODIGO_MATERIAL, 
-    M.DESCRIPCION AS DESCRIPCION_MATERIAL,
-    (SELECT MAX(MD2.CANTIDAD) 
-     FROM T_MATERIALES_DISPONIBLES MD2 
-     WHERE MD2.CODIGO_MATERIAL = PD.CODIGO_MATERIAL) AS STOCK_DISPONIBLE,
-    SUM(PD.CANTIDAD) AS CANTIDAD_VENDIDA 
-    FROM T_PEDIDOS P
-    INNER JOIN T_PEDIDOS_DETALLE PD ON P.NUMERO = PD.NUMERO
-    INNER JOIN T_MATERIALES M ON PD.CODIGO_MATERIAL = M.CODIGO_MATERIAL
-    WHERE CAST(P.FECHA_PEDIDO AS DATE) = CAST(GETDATE() AS DATE) 
-    GROUP BY PD.CODIGO_MATERIAL, M.DESCRIPCION
-    HAVING (SELECT MAX(MD2.CANTIDAD) 
-    FROM T_MATERIALES_DISPONIBLES MD2 
-    WHERE MD2.CODIGO_MATERIAL = PD.CODIGO_MATERIAL) > 30
-    ORDER BY CANTIDAD_VENDIDA DESC";
-
-    $resultado = GenerarArray($sql, '');
-    if ($resultado) echo json_encode(array('ok' => true, 'data' => $resultado));
-    else echo json_encode(array('ok' => false, 'data' => []));
+  case "Cartera_edades":
+    $codigo_sap = $_POST[ 'codigo_sap' ];
+    $org = $_POST[ 'org' ];
+    $sql = "SELECT 
+            V.CLIENTE,
+                SUM(V.C_SIN_VENCER) C_SIN_VENCER,
+                 SUM(V.C_1_30) C_1_30,
+                 SUM(V.C_31_60) C_31_60,
+                 SUM(V.C_61_90)C_61_90 ,
+                 SUM(V.C_91_120) C_91_120,
+                 SUM(V.C_120) C_120 
+          FROM ZV_CARTERA V 
+          WHERE 
+            V.CLIENTE            = '" . $codigo_sap . "' AND 
+            V.SOCIEDAD               =  '" . $org . "'  AND 
+            V.DOCUMENTO_COMPENSACION = '-' AND
+            V.CLASE_DOCUMENTO       <> 'WL' AND
+            V.CLASE_DOCUMENTO       <> 'DZ'    
+            GROUP BY V.CLIENTE ";
+    echo json_encode( GenerarArray( $sql, '' ) );
     mssql_close();
+    break;
+  case "Presupuesto_datos":
+    $codigo_sap = $_POST[ 'codigo_sap' ];
+    $org = $_POST[ 'org' ];
+    $sql = "SELECT
+          tcpc.VALOR_PRESUPUESTO,
+          SUM(vf.P_FACTURA_NETO) AS VlrNetoTotal,
+          ROUND((SUM(vf.P_FACTURA_NETO) * 100.0) / tcpc.VALOR_PRESUPUESTO, 2) AS [%CumpPpto],
+          (tcpc.VALOR_PRESUPUESTO - SUM(vf.P_FACTURA_NETO)) AS Falta,
+          -- Ajuste para calcular lo que debería llevar según el día actual
+            (tcpc.VALOR_PRESUPUESTO / 30) * DAY(GETDATE()) AS DeberiaLlevar,
+          ROUND(((tcpc.VALOR_PRESUPUESTO / 30) * DAY(GETDATE()) * 100.0) / tcpc.VALOR_PRESUPUESTO, 2) AS [%_D_LLV],
+          ROUND(((SUM(vf.P_FACTURA_NETO) * 100.0) / ((tcpc.VALOR_PRESUPUESTO / 30) * DAY(GETDATE()))) - 100, 2) AS [%_Deficit],
+          -- Proyección basada en el rendimiento actual ajustado a 30 días
+            (SUM(vf.P_FACTURA_NETO) / DAY(GETDATE())) * 30 AS ProyVsProm,
+          ROUND(((SUM(vf.P_FACTURA_NETO) / DAY(GETDATE())) * 30) * 100.0 / tcpc.VALOR_PRESUPUESTO, 2) AS [%_ProyVsProm],
+          (tcpc.VALOR_PRESUPUESTO / 30) AS [ProyDiaria(100%)]
+        FROM
+          T_PRESUPUESTO tcpc
+        LEFT JOIN v_facturacion vf 
+            ON 
+          vf.CODIGO_SAP = TCPC.CODIGO_SAP_CLIENTE
+          AND YEAR(vf.FECHA) = YEAR(GETDATE())
+          AND MONTH(vf.FECHA) = MONTH(GETDATE())
+           AND vf.ORGANIZACION_VENTAS = '" . $org . "'
+        WHERE
+          TCPC.CODIGO_SAP_CLIENTE = '" . $codigo_sap . "'
+          AND TCPC.ANIO = YEAR(GETDATE())
+          AND TCPC.MES = MONTH(GETDATE())         
+          AND tcpc.ORGANIZACION_VENTAS = '" . $org . "'
+        GROUP BY
+          tcpc.VALOR_PRESUPUESTO;";
+    echo json_encode( GenerarArray( $sql, '' ) );
+    mssql_close();
+    break;
+
+
+  case "Prioridad_ot":
+    $almacen = isset( $_POST[ 'almacen' ] ) ? trim( $_POST[ 'almacen' ] ) : '';
+    $ot = isset( $_POST[ 'ot' ] ) ? $_POST[ 'ot' ] : '';
+    $recojeDespachos = isset( $_POST[ 'recojeDespachos' ] ) ? $_POST[ 'recojeDespachos' ] : '0';
+    $recojePuntoVenta = isset( $_POST[ 'recojePuntoVenta' ] ) ? $_POST[ 'recojePuntoVenta' ] : '0';
+    if ( empty( $ot ) || empty( $almacen ) ) {
+      echo json_encode( [
+        'Tipo' => 'E',
+        'Msj' => 'Datos incompletos: ' . ( empty( $ot ) ? 'Falta número OT' : 'Falta almacén' )
+      ] );
+      break;
+    }
+    if ( $recojeDespachos === '1' || $recojePuntoVenta === '1' ) {
+      $sql = "UPDATE T_SEPARACION_OT SET PRIORIDAD ='2' WHERE NUMERO_OT = '" . $ot . "' AND ALMACEN = '" . $almacen . "';";
+      if ( mssql_query( $sql ) ) {
+        echo json_encode( [ 'Tipo' => 'S', 'Msj' => ' Prioridad actualizada correctamente' ] );
+      } else {
+        echo json_encode( [ 'Tipo' => 'E', 'Msj' => 'Error al guardar prioridad' ] );
+      }
+      mssql_close();
+    }
+    break;
+  case "Top_20_mas_vendidos_con_copi":
+    $org = $_POST[ 'org' ];
+    $oficina = $_POST[ 'oficina' ];
+    $lista = $_POST[ 'lista' ];
+    $sql = "WITH Grupo100 AS (
+                        SELECT TOP 20 v.codigo_material
+                        FROM v_facturacion v
+                        INNER JOIN V_MATERIALES_STOCK tms 
+                            ON tms.CODIGO_MATERIAL = v.CODIGO_MATERIAL 
+                            AND tms.OFICINA_VENTAS = '" . $oficina . "' 
+                        WHERE 
+                            v.tipo_factura IN ('zf01','zf03','zf05','zf07','zf09','zf10','zf11','zf12') 
+                            AND v.organizacion_ventas = '" . $org . "'
+                            AND v.GRUPO1 = '100'
+                            AND v.p_neto > 0
+                            AND CAST(v.FECHA_HORA AS DATETIME) >= DATEADD(HOUR, 16, CAST(CAST(DATEADD(DAY, -1, GETDATE()) AS DATE) AS DATETIME))
+                            AND CAST(v.FECHA_HORA AS DATETIME) <= GETDATE()
+                        GROUP BY v.CODIGO_MATERIAL
+                        HAVING SUM(tms.STOCK) > 30
+                        ORDER BY COUNT(v.codigo_material) DESC
+                    ), 
+                    Grupo130 AS (
+                        SELECT TOP 20 v.codigo_material
+                        FROM v_facturacion v
+                        INNER JOIN V_MATERIALES_STOCK tms 
+                            ON tms.CODIGO_MATERIAL = v.CODIGO_MATERIAL 
+                            AND tms.OFICINA_VENTAS = '" . $oficina . "' 
+                        WHERE 
+                            v.tipo_factura IN ('zf01','zf03','zf05','zf07','zf09','zf10','zf11','zf12') 
+                            AND v.organizacion_ventas = '" . $org . "'
+                            AND v.GRUPO1 = '100'
+                            AND v.GRUPO2 = '130'
+                            AND v.p_neto > 0
+                            AND CAST(v.FECHA_HORA AS DATETIME) >= DATEADD(HOUR, 16, CAST(CAST(DATEADD(DAY, -1, GETDATE()) AS DATE) AS DATETIME))
+                            AND CAST(v.FECHA_HORA AS DATETIME) <= GETDATE()
+                        GROUP BY v.CODIGO_MATERIAL
+                        HAVING SUM(tms.STOCK) > 30
+                        ORDER BY COUNT(v.codigo_material) DESC
+                    )
+                    SELECT 
+                        tm.CODIGO_MATERIAL,
+                        CASE 
+                            WHEN g130.codigo_material IS NOT NULL THEN 1 
+                            ELSE 0 
+                        END AS GRUPO_130
+                    FROM T_MATERIALES tm
+                    INNER JOIN Grupo100 g100 ON tm.CODIGO_MATERIAL = g100.codigo_material
+                    LEFT JOIN Grupo130 g130 ON tm.CODIGO_MATERIAL = g130.codigo_material;";
+    echo json_encode( GenerarArray( $sql, '' ) );
+    mssql_close();
+    break;
+  case "MAIL_REDENCIONES":
+    $id = $_POST[ 'id' ];
+    $sql = "select 
+                  r.codigo_material,
+                  r.codigo_sap,
+                  r.oficina_ventas,
+                  r.organizacion_ventas,
+                  r.puntos,
+                  r.usuario,
+                  t.nombres,
+                  t.razon_comercial,
+                  t.nit,
+                  isnull(m.descripcion2,m.descripcion) as material,
+                  t.email
+                from t_redencion_puntos r 
+                inner join t_terceros t on t.codigo_sap = r.codigo_sap 
+                inner join t_materiales m on m.codigo_material = r.codigo_material
+                where 
+                   r.id = $id ";
+    $dato = mssql_fetch_array( mssql_query( $sql ) );
+
+    mssql_close();
+
+    require_once( '../resources/PhPMailer/Email.php' );
+    $org = '';
+    $slogan = '';
+    $titulo = '';
+    $asunto = '';
+    if ( $dato[ 'organizacion_ventas' ] == '1000' ) {
+      $titulo = 'Nueva redención de puntos Multidrogas de colombia!';
+      $url = 'www.multidrogas.com';
+      $slogan = 'CM de Colombia S.A.S el socio leal y estratégico del droguista colombiano';
+      $asunto = 'Redenciones WEB CM';
+    } else {
+      $titulo = 'Nueva redención de puntos Distribuidora Roma!';
+      $url = 'www.dfroma.com';
+      $slogan = 'Distribuidora farmaceutica ROMA S.A';
+      $asunto = 'Redenciones WEB ROMA';
+    }
+    $msg = '<!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Confirmación de Redención de Puntos</title>
+            <style type="text/css">
+                body {
+                    font-family: Arial, sans-serif;
+                    line-height: 1.6;
+                    color: #333333;
+                    max-width: 600px;
+                    margin: 0 auto;
+                    padding: 20px;
+                }
+                .email-container {
+                    border: 1px solid #e0e0e0;
+                    border-radius: 8px;
+                    overflow: hidden;
+                }
+                .email-header {
+                    background-color: #2c3e50;
+                    color: #ffffff;
+                    padding: 20px;
+                    text-align: center;
+                    font-size: 18px;
+                    font-weight: bold;
+                }
+                .email-body {
+                    padding: 20px;
+                    background-color: #ffffff;
+                }
+                .info-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin: 15px 0;
+                }
+                .info-table td {
+                    padding: 12px;
+                    border-bottom: 1px solid #e0e0e0;
+                }
+                .info-table tr:last-child td {
+                    border-bottom: none;
+                }
+                .label {
+                    font-weight: bold;
+                    color: #2c3e50;
+                    width: 30%;
+                }
+                .highlight {
+                    background-color: #f8f9fa;
+                }
+                .email-footer {
+                    background-color: #f8f9fa;
+                    padding: 15px;
+                    text-align: center;
+                    font-size: 12px;
+                    color: #666666;
+                }
+                .points-badge {
+                    display: inline-block;
+                    background-color: #27ae60;
+                    color: white;
+                    padding: 5px 10px;
+                    border-radius: 20px;
+                    font-weight: bold;
+                }
+                a {
+                    color: #3498db;
+                    text-decoration: none;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="email-container">
+                <div class="email-header">
+                    CONFIRMACIÓN DE REDENCIÓN DE PUNTOS
+                </div>
+
+                <div class="email-body">
+                    <p style="text-align: center; margin-bottom: 25px;">
+                        ¡Felicitaciones! Has redimido exitosamente tus puntos por un obsequio.
+                    </p>
+
+                    <table class="info-table">
+                        <tr>
+                            <td class="label">Producto Redimido:</td>
+                            <td>' . $dato[ 'codigo_material' ] . ' / ' . $dato[ 'material' ] . '</td>
+                        </tr>
+                        <tr class="highlight">
+                            <td class="label">NIT:</td>
+                            <td>' . $dato[ 'nit' ] . '</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Cliente:</td>
+                            <td>' . $dato[ 'razon_comercial' ] . ' / ' . $dato[ 'nombres' ] . '</td>
+                        </tr>
+                        <tr class="highlight">
+                            <td class="label">Puntos Redimidos:</td>
+                            <td><span class="points-badge">' . $dato[ 'puntos' ] . ' puntos</span></td>
+                        </tr>
+                    </table>
+
+                    <p style="text-align: center; margin-top: 25px;">
+                        Gracias por participar en nuestro programa de fidelización.
+                    </p>
+                </div>
+
+                <div class="email-footer">
+                    <p>' . $slogan . '</p>
+                    <p><a href="' . $url . '">' . $url . '</a></p>
+                    <p style="margin-top: 10px;">© ' . date( 'Y' ) . ' Todos los derechos reservados</p>
+                </div>
+            </div>
+        </body>
+        </html>';
+
+    $para = 'sistemas@multidrogas.com';
+    if ( $dato[ 'email' ] != '' ) {
+      $para .= ";" . $dato[ 'email' ];
+    }
+    EnviarMail( $titulo, $msg, $asunto, $para );
     break;
 }
 ?>
