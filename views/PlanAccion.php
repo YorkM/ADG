@@ -332,7 +332,7 @@
                         <!-- </div> -->
                     </div>
                 </div>
-                <div style="margin-top: 30px;">
+                <div style="margin-top: 30px; overflow: auto;">
                     <h5 class="text-center" style="margin-bottom: 20px; font-weight: 400;">REPORTE - ACCIONES CONCRETAS</h5>
                     <table class="table table-bordered table-sm" id="tablaAccionesReporte" style="border-color: #9ba0a5;">
                         <thead class="table-info" style="border-color: #9ba0a5;">

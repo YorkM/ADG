@@ -4,7 +4,7 @@ let ArrCli = new Array();
 let ArrDctos = new Array();
 let arrayLiquidador = new Array();
 
-//? EJECUCIÓN DE FUNCIONALIDADES
+// EJECUCIÓN DE FUNCIONALIDADES
 $(function () {
   carga_anios('MultiAnio');
   carga_mes('MultiMes');
@@ -98,7 +98,7 @@ $(function () {
   $("#DocPDF").change(function () {
     uploadAjax();
   })
-  var idRol = $("#RolId").val();
+  var idRol = parseInt($("#RolId").val());
   //Boton de autorizacion 
   if (idRol == 1 || idRol == 26) { //Administrador & contabilidad
     $("#btnAutorizar").show();
@@ -119,6 +119,17 @@ $(function () {
     $("#btnSubirMulticash").attr('disabled', false);
   } else {
     $("#btnSubirMulticash").attr('disabled', true);
+  }
+
+  if (idRol !== 17 && idRol !== 48 && idRol !== 72 && idRol !== 73 && idRol !== 1) {
+    document.getElementById('btnBancos').removeAttribute('data-toggle');
+    $('#btnBancos').css({
+      "pointer-events": "none",
+      "color": "#aaa !important",
+      "background-color": "#f5f5f5",
+      "cursor": "not-allowed",
+      "text-decoration": "none"
+    });
   }
 
   $("#FechaDocumento").datepicker({
@@ -313,7 +324,7 @@ $(function () {
       reader.readAsText(e.target.files.item(0));
     }
     return false;
-  }); 
+  });
   //------------------------------------------------------------
   $("#btnEmailZona").click(function () {
     ConsultarZonas();
@@ -405,10 +416,10 @@ const filtrar = (filtro) => {
   const filas = document.querySelectorAll('#tdPlanillas2 tbody tr');
 
   filas.forEach(fila => {
-      const celdas = fila.querySelectorAll('td');
-      const coincide = Array.from(celdas).some(td => td.textContent.toLowerCase().includes(filtro));
+    const celdas = fila.querySelectorAll('td');
+    const coincide = Array.from(celdas).some(td => td.textContent.toLowerCase().includes(filtro));
 
-      fila.style.display = coincide ? '' : 'none';
+    fila.style.display = coincide ? '' : 'none';
   });
 }
 
@@ -502,7 +513,7 @@ async function generarPDF(idTabla) {
   });
 
   tablaClon.style.display = 'none';
-  document.body.appendChild(tablaClon);  
+  document.body.appendChild(tablaClon);
 
   doc.autoTable({
     html: tablaClon,
@@ -531,15 +542,15 @@ async function generarPDF(idTabla) {
       font: 'helvetica',
       fontStyle: 'normal'
     }
-  });  
+  });
 
   document.body.removeChild(tablaClon);
 
   const finalY = doc.lastAutoTable.finalY || 45;
   doc.setFontSize(12);
-  doc.text('NOTA: El descuento pronto pago aplica pagando las facturas dentro de la fecha establecida', pageWidth / 2, finalY + 10, { align: 'center' });
-  doc.text('Las facturas deben ser canceladas en orden consecutivo', pageWidth / 2, finalY + 20, { align: 'center' });
-  doc.text('RECUERDE: SOLO ESTÁ PERMITIDO CANCELAR A LAS CUENTAS DE D.F ROMA', pageWidth / 2, finalY + 30, { align: 'center' });
+  doc.text('NOTA: El descuento pronto pago aplica pagando las facturas dentro de la fecha establecida', pageWidth / 2, finalY + 7, { align: 'center' });
+  doc.text('Las facturas deben ser canceladas en orden consecutivo', pageWidth / 2, finalY + 14, { align: 'center' });
+  doc.text('RECUERDE: SOLO ESTÁ PERMITIDO CANCELAR A LAS CUENTAS DE D.F ROMA', pageWidth / 2, finalY + 21, { align: 'center' });
 
   doc.save('liquidacion.pdf');
 }
@@ -552,7 +563,7 @@ const calcularDescuento = (basePP, importe, porcentaje, claseDoc, fechaVencimien
     if (vencido || ["NC", "ND"].includes(claseDoc)) {
       return { porcentaje: 0, descuento: 0, pagar: importe };
     }
-  
+
     const descuento = Math.round(basePP * (porcentaje / 100));
     const pagar = Math.round(importe - descuento);
     return { porcentaje, descuento, pagar };
@@ -583,7 +594,7 @@ function crearTablasPorDias(datos) {
   for (const dias in agrupadoPorDias) {
     const grupo = agrupadoPorDias[dias];
 
-    count ++;
+    count++;
 
     const titulo = document.createElement("h3");
     titulo.classList.add('text-center');
@@ -655,7 +666,7 @@ function crearTablasPorDias(datos) {
         </td>`;
       tbody.appendChild(fila);
     });
-    tabla.appendChild(tbody);    
+    tabla.appendChild(tbody);
 
     const totalBasePP = grupo.reduce((sum, item) => sum + item.basePP, 0);
     const totalImporte = grupo.reduce((sum, item) => sum + item.importe, 0);
@@ -682,7 +693,7 @@ function crearTablasPorDias(datos) {
     cardContenedor.appendChild(btnContenedor);
     contenedor.appendChild(cardContenedor);
 
-    $('.table-liquidador tbody').on('blur', '.input-obser', function() {
+    $('.table-liquidador tbody').on('blur', '.input-obser', function () {
       const valor = $(this).val();
       const td = $(this).closest('td');
       td.text(valor);
@@ -713,14 +724,14 @@ const agregarLiquidador = (item) => {
   const claseDoc = CLASE_DOCUMENTO.trim();
   const FB = FECHA_BASE.split("-");
   const fechaFactura = `${FB[2]}/${FB[1]}/${FB[0]}`;
-  
+
   ArrDctos.forEach(item => {
     let dias = 0;
     if (parseInt(item.dias) > 60 && parseInt(item.dias) <= 65) dias = 60;
     else if (parseInt(item.dias) > 45 && parseInt(item.dias) <= 50) dias = 45;
     else if (parseInt(item.dias) > 30 && parseInt(item.dias) <= 35) dias = 30;
-    else dias = parseInt(item.dias); 
- 
+    else dias = parseInt(item.dias);
+
     const fechaVencimientoFactura = agregarDias(FECHA_BASE, dias);
     const { porcentaje, descuento, pagar } = calcularDescuento(basePP, importe, parseFloat(item.descuento), claseDoc, fechaVencimientoFactura);
 
@@ -925,11 +936,11 @@ function CondicionesDcto() {
           + '<td>' + data[i].tipo + '</td>'
           + '<td>' + data[i].sujeto_cump + '</td>'
           + '</tr>';
-          ArrDctos.push({
-            dias: data[i].dias,
-            descuento : data[i].descuento,
-            tipo : data[i].tipo
-          })
+        ArrDctos.push({
+          dias: data[i].dias,
+          descuento: data[i].descuento,
+          tipo: data[i].tipo
+        })
       }
       tabla += '</tbody></table>';
 
@@ -1221,7 +1232,7 @@ function ConsultarMulticash() {
     });
 }
 
-//? FUNCIÓN CONSULTAR MULTICASH BANCO
+// FUNCIÓN CONSULTAR MULTICASH BANCO
 function ConsultarMulticashBanco() {
   $.ajax({
     type: "POST",
@@ -3001,8 +3012,8 @@ function ConsultarCondicionLista() {
           if (lista == data[i].lista) {
             ArrDctos.push({
               dias: data[i].dias,
-              descuento : data[i].descuento,
-              tipo : 'ADG'
+              descuento: data[i].descuento,
+              tipo: 'ADG'
             })
             if (data[i].sujeto_ppto == 'S') {
               cont++;
@@ -3031,7 +3042,7 @@ function ConsultarCondicionLista() {
             + '<td>' + data[i].oficina_ventas + '</td>'
             + '</tr>';
 
-           
+
         }
         tabla += '</tbody></table>';
         tabla2 += '</tbody></table>';
