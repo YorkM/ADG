@@ -330,20 +330,27 @@ session_start();
     }
 
     #tablaVisitasZona thead tr th {
-      font-size: 14px;
+      font-size: 15px;
     }
     
     #tablaVisitasZona tbody tr td {
-      font-size: 13px;
+      font-size: 14px;
     }
 
-    /* .custom-nowrap {
+    .tabla-fija thead th {
+      position: sticky;
+      top: 0;
+      background: #fff;
+      /* z-index: 2; */
+    }
+
+    .custom-nowrap-2 {
         padding: 0;
         line-height: 2;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-    } */
+    }
   </style>
 </head>
 
@@ -351,6 +358,7 @@ session_start();
   <input type="hidden" id="Organizacion" value="" readonly>
   <input type="hidden" id="RolId" value="<?php echo $_SESSION["ses_RolesId"]; ?>" readonly>
   <input type="hidden" id="Ofi" value="<?php echo $_SESSION["ses_OfcVentas"]; ?>" readonly>
+  
   <div class="alert alert-info"><i class="fa-solid fa-star fa-flip"></i>&nbsp;0104 - SEGUIMIENTO PROGRAMACIÓN</div>
   <div class="panel with-nav-tabs panel-info">
     <div class="panel-heading">
@@ -739,42 +747,13 @@ session_start();
               <tr>
                 <td colspan="3">
                   <button class="btn btn-primary btn-sm" id="btnBuscar">Consultar</button>
-                  <button class="btn btn-default btn-sm" id="btnLimpiar">Limpiar</button>
+                  <!-- <button class="btn btn-default btn-sm" id="btnLimpiar">Limpiar</button> -->
                 </td>
               </tr>
             </tbody>
           </table>
-          <div id="contenedorTablaVisitasZona" style="margin-top: 20px;">
-            <table class="table" id="tablaVisitasZona" style="width: 100%; margin-bottom: 0;">
-              <thead>
-                <tr>
-                  <th>Zona</th>
-                  <th>Zona Descripción</th>
-                  <th>Clientes Programados</th>
-                  <th>Clientes Visitados</th>
-                  <th>Clientes Contactados</th>
-                  <th>Hora Inicial</th>
-                  <th>Hora Final</th>
-                  <th>N° Ped. Ruta del Día</th>
-                  <th>Valor Ped. Tomados</th>
-                  <th>Valor Ped. Adicionales</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>222503</td>
-                  <td>MILLER/LAURA</td>
-                  <td>11</td>
-                  <td>10</td>
-                  <td>8</td>
-                  <td>09:01:08</td>
-                  <td>19:27:16</td>
-                  <td>0</td>
-                  <td>$0</td>
-                  <td>$521.900</td>
-                </tr>
-              </tbody>
-            </table>
+          <div id="contenedorTablaVisitasZona" style="overflow: auto; height: 60vh; margin-top: 20px;">            
+              
           </div>
         </div>
       </div>

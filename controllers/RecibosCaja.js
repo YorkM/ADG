@@ -121,9 +121,22 @@ $(function () {
     $("#btnSubirMulticash").attr('disabled', true);
   }
 
+  // RESTRICCIÓN DE ACCESO A LA PESTAÑA DE BANCOS 
   if (idRol !== 17 && idRol !== 48 && idRol !== 72 && idRol !== 73 && idRol !== 1) {
     document.getElementById('btnBancos').removeAttribute('data-toggle');
     $('#btnBancos').css({
+      "pointer-events": "none",
+      "color": "#aaa !important",
+      "background-color": "#f5f5f5",
+      "cursor": "not-allowed",
+      "text-decoration": "none"
+    });
+  }
+
+  // RESTRICCIÓN DE ACCESO A LA PESTAÑA DE LIQUIDADOR 
+  if (idRol !== 17 && idRol !== 48 && idRol !== 72 && idRol && idRol !== 44 && idRol !== 3 && idRol !== 14 && idRol !== 13 && idRol !== 73 && idRol !== 1) {
+    document.getElementById('btnLiquidador').removeAttribute('data-toggle');
+    $('#btnLiquidador').css({
       "pointer-events": "none",
       "color": "#aaa !important",
       "background-color": "#f5f5f5",
@@ -484,25 +497,26 @@ async function generarPDF(idTabla) {
   const doc = new jsPDF('landscape');
 
   const organizacion = $('#NumOrg').val();
-
   const logoImg = (organizacion === "2000") ? document.getElementById('logoEmpresa') : document.getElementById('logoEmpresa2');
+  const empresa = (organizacion === "2000") ? "D.F ROMA" : "CM";
+
   const canvas = document.createElement('canvas');
   canvas.width = logoImg.naturalWidth;
   canvas.height = logoImg.naturalHeight;
   const ctx = canvas.getContext('2d');
   ctx.drawImage(logoImg, 0, 0);
   const logoDataURL = canvas.toDataURL('image/png');
+
   const pageWidth = doc.internal.pageSize.getWidth();
   const logoWidth = 40;
   const xRight = pageWidth - logoWidth - 10;
   doc.addImage(logoDataURL, 'PNG', xRight, 10, logoWidth, 20);
 
-  doc.setFontSize(16);
+  doc.setFontSize(14);
   doc.text('LIQUIDACIÓN FACTURAS', 14, 20);
 
   const tablaOriginal = document.getElementById(idTabla);
   const tablaClon = tablaOriginal.cloneNode(true);
-
   ['thead', 'tbody', 'tfoot'].forEach(seccion => {
     const seccionTabla = tablaClon.querySelector(seccion);
     if (seccionTabla) {
@@ -511,7 +525,6 @@ async function generarPDF(idTabla) {
       });
     }
   });
-
   tablaClon.style.display = 'none';
   document.body.appendChild(tablaClon);
 
@@ -519,42 +532,79 @@ async function generarPDF(idTabla) {
     html: tablaClon,
     startY: 35,
     theme: 'grid',
+    showHead: 'firstPage',
+    showFoot: 'lastPage',
+    headStyles: { fillColor: [44, 62, 80], textColor: 255, halign: 'center' },
+    footStyles: { fillColor: [44, 62, 80], textColor: 255, halign: 'center' },
+    bodyStyles: { fillColor: [245, 245, 245], textColor: [33, 37, 41] },
+    alternateRowStyles: { fillColor: [220, 220, 220] },
+    styles: { fontSize: 11, cellPadding: 3 }
+  });
+
+  document.body.removeChild(tablaClon);
+  const finalY = doc.lastAutoTable.finalY || 45;
+
+  doc.setFontSize(12);
+  const notas = [
+    'NOTA: El descuento pronto pago aplica pagando las facturas dentro de la fecha establecida',
+    'Las facturas deben ser canceladas en orden consecutivo',
+    `RECUERDE: SOLO ESTÁ PERMITIDO CANCELAR A LAS CUENTAS DE ${empresa}`
+  ];
+  notas.forEach((texto, i) => {
+    doc.text(texto, pageWidth / 2, finalY + 7 + (i * 7), { align: 'center' });
+  });
+
+  const yCuentas = finalY + 35;
+  doc.setFontSize(13);
+  doc.setFont(undefined, 'bold');
+  doc.text(`CUENTAS Y CONVENIOS DE ${empresa}`, 14, yCuentas);
+
+  doc.setFont(undefined, 'normal');
+
+  let cuentasConvenios;
+
+  if (organizacion === "2000") {
+    cuentasConvenios = [
+      { banco: 'Banco Agrario', cuenta: '13030608080', tipo: 'Corriente', convenio: '13458' },
+      { banco: 'Banco de Bogotá', cuenta: '172037855', tipo: 'Corriente', convenio: '' },
+      { banco: 'Davivienda', cuenta: '560036469998987', tipo: 'Corriente', convenio: '1012947' },
+      { banco: 'BBVA', cuenta: '130612000100040000', tipo: 'Corriente', convenio: '31592' },
+      { banco: 'Bancolombia', cuenta: '01090147509', tipo: 'Corriente', convenio: '26835' },
+      { banco: 'Bancolombia', cuenta: '10022159448', tipo: 'Ahorros', convenio: '' },
+    ];
+  } else {
+    cuentasConvenios = [
+      { banco: 'Banco Agrario', cuenta: '327030001066', tipo: 'Corriente' },
+      { banco: 'Banco de Bogotá', cuenta: '438560393', tipo: 'Corriente' },
+      { banco: 'BBVA', cuenta: '612018051', tipo: 'Corriente' },
+      { banco: 'Bancolombia', cuenta: '67720889532', tipo: 'Corriente' },      
+    ];
+  }
+
+
+  doc.autoTable({
+    startY: yCuentas + 5,
+    head: [['Banco', 'Cuenta', 'Tipo', 'Convenio']],
+    body: cuentasConvenios.map(c => [c.banco, c.cuenta, c.tipo, c.convenio]),
+    theme: 'grid',
+    showHead: 'firstPage',
+    styles: {
+      fontSize: 11,
+      cellPadding: 3
+    },
     headStyles: {
       fillColor: [44, 62, 80],
       textColor: 255,
       halign: 'center'
     },
-    footStyles: {
-      fillColor: [44, 62, 80],
-      textColor: 255,
-      halign: 'center'
-    },
-    bodyStyles: {
-      fillColor: [245, 245, 245],
-      textColor: [33, 37, 41],
-    },
+    bodyStyles: { fillColor: [245, 245, 245], textColor: [33, 37, 41] },
     alternateRowStyles: {
       fillColor: [220, 220, 220]
-    },
-    styles: {
-      fontSize: 11,
-      cellPadding: 3,
-      font: 'helvetica',
-      fontStyle: 'normal'
     }
   });
 
-  document.body.removeChild(tablaClon);
-
-  const finalY = doc.lastAutoTable.finalY || 45;
-  doc.setFontSize(12);
-  doc.text('NOTA: El descuento pronto pago aplica pagando las facturas dentro de la fecha establecida', pageWidth / 2, finalY + 7, { align: 'center' });
-  doc.text('Las facturas deben ser canceladas en orden consecutivo', pageWidth / 2, finalY + 14, { align: 'center' });
-  doc.text('RECUERDE: SOLO ESTÁ PERMITIDO CANCELAR A LAS CUENTAS DE D.F ROMA', pageWidth / 2, finalY + 21, { align: 'center' });
-
   doc.save('liquidacion.pdf');
 }
-
 
 // FUNCIÓN PARA REALIZAR LOS CÁLCULOS DE DESCUENTO
 const calcularDescuento = (basePP, importe, porcentaje, claseDoc, fechaVencimiento) => {
