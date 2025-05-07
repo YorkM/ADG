@@ -362,10 +362,10 @@ const getReporte2 = async () => {
     resultado.forEach(item => {
         elementos += `
                     <tr>
-                    <th style="background-color: #DDD;">${item.OBJETIVOS.toUpperCase()}</th>
-                    <th style="background-color: #DDD;">${item.suma_indice}%</th>
-                    <th style="background-color: #DDD;">${item.promedio_avance}%</th>
-                    <th style="background-color: #DDD;" colspan="5"></th>
+                        <th style="background-color: #DDD;">${item.OBJETIVOS.toUpperCase()}</th>
+                        <th style="background-color: #DDD;">${item.suma_indice}%</th>
+                        <th style="background-color: #DDD;">${item.promedio_avance}%</th>
+                        <th style="background-color: #DDD;" colspan="5"></th>
                     </tr>`;
 
         item.acciones.forEach(accion => {

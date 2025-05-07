@@ -211,9 +211,15 @@ $(function () {
 		getReporteVisitasZonas();
 	});
 
+	$('#btnExportar').click(function () {
+		exportarExcel();
+	});
+
 	$('#btnLimpiar').click(function () {
-		$('#txtZonas').val("0");
-		$('#FiltroOficinaVentas').val("2000");
+		getZonasVentas();
+		const oficinas = OficinasVentas('S');
+		$("#FiltroOficinaVentas").html(oficinas);
+
 		$("#txtFecha1, #txtFecha2").val(FechaActual());
 		$("#txtFecha1, #txtFecha2").datepicker({
 			changeMonth: true,
@@ -224,12 +230,12 @@ $(function () {
 			width: 100,
 			heigth: 100
 		});
-		getReporteVisFiltroOficinaVentasitasZonas();
+
+		getReporteVisitasZonas();
 	});
 
 	$('#txtZonas').change(function () {
 		const filtro = this.value;
-		console.log(filtro);
 		filtrar(filtro);
 	});
 });
@@ -242,6 +248,21 @@ const getZonasVentas = async () => {
 	});
 	$('#txtZonas').html(zonas);
 }
+
+function exportarExcel(nombreArchivo = "reporte.xlsx", nombreHoja = "Datos") {
+	const tabla = document.getElementById("tablaVisitasZona");
+	if (!tabla) {
+	  console.log("No se encontró la tabla");
+	  return;
+	}
+  
+	const wb = XLSX.utils.table_to_book(tabla, {
+	  sheet: nombreHoja,
+	  raw: true,
+	});
+  
+	XLSX.writeFile(wb, nombreArchivo);
+}  
 
 const formatDate = (dateString) => {
 	const processedDateString = dateString.replace(/:(\d{3})([AP]M)/, " $2");
@@ -294,17 +315,17 @@ const getReporteVisitasZonas = async () => {
 		resp.data.forEach((item, index) => {
 			tabla += `
 				<tr>
-                  <td>${index + 1}</td>
-                  <td>${item.zona_ventas}</td>
-                  <td style="font-size: 12px;">${item.zona_descripcion}</td>
-                  <td class="text-center">${item.programados}</td>
-                  <td class="text-center">${item.visitados}</td>
-                  <td class="text-center">${item.contactados}</td>
-                  <td class="custom-nowrap-2">${(item.fecha_ini_gestion) ? formatDate(item.fecha_ini_gestion) : ''}</td>
-                  <td class="custom-nowrap-2">${(item.fecha_fin_gestion) ? formatDate(item.fecha_fin_gestion) : ''}</td>
-                  <td class="text-center">${item.cantidad_gestionados}</td>
-                  <td class="text-center">${formatNum(item.valor_gestionados, "$")}</td>
-                  <td class="text-center">${formatNum(item.valor_adicionales, "$")}</td>
+                  <td class="custom-border">${index + 1}</td>
+                  <td class="custom-border">${item.zona_ventas}</td>
+                  <td class="custom-border custom-nowrap-2" style="font-size: 12px;">${item.zona_descripcion}</td>
+                  <td class="custom-border text-center">${item.programados}</td>
+                  <td class="custom-border text-center">${item.visitados}</td>
+                  <td class="custom-border text-center">${item.contactados}</td>
+                  <td class="custom-border custom-nowrap-2">${(item.fecha_ini_gestion) ? formatDate(item.fecha_ini_gestion) : ''}</td>
+                  <td class="custom-border custom-nowrap-2">${(item.fecha_fin_gestion) ? formatDate(item.fecha_fin_gestion) : ''}</td>
+                  <td class="custom-border text-center">${item.cantidad_gestionados}</td>
+                  <td class="custom-border text-center">${formatNum(item.valor_gestionados, "$")}</td>
+                  <td class="custom-border text-center">${formatNum(item.valor_adicionales, "$")}</td>
                 </tr>`;
 		});
 		tabla += `

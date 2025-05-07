@@ -57,6 +57,7 @@ session_start();
   <script src="../lib/exportar_html_excel/Blob.min.js"></script>
   <script src="../lib/exportar_html_excel/xls.core.min.js"></script>
   <script src="../lib/exportar_html_excel/dist/js/tableexport.js"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
   <script src="https://momentjs.com/downloads/moment.min.js"></script>
   <script type="text/javascript" src="../resources/select2/js/select2.full.min.js"></script>
   <script type="text/javascript" src="../resources/fontawesome-free-6.1.2-web/js/all.min.js"></script>
@@ -345,11 +346,18 @@ session_start();
     }
 
     .custom-nowrap-2 {
-        padding: 0;
-        line-height: 2;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+      padding: 0;
+      line-height: 2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .custom-border {
+      border: solid 1px #9ba0a5 !important;
+      border-bottom: solid 1px #9ba0a5 !important;
+      border-top: solid 1px #9ba0a5 !important;
+      border-right: solid 1px #9ba0a5 !important;
     }
   </style>
 </head>
@@ -747,7 +755,8 @@ session_start();
               <tr>
                 <td colspan="3">
                   <button class="btn btn-primary btn-sm" id="btnBuscar">Consultar</button>
-                  <!-- <button class="btn btn-default btn-sm" id="btnLimpiar">Limpiar</button> -->
+                  <button class="btn btn-default btn-sm" id="btnLimpiar">Limpiar</button>
+                  <button class="btn btn-success btn-sm" id="btnExportar">Exportar a Excel</button>
                 </td>
               </tr>
             </tbody>

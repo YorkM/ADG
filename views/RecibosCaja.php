@@ -127,6 +127,11 @@ Redireccionar();
       padding: 3px 8px;
       font-size: 12px;
     }
+
+    .custom-padding-two {
+      padding: 3px 8px;
+      font-size: 12px;
+    }
   </style>
 </head>
 

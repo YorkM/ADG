@@ -121,28 +121,24 @@ $(function () {
     $("#btnSubirMulticash").attr('disabled', true);
   }
 
+  const cssDeshabilatar = {
+    "pointer-events": "none",
+    "color": "#aaa !important",
+    "background-color": "#f5f5f5",
+    "cursor": "not-allowed",
+    "text-decoration": "none"
+  }
+
   // RESTRICCIÓN DE ACCESO A LA PESTAÑA DE BANCOS 
   if (idRol !== 17 && idRol !== 48 && idRol !== 72 && idRol !== 73 && idRol !== 1) {
     document.getElementById('btnBancos').removeAttribute('data-toggle');
-    $('#btnBancos').css({
-      "pointer-events": "none",
-      "color": "#aaa !important",
-      "background-color": "#f5f5f5",
-      "cursor": "not-allowed",
-      "text-decoration": "none"
-    });
+    $('#btnBancos').css(cssDeshabilatar);
   }
 
   // RESTRICCIÓN DE ACCESO A LA PESTAÑA DE LIQUIDADOR 
   if (idRol !== 17 && idRol !== 48 && idRol !== 72 && idRol && idRol !== 44 && idRol !== 3 && idRol !== 14 && idRol !== 13 && idRol !== 73 && idRol !== 1) {
     document.getElementById('btnLiquidador').removeAttribute('data-toggle');
-    $('#btnLiquidador').css({
-      "pointer-events": "none",
-      "color": "#aaa !important",
-      "background-color": "#f5f5f5",
-      "cursor": "not-allowed",
-      "text-decoration": "none"
-    });
+    $('#btnLiquidador').css(cssDeshabilatar);
   }
 
   $("#FechaDocumento").datepicker({
@@ -228,7 +224,9 @@ $(function () {
       $("#btnFacturas").attr("data-toggle", "tab");
 
       $("#liMulticash").removeClass("disabled disabledTab");
-      $("#btnMulticash").attr("data-toggle", "tab");
+      if (idRol !== 14) {
+        $("#btnMulticash").attr("data-toggle", "tab");
+      }
       CondicionesDcto();
       Documentos();
       ConsultarCondicionLista();
@@ -497,7 +495,9 @@ async function generarPDF(idTabla) {
   const doc = new jsPDF('landscape');
 
   const organizacion = $('#NumOrg').val();
-  const logoImg = (organizacion === "2000") ? document.getElementById('logoEmpresa') : document.getElementById('logoEmpresa2');
+  const logoImg = (organizacion === "2000") 
+  ? document.getElementById('logoEmpresa') 
+  : document.getElementById('logoEmpresa2');
   const empresa = (organizacion === "2000") ? "D.F ROMA" : "CM";
 
   const canvas = document.createElement('canvas');
@@ -512,8 +512,9 @@ async function generarPDF(idTabla) {
   const xRight = pageWidth - logoWidth - 10;
   doc.addImage(logoDataURL, 'PNG', xRight, 10, logoWidth, 20);
 
-  doc.setFontSize(14);
-  doc.text('LIQUIDACIÓN FACTURAS', 14, 20);
+  doc.setFontSize(13);
+  doc.setFont(undefined, 'bold');
+  doc.text('LIQUIDACIÓN FACTURAS', 13, 20);
 
   const tablaOriginal = document.getElementById(idTabla);
   const tablaClon = tablaOriginal.cloneNode(true);
@@ -534,17 +535,35 @@ async function generarPDF(idTabla) {
     theme: 'grid',
     showHead: 'firstPage',
     showFoot: 'lastPage',
-    headStyles: { fillColor: [44, 62, 80], textColor: 255, halign: 'center' },
-    footStyles: { fillColor: [44, 62, 80], textColor: 255, halign: 'center' },
-    bodyStyles: { fillColor: [245, 245, 245], textColor: [33, 37, 41] },
-    alternateRowStyles: { fillColor: [220, 220, 220] },
-    styles: { fontSize: 11, cellPadding: 3 }
+    headStyles: { 
+      fillColor: [44, 62, 80], 
+      textColor: 255, 
+      halign: 'center' 
+    },
+    footStyles: { 
+      fillColor: [44, 62, 80], 
+      textColor: 255, 
+      halign: 'center' 
+    },
+    bodyStyles: { 
+      fillColor: [245, 245, 245], 
+      textColor: [33, 37, 41], 
+      halign: 'center' 
+    },
+    alternateRowStyles: { 
+      fillColor: [220, 220, 220] 
+    },
+    styles: { 
+      fontSize: 9, 
+      cellPadding: 2 
+    }
   });
 
   document.body.removeChild(tablaClon);
   const finalY = doc.lastAutoTable.finalY || 45;
 
-  doc.setFontSize(12);
+  doc.setFontSize(11);
+  doc.setFont(undefined, 'normal');
   const notas = [
     'NOTA: El descuento pronto pago aplica pagando las facturas dentro de la fecha establecida',
     'Las facturas deben ser canceladas en orden consecutivo',
@@ -555,9 +574,9 @@ async function generarPDF(idTabla) {
   });
 
   const yCuentas = finalY + 35;
-  doc.setFontSize(13);
+  doc.setFontSize(12);
   doc.setFont(undefined, 'bold');
-  doc.text(`CUENTAS Y CONVENIOS DE ${empresa}`, 14, yCuentas);
+  doc.text(`CUENTAS Y CONVENIOS DE ${empresa}`, 13, yCuentas);
 
   doc.setFont(undefined, 'normal');
 
@@ -581,7 +600,6 @@ async function generarPDF(idTabla) {
     ];
   }
 
-
   doc.autoTable({
     startY: yCuentas + 5,
     head: [['Banco', 'Cuenta', 'Tipo', 'Convenio']],
@@ -589,15 +607,19 @@ async function generarPDF(idTabla) {
     theme: 'grid',
     showHead: 'firstPage',
     styles: {
-      fontSize: 11,
-      cellPadding: 3
+      fontSize: 9,
+      cellPadding: 2
     },
     headStyles: {
       fillColor: [44, 62, 80],
       textColor: 255,
       halign: 'center'
     },
-    bodyStyles: { fillColor: [245, 245, 245], textColor: [33, 37, 41] },
+    bodyStyles: { 
+      fillColor: [245, 245, 245],
+      textColor: [33, 37, 41],
+      halign: 'center' 
+    },
     alternateRowStyles: {
       fillColor: [220, 220, 220]
     }
@@ -663,8 +685,9 @@ function crearTablasPorDias(datos) {
     cardContenedor.style.margin = '20px auto';
 
     const btnContenedor = document.createElement('div');
-    btnContenedor.classList.add('btn-pdf')
+    btnContenedor.classList.add('btn-pdf');
     btnContenedor.style.display = 'flex';
+    btnContenedor.style.gap = '10px';
     btnContenedor.style.justifyContent = 'flex-end';
 
     const btnDescargarPDF = document.createElement('button');
@@ -673,12 +696,20 @@ function crearTablasPorDias(datos) {
     btnDescargarPDF.classList.add('btn-primary');
     btnDescargarPDF.classList.add('custom-padding');
 
+    const btnExportar = document.createElement('button');
+    btnExportar.textContent = "Exportar a Excel";
+    btnExportar.classList.add('btn');
+    btnExportar.classList.add('btn-success');
+    btnExportar.classList.add('custom-padding-two');
+
+    // btnContenedor.appendChild(btnExportar);
     btnContenedor.appendChild(btnDescargarPDF);
 
     const thead = document.createElement("thead");
     const encabezado = `
       <tr>
-        <th>Doc.</th>
+        <th>Doc</th>
+        <th>Referencia</th>
         <th>Clase</th>
         <th>Fecha</th>
         <th>Fecha Venc.</th>
@@ -699,6 +730,7 @@ function crearTablasPorDias(datos) {
       const fila = document.createElement("tr");
       fila.innerHTML = `
         <td class="font-size">${item.numeroDoc}</td>
+        <td class="font-size">${item.referencia}</td>
         <td class="font-size">${item.claseDoc}</td>
         <td class="font-size">${item.fechaFactura}</td>
         <td class="font-size">${item.fechaVencimientoFactura}</td>
@@ -726,7 +758,7 @@ function crearTablasPorDias(datos) {
     const tfoot = document.createElement("tfoot");
     const totales = `
       <tr>
-        <td colspan="4" class="font-size-tf" style="text-align: center;">Totales</td>
+        <td colspan="5" class="font-size-tf" style="text-align: center;">Totales</td>
         <td class="font-size-tf">${formatNum(totalImporte, "$")}</td>
         <td class="font-size-tf">${formatNum(totalBasePP, "$")}</td>
         <td class="font-size-tf"></td>
@@ -762,12 +794,19 @@ function crearTablasPorDias(datos) {
       const idTabla = $(this).closest('.custom-card').find('table').attr('id');
       generarPDF(idTabla);
     });
+
+    // $('.btn-pdf').off().on('click', '.custom-padding-two', function (e) {
+    //   const idTabla = $(this).closest('.custom-card').find('table').attr('id');
+    //   console.log("Id tabla a Exportar:", idTabla);
+    //   generarPDF(idTabla);
+    // });
   }
 }
 
 // FUNCIÓN AGREGAR ITEM AL LIQUIDADOR
 const agregarLiquidador = (item) => {
-  const { BASE_PP, CLASE_DOCUMENTO, FECHA_BASE, IMPORTE, NUMERO_DOCUMENTO, REFERENCIA } = item;
+  console.log(item);
+  const { BASE_PP, CLASE_DOCUMENTO, FECHA_BASE, IMPORTE, NUMERO_DOCUMENTO, REFERENCIA, REFERENCIA_FACTURA } = item;
 
   const basePP = parseFloat(BASE_PP);
   const importe = parseFloat(IMPORTE);
@@ -788,6 +827,7 @@ const agregarLiquidador = (item) => {
     arrayLiquidador.push({
       numeroDoc: NUMERO_DOCUMENTO.trim(),
       referencia: REFERENCIA.trim(),
+      referenciaFactura: REFERENCIA_FACTURA.trim(),
       claseDoc,
       dias,
       fechaFactura,
@@ -1530,8 +1570,8 @@ function Limpiar() {
   if (rol == 14) {
     $("#dvTotalAbono").hide();
     activaTab('dvPlanilla');
-    $("#liCliente").addClass('disabled disabledTab');
-    $("#btnCliente").attr("data-toggle", "");
+    // $("#liCliente").addClass('disabled disabledTab');
+    // $("#btnCliente").attr("data-toggle", "");
     $("#btnEliminarRC").hide();
     $("#btnEliminarPDF").hide();
   } else {
@@ -1959,7 +1999,7 @@ function AddFactura(ob, valor, cumple_pres) {
 
 }
 
-//? DOCUMENTOS
+// DOCUMENTOS
 function Documentos() {
   $.ajax({
     type: "POST",
