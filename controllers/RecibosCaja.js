@@ -495,9 +495,9 @@ async function generarPDF(idTabla) {
   const doc = new jsPDF('landscape');
 
   const organizacion = $('#NumOrg').val();
-  const logoImg = (organizacion === "2000") 
-  ? document.getElementById('logoEmpresa') 
-  : document.getElementById('logoEmpresa2');
+  const logoImg = (organizacion === "2000")
+    ? document.getElementById('logoEmpresa')
+    : document.getElementById('logoEmpresa2');
   const empresa = (organizacion === "2000") ? "D.F ROMA" : "CM";
 
   const canvas = document.createElement('canvas');
@@ -535,27 +535,27 @@ async function generarPDF(idTabla) {
     theme: 'grid',
     showHead: 'firstPage',
     showFoot: 'lastPage',
-    headStyles: { 
-      fillColor: [44, 62, 80], 
-      textColor: 255, 
-      halign: 'center' 
+    headStyles: {
+      fillColor: [44, 62, 80],
+      textColor: 255,
+      halign: 'center'
     },
-    footStyles: { 
-      fillColor: [44, 62, 80], 
-      textColor: 255, 
-      halign: 'center' 
+    footStyles: {
+      fillColor: [44, 62, 80],
+      textColor: 255,
+      halign: 'center'
     },
-    bodyStyles: { 
-      fillColor: [245, 245, 245], 
-      textColor: [33, 37, 41], 
-      halign: 'center' 
+    bodyStyles: {
+      fillColor: [245, 245, 245],
+      textColor: [33, 37, 41],
+      halign: 'center'
     },
-    alternateRowStyles: { 
-      fillColor: [220, 220, 220] 
+    alternateRowStyles: {
+      fillColor: [220, 220, 220]
     },
-    styles: { 
-      fontSize: 9, 
-      cellPadding: 2 
+    styles: {
+      fontSize: 9,
+      cellPadding: 2
     }
   });
 
@@ -596,7 +596,7 @@ async function generarPDF(idTabla) {
       { banco: 'Banco Agrario', cuenta: '327030001066', tipo: 'Corriente' },
       { banco: 'Banco de Bogotá', cuenta: '438560393', tipo: 'Corriente' },
       { banco: 'BBVA', cuenta: '612018051', tipo: 'Corriente' },
-      { banco: 'Bancolombia', cuenta: '67720889532', tipo: 'Corriente' },      
+      { banco: 'Bancolombia', cuenta: '67720889532', tipo: 'Corriente' },
     ];
   }
 
@@ -615,10 +615,10 @@ async function generarPDF(idTabla) {
       textColor: 255,
       halign: 'center'
     },
-    bodyStyles: { 
+    bodyStyles: {
       fillColor: [245, 245, 245],
       textColor: [33, 37, 41],
-      halign: 'center' 
+      halign: 'center'
     },
     alternateRowStyles: {
       fillColor: [220, 220, 220]

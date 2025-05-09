@@ -1,84 +1,109 @@
-// JavaScript Document
-$(function(){
-	$("#numero").val('').focus();
+function Enter(e) {
+	if (e.key === 'Enter') trazabilidad();
+}
+
+function Regresar() {
+	$("#tbBuscarRastreo").show();
 	$("#tbRastreo").hide();
-});
-function Enter(){
- tecla = (document.all) ? ob.keyCode : ob.which;
-	if(tecla== 13 ){ 
-	  Trazabilidad();
+}
+
+const formatDate = (dateString) => {
+	const processedDateString = dateString.replace(/:(\d{3})([AP]M)/, " $2");
+	const date = new Date(processedDateString);
+	const options = {
+		day: "numeric",
+		month: "long",
+		year: "numeric",
+		hour: "numeric",
+		minute: "numeric",
+		hour12: true
+	};
+	return new Intl.DateTimeFormat("es-ES", options).format(date);
+}
+
+const trazabilidad = async () => {
+	let numero = $("#numero").val();
+	try {
+		if (numero !== "") {
+			showLoadingSwalAlert2('Cargando los datos...', false, true);
+
+			const resp = await enviarPeticion({
+				op: "TRAZABILIDAD",
+				link: "../models/RastreoPedido.php",
+				numero
+			});
+
+			if (resp.length) {
+				resp.forEach(item => {
+					console.log(item);
+					// CLIENTE
+					$("#txt_org").text(item.ORG);
+					$("#txt_bodega").text(item.BODEGA);
+					// CLIENTE
+					$("#txt_cliente").text(item.NOMBRES + ' - ' + item.RAZON_COMERCIAL);
+					$("#txt_dir").text(item.DIRECCION);
+					$("#txt_nit").text(item.NIT);
+					$("#txt_cod").text(item.CODIGO_SAP);
+					$("#txt_depa").text(item.DEPARTAMENTO);
+					$("#txt_ciud").text(item.CIUDAD);
+					// PEDIDO
+					$("#txt_pedido").text(item.NUMERO);
+					$("#txt_usr_ped").text(item.USUARIO);
+					$("#txt_fh_ped").text((item.FECHA_PEDIDO.trim()) && formatDate(item.FECHA_PEDIDO));
+					$("#txt_fh_ot").text((item.FECHA_OT.trim()) && formatDate(item.FECHA_OT));
+					$("#txt_usr_ot").text(item.USUARIO_OT);
+					$("#txtDifPedido").text((item.DIF_PEDIDO) && `${item.DIF_PEDIDO} Hrs`);
+					// SEPARACIÓN
+					$("#txt_usr_sep").text(item.USUARIO_SEPARA);
+					$("#txt_fhini_sep").text((item.INI_SEP.trim()) && formatDate(item.INI_SEP));
+					$("#txt_fhfin_sep").text((item.FIN_SEP.trim()) && formatDate(item.FIN_SEP));
+					$("#txt_num_ot").text(item.NUMERO_OT);
+					$("#difSepa").text((item.DIF_SEPA && item.INI_SEP.trim() && item.FIN_SEP.trim()) && `${item.DIF_SEPA} Hrs`);
+					console.log(item.DIF_SEPA);
+					// FACTURACIÓN
+					$("#txt_usr_fact").text(item.USUARIO_FACT);
+					$("#txt_fhini_fact").text((item.INI_FACT.trim()) && formatDate(item.INI_FACT));
+					$("#txt_fhfin_fact").text((item.FIN_FACT.trim()) && formatDate(item.FIN_FACT));
+					$("#txt_num_fact").text(item.NUMERO_FACT);
+					$("#difFact").text((item.DIF_FACT && item.INI_FACT.trim() && item.FIN_FACT.trim()) && `${item.DIF_FACT} Hrs`);
+					// ENTREGA
+					$("#txt_usr_ent").text(item.USUARIO_DESP);
+					$("#txt_fhini_ent").text((item.INI_TRANS.trim()) && formatDate(item.INI_TRANS));
+					$("#txt_fhfin_ent").text((item.FIN_TRANS.trim()) && formatDate(item.FIN_TRANS));
+					$("#difEntre").text((item.DIF_TRANS) && `${item.DIF_TRANS} Hrs`);
+					$("#txt_guia").text(item.GUIA);
+					$("#txt_nota").text(item.NOTA_ENTREGA);
+					// EMPAQUE
+					$("#txt_usr_emp").text(item.USUARIO_EMPAQUE);
+					$("#txt_fhini_emp").text((item.FINI_EMPAQUE.trim()) && formatDate(item.FINI_EMPAQUE));
+					$("#txt_fhfin_emp").text((item.FFIN_EMPAQUE.trim()) && formatDate(item.FFIN_EMPAQUE));
+					$("#difEmpa").text((item.DIF_EMPA) && `${item.DIF_EMPA} Hrs`);
+					$("#txt_n_bolsas").text(item.N_BOLSAS);
+					$("#txt_n_paquete").text(item.N_PAQUETES);
+					$("#txt_n_cajas").text(item.N_CAJAS);
+				});
+				$("#tbBuscarRastreo").hide();
+				$("#tbRastreo").show();
+			} else {
+				setTimeout(() => {
+					Swal.fire('😢 Oops!!', 'El número de pedido que está intentando buscar no existe, verifique e intente nuevamente', 'warning');					
+				}, 100);
+			}
+		} else {
+			setTimeout(() => {
+				Swal.fire('😢 Oops!!', 'Debe ingresar un número para iniciar la búsqueda', 'warning');
+			}, 100);
+		}
+	} catch (error) {
+		console.log(error);
+	} finally {
+		dissminSwal();
 	}
 }
-function Regresar(){
- $("#tbBuscarRastreo").show();
- $("#tbRastreo").hide();
-}
-function Trazabilidad(){
-var numero = $("#numero").val();
-if(numero!=''){
-$.ajax({
-		type: "POST",
-		encoding:"UTF-8",
-		url: "../models/RastreoPedido.php",
-		dataType: "json",
-		error: function(OBJ, ERROR, JQERROR){
-		 alert(JQERROR);
-		},
-		data: {
-			op   : "TRAZABILIDAD",
-			numero  : numero
-		},
-		async:false,
-		success: function(data){
-		 if(data!='' && data!=null){
-			 for(var i=0; i<=data.length-1; i++){
-				//CLIENTE-------------------------------------------
-				$("#txt_org").html(data[i].ORG);
-				$("#txt_bodega").html(data[i].BODEGA);
-				//CLIENTE-------------------------------------------
-				$("#txt_cliente").html(data[i].NOMBRES+' - '+data[i].RAZON_COMERCIAL);
-				$("#txt_dir").html(data[i].DIRECCION);
-				$("#txt_nit").html(data[i].NIT);
-				$("#txt_cod").html(data[i].CODIGO_SAP);
-				//PEDIDO-------------------------------------------
-				$("#txt_pedido").html(data[i].NUMERO);
-				$("#txt_usr_ped").html(data[i].USUARIO);
-				$("#txt_fh_ped").html(data[i].FECHA_PEDIDO);
-				$("#txt_fh_ot").html(data[i].FECHA_OT);
-				$("#txt_usr_ot").html(data[i].USUARIO_OT);
-				//SEPARACION-------------------------------------------
-				$("#txt_usr_sep").html(data[i].USUARIO_SEPARA);
-				$("#txt_fhini_sep").html(data[i].INI_SEP);
-				$("#txt_fhfin_sep").html(data[i].FIN_SEP);
-				$("#txt_num_ot").html(data[i].NUMERO_OT);
-				//FACTURACION-------------------------------------------
-				$("#txt_usr_fact").html(data[i].USUARIO_FACT);
-				$("#txt_fhini_fact").html(data[i].INI_FACT);
-				$("#txt_fhfin_fact").html(data[i].FIN_FACT);
-				$("#txt_num_fact").html(data[i].NUMERO_FACT);
-				//ENTREGA-------------------------------------------
-				$("#txt_usr_ent").html(data[i].USUARIO_DESP);
-				$("#txt_fhini_ent").html(data[i].INI_TRANS);
-				$("#txt_fhfin_ent").html(data[i].FIN_TRANS);
-				$("#txt_guia").html(data[i].GUIA);
-				$("#txt_nota").html(data[i].NOTA_ENTREGA);
-				//EMPAQUE-------------------------------------------
-				$("#txt_usr_emp").html(data[i].USUARIO_EMPAQUE);
-				$("#txt_fhini_emp").html(data[i].FINI_EMPAQUE);
-				$("#txt_fhfin_emp").html(data[i].FFIN_EMPAQUE);
-				$("#txt_n_bolsas").html(data[i].N_BOLSAS);
-				$("#txt_n_paquete").html(data[i].N_PAQUETES);
-				$("#txt_n_cajas").html(data[i].N_CAJAS);
-				
-			 }	
-			 $("#tbBuscarRastreo").hide();
-			 $("#tbRastreo").show();
-		}else{
-		  swal('Oops!!','El numero de pedido que esta intentando buscar no existe, verifique e intente nuevamente','warning');
-		}
-	 }
+
+$(function () {
+	$("#numero").val('').focus();
+	$("#tbRastreo").hide();
+
+	document.getElementById('numero').addEventListener('keydown', Enter);
 });
-}else{
-  swal('Oops!!','Debe ingresar un numero para iniciar la busqueda','warning');
-}
-}

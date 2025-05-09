@@ -24,7 +24,8 @@ session_start();
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
   <link type="text/css" rel="stylesheet" href="../resources/css/BootstrapTabs.css?<?php echo (rand()); ?>">
   <link type="text/css" rel="stylesheet" href="../resources/css/start/jquery-ui-1.9.2.custom.css?<?php echo (rand()); ?>" />
-  <link type="text/css" rel="stylesheet" href="../lib/SweetAlert/sweet-alert.css?<?php echo (rand()); ?>" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <!-- <link type="text/css" rel="stylesheet" href="../lib/SweetAlert/sweet-alert.css?<?php echo (rand()); ?>" /> -->
   <link type="text/css" rel="stylesheet" href="../resources/css/Animate.css?<?php echo (rand()); ?>">
   <link href="../lib/exportar_html_excel/dist/css/tableexport.css" rel="stylesheet" type="text/css">
   <link type="text/css" rel="stylesheet" href="../resources/select2-bootstrap4-theme/select2-bootstrap4.css">
@@ -50,7 +51,8 @@ session_start();
   <script type="text/javascript" src="../lib/js/bootstrap.min.js?<?php echo (rand()); ?>"></script>
   <script type="text/javascript" src="https://maps.google.com/maps/api/js?v=3&language=es&key=AIzaSyAiEVx_nyyrkNci_hWB_fMuUAkKn_OH_b8"></script>
   <script type="text/javascript" src="../lib/js/GoogleMapsPropios.js?<?php echo (rand()); ?>"></script>
-  <script type="text/javascript" src="../lib/SweetAlert/sweet-alert.min.js?<?php echo (rand()); ?>"></script>
+  <!-- <script type="text/javascript" src="../lib/SweetAlert/sweet-alert.min.js?<?php echo (rand()); ?>"></script> -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script type="text/javascript" src="../lib/js/funciones.js?<?php echo (rand()); ?>"></script>
   <script type="text/javascript" src="../lib/js/servicios.js?<?php echo (rand()); ?>"></script>
   <script src="../lib/exportar_html_excel/FileSaver.min.js"></script>
@@ -333,7 +335,7 @@ session_start();
     #tablaVisitasZona thead tr th {
       font-size: 15px;
     }
-    
+
     #tablaVisitasZona tbody tr td {
       font-size: 14px;
     }
@@ -366,7 +368,7 @@ session_start();
   <input type="hidden" id="Organizacion" value="" readonly>
   <input type="hidden" id="RolId" value="<?php echo $_SESSION["ses_RolesId"]; ?>" readonly>
   <input type="hidden" id="Ofi" value="<?php echo $_SESSION["ses_OfcVentas"]; ?>" readonly>
-  
+
   <div class="alert alert-info"><i class="fa-solid fa-star fa-flip"></i>&nbsp;0104 - SEGUIMIENTO PROGRAMACIÓN</div>
   <div class="panel with-nav-tabs panel-info">
     <div class="panel-heading">
@@ -729,18 +731,18 @@ session_start();
                 <th colspan="3">SEGUIMIENTO PROGRAMACIÓN ZONA</th>
               </tr>
             </thead>
-            <tbody>             
-              <tr>
-                <td>Zona de ventas</td>
-                <td>
-                  <select id="txtZonas" class="form-control" style="width:100%">                   
-                  </select>
-                </td>
-              </tr>              
+            <tbody>
               <tr>
                 <td>Oficina de ventas</td>
                 <td colspan="2">
-                  <select id="FiltroOficinaVentas" class="form-control" style="width:100%">                   
+                  <select id="FiltroOficinaVentas" class="form-control" style="width:100%">
+                  </select>
+                </td>
+              </tr>
+              <tr>
+                <td>Zona de ventas</td>
+                <td>
+                  <select id="txtZonas" class="form-control" style="width:100%">
                   </select>
                 </td>
               </tr>
@@ -751,7 +753,7 @@ session_start();
               <tr>
                 <td>Fecha Final</td>
                 <td colspan="2"><input type="text" id="txtFecha2" placeholder="Fecha Final" class="form-control" readonly></td>
-              </tr>             
+              </tr>
               <tr>
                 <td colspan="3">
                   <button class="btn btn-primary btn-sm" id="btnBuscar">Consultar</button>
@@ -761,8 +763,8 @@ session_start();
               </tr>
             </tbody>
           </table>
-          <div id="contenedorTablaVisitasZona" style="overflow: auto; height: 60vh; margin-top: 20px;">            
-              
+          <div id="contenedorTablaVisitasZona" style="overflow: auto; height: 60vh; margin-top: 20px;">
+
           </div>
         </div>
       </div>
@@ -846,7 +848,7 @@ session_start();
                 <td id="loncli"></td>
                 <td align="center">
                   <button type="button" class="btn btn-default btn-sm" aria-label="Left Align" onClick="VerMapa('C')">
-                    <!-- <img src="http://maps.google.com/mapfiles/ms/icons/red-dot.png" width="16" height="16"> -->
+                    <img src="http://maps.google.com/mapfiles/ms/icons/red-dot.png" width="16" height="16">
                   </button>
                 </td>
                 <td id="dir_cliente"></td>
@@ -861,7 +863,7 @@ session_start();
                 <td id="dir_visita"></td>
                 <td align="center">
                   <button type="button" class="btn btn-default btn-sm" aria-label="Left Align" onClick="VerMapa('V')">
-                    <!-- <img src="http://maps.google.com/mapfiles/ms/icons/green-dot.png" width="16" height="16"> -->
+                    <img src="http://maps.google.com/mapfiles/ms/icons/green-dot.png" width="16" height="16">
                   </button>
                 </td>
 
