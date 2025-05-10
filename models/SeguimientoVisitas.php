@@ -340,64 +340,29 @@ switch ($_POST['op']) {
 		$oficina = $_POST['oficina'];
 		$fechaInicio = $_POST['fechaInicio'];
 		$fechaFinal = $_POST['fechaFinal'];
-		$query = "select
-					z.zona_ventas,
-					z.zona_descripcion,
-					count(*) as programados,
-					sum(case when v.estado_visita = 'v' then 1 else 0 end) as visitados,
-					sum(case when v.estado_visita = 'c' then 1 else 0 end) as contactados,
-					min(convert(varchar(30),v.fecha_ini_gestion,120)) as fecha_ini_gestion,
-					max(convert(varchar(30),v.fecha_visito,120) )as fecha_fin_gestion,
-					u.[login] as usuario,
-					u.id as usuario_id
-					into #tmp_datos
-					from t_visitas_vendedor v
-					inner join t_usuarios u on u.id = v.id_usuario
-					inner join t_terceros_organizacion o on o.codigo_sap = v.codigo_sap_cli and
-															o.canal_distribucion = 10 and 
-															o.organizacion_ventas = u.organizacion_venta
-					inner join t_zonas_ventas z on z.zona_ventas = o.zona_ventas 
-					where 
-					cast (v.fecha_visita as date) between cast('$fechaInicio' as date) and cast('$fechaFinal' as date) and 
-					u.roles_id in(14) and z.zona_ventas like '$oficina%' -- solo vendedores en caso de televendedor añadir el 12
-					group by 
-					z.zona_ventas,
-					z.zona_descripcion,
-					u.[login],
-					u.id
-
-					select 
+		$query = "SELECT 
 					t.zona_ventas,
 					t.zona_descripcion,
-					t.programados,
-					t.visitados,
-					t.contactados,
-					t.fecha_ini_gestion,
-					t.fecha_fin_gestion,
+					min(convert(varchar(30),t.fecha_ini_gestion,120)) as fecha_ini_gestion,
+					max(convert(varchar(30),t.fecha_fin_gestion,120) )as fecha_fin_gestion,
 					t.usuario_id,
 					t.usuario,
-					cantidad_gestionados = (select 
-										count(distinct f.numero_factura)
-										from v_facturacion f 
-										where 
-										cast(f.fecha_pedido as date) = cast(t.fecha_ini_gestion as date) 
-										and  f.usuario = t.usuario ),
-					valor_gestionados = (select 
-											isnull(sum(f.p_neto),0) 
-										from v_facturacion f 
-										where 
-										cast(f.fecha_pedido as date) = cast(t.fecha_ini_gestion as date) 
-										and  f.usuario = t.usuario ),
-					valor_adicionales = (select 
-											isnull(sum(f.p_neto),0) 
-										from v_facturacion f 
-										where 
-										f.zona_ventas = t.zona_ventas  
-										and cast(f.fecha_pedido as date) = cast(t.fecha_ini_gestion as date)
-										and f.usuario <> t.usuario )
-					from #tmp_datos t 
-
-					order by t.zona_ventas";
+					sum(case when T.estado_visita = 'p' then 1 else 0 end) as programada,
+					sum(case when T.estado_visita = 'v' then 1 else 0 end) as visitados,
+					sum(case when T.estado_visita = 'c' then 1 else 0 end) as contactados,
+					sum(t.cantidad_pedidos) as cantidad_pedidos,
+					sum(valor_pedidos) as valor_pedidos,
+					sum(valor_facturado) as valor_facturado,
+					sum( distinct t.valor_pedidos_adicionales) as valor_pedidos_adicionales
+					FROM v_gestion_visitas_zonas T
+					WHERE 
+					CAST(t.fecha_visita AS DATE) BETWEEN CAST('$fechaInicio' AS DATE) and CAST('$fechaFinal' AS DATE) 
+					AND t.zona_ventas LIKE '$oficina%'
+					GROUP BY 
+					t.zona_ventas,
+					t.zona_descripcion,
+					t.usuario_id,
+					t.usuario";		
 		$resultado = GenerarArray($query, '');
 		if ($resultado) echo json_encode(['ok' => true, 'data' => $resultado]); 
 		else echo json_encode(['ok' => false, 'data' => []]);		

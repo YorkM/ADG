@@ -103,8 +103,27 @@ Redireccionar();
     .contenedor-valores {
       display: flex;
       flex: 1;
-      gap: 120px;
+      gap: 5%;
       align-items: center;
+    }
+
+    .contenedor-val-todas {
+      display: flex; 
+      justify-content: space-between; 
+      align-items: end; 
+      margin-bottom: 8px;
+    }
+    
+    @media (max-width: 768px) { 
+      .contenedor-valores {
+        flex-direction: column;
+      }
+
+      .contenedor-val-todas {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+      }
     }
 
     .p-valores {
@@ -288,7 +307,7 @@ Redireccionar();
           </div>
         </div>
         <div class="tab-pane fade in" id="dvFacturas">
-          <div style="display: flex; justify-content: space-between; align-items: end; margin-bottom: 8px;">
+          <div class="contenedor-val-todas">
             <div class="contenedor-valores">
               <p class="p-valores">Valor Total: <span class="span-valores" id="valorTotal">$0</span></p>
               <p class="p-valores">Partidas: <span class="span-valores" id="partidas">0</span></p>
@@ -298,7 +317,7 @@ Redireccionar();
               <button class="btn btn-primary" id="btnSeleccionarTodas">Seleccionar todas</button>
             </div>
           </div>
-          <div id="dvResultCartera" style="overflow-y: scroll; overflow-x: hidden; height: 406px;"></div>
+          <div id="dvResultCartera" style="overflow: auto; height: 60vh;"></div>
         </div>
         <div class="tab-pane fade in" id="dvPlanilla">
           <table width="100%" class="form" id="tb_filtros_planilla">
@@ -323,7 +342,7 @@ Redireccionar();
               <!--<td><button class="btn btn-default" id="btnConsultar"   onClick="ConsultarPlanilla();">Consultar</button></td>-->
             </tr>
           </table>
-          <div id="dvResultPlanilla" style="overflow-y:scroll; overflow-x:hidden; height:500px;"></div>
+          <div id="dvResultPlanilla" style="overflow: auto; height: 60vh;"></div>
         </div>
         <div class="tab-pane fade in" id="dvInformes">
           <table width="100%" class="form" id="">
@@ -410,7 +429,7 @@ Redireccionar();
               </div>
             </div>
           </div>
-          <div id="dvResultMulticash" style="overflow-y: scroll; overflow-x: hidden; height: 500px;">
+          <div id="dvResultMulticash" style="overflow: auto; height: 50vh;">
             <hr>
             <table class="table" width="100%" id="tdPlanillas">
               <thead>
@@ -435,7 +454,7 @@ Redireccionar();
         <div class="tab-pane fade in" id="dvLiquidador">
           <img id="logoEmpresa" src="../resources/images/LogoRoma.png" style="display: none;" />
           <img id="logoEmpresa2" src="../resources/images/LogoCM.png" style="display: none;" />
-          <div style="overflow-y: scroll; overflow-x: hidden; height: 67vh;" id="contenedorTablasLiquidador">
+          <div style="overflow: auto; height: 67vh;" id="contenedorTablasLiquidador">
 
           </div>
         </div>
@@ -458,7 +477,7 @@ Redireccionar();
             </div>
           </div>
           <!-- REVISAR TABLA -->
-          <div id="dvResultMulticash2" style="overflow-y: scroll; overflow-x: hidden; max-height: 428px;">
+          <div id="dvResultMulticash2" style="overflow: auto; max-height: 60vh;">
             <hr>
             <table class="table" width="100%" id="tdPlanillas2">
               <thead>

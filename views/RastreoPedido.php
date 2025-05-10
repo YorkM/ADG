@@ -2,7 +2,6 @@
 header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
 header("Expires: Sat, 1 Jul 2000 05:00:00 GMT"); // Fecha en el pasado
 include('../models/funciones.php');
-///echo $_SESSION["ses_NitPro"];
 ?>
 <!doctype html>
 
@@ -15,12 +14,9 @@ include('../models/funciones.php');
   <meta http-equiv="Pragma" content="no-cache">
   <meta charset="utf-8">
   <title>Trazabilidad de pedidos</title>
-  <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"> -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
   <link type="text/css" rel="stylesheet" href="../resources/css/start/jquery-ui-1.9.2.custom.css?<?php echo (rand()); ?>" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-  <!-- <link type="text/css" rel="stylesheet" href="../lib/SweetAlert/sweet-alert.css?" /> -->
-  <!-- <link type="text/css" rel="stylesheet" href="../resources/css/BootstrapTabs.css?"> -->
   <style>
     html {
       font-size: 1rem;
@@ -72,7 +68,6 @@ include('../models/funciones.php');
 
     .rastreo-table-two {
       vertical-align: middle;
-      /* text-align: center; */
       word-wrap: break-word;
     }
 
@@ -85,13 +80,6 @@ include('../models/funciones.php');
       font-weight: bold;
       display: block;
       margin-top: 5px;
-    }
-
-    .rastreo-section {
-      padding: 15px;
-      background-color: #f8f9fa;
-      border-radius: 8px;
-      margin-bottom: 25px;
     }
 
     .custom-color {
@@ -168,7 +156,10 @@ include('../models/funciones.php');
             <td class="custom-font-title">Dirección:</td>
             <td class="custom-font-size" colspan="2" id="txt_dir"></td>
           </tr>
-      </table>     
+      </table>
+      <div class="mt-2 mb-2 d-flex justify-content-center">
+        <button class="btn btn-primary btn_general Regresar w-100" onClick="regresar();">Regresar</button>
+      </div>     
     </div>
     <div class="col-md-6">
       <!-- TRZABILIDAD -->
@@ -202,7 +193,7 @@ include('../models/funciones.php');
           </tr>
           <tr>
             <td class="custom-font-title rastreo-table-two">Diferencia</td>
-            <td class="custom-font-size" id="txtDifPedido"></td>
+            <td class="custom-font-size" id="txtDifPedido" style="color: red; font-weight: 500;"></td>
           </tr>
           <tr>
             <td class="custom-font-title rastreo-table-two">Usuario OT</td>
@@ -236,7 +227,7 @@ include('../models/funciones.php');
           </tr>
           <tr>
             <td class="custom-font-title rastreo-table-two">Diferencia</td>
-            <td class="custom-font-size" id="difSepa"></td>
+            <td class="custom-font-size" id="difSepa" style="color: red; font-weight: 500;"></td>
           </tr>
         </tbody>
       </table>
@@ -266,7 +257,7 @@ include('../models/funciones.php');
           </tr>
           <tr>
             <td class="custom-font-title rastreo-table-two">Diferencia</td>
-            <td class="custom-font-size" id="difFact"></td>
+            <td class="custom-font-size" id="difFact" style="color: red; font-weight: 500;"></td>
           </tr>
         </tbody>
       </table>
@@ -292,7 +283,7 @@ include('../models/funciones.php');
           </tr>
           <tr>
             <td class="custom-font-title rastreo-table-two">Diferencia</td>
-            <td class="custom-font-size" id="difEmpa"></td>
+            <td class="custom-font-size" id="difEmpa" style="color: red; font-weight: 500;"></td>
           </tr>
           <tr>
             <td class="custom-font-title rastreo-table-two">N° Bolsas</td>
@@ -330,7 +321,7 @@ include('../models/funciones.php');
           </tr>
           <tr>
             <td class="custom-font-title rastreo-table-two">Diferencia</td>
-            <td class="custom-font-size" id="difEntre"></td>
+            <td class="custom-font-size" id="difEntre" style="color: red; font-weight: 500;"></td>
           </tr>
           <tr>
             <td class="custom-font-title rastreo-table-two">N° Guía</td>
@@ -341,18 +332,13 @@ include('../models/funciones.php');
             <td class="custom-font-size" id="txt_nota"></td>
           </tr>
         </tbody>
-      </table>
-      <div class="mt-2 mb-2 d-flex justify-content-center">
-        <button class="btn btn-primary btn_general Regresar w-100" onClick="Regresar();">Regresar</button>
-      </div>
+      </table>     
     </div>
   </div>
 
   <script type="text/javascript" src="../lib/js/jquery-2.1.1.min.js?<?php echo (rand()); ?>"></script>
   <script type="text/javascript" src="../lib/js/jquery-ui-1.9.2.custom.js?<?php echo (rand()); ?>"></script>
-  <!-- <script type="text/javascript" src="../lib/js/bootstrap.min.js?"></script> -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.min.js" integrity="sha384-RuyvpeZCxMJCqVUGFI0Do1mQrods/hhxYlcVfGPOfQtPJh0JCw12tUAZ/Mv10S7D" crossorigin="anonymous"></script>
-  <!-- <script type="text/javascript" src="../lib/SweetAlert/sweet-alert.min.js?<"></script> -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script type="text/javascript" src="../lib/js/servicios.js?<?php echo (rand()); ?>"></script>
   <script type="text/javascript" src="../lib/js/funciones.js?<?php echo (rand()); ?>"></script>

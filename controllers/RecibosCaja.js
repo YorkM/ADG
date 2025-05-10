@@ -636,9 +636,18 @@ const calcularDescuento = (basePP, importe, porcentaje, claseDoc, fechaVencimien
       return { porcentaje: 0, descuento: 0, pagar: importe };
     }
 
+    if (claseDoc === "DZ" && importe > 0) {
+      const descuento = Math.round(basePP * (porcentaje / 100));
+      const pagar = Math.round(importe - descuento);
+      return { porcentaje, descuento, pagar };
+    } else {
+      return { porcentaje: 0, descuento: 0, pagar: importe };
+    }
+
     const descuento = Math.round(basePP * (porcentaje / 100));
     const pagar = Math.round(importe - descuento);
     return { porcentaje, descuento, pagar };
+
   } else {
     const descuento = Math.round(importe * (porcentaje / 100));
     const pagar = Math.round(importe - descuento);
@@ -805,7 +814,6 @@ function crearTablasPorDias(datos) {
 
 // FUNCIÓN AGREGAR ITEM AL LIQUIDADOR
 const agregarLiquidador = (item) => {
-  console.log(item);
   const { BASE_PP, CLASE_DOCUMENTO, FECHA_BASE, IMPORTE, NUMERO_DOCUMENTO, REFERENCIA, REFERENCIA_FACTURA } = item;
 
   const basePP = parseFloat(BASE_PP);

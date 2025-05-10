@@ -1,7 +1,6 @@
 // JavaScript Document
 // JavaScript Document 
 const TemasCartera = [
-
   'NA',
   'Saldo Vencido',
   'Cupo Excedido',
@@ -10,7 +9,6 @@ const TemasCartera = [
 ]
 
 const TemasCarteraVencimiento = [
-
   'NA',
   'Solicita acuerdo de pago',
   'No tiene forma de pagar',
@@ -19,10 +17,13 @@ const TemasCarteraVencimiento = [
   'Pago ya realizado',
   'Otro',
 ]
+
+const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+const mesesCortos = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+
 let causalesNoventas = [];
 
 const cargarMotivosNoVenta = async () => {
-
   try {
     data = {
       link: '../models/ProgramacionCliente.php',
@@ -39,6 +40,7 @@ const cargarMotivosNoVenta = async () => {
     console.error(e)
   }
 }
+
 cargarMotivosNoVenta();
 
 modoSeleccion = false;
@@ -94,11 +96,9 @@ $(function () {
     } catch (error) {
       console.error(error)
     }
-
-  })
+  });
 
   $("#chk_seleccionar").change(function () {
-
     if ($("#Result").html() != '') {
 
       $("#datos_visitas tr:gt(0)").each(function () {
@@ -118,14 +118,12 @@ $(function () {
     }
 
     validarSleccionados();
-  })
+  });
 
   $("#SeleccionarProg").click(function () {
-
     modoSeleccion = !modoSeleccion;
 
     if ($("#Result").html() != '') {
-
       if (!modoSeleccion) {
         $(this).removeClass("btn-info");
         $(this).html(`Seleccionar prog.(Desactivado)`);
@@ -141,8 +139,7 @@ $(function () {
       $(this).html(`<i class="fa fa-check "></i>&nbsp;<b>Seleccionar prog.(Activado)</b>`);
       $("#span_chk_seleccionar").show();
     }
-  })
-
+  });
 
   $("#btn-version-actual").click(function () {
     $("#ModalGestionVersion").modal("hide");
@@ -152,28 +149,30 @@ $(function () {
   $("#btn-version-beta").click(function () {
     $("#ModalGestionVersion").modal("hide");
     abrirVersionBeta();
-  })
-
+  });
 
   $("#Organizacion").val(parent.parent.$("#org").val());
+
   $("#fecha_ini").datepicker({
     changeMonth: true,
     changeYear: true,
-    monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-    monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+    monthNames: meses,
+    monthNamesShort: mesesCortos,
     dateFormat: 'dd-mm-yy',
     width: 100,
     heigth: 100,
   });
+
   $("#fecha_fin").datepicker({
     changeMonth: true,
     changeYear: true,
-    monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-    monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+    monthNames: meses,
+    monthNamesShort: mesesCortos,
     dateFormat: 'dd-mm-yy',
     width: 100,
     heigth: 100,
   });
+
   $("#fecha_ini").val(FechaActual());
   $("#fecha_fin").val(FechaActual());
 
@@ -196,8 +195,8 @@ $(function () {
   $("#txtFecha1, #txtFecha2").datepicker({
     changeMonth: true,
     changeYear: true,
-    monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-    monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+    monthNames: meses,
+    monthNamesShort: mesesCortos,
     dateFormat: 'dd-mm-yy',
     width: 100,
     heigth: 100
@@ -230,8 +229,8 @@ $(function () {
     $("#txtFecha1, #txtFecha2").datepicker({
       changeMonth: true,
       changeYear: true,
-      monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-      monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+      monthNames: meses,
+      monthNamesShort: mesesCortos,
       dateFormat: 'dd-mm-yy',
       width: 100,
       heigth: 100
@@ -338,7 +337,7 @@ const getReporteVisitasZonas = async () => {
     let fechaInicio = `${FI[2]}-${FI[1]}-${FI[0]}`;
     let fechaFinal = `${FF[2]}-${FF[1]}-${FF[0]}`;
 
-    showLoadingSwalAlert2('Cargando los datos...', false, true);
+    LoadImg("Cargando los datos...");
 
     const resp = await enviarPeticion({
       op: "G_REPORTE_VISITAS_ZONAS",
@@ -357,13 +356,14 @@ const getReporteVisitasZonas = async () => {
                   <th class="custom-nowrap-2">N°</th>
                   <th class="custom-nowrap-2">Zona</th>
                   <th class="custom-nowrap-2">Zona Descrip.</th>
-                  <th class="custom-nowrap-2">Cl. Programados</th>
-                  <th class="custom-nowrap-2">Cl. Visitados</th>
-                  <th class="custom-nowrap-2">Cl. Contactados</th>
+                  <th class="custom-nowrap-2">Programados</th>
+                  <th class="custom-nowrap-2">Visitados</th>
+                  <th class="custom-nowrap-2">Contactados</th>
                   <th class="custom-nowrap-2">Fecha y Hora Inicial</th>
                   <th class="custom-nowrap-2">Fecha y Hora Final</th>
-                  <th class="custom-nowrap-2">N° Ped. Ruta del Día</th>
-                  <th class="custom-nowrap-2">Valor Ped. Tomados</th>
+                  <th class="custom-nowrap-2">Cantidad Pedidos</th>
+                  <th class="custom-nowrap-2">Valor Pedidos</th>
+                  <th class="custom-nowrap-2">Valor Facturado</th>
                   <th class="custom-nowrap-2">Valor Ped. Adicionales</th>
                 </tr>
               </thead>
@@ -375,15 +375,16 @@ const getReporteVisitasZonas = async () => {
 				        <tr>
                   <td class="custom-border">${index + 1}</td>
                   <td class="custom-border">${item.zona_ventas}</td>
-                  <td class="custom-border custom-nowrap-2" style="font-size: 12px;">${item.zona_descripcion}</td>
-                  <td class="custom-border text-center">${item.programados}</td>
+                  <td class="custom-border custom-nowrap-2" style="font-size: 11px;">${item.zona_descripcion}</td>
+                  <td class="custom-border text-center">${item.programada}</td>
                   <td class="custom-border text-center">${item.visitados}</td>
                   <td class="custom-border text-center">${item.contactados}</td>
                   <td class="custom-border custom-nowrap-2">${(item.fecha_ini_gestion) ? formatDate(item.fecha_ini_gestion) : ''}</td>
                   <td class="custom-border custom-nowrap-2">${(item.fecha_fin_gestion) ? formatDate(item.fecha_fin_gestion) : ''}</td>
-                  <td class="custom-border text-center">${item.cantidad_gestionados}</td>
-                  <td class="custom-border text-center">${formatNum(item.valor_gestionados, "$")}</td>
-                  <td class="custom-border text-center">${formatNum(item.valor_adicionales, "$")}</td>
+                  <td class="custom-border text-center">${item.cantidad_pedidos}</td>
+                  <td class="custom-border text-center">${formatNum(item.valor_pedidos, "$")}</td>
+                  <td class="custom-border text-center">${formatNum(item.valor_facturado, "$")}</td>
+                  <td class="custom-border text-center">${formatNum(item.valor_pedidos_adicionales, "$")}</td>
                 </tr>`;
       });
 
@@ -396,7 +397,7 @@ const getReporteVisitasZonas = async () => {
   } catch (error) {
     console.log(error);
   } finally {
-    dissminSwal();
+    UnloadImg();
   }
 }
 
@@ -685,7 +686,6 @@ const seleccionarFilar = (obs) => {
 
   }
 }
-
 
 function Consultar() {
   oficina = $("#oficina").val();

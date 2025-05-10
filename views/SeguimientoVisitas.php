@@ -333,11 +333,11 @@ session_start();
     }
 
     #tablaVisitasZona thead tr th {
-      font-size: 15px;
+      font-size: 14px;
     }
 
     #tablaVisitasZona tbody tr td {
-      font-size: 14px;
+      font-size: 13px;
     }
 
     .tabla-fija thead th {
