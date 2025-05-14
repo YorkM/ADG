@@ -444,24 +444,7 @@ const limpiarDatos = () => {
 
   $('#tdPlanillas tbody').html("");
 
-  $('#tablaLiquidador tbody').html("");
-  $('#tablaLiquidador2 tbody').html("");
-  $('#tablaLiquidador3 tbody').html("");
-
-  $('#totalFacturas').text("$0");
-  $('#totalProntoPago').text("$0");
-  $('#totalDescuento').text("$0");
-  $('#totalPagar').text("$0");
-
-  $('#totalFacturas2').text("$0");
-  $('#totalProntoPago2').text("$0");
-  $('#totalDescuento2').text("$0");
-  $('#totalPagar2').text("$0");
-
-  $('#totalFacturas3').text("$0");
-  $('#totalProntoPago3').text("$0");
-  $('#totalDescuento3').text("$0");
-  $('#totalPagar3').text("$0");
+  $('#contenedorTablasLiquidador').html("");
 }
 
 // FUNCIÓN AGREGAR DIAS FECHA BASE
@@ -636,13 +619,9 @@ const calcularDescuento = (basePP, importe, porcentaje, claseDoc, fechaVencimien
       return { porcentaje: 0, descuento: 0, pagar: importe };
     }
 
-    if (claseDoc === "DZ" && importe > 0) {
-      const descuento = Math.round(basePP * (porcentaje / 100));
-      const pagar = Math.round(importe - descuento);
-      return { porcentaje, descuento, pagar };
-    } else {
+    if (claseDoc === "DZ" && importe < 0) {
       return { porcentaje: 0, descuento: 0, pagar: importe };
-    }
+    } 
 
     const descuento = Math.round(basePP * (porcentaje / 100));
     const pagar = Math.round(importe - descuento);

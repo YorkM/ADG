@@ -1476,17 +1476,18 @@ const verFacturaPreliminar = (resp, sw) => {
 }
 
 const gestionarSolicitud = async (data) => {
-  const usuario = data.usuario.split('\n')[2].split('>')[1].split('<')[0];
-  const nombreUsuario = data.usuario.split('>')[2].split('<')[0];
+  const usuario = data.USUARIO_SOLICITA;
+  const nombreUsuario = data.NOMBRE_USUARIO;
   $('#usuarioInfoM').val(`${usuario} - ${nombreUsuario}`);
   $('#usuarioInfo').val(usuario);
-  $('#tipoGastoInfo').val(data.tipo);
-  $('#tipoGastoInfoM').val(data.tipo);
-  $('#departamentoInfo').val(data.dpto);
-  $('#fechaInfo').val(data.fecha.split(',')[0]);
-  $('#idOcultoSolicitud').val(data.id);
+  $('#tipoGastoInfo').val(tipoGasto[data.TIPO_GASTO]);
+  $('#tipoGastoInfoM').val(tipoGasto[data.TIPO_GASTO]);
+  $('#departamentoInfo').val(data.DPTO);
+  let fecha = formatDate(data.FECHA_SOLICITA);
+  $('#fechaInfo').val(fecha.toUpperCase());
+  $('#idOcultoSolicitud').val(data.ID);
 
-  const resp = await enviarPeticion({ op: "G_INFOMODAL", idSolicitud: data.id, link: "../models/WorkFlow.php" });
+  const resp = await enviarPeticion({ op: "G_INFOMODAL", idSolicitud: data.ID, link: "../models/WorkFlow.php" });
   $("#adjCheck1, #adjCheck2, #adjCheck3").addClass("d-none").removeClass("d-flex");
   $("#btnVerAdj1, #btnVerAdj2, #btnVerAdj3").off("click");
   $('#estadoOcultoSolicitud').val(resp[0].ESTADO);
@@ -1494,7 +1495,7 @@ const gestionarSolicitud = async (data) => {
   if (tipoAnticipo === "1") tipoAnticipo = "- CON COTIZACIÓN";
   if (tipoAnticipo === "2") tipoAnticipo = "- LEGALIZACIÓN DE VIAJE";
   if (tipoAnticipo === "3") tipoAnticipo = "- SIN COTIZACIÓN";
-  $('#tipoGastoInfoM').val(`${data.tipo} ${tipoAnticipo}`);
+  $('#tipoGastoInfoM').val(`${tipoGasto[data.TIPO_GASTO]} ${tipoAnticipo}`);
 
   $('#btnVerFactura').on('click', () => {
     verFacturaPreliminar(resp, 1);
@@ -1607,65 +1608,67 @@ const getSolicitudes = async () => {
     // USUARIO QUE CREÓ LA SOLICITUD
     else resp = resp.filter(elem => elem.USUARIO === usuario);
 
-    const nuevoObj = resp.map((item) => {
-      return {
-        idSol: item.ID,
-        // organizacion: item.ORGANIZACION_VENTAS_T || 'N/A',
-        oficina: item.OFICINA_VENTAS_T.split(' ')[1] || 'N/A',
-        dpto: item.DPTO || 'N/A',
-        concepto: item.CONCEPTO || 'N/A',
-        tipo: tipoGasto[item.TIPO_GASTO] || 'Desconocido',
-        usuario: `<div>
-                      <p style="margin: 0; font-size: 12px">${item.NOMBRE_USUARIO}</p>
-                      <small style="font-size: 10px; margin: 0;">${item.USUARIO_SOLICITA || 'N/A'}</small>
-                  </div>`,
-        estado: `<div data-item="${item.ID}" class="btn-noti position-relative" style="width: 80px;">
-                    <span class="badge estados" style="background-color:${estados[item.ESTADO].color}">${estados[item.ESTADO].texto}</span>
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger ${parseInt(item.INDICADORNOTA) > 0 ? "" : "d-none"}" style="font-size: 7px;">
-                    1
-                    </span>
-                </div>`,
-        fecha: item.FECHA_SOLICITA ? formatDate(item.FECHA_SOLICITA).toUpperCase() : 'N/A',
-        id: item.ID
-      }
+    let tabla = `
+      <table id="tablaSolicitudes" class="table table-sm table-bordered table-hover" style="width: 100%;">
+        <thead class="table-info">
+            <tr>
+                <th>N°</th>
+                <th>Oficina</th>
+                <th>Departamento</th>
+                <th>Concepto</th>
+                <th>Tipo Gasto</th>
+                <th>Usuario</th>
+                <th class="text-center">Estado</th>
+                <th>Fecha Solicitud</th>
+                <th class="text-center">Acción</th>
+            </tr>
+        </thead>
+        <tbody>`;      
+
+    resp.forEach(item => {
+      tabla += `
+            <tr>
+                <td>${item.ID}</td>
+                <td>${item.OFICINA_VENTAS_T.split(' ')[1] || 'N/A'}</td>
+                <td>${item.DPTO || 'N/A'}</td>
+                <td>${item.CONCEPTO || 'N/A'}</td>
+                <td>${tipoGasto[item.TIPO_GASTO] || 'Desconocido'}</td>
+                <td>
+                    <p style="margin: 0; font-size: 12px">${item.NOMBRE_USUARIO} <span style="font-size: 10px; color: #2575fc; font-weight: bold;">(${item.USUARIO_SOLICITA || 'N/A'})</span></p>
+                </td>                       
+                <td style="display: flex; justify-content: center;">
+                    <div data-item="${item.ID}" class="btn-noti position-relative" style="width: 90px;">
+                        <span class="badge estados" style="background-color: ${estados[item.ESTADO].color}">${estados[item.ESTADO].texto}</span>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger ${parseInt(item.INDICADORNOTA) > 0 ? "" : "d-none"}" style="font-size: 7px;">
+                            1
+                        </span>
+                    </div>
+                </td>
+                <td>${item.FECHA_SOLICITA ? formatDate(item.FECHA_SOLICITA).toUpperCase() : 'N/A'}</td>
+                <td style="display: flex; justify-content: center;">
+                    <button class="btn btn-outline-primary btn-sm btn-gestionar" data-item='${JSON.stringify(item)}'>
+                        <i class="fa-solid fa-play"></i>
+                    </button>
+                </td>
+            </tr>`;
     });
 
-    let columNames = ['N° solicitud', 'Oficina', 'Departamento', 'Concepto', 'Tipo Gasto', 'Usuario', 'Estado', 'Fecha'];
+    tabla += `
+              </tbody>
+            </table>`;
+    $('#cantSolicitudes').text(resp.length);    
+    $('#contenedorTablaSolicitudes').html(tabla);    
 
-    if ($.fn.DataTable.isDataTable("#tablaSolicitudes")) {
-      $("#tablaSolicitudes").DataTable().destroy();
-      $("#tablaSolicitudes tbody").empty();
-    }
+    $('#tablaSolicitudes').on('click', '.btn-noti', function (e) {
+      const id = $(this).attr('data-item');
+      gestionarLogs(id);       
+    });
 
-    let config = {
-      callback: gestionarSolicitud,
-      clases: `btn btn-outline-primary btn-sm`,
-      customClass: 'btn-gestionar',
-      icon: `<i class="fa-solid fa-play"></i>`,
-      rowAmount: -1,
-      order: [[0, "desc"]],
-      dom: "Bfrtip",
-	    buttons: [
-        {
-          extend: "excelHtml5",
-          text: "Exportar a Excel",
-          title: "Reporte_Datos",
-          filename: "Datos_Exportados",
-          className: "btn btn-success btn-sm"
-        }
-      ],
-    }
+    $('#tablaSolicitudes').on('click', '.btn-gestionar', function (e) {
+      const data = JSON.parse($(this).attr('data-item'));
+      gestionarSolicitud(data);
+    });
 
-    createDataTable('tablaSolicitudes', nuevoObj, Object.keys(nuevoObj[0] || {}), columNames, null, null, false, '', '', config);
-    setTimeout(() => {
-      $('#tablaSolicitudes_filter > label > input').css({ "width": "350px", "margin-right": "10px" });
-      $('#tablaSolicitudes_length > label').css({ "margin-left": "10px" });      
-
-      $('#tablaSolicitudes').off('click').on('click', '.btn-noti', function (e) {
-        const id = $(this).attr('data-item');
-        gestionarLogs(id);       
-      });      
-    }, 500);
   } catch (e) {
     console.error("Error al obtener las solicitudes:", e);
   }

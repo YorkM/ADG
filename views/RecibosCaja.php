@@ -38,6 +38,10 @@ Redireccionar();
   <script type="text/javascript" src="../resources/HighCharts/code/highcharts.js?1991462313"></script>
   <script type="text/javascript" src="../controllers/RecibosCaja.js?<?php echo (rand()); ?>"></script>
   <style>
+    html {
+      font-size: 1rem;
+    }
+
     .material-switch>input[type="checkbox"] {
       display: none;
     }
@@ -108,13 +112,13 @@ Redireccionar();
     }
 
     .contenedor-val-todas {
-      display: flex; 
-      justify-content: space-between; 
-      align-items: end; 
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
       margin-bottom: 8px;
     }
-    
-    @media (max-width: 768px) { 
+
+    @media (max-width: 768px) {
       .contenedor-valores {
         flex-direction: column;
       }

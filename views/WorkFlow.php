@@ -39,11 +39,20 @@
             vertical-align: middle;
         }
 
-        table thead tr th {
-            font-size: 16px !important;
+        #tablaSolicitudes thead tr th {
+            font-size: 15px !important;
             font-weight: 400;
             vertical-align: middle;
             color: #055160;
+        }
+
+        th,
+        td {
+            padding: 0;
+            line-height: 2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .timeline-container {
@@ -116,11 +125,12 @@
 
         .estados {
             background-color: #0A97B0;
-            width: 75px;
+            width: 90px;
             padding: 5px 0;
             color: black;
             font-weight: 700;
             font-size: 10px;
+            cursor: pointer;                        
         }
 
         .btn-gestionar {
@@ -134,11 +144,6 @@
         .btn-disabled {
             background-color: #ccc;
             border: none;
-        }
-
-        #tablaSolicitudes>tbody>tr.odd,
-        #tablaSolicitudes>tbody>tr.even {
-            cursor: pointer;
         }
 
         hr {
@@ -163,17 +168,17 @@
     <div id="main-content">
         <div class="alert alert-info mb-2" style="font-weight: 500;"><i class="fa-solid fa-star fa-flip"></i>&nbsp;0417 - WORKFLOW</div>
         <div class="row shadow-sm py-2 w-90 mx-auto mb-3 mt-2" id=barraFiltros>
-            <div class="col-3">
+            <div class="mb-1 col-md-3">
                 <select class="form-select" id="filtroOficina">
 
                 </select>
             </div>
-            <div class="col-2">
+            <div class="mb-1 col-md-2">
                 <select class="form-select" id="filtroDepartamentos">
 
                 </select>
             </div>
-            <div class="col-2">
+            <div class="mb-1 col-md-2">
                 <div class="input-group">
                     <span style="border: 1px solid #ccc; border-radius: 3px 0 0 3px; display: flex; align-items: center; gap: 8px; padding: 0 5px;">
                         <i class="fa-solid fa-calendar-days"></i>Desde
@@ -181,7 +186,7 @@
                     <input type="text" id="fechaDesde" class="form-control" readonly>
                 </div>
             </div>
-            <div class="col-2">
+            <div class="mb-1 col-md-2">
                 <div class="input-group">
                     <span style="border: 1px solid #ccc; border-radius: 3px 0 0 3px; display: flex; align-items: center; gap: 8px; padding: 0 5px;">
                         <i class="fa-solid fa-calendar-days"></i>Hasta
@@ -189,25 +194,31 @@
                     <input type="text" id="fechaHasta" class="form-control" readonly>
                 </div>
             </div>
-            <div class="col-3">        
+            <div class="mb-1 col-md-3">        
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="mb-1 col-md-6">
                         <button class="btn btn-primary w-100" id="btnModalAddSolic">Agregar</button>
                     </div>
-                    <div class="col-md-6">
+                    <div class="mb-1 col-md-6">
                         <button class="btn btn-secondary w-100" id="btnRefrescar">Refrescar</button>
                     </div>
                 </div>
             </div>
         </div>
-        <table id="tablaSolicitudes" class="table table-sm table-borderless table-hover" style="width: 100%;">
-            <thead class="table-info">
-
-            </thead>
-            <tbody>
-
-            </tbody>
-        </table>
+        <div class="row align-items-center px-2 mb-3">
+            <div class="col-md-3">
+                <button class="btn btn-success w-100" id="exportar">Exportar a Excel</button>
+            </div>
+            <div class="col-md-3">
+                <p style="margin: 0; font-size: 20px; text-align: center;">Solicitudes: <span style="font-size: 20px; color: #007bff; font-weight: bold;" id="cantSolicitudes">16</span></p>
+            </div>
+            <div class="col-md-6">
+                <input type="text" class="form-control" placeholder="Filtrar solicitudes..." id="filtroSolicitudes">
+            </div>
+        </div>
+        <div style="overflow: auto;" id="contenedorTablaSolicitudes">               
+           
+        </div>
     </div> 
     <!-- MODAL CREAR SOLICITUD -->
     <div class="modal fade" id="modalAgregarSolicitud" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
