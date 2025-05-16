@@ -1,4 +1,5 @@
-//Imagen de carga.
+let url_file = "https://app.pwmultiroma.com/web/nomina/";
+
 function LoadImg(texto) {
   let html = `<center>
                 <figure>
@@ -18,25 +19,93 @@ function UnloadImg() {
   $(".form-control").attr("disabled", false);
 }
 
+function renderizarGaleria(resp) {
+  console.log(resp);
+
+  const documentos = [
+    { nombre: 'Hoja de vida', campo: 'HOJA_VIDA', icono: '<i class="fas fa-file" style="color: #837d7d;"></i>' },    
+    { nombre: 'Cédula de ciudadanía', campo: 'CEDULA_CIUDADANIA', icono: '<i class="fa-solid fa-id-card" style="color: #a52a2a;"></i>' },    
+    { nombre: 'Contrato laboral', campo: 'CONTRATO_LABORAL', icono: '<i class="fa-solid fa-file-contract" style="color: #0d6efd;"></i>' },    
+    { nombre: 'Exámenes médicos', campo: 'EXAMENES_MEDICOS', icono: '<i class="fa-solid fa-stethoscope" style="color: #ff7f50;"></i>' },    
+    { nombre: 'Certificado bancario', campo: 'CERTIFICACION_BANCARIA', icono: '<i class="fa-solid fa-building-columns" style="color: #05bdb6;"></i>' },    
+    { nombre: 'Certificado estudio', campo: 'CERTIFICADO_ESTUDIO', icono: '<i class="fa-solid fa-graduation-cap" style="color: #15158d;"></i>' },    
+    { nombre: 'Certificado EPS', campo: 'CERTICADO_EPS', icono: '<i class="fa-solid fa-suitcase-medical" style="color: #ef0a0a;"></i>' },    
+    { nombre: 'Certificado ARL', campo: 'CERTIFICADO_ARL', icono: '<i class="fa-solid fa-helmet-safety" style="color: #ffc107;"></i>' },    
+    { nombre: 'Certificado AFP', campo: 'CERTIFICADO_AFP', icono: '<i class="fa-solid fa-sack-dollar" style="color: #025e02;"></i>' }    
+  ];
+
+  const galeria = document.getElementById("galeria");
+  galeria.innerHTML = documentos.map(doc => `
+                <div class="gallery-item" data-item="${resp[0][doc.campo]}" style="position: relative;">
+                    ${doc.icono}
+                    <p>${doc.nombre}</p>
+                    <span class="${(resp[0][doc.campo]) ? '' : 'd-none'}" style="position: absolute; top: -6px; right: -3px;">
+                      <i class="fa-solid fa-check text-success" style="font-size: 25px;"></i>
+                    </span>
+                </div>`).join('');
+  
+  $('#galeria').on('click', '.gallery-item', function () {
+    const archivo = $(this).attr('data-item');
+    if (archivo) {
+      let url = `${url_file}${archivo}.pdf`;
+      let elementoIframe = `<iframe src="${url}?t=${new Date().getTime()}" width="100%" height="600px"></iframe>`;
+      $("#visorPDF").html(elementoIframe);
+      $("#ModalPDF").modal('show');
+    } else {
+      Swal.fire("😥Oops...!", "Sin archivo disponible", "warning");
+    }
+  });
+}
+
+const getDocumentos = async (codigoSapEmp) => {
+  const resp = await enviarPeticion({op: "G_DOCUMENTOS", codigoSapEmp, link: "../models/Nomina.php"});
+
+  if (resp.length) {
+    renderizarGaleria(resp);
+    $('#contenedorBtn').removeClass('d-flex').hide();
+  } else {
+    $('#contenedorBtn').addClass('d-flex').show();
+    document.getElementById("galeria").innerHTML = `<p class="lead text-center" style="font-size: 25px;">El empleado no cuenta con documentos</p>`;
+  }
+}
+
 const SubirArchivosAdj = async (codigoSAP, arr_arch) => {
-  let nuevoNombre = "";
+  let camposParaActualizar = {};
+
   for (let i = 0; i < arr_arch.length; i++) {
-    console.log(arr_arch[i].name);
-    if (arr_arch[i]) {
-      nuevoNombre = arr_arch[i].name;
-      let UploadFile = await subirArchivos(arr_arch[i], {
+    const item = arr_arch[i];
+    if (item && item.file) {
+      const archivo = item.file;
+      const campoBD = item.campo;
+      const nuevoNombre = `${codigoSAP}_${campoBD}`;
+
+      const UploadFile = await subirArchivos(archivo, {
         validateSize: false,
         maxSize: 0,
         validateExt: false,
         typesFile: {},
         ruta: "/web/nomina",
-      }, (params = { nuevo_nombre: `${nuevoNombre}` }));
+      }, { nuevo_nombre: nuevoNombre });
 
       if (UploadFile.ok) {
-        await enviarPeticion({ nombre: `${nuevoNombre}`, codigoSAP, link: "../models/Nomina.php", op: "G_DOCUMENTOS", });
+        console.log(`Subido: ${nuevoNombre}`);
+        camposParaActualizar[campoBD] = nuevoNombre;
       } else {
-        console.log(i);
+        console.warn(`Error al subir ${campoBD}`);
       }
+    }
+  }
+
+  if (Object.keys(camposParaActualizar).length > 0) {
+    const resp = await enviarPeticion({
+      link: "../models/Nomina.php",
+      op: "I_DOCUMENTOS",
+      codigoSAP,
+      ...camposParaActualizar
+    });
+    if (resp.ok) {
+      getDocumentos(codigoSAP);
+      Swal.fire("Guardar ducumentos", "Se guardaron los documentos correctamente", "success");
     }
   }
 }
@@ -53,32 +122,31 @@ const guardarDocumentos = () => {
   const cedula = document.querySelector('#cedula').files[0];
   const examen = document.querySelector('#examen').files[0];
 
-  let arr_arch = [hojaVida, cedula, contrato, examen, certificadoBancario, certificadoEstudio, certificadoEps, certificadoArl, certificadoAfp];
-  console.log(arr_arch);
+  const arr_arch = [
+    {file: certificadoBancario, campo: "CERTIFICACION_BANCARIA"},
+    {file: certificadoEstudio, campo: "CERTIFICADO_ESTUDIO"},
+    {file: certificadoEps, campo: "CERTICADO_EPS"},
+    {file: certificadoArl, campo: "CERTIFICADO_ARL"},
+    {file: certificadoAfp, campo: "CERTIFICADO_AFP"},
+    {file: hojaVida, campo: "HOJA_VIDA"},
+    {file: contrato, campo: "CONTRATO_LABORAL"},
+    {file: cedula, campo: "CEDULA_CIUDADANIA"},
+    {file: examen, campo: "EXAMENES_MEDICOS"}
+  ];
+  
   SubirArchivosAdj(codigoSAP, arr_arch);
+
+  $('#modalDocumentos').modal('hide');
 }
 
 const clickArchivos = (idBoton, txtDoc) => {
   let btnArchivo = document.querySelector(`#${idBoton}`);
   btnArchivo.addEventListener("click", (e) => { 
-    let url = `${url_file}/web/workflow/${txtDoc}.pdf`;
-    let elementoIframe = `<iframe src="${url}?t=${new Date().getTime()}" width="100%" height="600px"></iframe>`;
-    $("#visorPDF").html(elementoIframe);
-    $("#modalVistaArchivos").modal('show');
+    
+    
   });
 }
 
-const getDocumentos = async (codigoSapEmp) => {
-  const resp = await enviarPeticion({op: "G_DOCUMENTOS", codigoSapEmp, link: "../models/Nomina.php"});
-  const {HOJA_VIDA, CEDULA_CIUDADANIA, CONTRATO_LABORAL} = resp[0];
-  console.log({HOJA_VIDA, CEDULA_CIUDADANIA, CONTRATO_LABORAL});
-  if (HOJA_VIDA) {
-    $('#btnHV').removeClass('btn-secondary').addClass('btn-success');
-    clickArchivos("btnHV", HOJA_VIDA);
-  }
-}
-
-//Carga de clientes
 function LoadEmpleado() {
   let codigo = $("#txtCodigoSAP").val();
   $.ajax({
@@ -109,7 +177,7 @@ function LoadEmpleado() {
         $("#txtCuentaBanco").val(data[0].NUMERO_CUENTA);
         PeriodosNomina(codigo);
         $('#tabEmpleadoDoc').attr('disabled', false);
-        // getDocumentos(codigo);
+        getDocumentos(codigo);
       }
     }
   }).done(function () {

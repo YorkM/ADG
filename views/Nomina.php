@@ -55,6 +55,39 @@ Redireccionar();
     [data-notify] {
       z-index: 9999 !important;
     }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 25px;
+      max-width: 70%;
+      margin: auto;
+    }
+
+    .gallery-item {
+      background: white;
+      padding: 10px;
+      border-radius: 10px;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      transition: transform 0.3s;
+      text-align: center;
+    }
+
+    .gallery-item:hover {
+      transform: scale(1.05);
+    }
+
+    .gallery-item i {
+      font-size: 40px;
+      /* color: #1e30c7; */
+    }
+
+    .gallery-item p {
+      margin: 10px 0 0;
+      font-size: 14px;
+      font-weight: 500;
+    }
   </style>
   <!------------------------------------------------------------------------------------------------------------------>
 </head>
@@ -67,7 +100,7 @@ Redireccionar();
     <!-- Bordered Tabs -->
     <ul class="nav nav-tabs nav-tabs-bordered alert alert-info p-0" id="borderedTab" role="tablist">
       <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="tabSeguimiento" data-bs-toggle="tab" data-bs-target="#dvEmpleados" type="button" role="tab" aria-controls="home" aria-selected="true"><i class="fa-solid fa-person-running"></i> Empleado</button>
+        <button class="nav-link active" id="tabSeguimiento" data-bs-toggle="tab" data-bs-target="#dvEmpleados" type="button" role="tab" aria-controls="home" aria-selected="true"><i class="fa-solid fa-user-tie"></i> Empleado</button>
       </li>
       <li class="nav-item" role="presentation">
         <button class="nav-link" disabled id="tabEmpleadoDoc" data-bs-toggle="tab" data-bs-target="#dvEmpleadoDoc" type="button" role="tab" aria-controls="home" aria-selected="true"><i class="fa-solid fa-folder"></i> Documentos</button>
@@ -140,11 +173,11 @@ Redireccionar();
             <div class="card-body" id="">
               <div class="card-header alert-info"><span class="fa-solid fa-file-arrow-down" aria-hidden="true"></span> COLILLA DE PAGO </div>
               <div class="row mb-3 mt-3">
-                <div class="col-sm-7">
+                <div class="col-sm-8">
                   <select class="form-select form-select-sm" id="slcPeriodo">
                   </select>
                 </div>
-                <div class="col-sm-5">
+                <div class="col-sm-4">
                   <button type="button" id="btnGeneraColilla" class="btn btn-primary btn-sm w-100">
                     <span class="fa-solid fa-file-import" aria-hidden="true"></span>
                     Generar soporte de pago
@@ -152,7 +185,7 @@ Redireccionar();
                 </div>
               </div>
             </div>
-            <div class="card-body" style="display: none" id="">
+            <div class="card-body" style="display: none;" id="">
               <div class="card-header alert-info"><span class="fa-solid fa-file-arrow-down" aria-hidden="true"></span> CERTIFICADO LABORAL </div>
               <div class="row mb-3 mt-3">
                 <div class="col-sm-8">
@@ -171,11 +204,13 @@ Redireccionar();
         </div>
       </div>
       <div class="tab-pane fade" id="dvEmpleadoDoc" role="tabpanel" aria-labelledby="home-tab">
-        <h2 class="text-center fw-bold mb-3">Vista de documentos</h2>
-        <button class="btn btn-primary btn-sm d-flex align-items-baseline gap-3" style="position: fixed; bottom: 30px; right: 60px;" id="btnAgregarDoc">
-          Agregar documentos
-          <i class="fa-solid fa-circle-plus"></i>
-        </button>
+        <h2 class="text-center mt-3" style="margin-bottom: 70px;">Documentos del empleado</h2>
+        <div class="gallery" id="galeria">
+
+        </div>
+        <div class="mt-2 d-flex justify-content-center" id="contenedorBtn">
+          <button class="btn btn-primary" id="btnAgregarDoc">Agregar Documentos</button>
+        </div>
       </div>
     </div>
   </div>
@@ -207,7 +242,7 @@ Redireccionar();
               </div>
               <div class="row p-3">
                 <div class="col-4 form-group">
-                  <label for="examen">Examenes médicos</label>
+                  <label for="examen">Exámenes médicos</label>
                   <input type="file" class="form-control form-control-sm" accept=".pdf" id="examen">
                 </div>
                 <div class="col-4 form-group">
@@ -252,8 +287,8 @@ Redireccionar();
           <h5 class="modal-title" id="">VISUALIZAR DOCUMENTO</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body" id="ContenidoPDF">
-          ...
+        <div class="modal-body" id="visorPDF">
+          
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>

@@ -207,10 +207,10 @@
         </div>
         <div class="row align-items-center px-2 mb-3">
             <div class="col-md-3">
-                <button class="btn btn-success w-100" id="exportar">Exportar a Excel</button>
+                <button class="btn btn-success w-100" id="btnExportar">Exportar a Excel</button>
             </div>
             <div class="col-md-3">
-                <p style="margin: 0; font-size: 20px; text-align: center;">Solicitudes: <span style="font-size: 20px; color: #007bff; font-weight: bold;" id="cantSolicitudes">16</span></p>
+                <p style="margin: 0; font-size: 20px; text-align: center;">Solicitudes: <span style="font-size: 20px; color: #007bff; font-weight: bold;" id="cantSolicitudes"></span></p>
             </div>
             <div class="col-md-6">
                 <input type="text" class="form-control" placeholder="Filtrar solicitudes..." id="filtroSolicitudes">
@@ -1078,6 +1078,7 @@
     <script type="text/javascript" src="../resources/bootstrap/bootstrap-5.0.2-dist/js/bootstrap.min.js"></script>
     <script src="../resources/bootstrap/bootstrap-5.0.2-dist/js/bootstrap.bundle.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <script src="../resources/niceadmin/assets/vendor/chart.js/chart.umd.js"></script>
     <script src="../resources/niceadmin/assets/vendor/echarts/echarts.min.js"></script>
     <script src="../controllers/humana/Storage.js"></script>

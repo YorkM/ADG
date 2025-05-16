@@ -875,6 +875,8 @@ Redireccionar();
       </div>
     </div>
   </div>
+  <div id="Bloquear" style="display:none;"></div>
+  <div class="centrado-porcentual" style="display:none;background-color:transparent; width:30%; height:250px"></div>
   <!-------Modal PDF---->
   <div id="ModalPDF" class="modal fade bd-example-modal-lg" role="dialog">
     <div class="modal-dialog modal-lg">
@@ -918,9 +920,7 @@ Redireccionar();
         </div>
       </div>
     </div>
-  </div>
-  <div id="Bloquear" style="display:none;"></div>
-  <div class="centrado-porcentual" style="display:none;background-color:transparent; width:30%; height:250px"></div>
+  </div> 
 </body>
 
 </html>

@@ -2393,6 +2393,32 @@ const restaurarSolicitud = async () => {
   getSolicitudes();
 }
 
+function exportarExcel(nombreArchivo = "solicitudes.xlsx", nombreHoja = "Datos") {
+  const tabla = document.getElementById("tablaSolicitudes");
+  if (!tabla) {
+    console.log("No se encontró la tabla");
+    return;
+  }
+
+  const wb = XLSX.utils.table_to_book(tabla, {
+    sheet: nombreHoja,
+    raw: true,
+  });
+
+  XLSX.writeFile(wb, nombreArchivo);
+}
+
+const filtrar = (filtro) => {
+  const filas = document.querySelectorAll('#tablaSolicitudes tbody tr');
+
+  filas.forEach(fila => {
+    const celdas = fila.querySelectorAll('td');
+    const coincide = Array.from(celdas).some(td => td.textContent.toLowerCase().includes(filtro));
+
+    fila.style.display = coincide ? '' : 'none';
+  });
+}
+
 // EJECUCIÓN DE FUNCIONALIDADES
 $(function() { 
   $('#btnVerFacturaDiv').removeClass('d-flex').hide();
@@ -2591,5 +2617,17 @@ $(function() {
 
   $("#btnRestaurar").on("click", () => {
     restaurarSolicitud();
+  });
+
+  $("#btnExportar").on("click", () => {
+    const rows = $('#tablaSolicitudes tbody tr').length;
+    if (!rows) return;
+    
+    exportarExcel();
+  });
+  
+  $("#filtroSolicitudes").keyup(function () {
+    let filtro = $(this).val();
+    filtrar(filtro);
   });
 });

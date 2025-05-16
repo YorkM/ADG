@@ -53,5 +53,39 @@ switch ( $_POST[ 'op' ] ) {
 	$query = GenerarArray("SELECT * FROM T_DOCUMENTOS_EMPLEADOS WHERE COD_SAP_EMPLEADO = '$cod_sap_emp'", '');
 	echo json_encode($query); 
 	break;
+
+  case 'I_DOCUMENTOS':
+	$codigoSAP = $_POST['codigoSAP'];
+
+    $campos_validos = [
+        "HOJA_VIDA",
+        "CEDULA_CIUDADANIA",
+        "CONTRATO_LABORAL",
+        "EXAMENES_MEDICOS",
+        "CERTIFICACION_BANCARIA",
+        "CERTICADO_EPS",
+        "CERTIFICADO_ESTUDIO",
+        "CERTIFICADO_ARL",
+        "CERTIFICADO_AFP"
+    ];
+
+    $columnas = ["COD_SAP_EMPLEADO"];
+    $valores = ["'$codigoSAP'"];
+
+    foreach ($_POST as $clave => $valor) {
+        if (in_array($clave, $campos_validos)) {
+            $columnas[] = $clave;
+            $valores[] = "'" . addslashes($valor) . "'";
+        }
+    }
+
+    $sql = "INSERT INTO T_DOCUMENTOS_EMPLEADOS (" . implode(", ", $columnas) . ") VALUES (" . implode(", ", $valores) . ")";
+
+    $resultado = mssql_query($sql);
+
+    if ($resultado) echo json_encode(["ok" => true, "msg" => "Documentos insertados correctamente."]);
+	else echo json_encode(["ok" => false, "msg" => "Error al insertar los documentos"]);
+		 
+	break;
 }
 ?>
