@@ -39,9 +39,9 @@ function renderizarGaleria(resp) {
                 <div class="gallery-item" data-item="${resp[0][doc.campo]}" style="position: relative;">
                     ${doc.icono}
                     <p>${doc.nombre}</p>
-                    <span class="${(resp[0][doc.campo]) ? '' : 'd-none'}" style="position: absolute; top: -6px; right: -3px;">
-                      <i class="fa-solid fa-check text-success" style="font-size: 25px;"></i>
-                    </span>
+                    <span class="${(resp[0][doc.campo]) ? '' : 'd-none'}" style="position: absolute; top: -4px; right: -6px;">
+                      <i class="fa-regular fa-circle-check text-success" style="font-size: 20px;"></i>
+                    </span>                   
                 </div>`).join('');
   
   $('#galeria').on('click', '.gallery-item', function () {
@@ -50,7 +50,9 @@ function renderizarGaleria(resp) {
       let url = `${url_file}${archivo}.pdf`;
       let elementoIframe = `<iframe src="${url}?t=${new Date().getTime()}" width="100%" height="600px"></iframe>`;
       $("#visorPDF").html(elementoIframe);
-      $("#ModalPDF").modal('show');
+      // setTimeout(() => {
+        $("#ModalPDF").modal('show');        
+      // }, 500);
     } else {
       Swal.fire("😥Oops...!", "Sin archivo disponible", "warning");
     }
@@ -63,8 +65,10 @@ const getDocumentos = async (codigoSapEmp) => {
   if (resp.length) {
     renderizarGaleria(resp);
     $('#contenedorBtn').removeClass('d-flex').hide();
+    $('#contenedorBtn2').addClass('d-flex').show();
   } else {
     $('#contenedorBtn').addClass('d-flex').show();
+    $('#contenedorBtn2').removeClass('d-flex').hide();
     document.getElementById("galeria").innerHTML = `<p class="lead text-center" style="font-size: 25px;">El empleado no cuenta con documentos</p>`;
   }
 }
@@ -96,6 +100,8 @@ const SubirArchivosAdj = async (codigoSAP, arr_arch) => {
     }
   }
 
+  // TODO: REALIZAR FUNCIONALIDAD DE ACTUALIZAR DOCUMENTOS
+  // TODO: VALIDAR SI YA EXISTE REGISTRO
   if (Object.keys(camposParaActualizar).length > 0) {
     const resp = await enviarPeticion({
       link: "../models/Nomina.php",
@@ -137,14 +143,6 @@ const guardarDocumentos = () => {
   SubirArchivosAdj(codigoSAP, arr_arch);
 
   $('#modalDocumentos').modal('hide');
-}
-
-const clickArchivos = (idBoton, txtDoc) => {
-  let btnArchivo = document.querySelector(`#${idBoton}`);
-  btnArchivo.addEventListener("click", (e) => { 
-    
-    
-  });
 }
 
 function LoadEmpleado() {
@@ -273,6 +271,14 @@ $(function () {
 
   $('#btnAgregarDoc').click( ()=> {
     $('#modalDocumentos').modal('show');
+    $('#exampleModalLabel').text("Agregar documentos");
+    $('#btnGuardarDocs').text("Guardar documentos");
+  });
+
+  $('#btnAgregarDoc2').click( ()=> {
+    $('#modalDocumentos').modal('show');
+    $('#exampleModalLabel').text("Actualizar documentos");
+    $('#btnGuardarDocs').text("Actualizar documentos");
   });
 
   $('#btnGuardarDocs').click( ()=> {

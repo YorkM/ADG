@@ -58,8 +58,8 @@ Redireccionar();
 
     .gallery {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 25px;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 50px;
       max-width: 70%;
       margin: auto;
     }
@@ -204,12 +204,15 @@ Redireccionar();
         </div>
       </div>
       <div class="tab-pane fade" id="dvEmpleadoDoc" role="tabpanel" aria-labelledby="home-tab">
-        <h2 class="text-center mt-3" style="margin-bottom: 70px;">Documentos del empleado</h2>
+        <h2 class="text-center mt-3" style="margin-bottom: 50px;">Documentos del empleado</h2>
         <div class="gallery" id="galeria">
 
         </div>
         <div class="mt-2 d-flex justify-content-center" id="contenedorBtn">
           <button class="btn btn-primary" id="btnAgregarDoc">Agregar Documentos</button>
+        </div>
+        <div class="mt-3 d-flex justify-content-center" id="contenedorBtn2">
+          <button class="btn btn-primary" id="btnAgregarDoc2">Actualizar Documentos</button>
         </div>
       </div>
     </div>
@@ -288,7 +291,7 @@ Redireccionar();
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body" id="visorPDF">
-          
+
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
