@@ -204,7 +204,7 @@ Redireccionar();
         </div>
       </div>
       <div class="tab-pane fade" id="dvEmpleadoDoc" role="tabpanel" aria-labelledby="home-tab">
-        <h2 class="text-center mt-3" style="margin-bottom: 50px;">Documentos del empleado</h2>
+        <h2 class="text-center mt-3" style="margin-bottom: 50px;" id="tituloGaleria">Documentos del empleado</h2>
         <div class="gallery" id="galeria">
 
         </div>

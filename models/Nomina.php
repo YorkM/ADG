@@ -87,5 +87,40 @@ switch ( $_POST[ 'op' ] ) {
 	else echo json_encode(["ok" => false, "msg" => "Error al insertar los documentos"]);
 		 
 	break;
+
+  case 'U_DOCUMENTOS':
+	$codigoSAP = $_POST['codigoSAP']; 
+
+	$campos_validos = [
+		"HOJA_VIDA",
+		"CEDULA_CIUDADANIA",
+		"CONTRATO_LABORAL",
+		"EXAMENES_MEDICOS",
+		"CERTIFICACION_BANCARIA",
+		"CERTICADO_EPS",
+		"CERTIFICADO_ESTUDIO",
+		"CERTIFICADO_ARL",
+		"CERTIFICADO_AFP"
+	];
+
+	$set_clauses = [];
+
+	foreach ($_POST as $clave => $valor) {
+		if (in_array($clave, $campos_validos) && !empty($valor)) {
+			$set_clauses[] = "$clave = '" . addslashes($valor) . "'";
+		}
+	}
+
+	if (!empty($set_clauses)) {
+		$sql = "UPDATE T_DOCUMENTOS_EMPLEADOS SET " . implode(", ", $set_clauses) . " WHERE COD_SAP_EMPLEADO = '$codigoSAP'";
+
+		$resultado = mssql_query($sql);
+
+		if ($resultado) echo json_encode(["ok" => true, "msg" => "Documentos actualizados correctamente."]);
+		else echo json_encode(["ok" => false, "msg" => "Error al actualizar los documentos"]);
+	} else {
+		echo json_encode(["ok" => false, "msg" => "No hay campos válidos para actualizar."]);
+	}
+
+	break;
 }
-?>

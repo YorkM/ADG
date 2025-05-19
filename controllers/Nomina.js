@@ -20,8 +20,6 @@ function UnloadImg() {
 }
 
 function renderizarGaleria(resp) {
-  console.log(resp);
-
   const documentos = [
     { nombre: 'Hoja de vida', campo: 'HOJA_VIDA', icono: '<i class="fas fa-file" style="color: #837d7d;"></i>' },    
     { nombre: 'Cédula de ciudadanía', campo: 'CEDULA_CIUDADANIA', icono: '<i class="fa-solid fa-id-card" style="color: #a52a2a;"></i>' },    
@@ -36,25 +34,23 @@ function renderizarGaleria(resp) {
 
   const galeria = document.getElementById("galeria");
   galeria.innerHTML = documentos.map(doc => `
-                <div class="gallery-item" data-item="${resp[0][doc.campo]}" style="position: relative;">
-                    ${doc.icono}
-                    <p>${doc.nombre}</p>
-                    <span class="${(resp[0][doc.campo]) ? '' : 'd-none'}" style="position: absolute; top: -4px; right: -6px;">
-                      <i class="fa-regular fa-circle-check text-success" style="font-size: 20px;"></i>
-                    </span>                   
-                </div>`).join('');
+    <div class="gallery-item" data-item="${resp[0][doc.campo]}" style="position: relative;">
+        ${doc.icono}
+        <p>${doc.nombre}</p>
+        <span class="${(resp[0][doc.campo]) ? '' : 'd-none'}" style="position: absolute; top: -4px; right: -6px;">
+          <i class="fa-regular fa-circle-check text-success" style="font-size: 20px;"></i>
+        </span>                   
+    </div>`).join('');
   
   $('#galeria').on('click', '.gallery-item', function () {
     const archivo = $(this).attr('data-item');
     if (archivo) {
       let url = `${url_file}${archivo}.pdf`;
-      let elementoIframe = `<iframe src="${url}?t=${new Date().getTime()}" width="100%" height="600px"></iframe>`;
+      let elementoIframe = `<iframe src="${url}?t=${new Date().getTime()}" style="width:100%; height:80vh; border:none;"></iframe>`;
       $("#visorPDF").html(elementoIframe);
-      // setTimeout(() => {
-        $("#ModalPDF").modal('show');        
-      // }, 500);
+      $("#ModalPDF").modal('show');        
     } else {
-      Swal.fire("😥Oops...!", "Sin archivo disponible", "warning");
+      Swal.fire("😥Oops...!", "El documento no ha sido cargado", "warning");
     }
   });
 }
@@ -66,14 +62,24 @@ const getDocumentos = async (codigoSapEmp) => {
     renderizarGaleria(resp);
     $('#contenedorBtn').removeClass('d-flex').hide();
     $('#contenedorBtn2').addClass('d-flex').show();
+    $('#tituloGaleria').show();
   } else {
     $('#contenedorBtn').addClass('d-flex').show();
     $('#contenedorBtn2').removeClass('d-flex').hide();
+    $('#tituloGaleria').hide();
     document.getElementById("galeria").innerHTML = `<p class="lead text-center" style="font-size: 25px;">El empleado no cuenta con documentos</p>`;
   }
 }
 
 const SubirArchivosAdj = async (codigoSAP, arr_arch) => {
+  let existeCodigoSAP = await enviarPeticion({
+    op: "G_DOCUMENTOS", 
+    link: "../models/Nomina.php", 
+    codigoSapEmp: codigoSAP
+  });
+
+  existeCodigoSAP = existeCodigoSAP.length > 0;  
+
   let camposParaActualizar = {};
 
   for (let i = 0; i < arr_arch.length; i++) {
@@ -100,18 +106,29 @@ const SubirArchivosAdj = async (codigoSAP, arr_arch) => {
     }
   }
 
-  // TODO: REALIZAR FUNCIONALIDAD DE ACTUALIZAR DOCUMENTOS
-  // TODO: VALIDAR SI YA EXISTE REGISTRO
   if (Object.keys(camposParaActualizar).length > 0) {
-    const resp = await enviarPeticion({
-      link: "../models/Nomina.php",
-      op: "I_DOCUMENTOS",
-      codigoSAP,
-      ...camposParaActualizar
-    });
-    if (resp.ok) {
-      getDocumentos(codigoSAP);
-      Swal.fire("Guardar ducumentos", "Se guardaron los documentos correctamente", "success");
+    if (!existeCodigoSAP) {
+      const resp = await enviarPeticion({
+        link: "../models/Nomina.php",
+        op: "I_DOCUMENTOS",
+        codigoSAP,
+        ...camposParaActualizar
+      });
+      if (resp.ok) {
+        getDocumentos(codigoSAP);
+        Swal.fire("Guardar documentos", "Se guardaron los documentos correctamente", "success");
+      }
+    } else {
+      const resp = await enviarPeticion({
+        link: "../models/Nomina.php",
+        op: "U_DOCUMENTOS",
+        codigoSAP,
+        ...camposParaActualizar
+      });
+      if (resp.ok) {
+        getDocumentos(codigoSAP);
+        Swal.fire("Actualizar documentos", "Se actualizaron los documentos correctamente", "success");
+      }
     }
   }
 }
@@ -161,6 +178,19 @@ function LoadEmpleado() {
       codigo
     },
     success: function (data) {
+      $("#txtNombres").val("");
+      $("#txtTipoidentificacion").val("");
+      $("#txtIdentificacion").val("");
+      $("#txtfhIngreso").val("");
+      $("#txtSalario").val("");
+      $("#txtDireccion").val("");
+      $("#txtCiudad").val("");
+      $("#txtSalud").val("");
+      $("#txtCaja").val("");
+      $("#txtARL").val("");
+      $("#txtCuentaBanco").val("");
+      $('#slcPeriodo').html("");
+      $('#tabEmpleadoDoc').attr('disabled', true);
       if (data.length) {
         $("#txtNombres").val(data[0].NOMBRES);
         $("#txtTipoidentificacion").val(data[0].TIPO_IDENTIFICACION);
@@ -283,5 +313,9 @@ $(function () {
 
   $('#btnGuardarDocs').click( ()=> {
     guardarDocumentos();
+  });
+
+  $("#modalDocumentos").on("hidden.bs.modal", () => {
+    $('input[type="file"]').val("");
   });
 });
