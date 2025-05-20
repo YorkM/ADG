@@ -200,7 +200,7 @@
                         <button class="btn btn-primary w-100" id="btnModalAddSolic">Agregar</button>
                     </div>
                     <div class="mb-1 col-md-6">
-                        <button class="btn btn-secondary w-100" id="btnRefrescar">Refrescar</button>
+                        <button class="btn btn-warning w-100" id="btnRefrescar">Refrescar</button>
                     </div>
                 </div>
             </div>
