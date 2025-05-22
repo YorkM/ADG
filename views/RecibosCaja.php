@@ -155,13 +155,35 @@ Redireccionar();
       padding: 3px 8px;
       font-size: 12px;
     }
+
+    .cantBan {
+      margin: 0;
+      font-size: 1.1rem;
+      border: 1px solid #ccc;
+      padding: 2px 5px;
+      border-radius: 4px;
+      box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+      text-align: center;
+    }
+
+    .no-wrap {
+      padding: 0;
+      line-height: 2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .vertical {
+      vertical-align: middle !important;
+    }
   </style>
 </head>
 
 <body>
-  <input type="hidden" id="RolId" value="<?php echo (!empty($_SESSION["ses_RolesId"])) ? $_SESSION["ses_RolesId"] : "" ?>" readonly>
-  <input type="hidden" id="UsrLogin" value="<?php echo (!empty($_SESSION["ses_Login"])) ? $_SESSION["ses_Login"] : "" ?>" readonly>
-  <input type="hidden" id="NumOrg" value="<?php echo (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : "" ?>" readonly>
+  <input type="hidden" id="RolId" value="<?php echo (!empty($_SESSION["ses_RolesId"])) ? $_SESSION["ses_RolesId"] : ""; ?>" readonly>
+  <input type="hidden" id="UsrLogin" value="<?php echo (!empty($_SESSION["ses_Login"])) ? $_SESSION["ses_Login"] : ""; ?>" readonly>
+  <input type="hidden" id="NumOrg" value="<?php echo (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : ""; ?>" readonly>
   <input type="hidden" value="" id="fechaPagoHide">
 
   <div class="alert alert-info"><i class="fa-solid fa-star fa-flip"></i>&nbsp;0405 - RECIBOS DE PAGO</div>
@@ -341,9 +363,12 @@ Redireccionar();
                   <button class="btn btn-default btn-sm" type="button" onClick="filtroEstado('T')"> <span class="glyphicon glyphicon-hand-right" aria-hidden="true"></span> </button>
                 </div>
               </td>
-              <td><button class="btn btn-default" id="btnCompensaciones" style="display:none;"><i class="fa-solid fa-faucet"></i> Compensaciones</button></td>
-
-              <!--<td><button class="btn btn-default" id="btnConsultar"   onClick="ConsultarPlanilla();">Consultar</button></td>-->
+              <td>
+                <button class="btn btn-default" id="btnCompensaciones" style="display:none;">
+                  <i class="fa-solid fa-faucet"></i>
+                  Compensaciones
+                </button>
+              </td>
             </tr>
           </table>
           <div id="dvResultPlanilla" style="overflow: auto; height: 60vh;"></div>
@@ -385,31 +410,6 @@ Redireccionar();
           </div>
         </div>
         <div class="tab-pane fade in" id="dvMulticash">
-          <!-- <table width="100%">
-            <tr>
-              <td width="50%">
-                <input type="text" placeholder="Filtro de búsqueda" class="form-control" id="filtro" name="filtro">
-              </td>
-              <td>
-                <select id="MultiDay" class="form-control">
-                </select>
-              </td>
-              <td>
-                <select id="MultiMes" class="form-control">
-                </select>
-              </td>
-              <td>
-                <select id="MultiAnio" class="form-control">
-                </select>
-              </td>
-              <td>
-                <div class="input-group">
-                  <input type="text" class="form-control" placeholder="Validar Multicash" id="txtValidaDocumento" onKeyPress="return vnumeros(event)">
-                  <span class="input-group-addon"> <span class="glyphicon glyphicon-search" aria-hidden="true"></span></span>
-                </div>
-              </td>
-            </tr>
-          </table> -->
           <div class="row">
             <div class="col-md-6">
               <input type="text" placeholder="Filtro de búsqueda" class="form-control" id="filtro" name="filtro">
@@ -464,7 +464,7 @@ Redireccionar();
         </div>
         <div class="tab-pane fade in" id="dvBancos">
           <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-4">
               <input type="text" placeholder="Filtro de búsqueda" class="form-control" id="filtro2" name="filtro2">
             </div>
             <div class="col-md-2">
@@ -479,6 +479,12 @@ Redireccionar();
               <select id="MultiAnio2" class="form-control">
               </select>
             </div>
+            <div class="col-md-2">
+              <p class="cantBan">
+                Cantidad:
+                <span id="cantBancos" style="color: #337ab7; font-size: 1.24rem;"></span>
+              </p>
+            </div>
           </div>
           <!-- REVISAR TABLA -->
           <div id="dvResultMulticash2" style="overflow: auto; max-height: 60vh;">
@@ -486,20 +492,20 @@ Redireccionar();
             <table class="table" width="100%" id="tdPlanillas2">
               <thead>
                 <tr>
-                  <th>N°</th>
-                  <th>CUENTA</th>
-                  <th>CLAVE REF.</th>
-                  <th>N° DOC.</th>
-                  <th>VALOR</th>
-                  <th>FECHA DOC.</th>
-                  <th>REFERENCIA</th>
-                  <th>SAP</th>
-                  <th>CLIENTE</th>
-                  <th>OFICINA</th>
-                  <th>ZONA</th>
-                  <th>NOMBRE</th>
-                  <th>CONDICIÓN</th>
-                  <th>OBSER.</th>
+                  <th class="no-wrap">N°</th>
+                  <th class="no-wrap">CUENTA</th>
+                  <th class="no-wrap">CLAVE REF.</th>
+                  <th class="no-wrap">N° DOC.</th>
+                  <th class="no-wrap">VALOR</th>
+                  <th class="no-wrap">FECHA DOC.</th>
+                  <th class="no-wrap">REFERENCIA</th>
+                  <th class="no-wrap">SAP</th>
+                  <th class="no-wrap">CLIENTE</th>
+                  <th class="no-wrap">OFICINA</th>
+                  <th class="no-wrap">ZONA</th>
+                  <th class="no-wrap">NOMBRE</th>
+                  <th class="no-wrap">CONDICIÓN</th>
+                  <th class="no-wrap">OBSER.</th>
                 </tr>
               </thead>
               <tbody id="tdDetalleMulticash2">
@@ -920,7 +926,7 @@ Redireccionar();
         </div>
       </div>
     </div>
-  </div> 
+  </div>
 </body>
 
 </html>

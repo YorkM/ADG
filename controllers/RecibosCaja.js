@@ -405,6 +405,10 @@ $(function () {
     const filtro = this.value.toLowerCase();
     filtrar(filtro);
   });
+
+  $('#liBancos').click(function () {
+    ConsultarMulticashBanco();
+  });
 });
 
 // DECLARACIÓN DE FUNCIONES GENERALES
@@ -443,7 +447,6 @@ const limpiarDatos = () => {
   $("#VlrSinAsignar").val(formatNum(0, '$'));
 
   $('#tdPlanillas tbody').html("");
-
   $('#contenedorTablasLiquidador').html("");
 }
 
@@ -801,7 +804,15 @@ const agregarLiquidador = (item) => {
   const FB = FECHA_BASE.split("-");
   const fechaFactura = `${FB[2]}/${FB[1]}/${FB[0]}`;
 
-  ArrDctos.forEach(item => {
+  const descuentosFiltrados = ArrDctos.filter((obj, index, self) =>
+    index === self.findIndex(o =>
+      o.dias === obj.dias &&
+      o.descuento === obj.descuento &&
+      o.tipo === obj.tipo
+    )
+  );
+
+  descuentosFiltrados.forEach(item => {
     let dias = 0;
     if (parseInt(item.dias) > 60 && parseInt(item.dias) <= 65) dias = 60;
     else if (parseInt(item.dias) > 45 && parseInt(item.dias) <= 50) dias = 45;
@@ -1364,27 +1375,29 @@ function ConsultarMulticashBanco() {
       $('#tdPlanillas2 tbody').html(``);
       let elementos = ``;
 
+      $('#cantBancos').text(resultado.length);
+
       if (resultado.length) {
         resultado.forEach((item, index) => {
           elementos += `
             <tr>
-              <td>${index + 1}</td>
-              <td>${item.cuenta}</td>
-              <td>${item.descripcion}</td>
-              <td>${item.numero}</td>
-              <td>${formatNum(item.valor, "$")}</td>
-              <td>${item.fecha_cont}</td>
-              <td>${item.referencia}</td>
-              <td>${item.codigo_sap}</td>
-              <td>
+              <td class="vertical">${index + 1}</td>
+              <td class="vertical">${item.cuenta}</td>
+              <td class="vertical">${item.descripcion}</td>
+              <td class="vertical">${item.numero}</td>
+              <td class="vertical">${formatNum(item.valor, "$")}</td>
+              <td class="vertical">${item.fecha_cont}</td>
+              <td class="vertical">${item.referencia}</td>
+              <td class="vertical">${item.codigo_sap}</td>
+              <td class="vertical">
                 <p>${item.nombres}</p>
                 <small class="text-primary">${item.razon_comercial}</small>
               </td>
-              <td>${item.bodega_desc.split(' ')[1]}</td>
-              <td>${item.zona_ventas}</td>
-              <td>${item.zona_descripcion}</td>
-              <td>${item.condicion_pago}</td>
-              <td class="text-center">
+              <td class="vertical">${item.bodega_desc.split(' ')[1]}</td>
+              <td class="vertical">${item.zona_ventas}</td>
+              <td class="vertical">${item.zona_descripcion}</td>
+              <td class="vertical">${item.condicion_pago}</td>
+              <td class="text-center vertical">
                 <button class="btn btn-primary btn-sm observacion" data-id='${JSON.stringify(item)}'>
                   <i class="fa-solid fa-paper-plane"></i>                                                                     
                 </button>
@@ -1411,11 +1424,11 @@ function ConsultarMulticashBanco() {
             setTimeout(() => {
               $('#btnMulticash').click();
               const valorBuscado = referencia.trim();
-              const coincidencia = ArrayMulticashBanco.find(item => item.referencia.trim() === valorBuscado);
-              if (coincidencia) {
+              const coincidencia2 = ArrayMulticashBanco.find(item => item.referencia.trim() === valorBuscado);
+              if (coincidencia2) {
                 $('#filtro')
-                  .val(coincidencia.item_busqueda)
-                  .data('ui-autocomplete')._trigger('select', null, { item: coincidencia });
+                  .val(coincidencia2.item_busqueda)
+                  .data('ui-autocomplete')._trigger('select', null, { item: coincidencia2 });
 
                 $('#MultiDay').val(MultiDay).trigger('change');
               }
