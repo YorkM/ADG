@@ -56,7 +56,11 @@ function renderizarGaleria(resp) {
 }
 
 const getDocumentos = async (codigoSapEmp) => {
-  const resp = await enviarPeticion({op: "G_DOCUMENTOS", codigoSapEmp, link: "../models/Nomina.php"});
+  const resp = await enviarPeticion({
+    op: "G_DOCUMENTOS", 
+    codigoSapEmp, 
+    link: "../models/Nomina.php"
+  });
 
   if (resp.length) {
     renderizarGaleria(resp);
@@ -67,7 +71,12 @@ const getDocumentos = async (codigoSapEmp) => {
     $('#contenedorBtn').addClass('d-flex').show();
     $('#contenedorBtn2').removeClass('d-flex').hide();
     $('#tituloGaleria').hide();
-    document.getElementById("galeria").innerHTML = `<p class="lead text-center" style="font-size: 25px;">El empleado no cuenta con documentos</p>`;
+    document.getElementById("galeria").innerHTML = `
+    <p 
+      class="lead text-center" 
+      style="font-size: 25px;"
+    >El empleado no cuenta con documentos
+    </p>`;
   }
 }
 
@@ -305,7 +314,39 @@ $(function () {
     $('#btnGuardarDocs').text("Guardar documentos");
   });
 
-  $('#btnAgregarDoc2').click( ()=> {
+  $('#btnAgregarDoc2').click(async ()=> {
+    let codigoSapEmp = $('#txtCodigoSAP').val();
+
+    const resp = await enviarPeticion({
+      op: "G_DOCUMENTOS",
+      codigoSapEmp,
+      link: "../models/Nomina.php"
+    });
+
+    if (resp.length) {
+      const {
+        HOJA_VIDA,
+        CEDULA_CIUDADANIA,
+        CONTRATO_LABORAL,
+        EXAMENES_MEDICOS,
+        CERTIFICACION_BANCARIA,
+        CERTICADO_EPS,
+        CERTIFICADO_ESTUDIO,
+        CERTIFICADO_ARL,
+        CERTIFICADO_AFP
+      } = resp[0];
+
+      if (HOJA_VIDA) $('#hojaVida').css({"border-bottom": "3px solid green"});
+      if (CEDULA_CIUDADANIA) $('#cedula').css({"border-bottom": "3px solid green"});
+      if (CONTRATO_LABORAL) $('#contrato').css({"border-bottom": "3px solid green"});
+      if (EXAMENES_MEDICOS) $('#examen').css({"border-bottom": "3px solid green"});
+      if (CERTIFICACION_BANCARIA) $('#certificadoBancario').css({"border-bottom": "3px solid green"});
+      if (CERTICADO_EPS) $('#certificadoEps').css({"border-bottom": "3px solid green"});
+      if (CERTIFICADO_ESTUDIO) $('#certificadoEstudio').css({"border-bottom": "3px solid green"});
+      if (CERTIFICADO_ARL) $('#certificadoArl').css({"border-bottom": "3px solid green"});
+      if (CERTIFICADO_AFP) $('#certificadoAfp').css({"border-bottom": "3px solid green"});
+    }
+
     $('#modalDocumentos').modal('show');
     $('#exampleModalLabel').text("Actualizar documentos");
     $('#btnGuardarDocs').text("Actualizar documentos");
@@ -317,5 +358,6 @@ $(function () {
 
   $("#modalDocumentos").on("hidden.bs.modal", () => {
     $('input[type="file"]').val("");
+    $('input[type="file"]').css({"border": "1px solid #ced4da"});
   });
 });

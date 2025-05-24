@@ -208,6 +208,8 @@ $(function () {
     select: function (event, ui) {
       limpiarDatos();
 
+      $("#tdBody").html("");
+
       $("#CodigoSAP").val(ui.item.codigo_sap);
       $("#Email").val(ui.item.email);
       $("#EmailZona").val(ui.item.email_zona);
@@ -1407,7 +1409,7 @@ function ConsultarMulticashBanco() {
 
         $('#tdPlanillas2 tbody').html(elementos);
 
-        $('#tdPlanillas2').on('click', '.observacion', function () {
+        $('#tdPlanillas2').off().on('click', '.observacion', function () {
           limpiarDatos();
           const { codigo_sap, referencia } = JSON.parse($(this).attr('data-id'));
           const MultiDay = $('#MultiDay2').val();
@@ -1461,6 +1463,7 @@ function validarSiNumero(numero) {
 }
 
 function AddMulticash(ob) {
+  debugger;
   var obj = $(ob);
   var estado = $.trim(obj.find('td').eq(7).html());
   var cuenta = $.trim(obj.find('td').eq(0).html());
@@ -1471,7 +1474,6 @@ function AddMulticash(ob) {
   var ref = $.trim(obj.find('td').eq(8).html());
 
   if (estado == 0) {
-    //console.log('Cuenta : '+cuenta+' Valor:'+valor+' Fecha:'+fvalor);
     AddAbonoCash(cuenta, fvalor, valor, num, id, ref);
     obj.css('background', '#51F563');
     obj.find('td').eq(7).html(1);
@@ -1488,11 +1490,7 @@ function AddMulticash(ob) {
         $(this).remove();
       }
     });
-  }
-  /*
-  $("#VlrTotalAbono").val(formatNum(parseFloat(unformatNum(valor))+parseFloat(unformatNum(total)),'$'));
-  var vasignado = parseFloat(unformatNum($("#VlrTotalAbono").val()))-parseFloat(unformatNum($("#VlrTotalFacturas").val()));
-  $("#VlrSinAsignar").val(formatNum(vasignado,'$'));*/
+  } 
 }
 
 function printDiv(nombreDiv) {
@@ -1705,7 +1703,7 @@ function AddAbono() {
 
   if (cuenta == '2815050503' && parseFloat(unformatNum(valor)) > 1000) sw = 2;
 
-  if (parseFloat(unformatNum(valor)) > 0) {
+  if (parseFloat(unformatNum(valor)) <= 1000) {
     $("#tdBody tr").each(function (index, element) {
       var c = $(this).find('td').eq(0).html();
 
@@ -1754,6 +1752,8 @@ function AddAbono() {
       $("#ValorAbono").val('');
       $("#ValorAbono").focus();
     }
+  } else {
+    Swal.fire("Oops..!", "El valor excede el limite permitido", "error");
   }
 
 }
@@ -1803,9 +1803,7 @@ function NofificacionDescuento(pcjDesc) {
 }
 
 function AddFactura(ob, valor, cumple_pres) {
-
-  //   / console.log(valor+' '+cumple_pres);
-
+  debugger;
   var NumDoc = $.trim($(ob).parent().parent().find('td').eq(0).html());
   var total = unformatNum($("#VlrTotalFacturas").val());
   var tipoDoc = $.trim($(ob).parent().parent().find('td').eq(2).html());
@@ -1824,11 +1822,8 @@ function AddFactura(ob, valor, cumple_pres) {
     vlrAbonos = vlrAbonos + parseFloat(unformatNum($.trim($(this).find('td').eq(2).html())));
     var fecha = $.trim($(this).find('td').eq(3).html());
 
-    //console.log({fecha});
     fecha = fecha.split("-");
-    //console.log({fecha});
     fecha = new Date(parseInt(fecha[0]), parseInt(fecha[1] - 1), parseInt(fecha[2]));
-    //console.log({fecha});
 
     if (fechaAbono == '') {
       fechaAbono = fecha;
@@ -1838,6 +1833,7 @@ function AddFactura(ob, valor, cumple_pres) {
       }
     }
   });
+
   if (numAbonos > 0) {
     /*nuevo codigo para condiciones de descuentos especiales*/
     fechaDoc = fechaDoc.split("-");
@@ -1846,13 +1842,9 @@ function AddFactura(ob, valor, cumple_pres) {
     fechaCrea = fechaCrea.split("-");
     fechaCrea = new Date(parseInt(fechaCrea[0]), parseInt(fechaCrea[1] - 1), parseInt(fechaCrea[2]));
 
-
-    //console.warn(fechaAbono+' - '+fechaCrea)
-
     dias = fechaAbono.getTime() - fechaCrea.getTime();
     dias = (dias / (1000 * 60 * 60 * 24));
 
-    //console.warn(dias);
     var pcjDesc = 0;
     /* PARAMETROS DE CONDICIONES DE DESCUENTOS ADICIONALES  */
     /*   1.CLIENTE TIPO DROGUERIA GRUPO 100                 */
@@ -1870,7 +1862,6 @@ function AddFactura(ob, valor, cumple_pres) {
             NofificacionDescuento(pcjDesc);
             return false;
           }
-
         }
       });
 
@@ -1885,7 +1876,6 @@ function AddFactura(ob, valor, cumple_pres) {
               NofificacionDescuento(pcjDesc);
               return false;
             }
-
           }
         });
       }
@@ -1904,8 +1894,6 @@ function AddFactura(ob, valor, cumple_pres) {
                   NofificacionDescuento(pcjDesc);
                   return false;
                 }
-
-
               }
             }
           } else {
@@ -1916,7 +1904,6 @@ function AddFactura(ob, valor, cumple_pres) {
                 NofificacionDescuento(pcjDesc);
                 return false;
               }
-
             }
           }
 
@@ -1930,10 +1917,12 @@ function AddFactura(ob, valor, cumple_pres) {
     if (parseInt(vlrDoc) < 0) {
       vlrDoc = vlrDoc * -1;
     }
+
     if (valor == '') {
       valor = 0;
       $(ob).val(0);
     }
+
     var valor = parseInt(unformatNum(valor));
     if (vlrDoc >= valor || valor == 0 || valor == '') {
       var vtotal = 0;

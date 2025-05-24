@@ -229,7 +229,7 @@ Redireccionar();
         <div class="modal-body">
           <div class="container">
             <div class="shadow-sm">
-              <div class="row p-3">
+              <div class="row p-3 mb-4">
                 <div class="col-4 form-group">
                   <label for="hojaVida">Hoja de vida</label>
                   <input type="file" class="form-control form-control-sm" accept=".pdf" id="hojaVida">
@@ -243,7 +243,7 @@ Redireccionar();
                   <input type="file" class="form-control form-control-sm" accept=".pdf" id="contrato">
                 </div>
               </div>
-              <div class="row p-3">
+              <div class="row p-3 mb-4">
                 <div class="col-4 form-group">
                   <label for="examen">Exámenes médicos</label>
                   <input type="file" class="form-control form-control-sm" accept=".pdf" id="examen">
