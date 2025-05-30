@@ -733,10 +733,17 @@ function crearTablasPorDias(datos) {
         <td class="font-size">${item.porcentajeDescuento}%</td>
         <td class="font-size">${formatNum(item.valorDescuento, "$")}</td>
         <td class="font-size">${formatNum(item.valorPagar, "$")}</td>
-        <td class="font-size td-text"><input type="text" maxlength="25" class="form-control input-sm input-obser"></td>
+        <td class="font-size td-text">
+          <input 
+            type="text" 
+            maxlength="25" 
+            class="form-control input-sm input-obser">
+          </td>
         <td class="text-center">
-          <button class="btn btn-danger btn-sm eliminar-liquidacion" data-item='${item.numeroDoc}'>
-            <i class="fa-solid fa-trash-can"></i>
+          <button 
+            class="btn btn-danger btn-sm eliminar-liquidacion" 
+            data-item='${item.numeroDoc}'>
+              <i class="fa-solid fa-trash-can"></i>
           </button>
         </td>`;
       tbody.appendChild(fila);
@@ -798,7 +805,15 @@ function crearTablasPorDias(datos) {
 
 // FUNCIÓN AGREGAR ITEM AL LIQUIDADOR
 const agregarLiquidador = (item) => {
-  const { BASE_PP, CLASE_DOCUMENTO, FECHA_BASE, IMPORTE, NUMERO_DOCUMENTO, REFERENCIA, REFERENCIA_FACTURA } = item;
+  const { 
+    BASE_PP, 
+    CLASE_DOCUMENTO, 
+    FECHA_BASE, 
+    IMPORTE, 
+    NUMERO_DOCUMENTO, 
+    REFERENCIA, 
+    REFERENCIA_FACTURA 
+  } = item;
 
   const basePP = parseFloat(BASE_PP);
   const importe = parseFloat(IMPORTE);
@@ -1463,7 +1478,6 @@ function validarSiNumero(numero) {
 }
 
 function AddMulticash(ob) {
-  debugger;
   var obj = $(ob);
   var estado = $.trim(obj.find('td').eq(7).html());
   var cuenta = $.trim(obj.find('td').eq(0).html());
@@ -1502,10 +1516,16 @@ function printDiv(nombreDiv) {
 }
 
 function LoadImg(texto) {
-  html = '<center>'
-    + '<figure><img src="../resources/icons/preloader.gif" class="img-responsive"/></figure>'
-    + '<figcaption>' + texto + '</figcaption>'
-    + '</center>';
+  const html = `
+  <center>
+    <figure>
+      <img 
+        src="../resources/icons/preloader.gif" 
+        class="img-responsive"
+      />
+    </figure>
+    <figcaption>${texto}</figcaption>
+  </center>`;
   $(".centrado-porcentual").html(html);
   $(".form-control").attr("disabled", true);
   $(".centrado-porcentual").show();
@@ -1803,7 +1823,6 @@ function NofificacionDescuento(pcjDesc) {
 }
 
 function AddFactura(ob, valor, cumple_pres) {
-  debugger;
   var NumDoc = $.trim($(ob).parent().parent().find('td').eq(0).html());
   var total = unformatNum($("#VlrTotalFacturas").val());
   var tipoDoc = $.trim($(ob).parent().parent().find('td').eq(2).html());
