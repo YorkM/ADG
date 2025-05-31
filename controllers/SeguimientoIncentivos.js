@@ -255,10 +255,13 @@ const gestionarSeguimiento = async (item) => {
                     <thead class="table-info">
                         <tr>
                             <th>Zona</th>
-                            <th>Valores</th>
+                            <th>Nombre Zona</th>
+                            <th>${(tipoSeguimiento === "VALOR NETO") ? "Valores" : "Cantidades"}</th>
                             <th>% Liquidación</th>                            
                             <th>Valor Zona</th>
                             <th>Valor Cada Uno</th>
+                            <th>Nota</th>
+                            <th>Medio</th>
                         </tr>
                     </thead>
                     <tbody>`;
@@ -271,11 +274,14 @@ const gestionarSeguimiento = async (item) => {
                     
                     tablaLiquidacionZonas += `
                             <tr>
-                                <td class="custom-td">${item.ZONA_VENTAS} - ${item.ZONA_DESCRIPCION}</td>
+                                <td class="custom-td-2">${item.ZONA_VENTAS}</td>
+                                <td class="custom-td">${item.ZONA_DESCRIPCION}</td>
                                 <td class="custom-td-2">${formatNum(item.TOTAL_NETO_FACT, "$")}</td>
                                 <td class="custom-td-2">${porcentajeVenta.toFixed(2)}%</td>
                                 <td class="custom-td-2">${formatNum(Math.round(incentivoZona), "$")}</td>
                                 <td class="custom-td-2">${formatNum(Math.round(valorCadaVendedor), "$")}</td>
+                                <td class="custom-td">AG ENERO 2025</td>
+                                <td class="custom-td">CONSIGNACIÓN</td>
                             </tr>`;                
                 });
                 tablaLiquidacionZonas += `
@@ -290,11 +296,14 @@ const gestionarSeguimiento = async (item) => {
                     
                     tablaLiquidacionZonas += `
                             <tr>
-                                <td class="custom-td">${item.ZONA_VENTAS} - ${item.ZONA_DESCRIPCION}</td>
+                                <td class="custom-td-2">${item.ZONA_VENTAS}</td>
+                                <td class="custom-td">${item.ZONA_DESCRIPCION}</td>
                                 <td class="custom-td-2">${item.CANTIDAD}</td>
                                 <td class="custom-td-2">${porcentajeVenta.toFixed(2)}%</td>
                                 <td class="custom-td-2">${formatNum(Math.round(incentivoZona), "$")}</td>
                                 <td class="custom-td-2">${formatNum(Math.round(valorCadaVendedor), "$")}</td>
+                                <td class="custom-td">AG ENERO 2025</td>
+                                <td class="custom-td">CONSIGNACIÓN</td>
                             </tr>`;                
                 });
                 tablaLiquidacionZonas += `

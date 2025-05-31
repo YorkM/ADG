@@ -264,16 +264,10 @@
                             <tr>
                                 <th>Rappels</th>
                                 <th>Seguimiento Incentivo</th>
-                                <th id="descProveedor" style="font-size: 14px !important;"></th>
-                                <th>-</th>
-                                <th>-</th>
+                                <th colspan="3" id="descProveedor" style="font-size: 14px !important;"></th>
                             </tr>
                             <tr>
-                                <td style="background-color: white;">-</td>
-                                <td style="background-color: white;">-</td>
-                                <td style="background-color: white;">-</td>
-                                <td style="background-color: white;">-</td>
-                                <td style="background-color: white;">-</td>
+                                <td colspan="6" style="background-color: white;"></td>                                
                             </tr>
                             <tr>
                                 <th>Zona</th>
