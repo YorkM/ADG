@@ -49,6 +49,12 @@
             color: #055160;
         }
 
+        #tablaResumen2 thead tr th {
+            font-size: 15px !important;
+            font-weight: 400;
+            color: #055160;
+        }
+
         #tablaLiquidacion thead tr th {
             font-size: 15px !important;
             font-weight: 400;
@@ -80,7 +86,7 @@
         }
 
         .custom-td {
-            font-size: 13px;
+            font-size: 13px !important;
         }
 
         .custom-td-2 {
@@ -120,6 +126,8 @@
                 <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false"><i class="fa-solid fa-eye"></i>&nbsp;Seguimiento Incentivo</button>
 
                 <button class="nav-link" id="nav-profile-tab-2" data-bs-toggle="tab" data-bs-target="#nav-profile-2" type="button" role="tab" aria-controls="nav-profile-2" aria-selected="false"><i class="fa-solid fa-sack-dollar"></i>&nbsp;Liquidación FDV</button>
+
+                <button class="nav-link" id="nav-profile-tab-3" data-bs-toggle="tab" data-bs-target="#nav-profile-3" type="button" role="tab" aria-controls="nav-profile-3" aria-selected="false"><i class="fa-solid fa-rectangle-list"></i>&nbsp;Resumen</button>
             </div>
         </nav>
         <div class="tab-content " id="nav-tabContent">
@@ -259,7 +267,7 @@
                 </div>
                 <h4 class="text-center text-green">Resumen por Proveedor - Por Zonas de Ventas</h4>
                 <div class="overflow mt-3 mb-3">
-                    <table class="table table-bordered table-sm mx-auto" id="tablaResumen" style="width: 60%;">
+                    <table class="table table-bordered table-hover table-sm mx-auto" id="tablaResumen" style="width: 60%;">
                         <thead class="table-info">
                             <tr>
                                 <th>Rappels</th>
@@ -322,20 +330,41 @@
                     
                 </div>               
             </div>
+            <div class="tab-pane fade p-2" id="nav-profile-3" role="tabpanel" aria-labelledby="nav-profile-tab">
+                <div class="overflow mt-3 mb-3" id="contenedorTablaResumen">
+                    
+                </div>               
+            </div>
         </div>
     </div>
-    <!-- MODAL -->
-    <div class="modal fade" id="" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog" style="min-width: 80%;">
+    <!-- MODAL --> 
+    <div class="modal fade" id="modalSeguimiento" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" style="min-width: 50%;">
             <div class="modal-content">
                 <div class="modal-header">
                     <div class="modal-title">
-                        <h5></h5>
+                        <h5>Actualizar Datos</h5>
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-
+                <div class="modal-body" style="padding-bottom: 30px;">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label for="cuotaValor">Cuota en Valores</label>
+                                <input type="text" class="form-control form-control-sm" id="cuotaValor">
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label for="cuotaImpacto">Cuota en Impactos</label>
+                                <input type="text" class="form-control form-control-sm" id="cuotaImpacto">
+                            </div>
+                        </div>
+                        <div class="col-md-2 align-self-end">
+                            <button class="btn btn-outline-primary btn-sm w-100" id="actualizarDatos">Actualizar</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

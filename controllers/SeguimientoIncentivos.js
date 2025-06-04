@@ -1,3 +1,9 @@
+const porcentajeFDV = 88;
+const porcentajeMercadeo = 5;
+const porcentajeGerComer = 3;
+const porcentajeCoorContac = 2;
+const porcentajeCoorComer = 2;
+
 // FUNCIÓN CONFIRMAR ACCIONES
 const confirmAlert = async (title, text) => {
     const result = await Swal.fire({
@@ -13,6 +19,22 @@ const confirmAlert = async (title, text) => {
 
     return result;
 }
+
+const meses = {
+    "01": "ENERO",
+    "02": "FEBRERO",
+    "03": "MARZO",
+    "04": "ABRIL",
+    "05": "MAYO",
+    "06": "JUNIO",
+    "07": "JULIO",
+    "08": "AGOSTO",
+    "09": "SEPTIEMBRE",
+    "10": "OCTUBRE",
+    "11": "NOVIEMBRE",
+    "12": "DICIEMBRE"
+}
+
 // FUNCIÓN LIMPIAR
 const limpiar = () => {
     const oficinas = OficinasVentas('S');
@@ -85,6 +107,57 @@ const guardarDatosBase = async () => {
         limpiar();
     }
 }
+// FUNCIÓN PARA OBTENER RESUMEN INCETIVOS
+const getResumenIncentivos = async () => {
+    const organizacion = $('#numOrg').val();
+
+    const resp = await enviarPeticion({
+        op: "G_RESUMEN",
+        link: "../models/SeguimientoIncentivos.php",
+        organizacion       
+    });
+
+    if (resp.data.length) {
+        let tablaResumen = `
+            <table class="table table-bordered table-hover table-sm" id="tablaResumen2" style="width: 100%;">
+                <thead class="table-info">        
+                    <tr>
+                        <th>Laboratorio</th>
+                        <th>Concepto</th>
+                        <th>Documento</th>
+                        <th>Valor Final</th>                       
+                    </tr>
+                </thead>
+                <tbody>`;
+
+        const totalValorFinal = resp.data.reduce((acumulado, item) => acumulado + parseFloat(item.VALOR_FINAL), 0); 
+                
+        resp.data.forEach(item => {
+            let mes = (parseInt(item.MES) < 10) ? `0${item.MES}` : `${item.MES}`;
+            const concepto = `INCENTIVO FDV ${meses[mes]} ${item.ANIO}`;
+            tablaResumen += `
+                    <tr>
+                        <td class="custom-td">${item.LABORATORIO}</td>
+                        <td class="custom-td">${concepto}</td>
+                        <td class="custom-td-2">${item.DOCUMENTO}</td>
+                        <td class="custom-td-2">${formatNum(item.VALOR_FINAL, "$")}</td>                        
+                    </tr>`;                
+        });
+        tablaResumen += `
+                    </tbody>
+                    <tfoot class="table-info">        
+                        <tr>
+                            <td class="text-green" colspan="3">TOTAL</td>
+                            <td class="text-green">${formatNum(totalValorFinal, "$")}</td>                                                  
+                        </tr>
+                    </tfoot>                       
+                </table>`;
+        $('#contenedorTablaResumen').html(tablaResumen);
+    } else {
+        const texto = `<p class="lead text-center">Resumen no disponible, No se registra ningún incentivo aún!!!</p>`;
+        $('#contenedorTablaResumen').html(texto);
+    }
+}
 // FUNCIÓN PARA OBTENER LOS DATOS BASE
 const getDatosBase = async () => {
     const organizacion = $('#numOrg').val();
@@ -121,6 +194,8 @@ const getDatosBase = async () => {
     });
     $('#tablaIncentivos tbody').html(elementos);
 
+    getResumenIncentivos();
+
     $('#tablaIncentivos').on('click', '.seguimiento', function () {
         const fila = $(this).closest('tr').find('td');
         const item = {
@@ -140,6 +215,22 @@ const getDatosBase = async () => {
 
         gestionarSeguimiento(item);
     });
+
+    $('#tablaIncentivos').on('click', '.editar', function () {
+        const fila = $(this).closest('tr').find('td');
+
+        const item = {
+            idSeguimiento: fila.eq(0).text(),
+            cuota: fila.eq(4).text(),
+            impacto: fila.eq(5).text()
+        }
+
+        sessionStorage.ItemActualizar = JSON.stringify(item);
+
+        $('#cuotaValor').val(item.cuota);
+        $('#cuotaImpacto').val(item.impacto);
+        $('#modalSeguimiento').modal('show');
+    });
 }
 // FUNCIÓN PARA GESTIONAR SEGUIMIENTO
 const gestionarSeguimiento = async (item) => {
@@ -148,6 +239,8 @@ const gestionarSeguimiento = async (item) => {
 
         const { idSeguimiento, organizacion, oficina, grupoArticulo, descProveedor, cuota, impacto, tipoSeguimiento, fechaInicio, fechaFinal } = item;
         let zona = oficina.substring(0, 2);
+        let fechaRappelsMes = fechaInicio.split("-")[1];
+        let fechaRappelsAnio = fechaInicio.split("-")[0];
 
         $('#seguimientoOculto').val(idSeguimiento);
 
@@ -165,8 +258,27 @@ const gestionarSeguimiento = async (item) => {
         const cuotaActual = resp.data.reduce((acumulado, item) => acumulado + parseFloat(item.TOTAL_NETO_FACT), 0);
         const impactoActual = resp.data.reduce((acumulado, item) => acumulado + parseFloat(item.IMPACTOS), 0);
         const cantidadActual = resp.data.reduce((acumulado, item) => acumulado + parseFloat(item.CANTIDAD), 0);
-        const difCuota = cuotaLimpia  - cuotaActual;
-        const difImpacto = parseInt(impacto)  - impactoActual;
+        let difCuota = 0;
+        let difImpacto = 0;
+        let signo = ""; 
+        let signo2 = "";
+
+        if (cuotaLimpia > cuotaActual) {
+            difCuota = cuotaLimpia  - cuotaActual;
+            signo = "Menos";
+        } else {
+            difCuota = cuotaActual - cuotaLimpia;
+            signo = "Mas";
+        }
+
+        if (parseInt(impacto) > impactoActual) {
+            difImpacto = parseInt(impacto)  - impactoActual;
+            signo2 = "Menos";
+        } else {
+            difImpacto = impactoActual - parseInt(impacto);
+            signo2 = "Mas";
+        }
+
         const porcCuota = cuotaActual * 100 / cuotaLimpia;
         const porcImpacto = impactoActual * 100 / parseInt(impacto);
         
@@ -176,12 +288,12 @@ const gestionarSeguimiento = async (item) => {
 
         $('#cuota').text(cuota);
         $('#cuotaActual').text(formatNum(cuotaActual, "$"));
-        $('#difCuota').text(formatNum(difCuota, "$"));
+        $('#difCuota').text(`${signo}: ${formatNum(difCuota, "$")}`);
         $('#porcCuota').text(porcCuota.toFixed(2) + "%");
         $('#impacto').text(impacto);
         $('#impactoActual').text(impactoActual);
         $('#porcImpacto').text(porcImpacto.toFixed(2) + "%");
-        $('#difImpacto').text(difImpacto);
+        $('#difImpacto').text(`${signo2}: ${difImpacto}`);
 
         let datosResumen = ``;
         resp.data.forEach(item => {
@@ -217,11 +329,11 @@ const gestionarSeguimiento = async (item) => {
             $('#numeroNota').val(NUMERO_NOTA);
             $('#valorNota').val(formatNum(VALOR_NOTA, "$"));
 
-            const liquidacG = (parseFloat(VALOR_NOTA) * 88) / 100;
-            const mercadeo  = (parseFloat(VALOR_NOTA) * 5) / 100;
-            const gerenciaC = (parseFloat(VALOR_NOTA) * 3) / 100;
-            const coordCome = (parseFloat(VALOR_NOTA) * 2) / 100;
-            const coordCont = (parseFloat(VALOR_NOTA) * 2) / 100;
+            const liquidacG = (parseFloat(VALOR_NOTA) * porcentajeFDV) / 100;
+            const mercadeo  = (parseFloat(VALOR_NOTA) * porcentajeMercadeo) / 100;
+            const gerenciaC = (parseFloat(VALOR_NOTA) * porcentajeGerComer) / 100;
+            const coordCome = (parseFloat(VALOR_NOTA) * porcentajeCoorComer) / 100;
+            const coordCont = (parseFloat(VALOR_NOTA) * porcentajeCoorContac) / 100;
 
             const tablaLiquidacion = `
                 <table class="table table-bordered table-sm mx-auto" id="tablaLiquidacion" style="width: 100%;">
@@ -251,8 +363,15 @@ const gestionarSeguimiento = async (item) => {
             $('#contenedorTablaLiquidacion').html(tablaLiquidacion);
 
             let tablaLiquidacionZonas = `
-                <table class="table table-bordered table-sm mx-auto" id="tablaLiquidacionZonas" style="width: 100%;">
+                <table class="table table-bordered table-hover table-sm mx-auto" id="tablaLiquidacionZonas" style="width: 100%;">
                     <thead class="table-info">
+                        <tr>
+                            <th colspan="4">Rappels</th>
+                            <th class="custom-td" colspan="4">${descProveedor} ${meses[fechaRappelsMes]} ${fechaRappelsAnio}</th>                           
+                        </tr>
+                        <tr>
+                            <th colspan="8" style="background-color: white;"></th>                            
+                        </tr>
                         <tr>
                             <th>Zona</th>
                             <th>Nombre Zona</th>
@@ -268,7 +387,8 @@ const gestionarSeguimiento = async (item) => {
 
             if (tipoSeguimiento === "VALOR NETO") {
                 resp.data.forEach(item => {
-                    const porcentajeVenta = (parseInt(item.CANTIDAD) / parseInt(impacto)) * 100;
+                    const porcentajeVenta = (parseInt(item.TOTAL_NETO_FACT) / cuotaActual) * 100;
+                    // const porcentajeVenta = (parseInt(item.TOTAL_NETO_FACT) /  56053246) * 100;
                     const incentivoZona = (liquidacG * porcentajeVenta) / 100;
                     const valorCadaVendedor = incentivoZona / 2;
                     
@@ -280,7 +400,7 @@ const gestionarSeguimiento = async (item) => {
                                 <td class="custom-td-2">${porcentajeVenta.toFixed(2)}%</td>
                                 <td class="custom-td-2">${formatNum(Math.round(incentivoZona), "$")}</td>
                                 <td class="custom-td-2">${formatNum(Math.round(valorCadaVendedor), "$")}</td>
-                                <td class="custom-td">AG ENERO 2025</td>
+                                <td class="custom-td">${descProveedor} ${meses[fechaRappelsMes]} ${fechaRappelsAnio}</td>
                                 <td class="custom-td">CONSIGNACIÓN</td>
                             </tr>`;                
                 });
@@ -290,8 +410,9 @@ const gestionarSeguimiento = async (item) => {
                 $('#contenedorTablaLiquidacionZonas').html(tablaLiquidacionZonas);
             } else {
                 resp.data.forEach(item => {
-                    const porcentajeVenta = (parseFloat(item.TOTAL_NETO_FACT) / cuotaLimpia) * 100;
-                    const incentivoZona = (liquidacG * porcentajeVenta) / 100;
+                    // const porcentajeImpactos = (parseFloat(item.CANTIDAD) / parseInt(impacto)) * 100;
+                    const porcentajeImpactos = (parseFloat(item.CANTIDAD) / 8977) * 100;
+                    const incentivoZona = (liquidacG * porcentajeImpactos) / 100;
                     const valorCadaVendedor = incentivoZona / 2;
                     
                     tablaLiquidacionZonas += `
@@ -299,10 +420,10 @@ const gestionarSeguimiento = async (item) => {
                                 <td class="custom-td-2">${item.ZONA_VENTAS}</td>
                                 <td class="custom-td">${item.ZONA_DESCRIPCION}</td>
                                 <td class="custom-td-2">${item.CANTIDAD}</td>
-                                <td class="custom-td-2">${porcentajeVenta.toFixed(2)}%</td>
+                                <td class="custom-td-2">${porcentajeImpactos.toFixed(2)}%</td>
                                 <td class="custom-td-2">${formatNum(Math.round(incentivoZona), "$")}</td>
                                 <td class="custom-td-2">${formatNum(Math.round(valorCadaVendedor), "$")}</td>
-                                <td class="custom-td">AG ENERO 2025</td>
+                                <td class="custom-td">${descProveedor} ${meses[fechaRappelsMes]} ${fechaRappelsAnio}</td>
                                 <td class="custom-td">CONSIGNACIÓN</td>
                             </tr>`;                
                 });
@@ -314,7 +435,7 @@ const gestionarSeguimiento = async (item) => {
         } else {
             const texto = `<p class="lead text-center">Liquidación no disponible, aún no se fija el valor de la nota!!!</p>`;
             $('#contenedorTablaLiquidacion').html(texto);
-        }
+        }       
     
     } catch (error) {
         console.error(error);
@@ -379,6 +500,37 @@ const gestionarDatosNota = async () => {
         }
     }
 }
+// FUNCIÓN PARA ACTUALIZAR LOS DATOS BASE
+const actualizarDatos = async () => {
+    let { idSeguimiento, cuota, impacto } = JSON.parse(sessionStorage.ItemActualizar);
+    cuota = cuota.replace(/^\$|\.|,/g, "");
+    const cuotaValor = $('#cuotaValor').val().replace(/^\$|\.|,/g, "");
+    const cuotaImpacto = $('#cuotaImpacto').val();
+
+    if (cuota === cuotaValor && impacto === cuotaImpacto) {
+        $('#modalSeguimiento').modal('hide');
+        return; 
+    }
+
+    const result = await confirmAlert("Actualizar Datos", "Se actualizará la Cuota en Valores y la Cuota en Impactos... ¿Desea continuar?");
+    if (!result.isConfirmed) return;
+
+    const resp = await enviarPeticion({
+        op: "U_DATOS_BASE",
+        link: "../models/SeguimientoIncentivos.php",
+        idSeguimiento,
+        cuotaValor,
+        cuotaImpacto
+    });
+
+    if (resp.ok) {
+        Swal.fire("Actualizar Datos", "Los datos se actualizaron correctamente", "success");
+        getDatosBase();
+        $('#nav-profile-tab').attr('disabled', true);
+        $('#nav-profile-tab-2').attr('disabled', true);
+        $('#modalSeguimiento').modal('hide');
+    }
+}
 
 // EJECUCIÓN DE FUNCIONALIDADES
 $(function () {
@@ -395,14 +547,14 @@ $(function () {
 
     getGruposArticulos();
 
-    $('#cuotaValores, #valorNota').on('input', function () {
+    $('#cuotaValores, #valorNota, #cuotaValor').on('input', function () {
         let value = $(this).val().replace(/[^0-9]/g, '');
         if (value) value = parseFloat(value).toLocaleString('es-ES', { minimumFractionDigits: 0 });
         if (value) $(this).val("$" + value);
         else $(this).val("");
     });
 
-    $("#cuotaImpactos, #numeroNota").on("input", function () {
+    $("#cuotaImpactos, #numeroNota, #cuotaImpacto").on("input", function () {
         this.value = this.value.replace(/\D/g, "");
     });
 
@@ -415,5 +567,9 @@ $(function () {
 
     $('#guardarNota').click(function () {
         gestionarDatosNota();
+    });
+
+    $('#actualizarDatos').click(function () {
+        actualizarDatos();
     });
 });
