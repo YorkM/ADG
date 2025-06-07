@@ -281,8 +281,8 @@
                                 <th>Zona</th>
                                 <th>Nombre Zona</th>
                                 <th>Cantidad</th>
-                                <th>Suma de Valor Neto</th>
                                 <th>Cantidad Impactos</th>
+                                <th>Suma de Valor Neto</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -293,8 +293,8 @@
                                 <td class="text-green">TOTAL GENERAL</td>
                                 <td></td>
                                 <td class="text-green" id="totalCantidad"></td>
-                                <td class="text-green" id="totalResumen"></td>
                                 <td class="text-green" id="totalImpactos"></td>
+                                <td class="text-green" id="totalResumen"></td>
                             </tr>
                         </tfoot>
                     </table>

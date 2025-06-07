@@ -144,17 +144,17 @@ const getResumenIncentivos = async () => {
                     </tr>`;                
         });
         tablaResumen += `
-                    </tbody>
-                    <tfoot class="table-info">        
-                        <tr>
-                            <td class="text-green" colspan="3">TOTAL</td>
-                            <td class="text-green">${formatNum(totalValorFinal, "$")}</td>                                                  
-                        </tr>
-                    </tfoot>                       
-                </table>`;
+                </tbody>
+                <tfoot class="table-info">        
+                    <tr>
+                        <td class="text-green" colspan="3">TOTAL</td>
+                        <td class="text-green">${formatNum(totalValorFinal, "$")}</td>                                                  
+                    </tr>
+                </tfoot>                       
+            </table>`;
         $('#contenedorTablaResumen').html(tablaResumen);
     } else {
-        const texto = `<p class="lead text-center">Resumen no disponible, No se registra ningún incentivo aún!!!</p>`;
+        const texto = `<p class="lead text-center">Resumen no disponible, Aún no se registra incentivo!!!</p>`;
         $('#contenedorTablaResumen').html(texto);
     }
 }
@@ -302,8 +302,8 @@ const gestionarSeguimiento = async (item) => {
                     <td class="custom-td-2">${item.ZONA_VENTAS}</td>
                     <td class="custom-td">${item.ZONA_DESCRIPCION}</td>
                     <td class="custom-td-2">${item.CANTIDAD}</td>
-                    <td class="custom-td-2">${formatNum(item.TOTAL_NETO_FACT, "$")}</td>
                     <td class="custom-td-2">${item.IMPACTOS}</td>
+                    <td class="custom-td-2">${formatNum(item.TOTAL_NETO_FACT, "$")}</td>
                 </tr>`;
         });
         $('#tablaResumen tbody').html(datosResumen);

@@ -337,8 +337,8 @@ $(function () {
     },
     maxResults: 10,
     minLength: 3,
-    search: function () {},
-    open: function (event, ui) {},
+    search: function () { },
+    open: function (event, ui) { },
 
     select: function (event, ui) {
       $("#txtCodigoSAP").val(ui.item.codigo_sap);
@@ -375,8 +375,8 @@ $(function () {
     },
     maxResults: 10,
     minLength: 3,
-    search: function () {},
-    open: function (event, ui) {},
+    search: function () { },
+    open: function (event, ui) { },
     select: function (event, ui) {
       $("#CodigoSAPEntregas").val(ui.item.codigo_sap);
     }
@@ -407,8 +407,8 @@ $(function () {
     },
     maxResults: 10,
     minLength: 3,
-    search: function () {},
-    open: function (event, ui) {},
+    search: function () { },
+    open: function (event, ui) { },
     select: function (event, ui) {
       $("#txtFactCodigoCliente").val(ui.item.codigo_sap);
     }
@@ -433,8 +433,8 @@ $(function () {
     },
     maxResults: 10,
     minLength: 3,
-    search: function () {},
-    open: function (event, ui) {},
+    search: function () { },
+    open: function (event, ui) { },
     select: function (event, ui) {
       $("#txtFaltanteCodigoCliente").val(ui.item.codigo_sap);
     }
@@ -453,7 +453,7 @@ $(function () {
   //Busqueda o carga de cliente segun departamento
 
   if (DepId == 10) {
-    $("#colCliente").html('<select id="txt_cliente" class="form-control"></select>');
+    $("#colCliente").html('<select id="txt_cliente" class="form-select size-text"></select>');
     $("#txt_cliente").on('change', function () {
       CargarClienteSeleccionado();
     });
@@ -463,9 +463,9 @@ $(function () {
     $("#tr_cliente_fact").show();
     $("#tr_cliente_faltante").show();
     $("#colCliente").html(`<div class="input-group">
-								  <input type="text" id="txt_cliente" class="form-control" placeholder="Busqueda de clientes" tabindex="1">
+								  <input type="text" id="txt_cliente" class="form-control size-text" placeholder="Búsqueda de clientes" tabindex="1">
 								  <span class="input-group-btn">
-									<button class="btn btn-default" type="button" title="Búsqueda de cliente por voz" onclick="iniciarVozATexto('txt_cliente',this)">
+									<button class="btn btn-light btn-micro" type="button" title="Búsqueda de cliente por voz" onclick="iniciarVozATexto('txt_cliente',this)">
 										<i class="fa-solid fa-microphone"></i>&nbsp;
 									</button>
 								  </span>
@@ -492,8 +492,8 @@ $(function () {
       },
       maxResults: 10,
       minLength: 3,
-      search: function () {},
-      open: function (event, ui) {},
+      search: function () { },
+      open: function (event, ui) { },
       select: function (event, ui) {
         $("#TxtIntegracion").attr('disabled', true);
         $("#txt_nit").val(ui.item.nit);
@@ -535,8 +535,8 @@ $(function () {
           $("#txt_controlado").val('NO');
         }
         //Activacion de tabs de productos
-        $("#liProductos").removeClass("disabled disabledTab");
-        $("#btnProductos").attr("data-toggle", "tab");
+        // $("#liProductos").removeClass("disabled disabledTab");
+        $("#btnProductos").attr("disabled", false);
         //Grupos de clientes-----------------------------------
         $("#txtGrp1").val(ui.item.grupo1);
         $("#txtGrp2").val(ui.item.grupo2);
@@ -709,7 +709,7 @@ $(function () {
             name: 'valores',
             data: resp.datos
 
-          }, ]
+          },]
         });
 
       })
@@ -964,7 +964,7 @@ $(function () {
                   if ((reg > 0) && (reg > cant)) {
                     UnloadImg()
                     if (confirm("El producto " + $.trim(d.descripcion) + " presenta bonificado,"
-                        + "desea aumentar la cantidad a " + reg + " unidades para ganarlo?")) {
+                      + "desea aumentar la cantidad a " + reg + " unidades para ganarlo?")) {
                       cant = reg;
                     }
                     LoadImg("Subiendo CSV");
@@ -1097,6 +1097,7 @@ $(function () {
       });
     }
   });
+
   $("#buy-now").click(function () {
     crearPedidoRedencion();
   })
@@ -1106,6 +1107,10 @@ $(function () {
 
   // Mostrar u ocultar los divs según el valor de Rol
   $("#cartera_edades, #Presupuesto_datos").toggle(valoresPermitidosrol.includes(valor_rol));
+
+  $('#btnMas').click(function () {
+    $('#ModalMasCliente').modal('show');
+  });
 });
 
 const preLoadCliente = (codigo_sap) => {
@@ -1160,8 +1165,8 @@ const preLoadCliente = (codigo_sap) => {
       $("#txt_controlado").val('NO');
     }
     //Activacion de tabs de productos
-    $("#liProductos").removeClass("disabled disabledTab");
-    $("#btnProductos").attr("data-toggle", "tab");
+    // $("#liProductos").removeClass("disabled disabledTab");
+    $("#btnProductos").attr("disabled", false);
     //Grupos de clientes-----------------------------------
     $("#txtGrp1").val(DataCliente.grupo1);
     $("#txtGrp2").val(DataCliente.grupo2);
@@ -1204,88 +1209,88 @@ function GruposArticulos() {
 //
 /*
 function datos_cupo(){
-	$.ajax({
-		type    : "POST",
-		encoding: "UTF-8",
-		url     : "../models/PW-SAP.php",
-		async   : false,
-		dataType: "json",
-		error   : function(OBJ, ERROR, JQERROR){
-		},
-		beforeSend : function(){
-		},
-		data: {
-			op     : "S_CUPO_CREDITO",
-			org    : $.trim($("#Organizacion").val()),
-			codigo : $.trim($("#txt_codigoSap").val())
-		},
-		success: function(data){
-			var datos = '';
-		
-			if(data.length>0){
-				datos = [{
-						name: 'Disponible',
-						y: parseInt(data[0].DISPONIBLE),
-						sliced: true,
-						selected: true
-					   }, {
-						name: 'Comprometido',
-						y: parseInt(data[0].COMPROMETIDO)
-					  }];
-				$("#cupo_txt1").text('COMPROMETIDO : '+formatNum(data[0].COMPROMETIDO,'$'));
-				$("#cupo_txt2").text('DISPONIBLE   : '+formatNum(data[0].DISPONIBLE,'$'));
-			}else{
-				datos = [{
-						name: 'Disponible',
-						y: 100,
-						sliced: true,
-						selected: true
-					   }, {
-						name: 'Comprometido',
-						y: 0
-					  }];
-				$("#cupo_txt1").text('COMPROMETIDO : '+formatNum(0,'$'));
-				$("#cupo_txt2").text('DISPONIBLE   : '+$("#txt_cupo").val());
-			}
-			
-	     	   Highcharts.chart('container3', {
-					chart: {
-						plotBackgroundColor: null,
-						plotBorderWidth: null,
-						plotShadow: false,
-						type: 'pie'
-					},
-					title: {
-						text: 'CUPO DE CRÉDITO'
-					},
-					tooltip: {
-						pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-					},
-					accessibility: {
-						point: {
-							valueSuffix: '%'
-						}
-					},
-					plotOptions: {
-						pie: {
-							allowPointSelect: true,
-							cursor: 'pointer',
-							dataLabels: {
-								enabled: true,
-								format: '<b>{point.name}</b>: {point.percentage:.1f} %'
-							}
-						}
-					},
-					series: [{
-						name: 'Brands',
-					   // colorByPoint: true,
-						data: datos
-					}]
-				});	
-		}
-	}).fail(function(data){
-	    console.error(data);
-	});	
+  $.ajax({
+    type    : "POST",
+    encoding: "UTF-8",
+    url     : "../models/PW-SAP.php",
+    async   : false,
+    dataType: "json",
+    error   : function(OBJ, ERROR, JQERROR){
+    },
+    beforeSend : function(){
+    },
+    data: {
+      op     : "S_CUPO_CREDITO",
+      org    : $.trim($("#Organizacion").val()),
+      codigo : $.trim($("#txt_codigoSap").val())
+    },
+    success: function(data){
+      var datos = '';
+  	
+      if(data.length>0){
+        datos = [{
+            name: 'Disponible',
+            y: parseInt(data[0].DISPONIBLE),
+            sliced: true,
+            selected: true
+             }, {
+            name: 'Comprometido',
+            y: parseInt(data[0].COMPROMETIDO)
+            }];
+        $("#cupo_txt1").text('COMPROMETIDO : '+formatNum(data[0].COMPROMETIDO,'$'));
+        $("#cupo_txt2").text('DISPONIBLE   : '+formatNum(data[0].DISPONIBLE,'$'));
+      }else{
+        datos = [{
+            name: 'Disponible',
+            y: 100,
+            sliced: true,
+            selected: true
+             }, {
+            name: 'Comprometido',
+            y: 0
+            }];
+        $("#cupo_txt1").text('COMPROMETIDO : '+formatNum(0,'$'));
+        $("#cupo_txt2").text('DISPONIBLE   : '+$("#txt_cupo").val());
+      }
+    	
+             Highcharts.chart('container3', {
+          chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false,
+            type: 'pie'
+          },
+          title: {
+            text: 'CUPO DE CRÉDITO'
+          },
+          tooltip: {
+            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+          },
+          accessibility: {
+            point: {
+              valueSuffix: '%'
+            }
+          },
+          plotOptions: {
+            pie: {
+              allowPointSelect: true,
+              cursor: 'pointer',
+              dataLabels: {
+                enabled: true,
+                format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+              }
+            }
+          },
+          series: [{
+            name: 'Brands',
+             // colorByPoint: true,
+            data: datos
+          }]
+        });	
+    }
+  }).fail(function(data){
+      console.error(data);
+  });	
 
 }
 */
@@ -1301,7 +1306,7 @@ function consultaOpciones(pedido, alm, rdespacho, rpuntoventa) {
     error: function (OBJ, ERROR, JQERROR) {
       alert(JQERROR);
     },
-    beforeSend: function () {},
+    beforeSend: function () { },
     data: ({
       op: "S_GESTION_PEDIDOS_UNICO",
       pedido: pedido
@@ -1342,22 +1347,22 @@ function Notificaciones() {
   //Ventas 14
   //Administradores 1
   /*if(rol == 14 || rol == 12 || rol == 1){
-	 if(ofi == 2100 || ofi == 2200 || ofi == 2300){
-		$.notify({// options
-			icon:    'glyphicon glyphicon-warning-sign',
-			title: '<strong>CONVENCIÓN</strong></br>',
-			message: '¡Vamos con toda! Convención 2022 ARUBA'+
-					 '  tú puedes ¡ANIMO!',
-			url: '',
-			target: '_blank' 
-		},{// settings	
-			delay : 10000,
-			type: 'warning',
-			animate: {
-				enter: 'animated fadeInDown',
-				exit: 'animated fadeOutUp'
-			},
-		});
+   if(ofi == 2100 || ofi == 2200 || ofi == 2300){
+    $.notify({// options
+      icon:    'glyphicon glyphicon-warning-sign',
+      title: '<strong>CONVENCIÓN</strong></br>',
+      message: '¡Vamos con toda! Convención 2022 ARUBA'+
+           '  tú puedes ¡ANIMO!',
+      url: '',
+      target: '_blank' 
+    },{// settings	
+      delay : 10000,
+      type: 'warning',
+      animate: {
+        enter: 'animated fadeInDown',
+        exit: 'animated fadeOutUp'
+      },
+    });
      }
  }*/
   //DESCUENTOS ESPECIALES PAGINA WEB
@@ -1391,8 +1396,8 @@ function PermisosZonas() {
     url: "../models/PW-SAP.php",
     async: false,
     dataType: "json",
-    error: function (OBJ, ERROR, JQERROR) {},
-    beforeSend: function () {},
+    error: function (OBJ, ERROR, JQERROR) { },
+    beforeSend: function () { },
     data: {
       op: "S_PERMISO_ZONA",
       rol: rol
@@ -1418,8 +1423,8 @@ function ZonasVentas() {
     url: "../models/PW-SAP.php",
     async: false,
     dataType: "json",
-    error: function (OBJ, ERROR, JQERROR) {},
-    beforeSend: function () {},
+    error: function (OBJ, ERROR, JQERROR) { },
+    beforeSend: function () { },
     data: {
       op: "S_ZONAS_VENTA",
       sw: sw,
@@ -1774,8 +1779,8 @@ function Limpiar() {
   $("#txt_destinatario").attr('disabled', false);
   $("#btnDescuentos").hide();
   //Deshabilitar pestañas---------------------------------
-  $("#liProductos").addClass("disabled disabledTab");
-  $("#btnProductos").removeAttr("data-toggle", "tab");
+  // $("#liProductos").addClass("disabled disabledTab");
+  $("#btnProductos").attr("disabled", true);
   $("#liPedidos").addClass("disabled disabledTab");
   $("#btnPedidos").removeAttr("data-toggle", "tab");
   //------------------------------------------------------
@@ -1965,169 +1970,142 @@ function sortJSON(data, key, orden) {
 }
 
 function TableView(filas, n, cl) {
-  //console.log(filas);
-  var op_inf = 0;
-  if ($("#DvChkKits").hasClass('DivCheckBoxTrue')) {
-    op_sw = 'B_PRODUCTOS_KIT';
-    op_inf = 1;
-  }
-  var tabla = '<table class="table" align="center" width="100%" id="tableProd">'
-    + '<thead>'
-    + '<tr>'
-    + '<th data-breakpoints="xs"><span>CODIGO</span></th>';
-  if (parseInt(n) == 1) {
-    tabla += '<th onclick="ordenar(1,this)" class="glyphicon ' + cl + ' ordenArr">DESCRIPCION</th>';
-  } else {
-    tabla += '<th onclick="ordenar(1,this)" class=" ordenArr">DESCRIPCION</th>';
-  }
-  if (parseInt(n) == 2) {
-    tabla += '<th data-breakpoints="xs" onclick="ordenar(2,this)" class="glyphicon ' + cl + ' ordenArr">VALOR</th>';
-  } else {
-    tabla += '<th data-breakpoints="xs" onclick="ordenar(2,this)" class=" ordenArr">VALOR</th>';
-  }
-  tabla += '<th data-breakpoints="xs">IVA</th>';
-  if (parseInt(n) == 3) {
-    tabla += '<th data-breakpoints="xs" onclick="ordenar(3,this)" class="glyphicon ' + cl + ' ordenArr">DCTO</th>';
-  } else {
-    tabla += '<th data-breakpoints="xs" onclick="ordenar(3,this)" class="ordenArr">DCTO</th>';
-  }
-  tabla += '<th data-breakpoints="xs">VNETO</th>';
-  if (parseInt(n) == 4) {
-    tabla += '<th data-breakpoints="xs" onclick="ordenar(4,this)" class="glyphicon ' + cl + ' ordenArr">STOCK</th>';
-  } else {
-    tabla += '<th data-breakpoints="xs" onclick="ordenar(4,this)" class="ordenArr">STOCK</th>';
-  }
+  const op_inf = $("#DvChkKits").hasClass('DivCheckBoxTrue') ? 1 : 0;
+  const org = $.trim($("#Organizacion").val());
 
-  tabla += '<th style="width:20px;">CANTIDAD</th>'
-    + '<th style="width:120px;" data-breakpoints="xs">TOTAL</th>'
-    + '<th data-visible="false">ID</th>'
-    + /**/ '<th data-breakpoints="xs">INFO</th>'
-    + '</tr>'
-    + '</thead>'
-    + '<tbody>';
-  for (var i = 0; i <= filas.length - 1; i++) {
-    d = filas[i];
-    var Bonifica = 0; //variable creada para saber si el producto esta o no bonificado
-    if (d.cant_pedido == 0) {
-      d.cant_pedido = '';
-      d.vlr_pedido = '';
-    } else {
+  // Generar encabezados de tabla con ordenamiento dinámico
+  const headers = [
+    { title: 'CODIGO', breakpoints: 'xs', sortable: false },
+    { title: 'DESCRIPCION', sortable: true, sortOrder: n === 1 ? cl : '' },
+    { title: 'VALOR', breakpoints: 'xs', sortable: true, sortOrder: n === 2 ? cl : '' },
+    { title: 'IVA', breakpoints: 'xs', sortable: false },
+    { title: 'DCTO', breakpoints: 'xs', sortable: true, sortOrder: n === 3 ? cl : '' },
+    { title: 'VNETO', breakpoints: 'xs', sortable: false },
+    { title: 'STOCK', breakpoints: 'xs', sortable: true, sortOrder: n === 4 ? cl : '' },
+    { title: 'CANTIDAD', width: '20px', sortable: false },
+    { title: 'TOTAL', breakpoints: 'xs', width: '120px', sortable: false },
+    { title: 'ID', visible: false, sortable: false },
+    { title: 'INFO', breakpoints: 'xs', sortable: false }
+  ];
 
-    }
-    //****************************************************************
+  // Construir el HTML de la tabla
+  let tabla = `
+    <table class="table" align="center" width="100%" id="tableProd">
+      <thead>
+        <tr>
+          ${headers.map(header => `
+            <th ${header.breakpoints ? `data-breakpoints="${header.breakpoints}"` : ''}
+                ${header.width ? `style="width:${header.width}"` : ''}
+                ${header.visible === false ? 'data-visible="false"' : ''}
+                ${header.sortable ? `onclick="ordenar(${headers.findIndex(h => h.title === header.title)}, this)"` : ''}
+                class="${header.sortable ? 'ordenArr' : ''} ${header.sortOrder || ''}">
+              <span>${header.title}</span>
+            </th>
+          `).join('')}
+        </tr>
+      </thead>
+      <tbody>
+  `;
 
-    if (d.bonificado != 0 && (parseInt(d.stock_bonificado) >= parseInt(d.cant_bonificado))) {
-      Bonifica = 1;
+  // Generar filas de datos
+  filas.forEach((d, i) => {
+    const Bonifica = d.bonificado != 0 && (parseInt(d.stock_bonificado) >= parseInt(d.cant_bonificado)) ? 1 : 0;
+    const cantPedido = d.cant_pedido == 0 ? '' : d.cant_pedido;
+    const vlrPedido = d.cant_pedido == 0 ? '' : d.vlr_pedido;
 
-      img = '<img src="../resources/icons/regalo.png" width="24" heigth="24"' + 'onclick="InfoBon(\'' + d.descripcion + '\',\'' + d.desc_bonificado_n + '\',\'' + d.stock + '\',\'' + d.stock_bonificado + '\',\'' + d.condicion_b + '\',\'' + d.stock_prepack + '\')" align="absmiddle">';
-    } else {
-      Bonifica = 0;
-      img = '';
-    }
+    // Generar iconos
+    const img = Bonifica ?
+      `<img src="../resources/icons/regalo.png" width="24" height="24" 
+            onclick="InfoBon('${d.descripcion}','${d.desc_bonificado_n}','${d.stock}',
+                    '${d.stock_bonificado}','${d.condicion_b}','${d.stock_prepack}')" 
+            align="absmiddle">` : '';
 
-    var img_desc = '';
-    if (parseInt(d.descuento_adg) > 0) {
-      img_desc = '<span class="glyphicon glyphicon-star-empty alert-warning" aria-hidden="true"></span> <b>%</b> ';
-    } else {
-      img_desc = '';
+    const img_desc = parseInt(d.descuento_adg) > 0 ?
+      `<span class="glyphicon glyphicon-star-empty alert-warning" aria-hidden="true"></span> <b>%</b> ` : '';
+
+    const img_new = parseInt(d.dias_creacion) <= 90 ?
+      `<img src="../resources/icons/nuevo.png" width="24" title="* Producto Nuevo *" height="24" align="absmiddle">` : '';
+
+    // Iconos específicos para Roma
+    let img_1 = '', img_2 = '', img_3 = '';
+    if (org === '2000') {
+      img_1 = parseInt(d.img1) === 1 ?
+        `<img src="../resources/icons/pw/aniversario.png" width="32" title="FERIA ROMA" height="32" align="absmiddle">` : '';
+      img_2 = parseInt(d.img2) === 1 ?
+        `<img src="../resources/icons/pw/70star.png" width="24" title="PRODUCTO ESTRELLA" height="24" align="absmiddle">` : '';
     }
 
-    var img_new = '';
+    const ofertado = d.codigo_material.substring(0, 4);
+    img_3 = ofertado === '4000' ?
+      `<img src="../resources/icons/pw/tag_marcado.png" width="24" title="PRODUCTO OFERTADO" height="24" align="absmiddle">` : '';
 
-    if (parseInt(d.dias_creacion) <= 90) {
-      img_new = '<img src="../resources/icons/nuevo.png" width="24" title="* Producto Nuevo *" heigth="24" align="absmiddle">';
-    }
+    // Construir fila
+    tabla += `
+      <tr>
+        <td>${img_new}${d.codigo_material}</td>
+        <td>${img_3} ${img} ${img_desc} ${d.descripcion} ${img_1} ${img_2}</td>
+        <td style="background-color:#64D4F7">${formatNum(d.valor_unitario, '$')}</td>
+        <td>${d.iva}</td>
+        <td>${d.descuento}</td>
+        <td style="background-color:#95F3E8">${formatNum(d.valor_neto, '$')}</td>
+        <td>${d.stock}</td>
+        <td>
+          <input type="number" 
+                 id="CAF${d.codigo_material}" 
+                 onKeyPress="return vnumeros(event)" 
+                 value="${cantPedido}" 
+                 class="form-control" 
+                 tabindex="${i + 1}"
+                 onBlur="AddProducto(
+                   '${$.trim(d.codigo_material)}',
+                   '${$.trim(d.valor_unitario)}',
+                   '${$.trim(d.iva)}',
+                   '${$.trim(d.descuento)}',
+                   this.value,
+                   '${$.trim(d.valor_neto)}',
+                   '${$.trim(d.stock)}',
+                   '${$.trim(d.vlr_pedido)}',
+                   '${$.trim(d.id_pedido)}',
+                   '${$.trim(Bonifica)}',
+                   '${$.trim(d.cant_bonificado)}',
+                   '${$.trim(d.cant_regular)}',
+                   '${$.trim(d.stock_bonificado)}'
+                 )">
+        </td>
+        <td>
+          <input type="text" class="form-control" id="TOF${d.codigo_material}" 
+                 value="${formatNum(vlrPedido, '$')}" disabled readonly>
+        </td>
+        <td>
+          <input type="text" class="form-control" value="${d.id_pedido}" 
+                 id="IDF${d.codigo_material}" disabled readonly>
+        </td>
+        <td align="center">
+          <button type="button" class="btn btn-sm btn-default" 
+                  onClick="InfoMaterial(
+                    '${$.trim(d.codigo_material)}',
+                    '${$.trim(d.valor_unitario, '$')}',
+                    '${$.trim(d.iva)}',
+                    '${$.trim(d.descuento)}',
+                    '${$.trim(d.descripcion)}',
+                    '${$.trim(d.stock)}',
+                    ${d.op_inf}
+                  )">
+            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+          </button>
+        </td>
+      </tr>
+    `;
+  });
 
-    /*imagenes para feria roma*/
-    let img_1 = '';
-    let img_2 = '';
-    let img_3 = '';
-    var org = $.trim($("#Organizacion").val());
-    if (org == '2000') { //Activo solo para roma 
-      if (parseInt(d.img1) == 1) { //70 años roma
-        img_1 = '<img src="../resources/icons/pw/aniversario.png" width="32"  title="FERIA ROMA" heigth="32" align="absmiddle">'
-      }
-      if (parseInt(d.img2) == 1) { //productos estrella
-        img_2 = '<img src="../resources/icons/pw/70star.png" width="24"  title="PRODUCTO ESTRELLA" heigth="24" align="absmiddle">'
-      }
-    }
-    let ofertado = d.codigo_material.substring(0, 4);
-    if (ofertado == '4000') {
-      img_3 = '<img src="../resources/icons/pw/tag_marcado.png" width="24"  title="PRODUCTO OFERTADO" heigth="24" align="absmiddle">'
-    }
-    /*fin de imagenes para roma*/
+  tabla += `
+      </tbody>
+    </table>
+  `;
 
-    tabla += '<tr>'
-      +
-      /*0*/
-      '<td>' + img_new + d.codigo_material + '</td>'
-      +
-      /*1*/
-      '<td>' + img_3 + ' ' + img + ' ' + img_desc + ' ' + d.descripcion + ' ' + img_1 + ' ' + img_2 + ' </td>'
-      +
-      /*2*/
-      '<td style="background-color:#64D4F7">' + formatNum(d.valor_unitario, '$') + '</td>'
-      +
-      /*3*/
-      '<td>' + d.iva + '</td>'
-      +
-      /*4*/
-      '<td>' + d.descuento + '</td>'
-      +
-      /*5*/
-      '<td style="background-color:#95F3E8">' + formatNum(d.valor_neto, '$') + '</td>'
-      +
-      /*6*/
-      '<td>' + d.stock + '</td>'
-      +
-      /*7*/
-      '<td>'
-      + '<input type="number" id="CAF' + d.codigo_material + '" onKeyPress="return vnumeros(event)" '
-      + 'value="' + d.cant_pedido + '" class="form-control" tabindex="' + (i + 1) + '"'
-      + 'onBlur="AddProducto(\'' + $.trim(d.codigo_material) + '\',\''
-      + $.trim(d.valor_unitario) + '\',\''
-      + $.trim(d.iva) + '\',\''
-      + $.trim(d.descuento) + '\',this.value,\''
-      + $.trim(d.valor_neto) + '\',\''
-      + $.trim(d.stock) + '\',\''
-      + $.trim(d.vlr_pedido) + '\',\''
-      + $.trim(d.id_pedido) + '\',\''
-      + $.trim(Bonifica) + '\',\''
-      + $.trim(d.cant_bonificado) + '\',\''
-      + $.trim(d.cant_regular) + '\',\''
-      + $.trim(d.stock_bonificado) + '\')" >'
-      + '</td>'
-      +
-      /*8*/
-      '<td>' + '<input type="text" class="form-control" id="TOF' + d.codigo_material + '" value="' + formatNum(d.vlr_pedido, '$') + '" disabled readonly>'
-      + '</td>'
-      +
-      /*9*/
-      '<td>'
-      + '<input type="text" class="form-control" value="' + d.id_pedido + '" id="IDF' + d.codigo_material + '" disabled readonly>'
-      + '</td>'
-      +
-      /*10*/
-      '<td align="center">'
-      + '<button type="button" class="btn btn-sm btn-default" onClick="InfoMaterial(\'' + $.trim(d.codigo_material) + '\',\''
-      + $.trim(d.valor_unitario, '$') + '\',\''
-      + $.trim(d.iva) + '\',\''
-      + $.trim(d.descuento) + '\',\''
-      + $.trim(d.descripcion) + '\',\''
-      + $.trim(d.stock) + '\','
-      + d.op_inf + ')">'
-      + '<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>'
-      + '</button>'
-      + '</td>';
-    tabla += '</tr>';
-  } //finfor
-
-  tabla += '</tbody>'
-    + '</table>';
   $("#dvResultProductos").html(tabla);
   $('#tableProd').footable();
 }
-
 function GuardarShoping() {
   $.ajax({
     encoding: "UTF-8",
@@ -2382,8 +2360,8 @@ function CargarEan() {
     url: "../models/PW-SAP.php",
     async: true,
     dataType: "json",
-    error: function (OBJ, ERROR, JQERROR) {},
-    beforeSend: function () {},
+    error: function (OBJ, ERROR, JQERROR) { },
+    beforeSend: function () { },
     data: {
       op: "B_EAN"
     },
@@ -2442,11 +2420,11 @@ function BuscarProductos() {
   /*
  //valido si se abre desde la ventana de 0102 y selecciono por defecto el valor enviado en $_GET["pedido_integracion"]	
   if($("#pedido_integracion").val()!=''){
-	 if($("#pedido_integracion").val()=='S'){
-		$("#TxtIntegracion").val('S');
-	 }else{
-		 $("#TxtIntegracion").val('N');
-	 }
+   if($("#pedido_integracion").val()=='S'){
+    $("#TxtIntegracion").val('S');
+   }else{
+     $("#TxtIntegracion").val('N');
+   }
   }*/
 
   var TipoPed = $("#TxtIntegracion").val();
@@ -2520,7 +2498,7 @@ function BuscarProductos() {
           'img2': d.img2,
           'op_inf': d.op_inf
           /*,
-          					 'codigos_ean'          :d.codigos_ean */
+                     'codigos_ean'          :d.codigos_ean */
         } //det={
         ArrProd.push(det);
 
@@ -2528,8 +2506,8 @@ function BuscarProductos() {
       } //for
       // console.log('Registros ARRAY : '+ArrProd.length);
       sortJSON(ArrProd, 'descripcion', 'asc');
-      $("#liProductos").removeClass("disabled disabledTab");
-      $("#btnProductos").attr("data-toggle", "tab");
+      // $("#liProductos").removeClass("disabled disabledTab");
+      $("#btnProductos").attr("disabled", false);
       CargarEan(); //se comenta para ver como funciona el rendimiento
 
     }
@@ -2581,262 +2559,282 @@ function GuardarHuella() {
 
 
 const validarUrlImg = async (codigo) => {
-
   try {
-    codigo = codigo.substring(0, 1) != "8" ? "1" + codigo.substring(1, codigo.length) : codigo;
-    const url = await `https://app.pwmultiroma.com/web/imagenesMateriales/${codigo}.png`
-    $(".img-material").attr("src", url)
-    $(".img-material").css("width", 400);
-    $(".img-material").css("height", 345);
-  } catch (e) {
-    console.error(e)
-  }
+    codigo = codigo.substring(0, 1) != "8" ? "1" + codigo.substring(1) : codigo;
+    const url = `https://app.pwmultiroma.com/web/imagenesMateriales/${codigo}.png`;
+    const defaultUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Imagen_no_disponible.svg/480px-Imagen_no_disponible.svg.png";
 
-}
+    const img = new Image();
+    img.onload = function () {
+      $(".img-material").attr("src", url);
+    };
+    img.onerror = function () {
+      $(".img-material").attr("src", defaultUrl);
+    };
+    img.src = url;
+
+    // Aplicar el tamaño aunque la imagen no haya cargado aún
+    $(".img-material").css({ width: 400, height: 345 });
+
+  } catch (e) {
+    console.error(e);
+    $(".img-material").attr("src", "https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Imagen_no_disponible.svg/480px-Imagen_no_disponible.svg.png");
+  }
+};
+
 
 
 //---------------------Funcion de informacion adicional del producto (codigo,descripcion,fecha y lotes)
 function InfoMaterial(pcodigo, pvalor, piva, pdcto, pdesc, pstock, op) {
-  //alert(pcodigo+' - '+pvalor+' - '+piva+' - '+pdcto+' - '+pdesc+' - '+pstock+' - '+op);
-  /*
-     op : 0 informacion de material
-	 op : 1 informacion de kits
-   */
-  var vdfinanbase = 0;
-  var cod = pcodigo;
-  //Valor Bruto
-  var vunit = pvalor;
-  //Porcentaje IVA
-  var iva = parseInt(piva);
-  //Porcentaje descuento
-  var dcto = parseInt(pdcto);
-  //Organizacion
-  var org = $("#Organizacion").val();
-  //Oficina de ventas
-  var ofi = $("#txt_oficina").val();
-  //Lista de precios
-  var lst = $("#txt_lista").val();
-  //Tipo de informacion
-  var opc = op == 0 ? 'B_INFO_MATERIAL' : 'B_INFO_KIT';
-  //Neto sin descuento
-  var v1 = Math.round(parseFloat(vunit) - ((parseFloat(vunit) * dcto) / 100));
-  //Dto financiero
-  var dtoPP = parseInt($("#txt_descuento").val());
-  //Valor impuesto
-  var v2 = Math.round(v1 * (iva / 100));
-  //Valor descuento
-  var v3 = Math.round((parseFloat(vunit) * dcto) / 100);
-  var v4 = 0;
-  if (cod.substring(0, 1) != 9) {
+  // Configuración inicial
+  const vunit = parseFloat(pvalor);
+  const iva = parseInt(piva);
+  const dcto = parseInt(pdcto);
+  const org = $("#Organizacion").val();
+  const ofi = $("#txt_oficina").val();
+  const lst = $("#txt_lista").val();
+  const opc = op === 0 ? 'B_INFO_MATERIAL' : 'B_INFO_KIT';
 
-    newDF = Math.round((v1 - (v1 * (dtoPP / 100)) + v2));
-    //console.log(newDF);
-    //vdfinanbase = Math.round(parseFloat(v1)-((parseFloat(v1)*dtoPP)/100));  
-    //v4 = Math.round(parseFloat(vdfinanbase)+((parseFloat(vdfinanbase)*piva)/100));  
+  // Cálculos financieros
+  const v1 = Math.round(vunit - ((vunit * dcto) / 100));
+  const dtoPP = parseInt($("#txt_descuento").val());
+  const v2 = Math.round(v1 * (iva / 100));
+  const v3 = Math.round((vunit * dcto) / 100);
+
+  let v4 = 0;
+  if (pcodigo.substring(0, 1) !== '9') {
     v4 = Math.round((v1 - (v1 * (dtoPP / 100)) + v2));
-
   }
-  var idfila = $("#IDF" + pcodigo).val();
 
-  $("#huella_codmaterial").val(cod);
+  // Configurar valores en el modal
+  $("#huella_codmaterial").val(pcodigo);
   $("#huella_descripcion").val(pdesc);
   $("#huella_dcto").val(dcto);
   $("#huella_stock").val(pstock);
 
-  $("#shoping_codmaterial").val(cod);
+  $("#shoping_codmaterial").val(pcodigo);
   $("#shoping_descripcion").val(pdesc);
   $("#shoping_preciomaterial").val(formatNum(vunit, '$'));
+
+  // Mostrar modal
   $('#ModalInfoMaterial').modal('show');
+
+  // Cargar datos
   $.ajax({
     encoding: "UTF-8",
     url: "../models/PW-SAP.php",
-    global: false,
     type: "POST",
     beforeSend: function () {
-      $('#ContenidoInfoMateriales').html(`<div class="alert alert-info m-2"><i class=""></i> Cargando...</div>`);
+      $('#ContenidoInfoMateriales').html(`
+        <div class="alert alert-info m-2">
+          <i class="fas fa-spinner fa-spin"></i> Cargando...
+        </div>
+      `);
     },
-    data: ({
-      op: opc,
-      cod: cod,
-      org: org,
-      ofi: ofi,
-      lst: lst
-
-    }),
+    data: { op: opc, cod: pcodigo, org, ofi, lst },
     dataType: "json",
-    async: false,
-    success: function (data) {
-      if (op == 0) {
-        var ins = (data[0].INSTITUCIONAL == 1) ? 'SI' : 'NO';
-        var ctrl = (data[0].CONTROLADO == 1) ? 'SI' : 'NO';
-        var tabla = '<div class="container-fluid">'
-          + '<div class="row">'
-          + '<div class="col-lg-6">'
-          + '<div class="panel panel-info">'
-          + '<div class="panel-heading">DATOS BASICOS</div>'
-          + '<table class="form" width="100%" align="center">'
-          + '<tbody>'
-          + '<tr>'
-          + '<td colspan="2" align="center"><img src="https://dfnas.pwmultiroma.com/imagenesMateriales/no_imagen.png" class="img-responsive img-material" width="400" height="345"></td>'
-          + '</tr>'
-          + '<tr>'
-          + '<td><b>CODIGO</b></td>'
-          + '<td>' + data[0].CODIGO_MATERIAL + '</td>'
-          + '</tr>'
-          + '<tr>'
-          + '<td><b>TEXTO CORTO</b></td>'
-          + '<td>' + data[0].DESCRIPCION + '</td>'
-          + '</tr>'
-          + '<tr>'
-          + '<td><b>REGISTRO INFO</b></td>'
-          + '<td>' + data[0].CODIGO_SAP + '</td>'
-          + '</tr>'
-          + '<tr>'
-          + '<td><b>TEXTO LARGO</b></td>'
-          + '<td>' + data[0].DESCRIPCION2 + '</td>'
-          + '</tr>'
-          + '<tr>'
-          + '<td><b>LABORATORIO</b></td>'
-          + '<td>' + data[0].LAB + '</td>'
-          + '</tr>'
-          + '<tr>'
-          + '<td><b>INVIMA</b></td>'
-          + '<td>' + data[0].INVIMA + '</td>'
-          + '</tr>'
-          + '<tr>'
-          + '<td><b>EAN</b></td>'
-          + '<td>' + data[0].EAN + '</td>'
-          + '</tr>'
-          + '<tr>'
-          + '<td><b>EMBALAJE</b></td>'
-          + '<td>' + data[0].EMBALAJE + '</td>'
-          + '</tr>'
-          + '<tr>'
-          + '<td><b>FECHA CREACIÓN</b></td>'
-          + '<td>' + data[0].FECHA_CREACION + '</td>'
-          + '</tr>'
-          + '<tr>'
-          + '<td><b>DIAS CREACIÓN</b></td>'
-          + '<td>' + data[0].DIAS_CREACION + '</td>'
-          + '</tr>'
-          + '<tr>'
-          + '<td><b>CONTROLADO</b>: ' + ctrl + '</td>'
-          + '<td><b>INSTITUCIONAL</b> :' + ins + '</td>'
-          + '</tr>'
-          + '</tbody>'
-          + '</table>'
-          + '</div>'
-          + '</div>'
-          + '<div class="col-lg-6">'
-          + '<div class="panel panel-info">'
-          + '<div class="panel-heading">DATOS DE VENTA</div>'
-          + '<table class="form" width="100%" align="center">'
-          + '<tbody>'
-          + '<tr>'
-          + '<td><b>VLR BRUTO</b></td>'
-          + '<td>' + formatNum(vunit, '$') + '</td>'
-          + '</tr>'
-          + '<tr>'
-          + '<td><b>VLR NETO SIN IVA</b></td>'
-          + '<td>' + formatNum(v1, '$') + '</td>'
-          + '</tr>'
-          + '<tr>'
-          + '<td><b>VLR NETO FINANCIERO</b></td>'
-          + '<td>' + formatNum(v4, '$') + '</td>'
-          + '</tr>'
-          + '<tr>'
-          + '<td><b>VLR DESCUENTO</b></td>'
-          + '<td>' + formatNum(v3, '$') + '</td>'
-          + '</tr>'
-          + '<tr>'
-          + '<td><b>VLR IVA</b></td>'
-          + '<td>' + formatNum(v2, '$') + '</td>'
-          + '</tr>'
-          + '<tr>'
-          + '<td><b>PORCENTAJE DCTO</b></td>'
-          + '<td>' + dcto + '%</td>'
-          + '</tr>'
-          + '<tr>'
-          + '<td><b>PORCENTAJE IVA</b></td>'
-          + '<td>' + iva + '%</td>'
-          + '</tr>'
-          + '</tbody>'
-          + '</table>'
-          + '</div>'
-          + '</div>'
-          + '<div class="col-lg-6">'
-          + '<div class="panel panel-info">'
-          + '<div class="panel-heading">DATOS DE INGRESO</div>'
-          + '<table class="form" width="100%" align="center">'
-          + '<thead>'
-          + '<tr>'
-          + '<th>CENTRO/ALMACEN - LOTE/VENCIMIENTO</th>'
-          + '<th>STOCK</th>'
-          + '</tr>'
-          + '</thead>'
-          + '<tbody>';
-        for (var i = 0; i <= data.length - 1; i++) {
-          tabla += '<tr>'
-            + '<td>' + data[i].CENTRO_SUMINISTRADOR + ' | ' + data[i].ALMACEN + ' - ' + data[i].LOTE + '  |  ' + data[i].VENCIMIENTO + '</td>'
-            + '<td>' + data[i].STOCK + '</td>'
-            + '</tr>'
-        }
-
-        tabla += '</tbody>'
-          + '</table>'
-        '</div>'
-        + '</div>'
-        + '</div>'
-        + '</div>';
-
-
-      } else { //tabla de contenido de kits
-        var tabla = '<table class="table" width="100%" align="center">'
-          + '<thead>'
-          + '<tr>'
-          + '<th>CODIGO</th>'
-          + '<th>DESCRIPCION</th>'
-          + '<th>VALOR</th>'
-          + '<th>%IVA</th>'
-          + '<th>%DCTO</th>'
-          + '<th>VALOR NETO</th>'
-          + '<th>CANTIDAD</th>'
-          + '<th>VALOR TOTAL</th>'
-          + '</tr>'
-          + '</thead>'
-          + '<tbody>';
-        for (var i = 0; i <= data.length - 1; i++) {
-          tabla += '<tr>'
-            + '<td>' + data[i].CODIGO_MATERIAL + '</td>'
-            + '<td>' + data[i].DESCRIPCION + '</td>'
-            + '<td>' + formatNum(data[i].VALOR_UNITARIO, '$') + '</td>'
-            + '<td>' + data[i].IVA + '</td>'
-            + '<td>' + data[i].DESCUENTO + '</td>'
-            + '<td>' + formatNum(data[i].VALOR_NETO, '$') + '</td>'
-            + '<td>' + data[i].CANTIDAD + '</td>'
-            + '<td>' + formatNum((parseFloat(data[i].VALOR_NETO) * parseInt(data[i].CANTIDAD)), '$') + '</td>'
-            + '</tr>'
-        }
-        tabla += '</tbody>'
-          + '</table>';
+    success: function (data) {// console.log(data); return ;
+      if (op === 0) {
+        renderMaterialInfo(data, { vunit, v1, v2, v3, v4, iva, dcto });
+      } else {
+        renderKitInfo(data);
       }
-      $('#ContenidoInfoMateriales').html(tabla);
       validarUrlImg(pcodigo);
-
-
-      /*
-      setTimeout(function(){
-      	 $('div .img-material').each(function(){
-      		if($(this)[0].naturalHeight == 0){
-      		 $(this).attr('src','https://dfnas.pwmultiroma.com/imagenesMateriales/no_imagen.png');
-      		}
-      	});				
-      },500)	*/
-
+    },
+    error: function (xhr, status, error) {
+      console.error("Error en la solicitud AJAX:", status, error);
+      $('#ContenidoInfoMateriales').html(`
+        <div class="alert alert-danger m-2">
+          Error al cargar la información del material
+        </div>
+      `);
     }
-  }).fail(function (data) {
-    console.log(data);
-  })
+  });
+}
+
+// Función para renderizar información de material
+function renderMaterialInfo(data, { vunit, v1, v2, v3, v4, iva, dcto }) {
+  const ins = data[0].INSTITUCIONAL == 1 ? 'SI' : 'NO';
+  const ctrl = data[0].CONTROLADO == 1 ? 'SI' : 'NO';
+
+  const stockRows = data[0]['INVENTARIO_LOTES'].map(item => `
+    <tr>
+      <td>${item.CENTRO} </tb>
+      <td>${item.ALMACEN} </td>
+      <td>${item.TIPO_MOV}</td>
+      <td>${item.LOTE}</td>
+      <td>${item.VMCTO}</td>
+      <td>${parseInt(item.CANTIDAD)}</td>
+      <td>${item.UBICACION}</td>
+    </tr>
+  `).join('');
+
+  const html = `
+    <div class="container-fluid">
+      <div class="row">
+        <!-- Columna de datos básicos -->
+        <div class="col-lg-6">
+          <div class="panel panel-info">
+            <div class="panel-heading">DATOS BASICOS</div>
+            <table class="form" width="100%" align="center">
+              <tbody>
+                <tr>
+                  <td colspan="2" align="center">
+                    <img src="https://dfnas.pwmultiroma.com/imagenesMateriales/no_imagen.png" 
+                         class="img-responsive img-material" width="400" height="345">
+                  </td>
+                </tr>
+                <tr>
+                  <td><b>CODIGO</b></td>
+                  <td>${data[0].CODIGO_MATERIAL}</td>
+                </tr>
+                <tr>
+                  <td><b>TEXTO CORTO</b></td>
+                  <td>${data[0].DESCRIPCION}</td>
+                </tr>
+                <tr>
+                  <td><b>REGISTRO INFO</b></td>
+                  <td>${data[0].CODIGO_SAP}</td>
+                </tr>
+                <tr>
+                  <td><b>TEXTO LARGO</b></td>
+                  <td>${data[0].DESCRIPCION2}</td>
+                </tr>
+                <tr>
+                  <td><b>LABORATORIO</b></td>
+                  <td>${data[0].LAB}</td>
+                </tr>
+                <tr>
+                  <td><b>INVIMA</b></td>
+                  <td>${data[0].INVIMA}</td>
+                </tr>
+                <tr>
+                  <td><b>EAN</b></td>
+                  <td>${data[0].EAN}</td>
+                </tr>
+                <tr>
+                  <td><b>EMBALAJE</b></td>
+                  <td>${data[0].EMBALAJE}</td>
+                </tr>
+                <tr>
+                  <td><b>FECHA CREACIÓN</b></td>
+                  <td>${data[0].FECHA_CREACION}</td>
+                </tr>
+                <tr>
+                  <td><b>DIAS CREACIÓN</b></td>
+                  <td>${data[0].DIAS_CREACION}</td>
+                </tr>
+                <tr>
+                  <td><b>CONTROLADO</b>: ${ctrl}</td>
+                  <td><b>INSTITUCIONAL</b>: ${ins}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+        <!-- Columna de datos de venta -->
+        <div class="col-lg-6">
+          <div class="panel panel-info">
+            <div class="panel-heading">DATOS DE VENTA</div>
+            <table class="form" width="100%" align="center">
+              <tbody>
+                <tr>
+                  <td><b>VLR BRUTO</b></td>
+                  <td>${formatNum(vunit, '$')}</td>
+                </tr>
+                <tr>
+                  <td><b>VLR NETO SIN IVA</b></td>
+                  <td>${formatNum(v1, '$')}</td>
+                </tr>
+                <tr>
+                  <td><b>VLR NETO FINANCIERO</b></td>
+                  <td>${formatNum(v4, '$')}</td>
+                </tr>
+                <tr>
+                  <td><b>VLR DESCUENTO</b></td>
+                  <td>${formatNum(v3, '$')}</td>
+                </tr>
+                <tr>
+                  <td><b>VLR IVA</b></td>
+                  <td>${formatNum(v2, '$')}</td>
+                </tr>
+                <tr>
+                  <td><b>PORCENTAJE DCTO</b></td>
+                  <td>${dcto}%</td>
+                </tr>
+                <tr>
+                  <td><b>PORCENTAJE IVA</b></td>
+                  <td>${iva}%</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+        <!-- Columna de datos de ingreso -->
+        <div class="col-lg-12">
+          <div class="panel panel-info">
+            <div class="panel-heading">INVENTARIO FISICO POR LOTES</div>
+            <table class="table" width="100%" align="center">
+              <thead>
+                  <th>CENTRO</tb>
+                  <th>ALMACEN</td>
+                  <th>MOV</td>
+                  <th>LOTE</td>
+                  <th>VENCIMIENTO</td>
+                  <th>STOCK</td>
+                  <th>UBICACION</td>
+              </thead>
+              <tbody>
+                ${stockRows}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  $('#ContenidoInfoMateriales').html(html);
+}
+
+// Función para renderizar información de kit
+function renderKitInfo(data) {
+  const rows = data.map(item => `
+    <tr>
+      <td>${item.CODIGO_MATERIAL}</td>
+      <td>${item.DESCRIPCION}</td>
+      <td>${formatNum(item.VALOR_UNITARIO, '$')}</td>
+      <td>${item.IVA}</td>
+      <td>${item.DESCUENTO}</td>
+      <td>${formatNum(item.VALOR_NETO, '$')}</td>
+      <td>${item.CANTIDAD}</td>
+      <td>${formatNum((parseFloat(item.VALOR_NETO) * parseInt(item.CANTIDAD)), '$')}</td>
+    </tr>
+  `).join('');
+
+  const html = `
+    <table class="table" width="100%" align="center">
+      <thead>
+        <tr>
+          <th>CODIGO</th>
+          <th>DESCRIPCION</th>
+          <th>VALOR</th>
+          <th>%IVA</th>
+          <th>%DCTO</th>
+          <th>VALOR NETO</th>
+          <th>CANTIDAD</th>
+          <th>VALOR TOTAL</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>
+  `;
+
+  $('#ContenidoInfoMateriales').html(html);
 }
 //---------------------WS que valida en tiempo real el inventario en SAP
 function WSInvent(codigo, oficina) {
@@ -2945,6 +2943,7 @@ function AddProducto(pcodigo,
       idfila = InsertarDetalle(NumPed, codigo, cant, vlr_unitario, descuento, totalfila, iva);
       $("#IDF" + pcodigo).val(idfila); //
     } else {
+
       //Se actualiza la fila
       var id = $("#IDF" + pcodigo).val();
       ActualizarDetalle(id, cant, totalfila, codigo);
@@ -3078,7 +3077,7 @@ function InsertarDetalle(NumPed, codigo, cant, vlr_unitario, descuento, totalfil
         ModificarArray(cant, totalfila, numero, codigo);
       } else {
         /* alert('ERROR: Al insertar el producto - '+codigo);
-			 alert(data);*/
+       alert(data);*/
         Swal.fire({
           toast: true,
           icon: 'success',
@@ -3107,7 +3106,7 @@ function ActualizarDetalle(idfila, cant, totalfila, codigo) {
     url: "../models/PW-SAP.php",
     global: false,
     type: "POST",
-    error: function (OBJ, ERROR, JQERROR) {},
+    error: function (OBJ, ERROR, JQERROR) { },
     data: ({
       op: "U_PEDIDO_DETALLE",
       idfila: idfila,
@@ -3160,7 +3159,7 @@ function EliminarDetalle(idfila, codigo) {
           InserUpdateSAP('MODIFICAR', numero, numeroSAP);
         }
         ModificarArray(0, 0, 0, codigo);
-      } else {}
+      } else { }
       VerificaPedido();
     }
   });
@@ -3611,7 +3610,7 @@ function Temporales() {
                 </button>`;
               }
             } else {
-              if ($.trim(data[i].sol_desbloqueo) != '' /*&& data[i].sol_desbloqueo!='3'*/ ) {
+              if ($.trim(data[i].sol_desbloqueo) != '' /*&& data[i].sol_desbloqueo!='3'*/) {
                 let estado_sol_des = "";
                 let color = "";
 
@@ -3838,7 +3837,7 @@ function EnviarMail(tipo, numero) {
     }),
     dataType: "html",
     async: true,
-    success: function (data) {}
+    success: function (data) { }
   }).fail(function (data) {
     console.log(data);
   });
@@ -3861,7 +3860,7 @@ function EnviarMailAnulacion(tipo, numero, texto) {
     }),
     dataType: "html",
     async: true,
-    success: function (data) {}
+    success: function (data) { }
   }).fail(function (data) {
     console.log(data);
   });
@@ -4587,8 +4586,8 @@ function Ordenes() {
                         <input type="checkbox" id="recojeDespachos" name="recojeDespachos"> 
                         Recoge en Despachos
                     </label>
-                    ${$.trim($("#ped_bodega").val()) == '1100' ? 
-                    `<label style="display: block;">
+                    ${$.trim($("#ped_bodega").val()) == '1100' ?
+            `<label style="display: block;">
                         <input type="checkbox" id="recojePuntoVenta" name="recojePuntoVenta"> 
                         Recoge en Punto de venta
                     </label>` : ''}
@@ -4838,7 +4837,7 @@ function GestionPedidos() {
                   btnText = 'E';
                 }
               } else {
-                if ($.trim(data[i].sol_desbloqueo) != '' /* && data[i].sol_desbloqueo!='3'*/ ) {
+                if ($.trim(data[i].sol_desbloqueo) != '' /* && data[i].sol_desbloqueo!='3'*/) {
                   estado_sol_des = "";
 
                   switch (data[i].sol_desbloqueo) {
@@ -4920,6 +4919,7 @@ function GestionPedidos() {
         } else {
           $("#VtotalTerceros").html('');
           $("#DvRecuperablesTerceros").html(`<div class="alert alert-danger" role="alert">
+
             <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
             <span class="sr-only">Error:</span>NO EXISTEN RESULTADOS PARA LAS CONDICIONES SELECCIONADAS
           </div>`);
@@ -5612,12 +5612,14 @@ function VerficarPedido(numTMP) {
     encoding: "UTF-8",
     url: "../models/PW-SAP.php",
     global: false,
-    error: function (OBJ, ERROR, JQERROR) {},
-    beforeSend: function () {},
+    error: function (OBJ, ERROR, JQERROR) { },
+    beforeSend: function () { },
     data: ({
       op: 'VERIFY_PEDIDO',
       numTMP: numTMP
     }),
+
+
     dataType: "json",
     async: false,
     success: function (data) {
@@ -5636,8 +5638,8 @@ function NumeroSAP(numTMP) {
     encoding: "UTF-8",
     url: "../models/PW-SAP.php",
     global: false,
-    error: function (OBJ, ERROR, JQERROR) {},
-    beforeSend: function () {},
+    error: function (OBJ, ERROR, JQERROR) { },
+    beforeSend: function () { },
     data: ({
       op: 'NUMERO_SAP',
       numTMP: numTMP
@@ -5653,99 +5655,99 @@ function NumeroSAP(numTMP) {
 
 /*
 function top10_materiales(){
-	var ano  = new Date().getFullYear();
-	var mes  = new Date().getMonth()+1;
-	var pluginArrayArg = new Array();
-	var jsonArray = '';
+  var ano  = new Date().getFullYear();
+  var mes  = new Date().getMonth()+1;
+  var pluginArrayArg = new Array();
+  var jsonArray = '';
 	
-	$.ajax({ 
-		type: "POST",
-		url: "../models/PW-SAP.php",
-		beforeSend: function(){
-		},
-		data : ({
-			op  : 'B_TOP20_MATERIALES',
-			cod : $("#txt_codigoSap").val(),
-			org : $("#Organizacion").val(),
-			ano : ano,
-			mes : mes
-		}),
-		dataType: "json",
-		async:false,
-		success: function(data){ console.log(data);
-			   //console.log(data);
-			    
-				for(var i=0; i<=data.length-1; i++){
-				 var dato = new Object();
-					 dato.name = '('+data[i].codigo_material+') '+data[i].descripcion;
-					 dato.y    = Math.round(data[i].frecuencia);
-					 pluginArrayArg.push(dato);
-				}
-				jsonArray = JSON.parse(JSON.stringify(pluginArrayArg));
-		}
-	}).fail(function(data){
-		console.error(data)
-	});
+  $.ajax({ 
+    type: "POST",
+    url: "../models/PW-SAP.php",
+    beforeSend: function(){
+    },
+    data : ({
+      op  : 'B_TOP20_MATERIALES',
+      cod : $("#txt_codigoSap").val(),
+      org : $("#Organizacion").val(),
+      ano : ano,
+      mes : mes
+    }),
+    dataType: "json",
+    async:false,
+    success: function(data){ console.log(data);
+         //console.log(data);
+          
+        for(var i=0; i<=data.length-1; i++){
+         var dato = new Object();
+           dato.name = '('+data[i].codigo_material+') '+data[i].descripcion;
+           dato.y    = Math.round(data[i].frecuencia);
+           pluginArrayArg.push(dato);
+        }
+        jsonArray = JSON.parse(JSON.stringify(pluginArrayArg));
+    }
+  }).fail(function(data){
+    console.error(data)
+  });
    // Create the chart
 	
-	if(pluginArrayArg.length>0){
-		
-		Highcharts.chart('container2', {
-			chart: {
-				type: 'column'
-			},
-			title: {
-				text: 'TOP 10 DE PRODUCTOS MAS COMPRADOS'
-			},
-			subtitle: {
-				text: 'Frecuencia de compra : '+ano
-			},
-			accessibility: {
-				announceNewData: {
-					enabled: true
-				}
-			},
-			xAxis: {
-				type: 'category'
-			},
-			yAxis: {
-				title: {
-					text: 'Frecuencia de compra'
-				}
+  if(pluginArrayArg.length>0){
+  	
+    Highcharts.chart('container2', {
+      chart: {
+        type: 'column'
+      },
+      title: {
+        text: 'TOP 10 DE PRODUCTOS MAS COMPRADOS'
+      },
+      subtitle: {
+        text: 'Frecuencia de compra : '+ano
+      },
+      accessibility: {
+        announceNewData: {
+          enabled: true
+        }
+      },
+      xAxis: {
+        type: 'category'
+      },
+      yAxis: {
+        title: {
+          text: 'Frecuencia de compra'
+        }
 
-			},
-			legend: {
-				enabled: false
-			},
-			plotOptions: {
-				series: {
-					borderWidth: 0,
-					dataLabels: {
-						enabled: true,
-						format: '{point.y:f}'
-					}
-				}
-			},
+      },
+      legend: {
+        enabled: false
+      },
+      plotOptions: {
+        series: {
+          borderWidth: 0,
+          dataLabels: {
+            enabled: true,
+            format: '{point.y:f}'
+          }
+        }
+      },
 
-			tooltip: {
-				headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
-				pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:f}</b> <br/>'
-			},
+      tooltip: {
+        headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+        pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:f}</b> <br/>'
+      },
 
-			series: [
-				{
-					name: "Browsers",
-					colorByPoint: true,
-					data: jsonArray
-				}
-			]
+      series: [
+        {
+          name: "Browsers",
+          colorByPoint: true,
+          data: jsonArray
+        }
+      ]
 
-		});	   
-	}else{
-		
-		$("#container2").html('<h4>TOP 10 DE PRODUCTOS MAS COMPRADOS</h4><br><div class="alert alert-danger">Sin resultados!</div>');
-		
-	}
+    });	   
+  }else{
+  	
+    $("#container2").html('<h4>TOP 10 DE PRODUCTOS MAS COMPRADOS</h4><br><div class="alert alert-danger">Sin resultados!</div>');
+  	
+  }
 
 }*/
 
@@ -5759,299 +5761,300 @@ var ano       = new Date().getFullYear();
 var mes       = new Date().getMonth()+1;
 var ano_ant   = new Date().getFullYear()-1;
 $.ajax({ 
-		type: "POST",
-		url: "../models/PW-SAP.php",
-		beforeSend: function(){
-		},
-		data : ({
-			op  : 'B_FACTURACION_MES',
-			cod : $("#txt_codigoSap").val(),
-			org : $("#Organizacion").val(),
-			ano : ano,
-			mes : mes
-		}),
-		dataType: "json",
-		async:false,
-		success: function(data){ console.log({'Comportamiento':data});
-			for(var i=0; i<=data.length-1; i++){
-				switch(mes){
-				case 1:{  datos.push(parseFloat(data[i].Ene));
-			    }break
-				case 2:{  datos.push(parseFloat(data[i].Ene));
-			              datos.push(parseFloat(data[i].Feb));
-				}break
-				case 3:{  datos.push(parseFloat(data[i].Ene));
-						  datos.push(parseFloat(data[i].Feb));
-						  datos.push(parseFloat(data[i].Mar));
-				}break
-				case 4:{  datos.push(parseFloat(data[i].Ene));
-						  datos.push(parseFloat(data[i].Feb));
-						  datos.push(parseFloat(data[i].Mar));
-						  datos.push(parseFloat(data[i].Abr));
-				}break
-				case 5:{  datos.push(parseFloat(data[i].Ene));
-						  datos.push(parseFloat(data[i].Feb));
-						  datos.push(parseFloat(data[i].Mar));
-						  datos.push(parseFloat(data[i].Abr));
-						  datos.push(parseFloat(data[i].May));
-				}break
-				case 6:{  datos.push(parseFloat(data[i].Ene));
-						  datos.push(parseFloat(data[i].Feb));
-						  datos.push(parseFloat(data[i].Mar));
-						  datos.push(parseFloat(data[i].Abr));
-						  datos.push(parseFloat(data[i].May));
-						  datos.push(parseFloat(data[i].Jun));
-				}break
-				case 7:{  datos.push(parseFloat(data[i].Ene));
-						  datos.push(parseFloat(data[i].Feb));
-						  datos.push(parseFloat(data[i].Mar));
-						  datos.push(parseFloat(data[i].Abr));
-						  datos.push(parseFloat(data[i].May));
-						  datos.push(parseFloat(data[i].Jun));
-						  datos.push(parseFloat(data[i].Jul));
-				}break
-				case 8:{  datos.push(parseFloat(data[i].Ene));
-						  datos.push(parseFloat(data[i].Feb));
-						  datos.push(parseFloat(data[i].Mar));
-						  datos.push(parseFloat(data[i].Abr));
-						  datos.push(parseFloat(data[i].May));
-						  datos.push(parseFloat(data[i].Jun));
-						  datos.push(parseFloat(data[i].Jul));
-						  datos.push(parseFloat(data[i].Ago));
-				}break
-				case 9:{  datos.push(parseFloat(data[i].Ene));
-						  datos.push(parseFloat(data[i].Feb));
-						  datos.push(parseFloat(data[i].Mar));
-						  datos.push(parseFloat(data[i].Abr));
-						  datos.push(parseFloat(data[i].May));
-						  datos.push(parseFloat(data[i].Jun));
-						  datos.push(parseFloat(data[i].Jul));
-						  datos.push(parseFloat(data[i].Ago));
-						  datos.push(parseFloat(data[i].Sep));
-			    }break
-				case 10:{ datos.push(parseFloat(data[i].Ene));
-						  datos.push(parseFloat(data[i].Feb));
-						  datos.push(parseFloat(data[i].Mar));
-						  datos.push(parseFloat(data[i].Abr));
-						  datos.push(parseFloat(data[i].May));
-						  datos.push(parseFloat(data[i].Jun));
-						  datos.push(parseFloat(data[i].Jul));
-						  datos.push(parseFloat(data[i].Ago));
-						  datos.push(parseFloat(data[i].Sep));
-						  datos.push(parseFloat(data[i].Oct));
-			    }break
-				case 11:{ datos.push(parseFloat(data[i].Ene));
-						  datos.push(parseFloat(data[i].Feb));
-						  datos.push(parseFloat(data[i].Mar));
-						  datos.push(parseFloat(data[i].Abr));
-						  datos.push(parseFloat(data[i].May));
-						  datos.push(parseFloat(data[i].Jun));
-						  datos.push(parseFloat(data[i].Jul));
-						  datos.push(parseFloat(data[i].Ago));
-						  datos.push(parseFloat(data[i].Sep));
-						  datos.push(parseFloat(data[i].Oct));
-						  datos.push(parseFloat(data[i].Nov));
-			    }break
-				case 12:{ datos.push(parseFloat(data[i].Ene));
-						  datos.push(parseFloat(data[i].Feb));
-						  datos.push(parseFloat(data[i].Mar));
-						  datos.push(parseFloat(data[i].Abr));
-						  datos.push(parseFloat(data[i].May));
-						  datos.push(parseFloat(data[i].Jun));
-						  datos.push(parseFloat(data[i].Jul));
-						  datos.push(parseFloat(data[i].Ago));
-						  datos.push(parseFloat(data[i].Sep));
-						  datos.push(parseFloat(data[i].Oct));
-						  datos.push(parseFloat(data[i].Nov));
-						  datos.push(parseFloat(data[i].Dic));
-			   }break
-			}
-			}
-			JSON.parse(JSON.stringify(datos));
-			
-		}
+    type: "POST",
+    url: "../models/PW-SAP.php",
+    beforeSend: function(){
+    },
+    data : ({
+      op  : 'B_FACTURACION_MES',
+      cod : $("#txt_codigoSap").val(),
+      org : $("#Organizacion").val(),
+      ano : ano,
+      mes : mes
+    }),
+    dataType: "json",
+    async:false,
+    success: function(data){ console.log({'Comportamiento':data});
+      for(var i=0; i<=data.length-1; i++){
+        switch(mes){
+        case 1:{  datos.push(parseFloat(data[i].Ene));
+          }break
+        case 2:{  datos.push(parseFloat(data[i].Ene));
+                    datos.push(parseFloat(data[i].Feb));
+        }break
+        case 3:{  datos.push(parseFloat(data[i].Ene));
+              datos.push(parseFloat(data[i].Feb));
+              datos.push(parseFloat(data[i].Mar));
+        }break
+        case 4:{  datos.push(parseFloat(data[i].Ene));
+              datos.push(parseFloat(data[i].Feb));
+              datos.push(parseFloat(data[i].Mar));
+              datos.push(parseFloat(data[i].Abr));
+        }break
+        case 5:{  datos.push(parseFloat(data[i].Ene));
+              datos.push(parseFloat(data[i].Feb));
+              datos.push(parseFloat(data[i].Mar));
+              datos.push(parseFloat(data[i].Abr));
+              datos.push(parseFloat(data[i].May));
+        }break
+        case 6:{  datos.push(parseFloat(data[i].Ene));
+              datos.push(parseFloat(data[i].Feb));
+              datos.push(parseFloat(data[i].Mar));
+              datos.push(parseFloat(data[i].Abr));
+              datos.push(parseFloat(data[i].May));
+              datos.push(parseFloat(data[i].Jun));
+        }break
+        case 7:{  datos.push(parseFloat(data[i].Ene));
+              datos.push(parseFloat(data[i].Feb));
+              datos.push(parseFloat(data[i].Mar));
+              datos.push(parseFloat(data[i].Abr));
+              datos.push(parseFloat(data[i].May));
+              datos.push(parseFloat(data[i].Jun));
+              datos.push(parseFloat(data[i].Jul));
+        }break
+        case 8:{  datos.push(parseFloat(data[i].Ene));
+              datos.push(parseFloat(data[i].Feb));
+              datos.push(parseFloat(data[i].Mar));
+              datos.push(parseFloat(data[i].Abr));
+              datos.push(parseFloat(data[i].May));
+              datos.push(parseFloat(data[i].Jun));
+              datos.push(parseFloat(data[i].Jul));
+              datos.push(parseFloat(data[i].Ago));
+        }break
+        case 9:{  datos.push(parseFloat(data[i].Ene));
+              datos.push(parseFloat(data[i].Feb));
+              datos.push(parseFloat(data[i].Mar));
+              datos.push(parseFloat(data[i].Abr));
+              datos.push(parseFloat(data[i].May));
+              datos.push(parseFloat(data[i].Jun));
+              datos.push(parseFloat(data[i].Jul));
+              datos.push(parseFloat(data[i].Ago));
+              datos.push(parseFloat(data[i].Sep));
+          }break
+        case 10:{ datos.push(parseFloat(data[i].Ene));
+              datos.push(parseFloat(data[i].Feb));
+              datos.push(parseFloat(data[i].Mar));
+              datos.push(parseFloat(data[i].Abr));
+              datos.push(parseFloat(data[i].May));
+              datos.push(parseFloat(data[i].Jun));
+              datos.push(parseFloat(data[i].Jul));
+              datos.push(parseFloat(data[i].Ago));
+              datos.push(parseFloat(data[i].Sep));
+              datos.push(parseFloat(data[i].Oct));
+          }break
+        case 11:{ datos.push(parseFloat(data[i].Ene));
+              datos.push(parseFloat(data[i].Feb));
+              datos.push(parseFloat(data[i].Mar));
+              datos.push(parseFloat(data[i].Abr));
+              datos.push(parseFloat(data[i].May));
+              datos.push(parseFloat(data[i].Jun));
+              datos.push(parseFloat(data[i].Jul));
+              datos.push(parseFloat(data[i].Ago));
+              datos.push(parseFloat(data[i].Sep));
+              datos.push(parseFloat(data[i].Oct));
+              datos.push(parseFloat(data[i].Nov));
+          }break
+        case 12:{ datos.push(parseFloat(data[i].Ene));
+              datos.push(parseFloat(data[i].Feb));
+              datos.push(parseFloat(data[i].Mar));
+              datos.push(parseFloat(data[i].Abr));
+              datos.push(parseFloat(data[i].May));
+              datos.push(parseFloat(data[i].Jun));
+              datos.push(parseFloat(data[i].Jul));
+              datos.push(parseFloat(data[i].Ago));
+              datos.push(parseFloat(data[i].Sep));
+              datos.push(parseFloat(data[i].Oct));
+              datos.push(parseFloat(data[i].Nov));
+              datos.push(parseFloat(data[i].Dic));
+         }break
+      }
+      }
+      JSON.parse(JSON.stringify(datos));
+    	
+    }
  }).fail(function(data){
    console.error(data);
  });
 	
  $.ajax({ 
-		type: "POST",
-		url: "../models/PW-SAP.php",
-		beforeSend: function(){
-		},
-		data : ({
-			op  : 'B_FACTURACION_MES',
-			cod : $("#txt_codigoSap").val(),
-			org : $("#Organizacion").val(),
-			ano : ano_ant,
-			mes : mes
-		}),
-		dataType: "json",
-		async:false,
-		success: function(data){ 
-			console.log({data});
-			for(var i=0; i<=data.length-1; i++){
-			 switch(mes){
-				case 1:{  datos_ant.push(parseFloat(data[i].Ene));
-			    }break
-				case 2:{  datos_ant.push(parseFloat(data[i].Ene));
-			              datos_ant.push(parseFloat(data[i].Feb));
-				}break
-				case 3:{  datos_ant.push(parseFloat(data[i].Ene));
-						  datos_ant.push(parseFloat(data[i].Feb));
-						  datos_ant.push(parseFloat(data[i].Mar));
-				}break
-				case 4:{  datos_ant.push(parseFloat(data[i].Ene));
-						  datos_ant.push(parseFloat(data[i].Feb));
-						  datos_ant.push(parseFloat(data[i].Mar));
-						  datos_ant.push(parseFloat(data[i].Abr));
-				}break
-				case 5:{  datos_ant.push(parseFloat(data[i].Ene));
-						  datos_ant.push(parseFloat(data[i].Feb));
-						  datos_ant.push(parseFloat(data[i].Mar));
-						  datos_ant.push(parseFloat(data[i].Abr));
-						  datos_ant.push(parseFloat(data[i].May));
-				}break
-				case 6:{  datos_ant.push(parseFloat(data[i].Ene));
-						  datos_ant.push(parseFloat(data[i].Feb));
-						  datos_ant.push(parseFloat(data[i].Mar));
-						  datos_ant.push(parseFloat(data[i].Abr));
-						  datos_ant.push(parseFloat(data[i].May));
-						  datos_ant.push(parseFloat(data[i].Jun));
-				}break
-				case 7:{  datos_ant.push(parseFloat(data[i].Ene));
-						  datos_ant.push(parseFloat(data[i].Feb));
-						  datos_ant.push(parseFloat(data[i].Mar));
-						  datos_ant.push(parseFloat(data[i].Abr));
-						  datos_ant.push(parseFloat(data[i].May));
-						  datos_ant.push(parseFloat(data[i].Jun));
-						  datos_ant.push(parseFloat(data[i].Jul));
-				}break
-				case 8:{  datos_ant.push(parseFloat(data[i].Ene));
-						  datos_ant.push(parseFloat(data[i].Feb));
-						  datos_ant.push(parseFloat(data[i].Mar));
-						  datos_ant.push(parseFloat(data[i].Abr));
-						  datos_ant.push(parseFloat(data[i].May));
-						  datos_ant.push(parseFloat(data[i].Jun));
-						  datos_ant.push(parseFloat(data[i].Jul));
-						  datos_ant.push(parseFloat(data[i].Ago));
-				}break
-				case 9:{  datos_ant.push(parseFloat(data[i].Ene));
-						  datos_ant.push(parseFloat(data[i].Feb));
-						  datos_ant.push(parseFloat(data[i].Mar));
-						  datos_ant.push(parseFloat(data[i].Abr));
-						  datos_ant.push(parseFloat(data[i].May));
-						  datos_ant.push(parseFloat(data[i].Jun));
-						  datos_ant.push(parseFloat(data[i].Jul));
-						  datos_ant.push(parseFloat(data[i].Ago));
-						  datos_ant.push(parseFloat(data[i].Sep));
-			    }break
-				case 10:{ datos_ant.push(parseFloat(data[i].Ene));
-						  datos_ant.push(parseFloat(data[i].Feb));
-						  datos_ant.push(parseFloat(data[i].Mar));
-						  datos_ant.push(parseFloat(data[i].Abr));
-						  datos_ant.push(parseFloat(data[i].May));
-						  datos_ant.push(parseFloat(data[i].Jun));
-						  datos_ant.push(parseFloat(data[i].Jul));
-						  datos_ant.push(parseFloat(data[i].Ago));
-						  datos_ant.push(parseFloat(data[i].Sep));
-						  datos_ant.push(parseFloat(data[i].Oct));
-			    }break
-				case 11:{ datos_ant.push(parseFloat(data[i].Ene));
-						  datos_ant.push(parseFloat(data[i].Feb));
-						  datos_ant.push(parseFloat(data[i].Mar));
-						  datos_ant.push(parseFloat(data[i].Abr));
-						  datos_ant.push(parseFloat(data[i].May));
-						  datos_ant.push(parseFloat(data[i].Jun));
-						  datos_ant.push(parseFloat(data[i].Jul));
-						  datos_ant.push(parseFloat(data[i].Ago));
-						  datos_ant.push(parseFloat(data[i].Sep));
-						  datos_ant.push(parseFloat(data[i].Oct));
-						  datos_ant.push(parseFloat(data[i].Nov));
-			    }break
-				case 12:{ datos_ant.push(parseFloat(data[i].Ene));
-						  datos_ant.push(parseFloat(data[i].Feb));
-						  datos_ant.push(parseFloat(data[i].Mar));
-						  datos_ant.push(parseFloat(data[i].Abr));
-						  datos_ant.push(parseFloat(data[i].May));
-						  datos_ant.push(parseFloat(data[i].Jun));
-						  datos_ant.push(parseFloat(data[i].Jul));
-						  datos_ant.push(parseFloat(data[i].Ago));
-						  datos_ant.push(parseFloat(data[i].Sep));
-						  datos_ant.push(parseFloat(data[i].Oct));
-						  datos_ant.push(parseFloat(data[i].Nov));
-						  datos_ant.push(parseFloat(data[i].Dic));
-			   }break
-			 }
-			}
-			JSON.parse(JSON.stringify(datos_ant));
+    type: "POST",
+    url: "../models/PW-SAP.php",
+    beforeSend: function(){
+    },
+    data : ({
+      op  : 'B_FACTURACION_MES',
+      cod : $("#txt_codigoSap").val(),
+      org : $("#Organizacion").val(),
+      ano : ano_ant,
+      mes : mes
+    }),
+    dataType: "json",
+    async:false,
+    success: function(data){ 
+      console.log({data});
+      for(var i=0; i<=data.length-1; i++){
+       switch(mes){
+        case 1:{  datos_ant.push(parseFloat(data[i].Ene));
+          }break
+        case 2:{  datos_ant.push(parseFloat(data[i].Ene));
+                    datos_ant.push(parseFloat(data[i].Feb));
+        }break
+        case 3:{  datos_ant.push(parseFloat(data[i].Ene));
+              datos_ant.push(parseFloat(data[i].Feb));
+              datos_ant.push(parseFloat(data[i].Mar));
+        }break
+        case 4:{  datos_ant.push(parseFloat(data[i].Ene));
+              datos_ant.push(parseFloat(data[i].Feb));
+              datos_ant.push(parseFloat(data[i].Mar));
+              datos_ant.push(parseFloat(data[i].Abr));
+        }break
+        case 5:{  datos_ant.push(parseFloat(data[i].Ene));
+              datos_ant.push(parseFloat(data[i].Feb));
+              datos_ant.push(parseFloat(data[i].Mar));
+              datos_ant.push(parseFloat(data[i].Abr));
+              datos_ant.push(parseFloat(data[i].May));
+        }break
+        case 6:{  datos_ant.push(parseFloat(data[i].Ene));
+              datos_ant.push(parseFloat(data[i].Feb));
+              datos_ant.push(parseFloat(data[i].Mar));
+              datos_ant.push(parseFloat(data[i].Abr));
+              datos_ant.push(parseFloat(data[i].May));
+              datos_ant.push(parseFloat(data[i].Jun));
+        }break
+        case 7:{  datos_ant.push(parseFloat(data[i].Ene));
+              datos_ant.push(parseFloat(data[i].Feb));
+              datos_ant.push(parseFloat(data[i].Mar));
+              datos_ant.push(parseFloat(data[i].Abr));
+              datos_ant.push(parseFloat(data[i].May));
+              datos_ant.push(parseFloat(data[i].Jun));
+              datos_ant.push(parseFloat(data[i].Jul));
+        }break
+        case 8:{  datos_ant.push(parseFloat(data[i].Ene));
+              datos_ant.push(parseFloat(data[i].Feb));
+              datos_ant.push(parseFloat(data[i].Mar));
+              datos_ant.push(parseFloat(data[i].Abr));
+              datos_ant.push(parseFloat(data[i].May));
+              datos_ant.push(parseFloat(data[i].Jun));
+              datos_ant.push(parseFloat(data[i].Jul));
+              datos_ant.push(parseFloat(data[i].Ago));
+        }break
+        case 9:{  datos_ant.push(parseFloat(data[i].Ene));
+              datos_ant.push(parseFloat(data[i].Feb));
+              datos_ant.push(parseFloat(data[i].Mar));
+              datos_ant.push(parseFloat(data[i].Abr));
+              datos_ant.push(parseFloat(data[i].May));
+              datos_ant.push(parseFloat(data[i].Jun));
+              datos_ant.push(parseFloat(data[i].Jul));
+              datos_ant.push(parseFloat(data[i].Ago));
+              datos_ant.push(parseFloat(data[i].Sep));
+          }break
+        case 10:{ datos_ant.push(parseFloat(data[i].Ene));
+              datos_ant.push(parseFloat(data[i].Feb));
+              datos_ant.push(parseFloat(data[i].Mar));
+              datos_ant.push(parseFloat(data[i].Abr));
+              datos_ant.push(parseFloat(data[i].May));
+              datos_ant.push(parseFloat(data[i].Jun));
+              datos_ant.push(parseFloat(data[i].Jul));
+              datos_ant.push(parseFloat(data[i].Ago));
+              datos_ant.push(parseFloat(data[i].Sep));
+              datos_ant.push(parseFloat(data[i].Oct));
+          }break
+        case 11:{ datos_ant.push(parseFloat(data[i].Ene));
+              datos_ant.push(parseFloat(data[i].Feb));
+              datos_ant.push(parseFloat(data[i].Mar));
+              datos_ant.push(parseFloat(data[i].Abr));
+              datos_ant.push(parseFloat(data[i].May));
+              datos_ant.push(parseFloat(data[i].Jun));
+              datos_ant.push(parseFloat(data[i].Jul));
+              datos_ant.push(parseFloat(data[i].Ago));
+              datos_ant.push(parseFloat(data[i].Sep));
+              datos_ant.push(parseFloat(data[i].Oct));
+              datos_ant.push(parseFloat(data[i].Nov));
+          }break
+        case 12:{ datos_ant.push(parseFloat(data[i].Ene));
+              datos_ant.push(parseFloat(data[i].Feb));
+              datos_ant.push(parseFloat(data[i].Mar));
+              datos_ant.push(parseFloat(data[i].Abr));
+              datos_ant.push(parseFloat(data[i].May));
+              datos_ant.push(parseFloat(data[i].Jun));
+              datos_ant.push(parseFloat(data[i].Jul));
+              datos_ant.push(parseFloat(data[i].Ago));
+              datos_ant.push(parseFloat(data[i].Sep));
+              datos_ant.push(parseFloat(data[i].Oct));
+              datos_ant.push(parseFloat(data[i].Nov));
+              datos_ant.push(parseFloat(data[i].Dic));
+         }break
+       }
+      }
+      JSON.parse(JSON.stringify(datos_ant));
+
 	
-		}
+    }
  }).fail(function(data){
-	 console.error(data);
+   console.error(data);
  });
-	 
-	if(datos.length>0){
+   
+  if(datos.length>0){
 
-		Highcharts.chart('container', {
-		  chart: {
-			type: 'spline'
-		  },
-		  title: {
-			text: 'COMPORTAMIENTO DE VENTAS AÑO '+ano_ant+' - '+ano
-		  },
-		  subtitle: {
-			text: ''
-		  },
-		  xAxis: {
-			categories: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun','Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
-		  },
-		  yAxis: {
-			title: {
-			  text: 'Ventas'
-			},
-			labels: {
-			  formatter: function () {
-				return formatNum(this.value,'$');
-			  }
-			}
-		  },
-		  tooltip: {
-			crosshairs: true,
-			shared: true
-		  },
-		  plotOptions: {
-			spline: {
-			  marker: {
-				radius: 4,
-				lineColor: '#666666',
-				lineWidth: 1
-			  }
-			}
-		  },
-		  series: [
-				 {
-					name: ano,
-					marker: {
-					  symbol: 'square'
-					},
-					data: datos
+    Highcharts.chart('container', {
+      chart: {
+      type: 'spline'
+      },
+      title: {
+      text: 'COMPORTAMIENTO DE VENTAS AÑO '+ano_ant+' - '+ano
+      },
+      subtitle: {
+      text: ''
+      },
+      xAxis: {
+      categories: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun','Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+      },
+      yAxis: {
+      title: {
+        text: 'Ventas'
+      },
+      labels: {
+        formatter: function () {
+        return formatNum(this.value,'$');
+        }
+      }
+      },
+      tooltip: {
+      crosshairs: true,
+      shared: true
+      },
+      plotOptions: {
+      spline: {
+        marker: {
+        radius: 4,
+        lineColor: '#666666',
+        lineWidth: 1
+        }
+      }
+      },
+      series: [
+         {
+          name: ano,
+          marker: {
+            symbol: 'square'
+          },
+          data: datos
 
-				  }, 
-				 {
-					name: ano_ant,
-					marker: {
-					  symbol: 'diamond'
-					},
-					data: datos_ant
-				  }
-				]
-		});		
-		
-	   
-	}else{
-		$("#container").html('<h4>COMPORTAMIENTO DE VENTAS AÑO '+ano_ant+' - '+ano+'</h4><div class="alert alert-danger">Sin resultados!</div>')
-	}
+          }, 
+         {
+          name: ano_ant,
+          marker: {
+            symbol: 'diamond'
+          },
+          data: datos_ant
+          }
+        ]
+    });		
+  	
+     
+  }else{
+    $("#container").html('<h4>COMPORTAMIENTO DE VENTAS AÑO '+ano_ant+' - '+ano+'</h4><div class="alert alert-danger">Sin resultados!</div>')
+  }
 
 }
 */
@@ -6090,7 +6093,7 @@ function top10_materiales() {
     $.ajax({
       type: "POST",
       url: "../models/PW-SAP.php",
-      beforeSend: function () {},
+      beforeSend: function () { },
       data: ({
         op: 'B_TOP20_MATERIALES',
         cod: $("#txt_codigoSap").val(),
@@ -6136,7 +6139,7 @@ function dataComportamiento() {
     $.ajax({
       type: "POST",
       url: "../models/PW-SAP.php",
-      beforeSend: function () {},
+      beforeSend: function () { },
       data: ({
         op: 'B_FACTURACION_MES',
         cod: $("#txt_codigoSap").val(),
@@ -6379,7 +6382,7 @@ function QueryFeria(grupo) {
             + '</tr>'
             + '</tbody>'
             + '</table>';
-        } else {}
+        } else { }
 
       } else {
         tabla = '<div class="alert alert-danger" role="alert">'
@@ -6550,7 +6553,7 @@ function CargaGruposClientes(grupo) {
     url: "../models/CRM.php",
     async: false,
     dataType: "json",
-    beforeSend: function () {},
+    beforeSend: function () { },
     data: {
       op: "S_GRUPOS_CLIENTES",
       grupo: grupo
@@ -6828,7 +6831,7 @@ function Cartera_edades() {
       let cardHtml = `
       <div class="panel panel-info">
         <div class="panel-heading">
-          <h3 class="panel-title" style="font-size: 14px;  font-weight: bold;">CARTERA EDADES</h3>
+          <h3 class="panel-title custom-thead" style="font-size: 14px;  font-weight: bold;">CARTERA EDADES</h3>
         </div>
         <div class="panel-body" style="padding: 5px;">
           <div class="row">`;
@@ -6845,7 +6848,7 @@ function Cartera_edades() {
 
       cardHtml += `
             <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2" >
-              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+              <div class="panel panel-default custom-card shadow-sm">
                 <div class="panel-body" style="padding: 5px;">
                   <h5 style="font-size: 12px; margin: 0 0 5px 0;">SIN VENCER</h5>
                   <p style="font-size: 12px; margin: 0;">${formatNum(data.C_SIN_VENCER, '$')}</p>
@@ -6853,7 +6856,7 @@ function Cartera_edades() {
               </div>
             </div>
             <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2" >
-              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+              <div class="panel panel-default custom-card shadow-sm">
                 <div class="panel-body" style="padding: 5px;">
                   <h5 style="font-size: 12px; margin: 0 0 5px 0; ">1-30 DÍAS</h5>
                   <p style="font-size: 12px; margin: 0;">${formatNum(data.C_1_30, '$')}</p>
@@ -6861,7 +6864,7 @@ function Cartera_edades() {
               </div>
             </div>
             <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2">
-              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+              <div class="panel panel-default custom-card shadow-sm">
                 <div class="panel-body" style="padding: 5px;">
                   <h5 style="font-size: 12px; margin: 0 0 5px 0; ">31-60 DÍAS</h5>
                   <p style="font-size: 12px; margin: 0;">${formatNum(data.C_31_60, '$')}</p>
@@ -6869,7 +6872,7 @@ function Cartera_edades() {
               </div>
             </div>
             <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2">
-              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+              <div class="panel panel-default custom-card shadow-sm">
                 <div class="panel-body" style="padding: 5px;">
                   <h5 style="font-size: 12px; margin: 0 0 5px 0;">61-90 DÍAS</h5>
                   <p style="font-size: 12px; margin: 0;">${formatNum(data.C_61_90, '$')}</p>
@@ -6877,7 +6880,7 @@ function Cartera_edades() {
               </div>
             </div>
             <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2">
-              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+              <div class="panel panel-default custom-card shadow-sm">
                 <div class="panel-body" style="padding: 5px;">
                   <h5 style="font-size: 12px; margin: 0 0 5px 0;">91-120 DÍAS</h5>
                   <p style="font-size: 12px; margin: 0;">${formatNum(data.C_91_120, '$')}</p>
@@ -6885,7 +6888,7 @@ function Cartera_edades() {
               </div>
             </div>
             <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2">
-              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+              <div class="panel panel-default custom-card shadow-sm">
                 <div class="panel-body" style="padding: 5px;">
                   <h5 style="font-size: 12px; margin: 0 0 5px 0;">+120 DÍAS</h5>
                   <p style="font-size: 12px; margin: 0;">${formatNum(data.C_120, '$')}</p>
@@ -6918,7 +6921,7 @@ function Presupuesto_datos() {
       let cardHtml = `
       <div class="panel panel-info">
         <div class="panel-heading">
-          <h3 class="panel-title" style="font-size: 13px;  font-weight: bold;">DATOS DE PRESUPUESTO</h3>
+          <h3 class="panel-title custom-thead" style="font-size: 13px;  font-weight: bold;">DATOS DE PRESUPUESTO</h3>
         </div>
         <div class="panel-body" style="padding: 5px;">
           <div class="row">`;
@@ -6927,7 +6930,7 @@ function Presupuesto_datos() {
         // Si no hay datos, mostrar valores cero
         cardHtml += `
             <div class="col-xs-12 col-sm-6 col-md-4">
-              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+              <div class="panel panel-default custom-card shadow-sm">
                 <div class="panel-body" style="padding: 5px;">
                   <h5 style="font-size: 12px; margin: 0 0 5px 0;">VALOR PRESUPUESTO</h5>
                   <p style="font-size: 12px; margin: 0;">${(0).toLocaleString()}</p>
@@ -6935,7 +6938,7 @@ function Presupuesto_datos() {
               </div>
             </div>
             <div class="col-xs-12 col-sm-6 col-md-4">
-              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+              <div class="panel panel-default custom-card shadow-sm">
                 <div class="panel-body" style="padding: 5px;">
                   <h5 style="font-size: 12px; margin: 0 0 5px 0;">VALOR NETO TOTAL</h5>
                   <p style="font-size: 12px; margin: 0;">${(0).toLocaleString()}</p>
@@ -6943,7 +6946,7 @@ function Presupuesto_datos() {
               </div>
             </div>
             <div class="col-xs-12 col-sm-6 col-md-4">
-              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+              <div class="panel panel-default custom-card shadow-sm">
                 <div class="panel-body" style="padding: 5px;">
                   <h5 style="font-size: 12px; margin: 0 0 5px 0;">% CUMP. PRESUPUESTO</h5>
                   <p style="font-size: 12px; margin: 0;">0.00%</p>
@@ -6951,7 +6954,7 @@ function Presupuesto_datos() {
               </div>
             </div>
             <div class="col-xs-12 col-sm-6 col-md-4">
-              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+              <div class="panel panel-default custom-card shadow-sm">
                 <div class="panel-body" style="padding: 5px;">
                   <h5 style="font-size: 12px; margin: 0 0 5px 0;">FALTA</h5>
                   <p style="font-size: 12px; margin: 0;">${(0).toLocaleString()}</p>
@@ -6959,7 +6962,7 @@ function Presupuesto_datos() {
               </div>
             </div>
             <div class="col-xs-12 col-sm-6 col-md-4">
-              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+              <div class="panel panel-default custom-card shadow-sm">
                 <div class="panel-body" style="padding: 5px;">
                   <h5 style="font-size: 12px; margin: 0 0 5px 0;">DEBERÍA LLEVAR</h5>
                   <p style="font-size: 12px; margin: 0;">${(0).toLocaleString()}</p>
@@ -6967,7 +6970,7 @@ function Presupuesto_datos() {
               </div>
             </div>
             <div class="col-xs-12 col-sm-6 col-md-4">
-              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+              <div class="panel panel-default custom-card shadow-sm">
                 <div class="panel-body" style="padding: 5px;">
                   <h5 style="font-size: 12px; margin: 0 0 5px 0;">% D. LLEVAR</h5>
                   <p style="font-size: 12px; margin: 0;">0.00%</p>
@@ -6975,7 +6978,7 @@ function Presupuesto_datos() {
               </div>
             </div>
             <div class="col-xs-12 col-sm-6 col-md-4">
-              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+              <div class="panel panel-default custom-card shadow-sm">
                 <div class="panel-body" style="padding: 5px;">
                   <h5 style="font-size: 12px; margin: 0 0 5px 0;">% EXCESO/DÉFICIT</h5>
                   <p style="font-size: 12px; margin: 0;">0.00%</p>
@@ -6983,7 +6986,7 @@ function Presupuesto_datos() {
               </div>
             </div>
             <div class="col-xs-12 col-sm-6 col-md-4">
-              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+              <div class="panel panel-default custom-card shadow-sm">
                 <div class="panel-body" style="padding: 5px;">
                   <h5 style="font-size: 12px; margin: 0 0 5px 0;">PROY. VS PROM.</h5>
                   <p style="font-size: 12px; margin: 0;">${(0).toLocaleString()}</p>
@@ -6991,7 +6994,7 @@ function Presupuesto_datos() {
               </div>
             </div>
             <div class="col-xs-12 col-sm-6 col-md-4">
-              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+              <div class="panel panel-default custom-card shadow-sm">
                 <div class="panel-body" style="padding: 5px;">
                   <h5 style="font-size: 12px; margin: 0 0 5px 0;">% PROY. VS PROM.</h5>
                   <p style="font-size: 12px; margin: 0;">0.00%</p>
@@ -6999,7 +7002,7 @@ function Presupuesto_datos() {
               </div>
             </div>
             <div class="col-xs-12 col-sm-6 col-md-4">
-              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+              <div class="panel panel-default custom-card shadow-sm">
                 <div class="panel-body" style="padding: 5px;">
                   <h5 style="font-size: 12px; margin: 0 0 5px 0;">PROY. DIARIA (100%)</h5>
                   <p style="font-size: 12px; margin: 0;">${(0).toLocaleString()}</p>
@@ -7022,7 +7025,7 @@ function Presupuesto_datos() {
 
           cardHtml += `
             <div class="col-xs-12 col-sm-6 col-md-4" >
-              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+              <div class="panel panel-default custom-card shadow-sm">
                 <div class="panel-body" style="padding: 5px;">
                   <h5 style="font-size: 12px; margin: 0 0 5px 0;">VALOR PRESUPUESTO</h5>
                   <p style="font-size: 12px; margin: 0;">${VALOR_PRESUPUESTO.toLocaleString()}</p>
@@ -7030,7 +7033,7 @@ function Presupuesto_datos() {
               </div>
             </div>
             <div class="col-xs-12 col-sm-6 col-md-4">
-              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+              <div class="panel panel-default custom-card shadow-sm">
                 <div class="panel-body" style="padding: 5px;">
                   <h5 style="font-size: 12px; margin: 0 0 5px 0;">VALOR NETO TOTAL</h5>
                   <p style="font-size: 12px; margin: 0;">${VlrNetoTotal.toLocaleString()}</p>
@@ -7038,7 +7041,7 @@ function Presupuesto_datos() {
               </div>
             </div>
             <div class="col-xs-12 col-sm-6 col-md-4">
-              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+              <div class="panel panel-default custom-card shadow-sm">
                 <div class="panel-body" style="padding: 5px;">
                   <h5 style="font-size: 12px; margin: 0 0 5px 0;">% CUMP. PRESUPUESTO</h5>
                   <p style="font-size: 12px; margin: 0;">${porCumpPpto.toFixed(2)}%</p>
@@ -7046,7 +7049,7 @@ function Presupuesto_datos() {
               </div>
             </div>
             <div class="col-xs-12 col-sm-6 col-md-4">
-              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+              <div class="panel panel-default custom-card shadow-sm">
                 <div class="panel-body" style="padding: 5px;">
                   <h5 style="font-size: 12px; margin: 0 0 5px 0;">FALTA</h5>
                   <p style="font-size: 12px; margin: 0;">${Falta.toLocaleString()}</p>
@@ -7054,7 +7057,7 @@ function Presupuesto_datos() {
               </div>
             </div>
             <div class="col-xs-12 col-sm-6 col-md-4">
-              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+              <div class="panel panel-default custom-card shadow-sm">
                 <div class="panel-body" style="padding: 5px;">
                   <h5 style="font-size: 12px; margin: 0 0 5px 0;">DEBERÍA LLEVAR</h5>
                   <p style="font-size: 12px; margin: 0;">${DeberiaLlevar.toLocaleString()}</p>
@@ -7062,7 +7065,7 @@ function Presupuesto_datos() {
               </div>
             </div>
             <div class="col-xs-12 col-sm-6 col-md-4">
-              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+              <div class="panel panel-default custom-card shadow-sm">
                 <div class="panel-body" style="padding: 5px;">
                   <h5 style="font-size: 12px; margin: 0 0 5px 0;">% D. LLEVAR</h5>
                   <p style="font-size: 12px; margin: 0;">${por_D_LLV.toFixed(2)}%</p>
@@ -7070,7 +7073,7 @@ function Presupuesto_datos() {
               </div>
             </div>
             <div class="col-xs-12 col-sm-6 col-md-4">
-              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+              <div class="panel panel-default custom-card shadow-sm">
                 <div class="panel-body" style="padding: 5px;">
                   <h5 style="font-size: 12px; margin: 0 0 5px 0;">% EXCESO/DÉFICIT</h5>
                   <p style="font-size: 12px; margin: 0;">${por_ExcesoDeficit.toFixed(2)}%</p>
@@ -7078,7 +7081,7 @@ function Presupuesto_datos() {
               </div>
             </div>
             <div class="col-xs-12 col-sm-6 col-md-4">
-              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+              <div class="panel panel-default custom-card shadow-sm">
                 <div class="panel-body" style="padding: 5px;">
                   <h5 style="font-size: 12px; margin: 0 0 5px 0;">PROY. VS PROM.</h5>
                   <p style="font-size: 12px; margin: 0;">${ProyVsProm.toLocaleString()}</p>
@@ -7086,7 +7089,7 @@ function Presupuesto_datos() {
               </div>
             </div>
             <div class="col-xs-12 col-sm-6 col-md-4">
-              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+              <div class="panel panel-default custom-card shadow-sm">
                 <div class="panel-body" style="padding: 5px;">
                   <h5 style="font-size: 12px; margin: 0 0 5px 0;">% PROY. VS PROM.</h5>
                   <p style="font-size: 12px; margin: 0;">${por_ProyVsProm.toFixed(2)}%</p>
@@ -7094,7 +7097,7 @@ function Presupuesto_datos() {
               </div>
             </div>
             <div class="col-xs-12 col-sm-6 col-md-4">
-              <div class="panel panel-default" style="margin-bottom: 5px; border: 1px solid #f1f1f1;">
+              <div class="panel panel-default custom-card shadow-sm">
                 <div class="panel-body" style="padding: 5px;">
                   <h5 style="font-size: 12px; margin: 0 0 5px 0;">PROY. DIARIA (100%)</h5>
                   <p style="font-size: 12px; margin: 0;">${ProyDiaria.toLocaleString()}</p>
@@ -7179,6 +7182,7 @@ async function Top_20_mas_vendidos_con_copi() {
   console.log(resp);
   let obj = filtrarPorCodigos(ArrProd, resp);
   console.log(obj);
+
 
   let $tabla = $('<table>', {
     'class': 'table table-bordered table-hover table-sm',
