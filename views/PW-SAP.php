@@ -17,6 +17,7 @@ Redireccionar();
   <meta charset="utf-8">
   <title>Modulo de pedidos WEB - SAP</title>
   <link type="text/css" rel="stylesheet" href="../resources/css/start/jquery-ui-1.9.2.custom.css?<?php echo (rand()); ?>" />
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
   <link type="text/css" rel="stylesheet" href="../resources/css/Animate.css?<?php echo (rand()); ?>">
@@ -104,17 +105,80 @@ Redireccionar();
       gap: 20px;
       padding: 8px;
       border-radius: 5px;
+      z-index: 50;
     }
 
     .input-total {
-      width: 10%;
+      /* width: 10%; */
       color: #055160;
-      font-weight: 400;
+      font-weight: 500;
     }
 
     .p-total {
       margin: 0;
-    color: #055160;
+      color: #055160;
+      font-weight: 500;
+    }
+
+    @media (max-width: 768px) {
+      .custom-total {
+        width: 70%;
+        flex-direction: column;
+        gap: 0;
+      }
+
+      .input-total {
+        text-align: center;
+      }
+    }
+
+    .centrado-porcentual {
+      position: fixed;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(255, 255, 255, 0.8);
+      z-index: 9999;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .centrado-porcentual img {
+      max-width: 500px;
+      height: 300px;
+      margin-bottom: 10px;
+    }
+
+    .size-th {
+      font-size: 14px;
+      color: #055160;
+    }
+
+    .text-green {
+      color: #055160 !important;
+    }
+
+    .bag-info {
+      background-color: #cff4fc !important;
+    }
+
+    .size-td {
+      font-size: 13px;
+    }
+
+    .size-td-2 {
+      font-size: 11px;
+    }
+
+    #ui-id-1 {
+      font-size: 13px;
+    }
+
+    .vertical {
+      vertical-align: middle;
     }
   </style>
 </head>
@@ -249,46 +313,54 @@ Redireccionar();
       <!-- TAB PRODUCTOS -->
       <div class="tab-pane fade p-2" id="dvProductos" role="tabpanel" aria-labelledby="nav-profile-tab">
         <div class="custom-total">
-          <P class="p-total">VALOR TOTAL PEDIDO</P>
+          <P class="p-total">VALOR TOTAL PEDIDO:</P>
           <input type="text" id="txt_total" class="sin_borde input-total" readonly disabled>
         </div>
-
-        <table class="form" width="100%">
-          <tr>
-            <td colspan="2">
-              <div id="n_resultados" class="n_resultados"></div>
-            </td>
-          </tr>
-          <tr>
-            <td width="100%">
-              <div class="row">
-                <div class="col-md-12">
-                  <div class="input-group-btn">
-                    <button class="btn btn-sm btn-default" type="button" onclick="BotonBonificado(this)"> <img src="../resources/icons/regalo.png" width="24" heigth="24" title="PRODUCTO BONIFICADO" align="absmiddle">&nbsp; Bonificado </button>
-                    <button class="btn btn-sm btn-default" type="button" onclick="BotonOfertas(this)"> <img src="../resources/icons/pw/tag_marcado.png" width="24" title="PRODUCTO OFERTADO" heigth="24" align="absmiddle">&nbsp; Ofertas </button>
-                    <button class="btn btn-sm btn-default" type="button" onclick="BotonDescuentos(this)"> <img src="../resources/icons/pw/tag_discount.png" width="24" heigth="24" title="SOLO DESCUENTOS" align="absmiddle">&nbsp; Descuentos </button>
-                    <button class="btn btn-sm btn-default" type="button" onclick="Top_20_mas_vendidos_con_copi(this)"> <img src="../resources/icons/pw/top-10.png" width="24" heigth="24" title="TOP 20" align="absmiddle">&nbsp; TOP 20 </button>
-                  </div>
-                </div>
-                <div class="col-md-12">
-                  <div class="input-group">
-                    <input type="text" id="txt_bproductos" placeholder="F2 - Descripción de producto : Nombre - Codigo - Grupo" class="form-control" tabindex="1">
-                    <div class="input-group-btn">
-                      <button class="btn btn-default" type="button" title="Búsqueda de productos por voz" onclick="iniciarVozATexto('txt_bproductos',this)"> <i class="fa-solid fa-microphone"></i>&nbsp; </button>
-                      <button type="button" class="btn btn-default" id="btnMas" data-toggle="modal" data-target="#ModalAjustesBusqueda"> <i class="fa-solid fa-gear"></i>&nbsp; </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </td>
-          </tr>
-        </table>
-
-        <div id="dvResultProductos"></div>
+        <div class="container-fluid">
+          <div class="row mt-2 mb-2">
+            <div class="col-md-3">
+              <button class="btn btn-sm btn-light btn-micro w-100" type="button" onclick="BotonBonificado(this)">
+                <img src="../resources/icons/regalo.png" width="24" heigth="24" alt="PRODUCTO BONIFICADO" align="absmiddle">
+                &nbsp;Bonificado
+              </button>
+            </div>
+            <div class="col-md-3">
+              <button class="btn btn-sm btn-light btn-micro w-100" type="button" onclick="BotonOfertas(this)">
+                <img src="../resources/icons/pw/tag_marcado.png" width="24" alt="PRODUCTO OFERTADO" heigth="24" align="absmiddle">
+                &nbsp;Ofertas
+              </button>
+            </div>
+            <div class="col-md-3">
+              <button class="btn btn-sm btn-light btn-micro w-100" type="button" onclick="BotonDescuentos(this)">
+                <img src="../resources/icons/pw/tag_discount.png" width="24" heigth="24" alt="SOLO DESCUENTOS" align="absmiddle">
+                &nbsp;Descuentos
+              </button>
+            </div>
+            <div class="col-md-3">
+              <button class="btn btn-sm btn-light btn-micro w-100" type="button" onclick="Top_20_mas_vendidos_con_copi(this)">
+                <img src="../resources/icons/pw/top-10.png" width="24" heigth="24" alt="TOP 20" align="absmiddle">
+                &nbsp;TOP 20
+              </button>
+            </div>
+          </div>
+          <div class="input-group mb-2 shadow-sm">
+            <input type="text" id="txt_bproductos" class="form-control" tabindex="1" placeholder="F2 - Descripción de producto: Nombre - Codigo - Grupo">
+            <div class="input-group-btn">
+              <button class="btn btn-light btn-micro" type="button" title="Búsqueda de productos por voz" onclick="iniciarVozATexto('txt_bproductos',this)">
+                <i class="fa-solid fa-microphone"></i>&nbsp;
+              </button>
+              <button type="button" class="btn btn-light btn-micro" id="btnMas2">
+                <i class="fa-solid fa-gear"></i>&nbsp;
+              </button>
+            </div>
+          </div>
+          <p id="n_resultados" class="n_resultados lead p-total"></p>
+          <div id="dvResultProductos"></div>
+        </div>
       </div>
       <!-- TAB PEDIDO -->
       <div class="tab-pane fade p-2" id="dvPedidos" role="tabpanel" aria-labelledby="nav-profile-tab">
-        <p>pedido</p>
+        <div id="dvResultPedidos"></div>
       </div>
       <!-- TAB GESTIÓN -->
       <div class="tab-pane fade p-2" id="nav-profile-3" role="tabpanel" aria-labelledby="nav-profile-tab">
@@ -296,20 +368,6 @@ Redireccionar();
       </div>
     </div>
   </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -632,24 +690,9 @@ Redireccionar();
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  <!-- DIV'S PARA RENDERIZAR LOS LOADING -->
+  <div id="Bloquear" style="display: none;"></div>
+  <div id="loaderOverlay" class="centrado-porcentual" style="display: none;"></div>
 
   <!-------------------------MENU DE OPCIONES PARA PEDIDOS---------------------------------------------------------------------->
   <div id="ModalOpciones" class="modal fade bd-example-modal-md" role="dialog">
@@ -798,98 +841,114 @@ Redireccionar();
     </div>
   </div>
   <!----------------------------INFORMACION DE MATERIALES-------------------------------------------------------------------->
-  <div id="ModalInfoMaterial" class="modal fade bd-example-modal-lg" role="dialog">
+  <div class="modal fade" id="ModalInfoMaterial" tabindex="-1" aria-labelledby="ModalInfoMaterialLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-      <!-- Modal content-->
       <div class="modal-content">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">Datos adicionales de productos</h4>
+          <h5 class="modal-title" id="ModalInfoMaterialLabel">Datos adicionales de productos</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <div class="modal-body">
-          <div class="panel with-nav-tabs panel-info">
-            <div class="panel-heading">
-              <ul class="nav nav-tabs">
-                <li class="active"><a href="#ContenidoInfoMateriales" data-toggle="tab"> <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> Información</a> </li>
-                <li class="" id=""><a href="#ContenidoShoppingMateriales" data-toggle="tab" id=""> <span class="glyphicon glyphicon-star" aria-hidden="true"></span> Shopping</a> </li>
-                <li class="" id=""><a href="#ContenidoHuellaMateriales" data-toggle="tab" id=""> <span class="glyphicon glyphicon-bell" aria-hidden="true"></span> Huella</a> </li>
-              </ul>
+          <ul class="nav nav-tabs" id="materialTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#ContenidoInfoMateriales"
+                type="button" role="tab" aria-controls="ContenidoInfoMateriales" aria-selected="true">
+                <i class="bi bi-info-circle"></i> Información
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="shop-tab" data-bs-toggle="tab" data-bs-target="#ContenidoShoppingMateriales"
+                type="button" role="tab" aria-controls="ContenidoShoppingMateriales" aria-selected="false">
+                <i class="bi bi-star"></i> Shopping
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="huella-tab" data-bs-toggle="tab" data-bs-target="#ContenidoHuellaMateriales"
+                type="button" role="tab" aria-controls="ContenidoHuellaMateriales" aria-selected="false">
+                <i class="bi bi-bell"></i> Huella
+              </button>
+            </li>
+          </ul>
+          <div class="tab-content pt-3">
+            <div class="tab-pane fade show active" id="ContenidoInfoMateriales" role="tabpanel" aria-labelledby="info-tab">
+              <!-- Contenido dinámico -->
             </div>
-            <div class="panel-body">
-              <div class="tab-content">
-                <div class="tab-pane fade in active" id="ContenidoInfoMateriales"> </div>
-                <div class="tab-pane fade in" id="ContenidoShoppingMateriales">
-                  <table class="form" width="100%">
-                    <thead>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>CODIGO</td>
-                        <td><input type="text" class="form-control" id="shoping_codmaterial" readonly></td>
-                      </tr>
-                      <tr>
-                        <td>DESCRIPCIÓN</td>
-                        <td><input type="text" class="form-control" id="shoping_descripcion" readonly></td>
-                      </tr>
-                      <tr>
-                        <td>VALOR ACTUAL</td>
-                        <td><input type="text" class="form-control" id="shoping_preciomaterial" readonly></td>
-                      </tr>
-                      <tr>
-                        <td>COMPETENCIA</td>
-                        <td><select id="shoping_competencia" class="form-control">
-                          </select></td>
-                      </tr>
-                      <tr>
-                        <td>VALOR COMPETENCIA</td>
-                        <td><input type="number" class="form-control" id="shoping_valor"></td>
-                      </tr>
-                      <tr>
-                        <td>OBSERVACIÓN</td>
-                        <td><input type="text" class="form-control" id="shoping_observacion"></td>
-                      </tr>
-                      <tr>
-                        <td colspan="2"><button type="button" class="btn btn-sm btn-success" onClick="GuardarShoping();">Guardar</button></td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <div class="tab-pane fade in" id="ContenidoHuellaMateriales">
-                  <div class="alert alert-warning alert-dismissible" role="alert"> <strong>NOTA!</strong> Ingreso de huella de faltantes para solicitar compra. </div>
-                  <input type="hidden" class="form-control" id="huella_stock" readonly>
-                  <input type="hidden" class="form-control" id="huella_dcto" readonly>
-                  <table class="form" width="100%">
-                    <thead>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>CODIGO</td>
-                        <td><input type="text" class="form-control" id="huella_codmaterial" readonly></td>
-                      </tr>
-                      <tr>
-                        <td>DESCRIPCIÓN</td>
-                        <td><input type="text" class="form-control" id="huella_descripcion" readonly></td>
-                      </tr>
-                      <tr>
-                        <td>CANTIDAD</td>
-                        <td><input type="number" class="form-control" id="huella_cantidad"></td>
-                      </tr>
-                      <tr>
-                        <td>OBSERVACIÓN</td>
-                        <td><input type="text" class="form-control" id="huella_notas"></td>
-                      </tr>
-                      <tr>
-                        <td colspan="2"><button type="button" class="btn btn-sm btn-success" onClick="GuardarHuella();">Guardar</button></td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+            <div class="tab-pane fade" id="ContenidoShoppingMateriales" role="tabpanel" aria-labelledby="shop-tab">
+              <table class="table">
+                <tbody>
+                  <tr>
+                    <td class="vertical">CODIGO</td>
+                    <td><input type="text" class="form-control size-th" id="shoping_codmaterial" readonly></td>
+                  </tr>
+                  <tr>
+                    <td class="vertical">DESCRIPCIÓN</td>
+                    <td><input type="text" class="form-control size-td text-green" id="shoping_descripcion" readonly></td>
+                  </tr>
+                  <tr>
+                    <td class="vertical">VALOR ACTUAL</td>
+                    <td><input type="text" class="form-control size-th" id="shoping_preciomaterial" readonly></td>
+                  </tr>
+                  <tr>
+                    <td class="vertical">COMPETENCIA</td>
+                    <td><select id="shoping_competencia" class="form-control size-th"></select></td>
+                  </tr>
+                  <tr>
+                    <td class="vertical">VALOR COMPETENCIA</td>
+                    <td><input type="number" class="form-control size-th" id="shoping_valor"></td>
+                  </tr>
+                  <tr>
+                    <td class="vertical">OBSERVACIÓN</td>
+                    <td><input type="text" class="form-control size-td" id="shoping_observacion"></td>
+                  </tr>
+                  <tr>
+                    <td colspan="2">
+                      <button type="button" class="btn btn-success btn-sm" onClick="GuardarShoping();">
+                        Guardar
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="tab-pane fade" id="ContenidoHuellaMateriales" role="tabpanel" aria-labelledby="huella-tab">
+              <div class="alert alert-warning" role="alert"><strong>NOTA!</strong> Ingreso de huella de faltantes para
+                solicitar compra.
               </div>
+              <input type="hidden" class="form-control" id="huella_stock" readonly>
+              <input type="hidden" class="form-control" id="huella_dcto" readonly>
+              <table class="table">
+                <tbody>
+                  <tr>
+                    <td class="vertical">CODIGO</td>
+                    <td><input type="text" class="form-control size-th" id="huella_codmaterial" readonly></td>
+                  </tr>
+                  <tr>
+                    <td class="vertical">DESCRIPCIÓN</td>
+                    <td><input type="text" class="form-control size-td text-green" id="huella_descripcion" readonly></td>
+                  </tr>
+                  <tr>
+                    <td class="vertical">CANTIDAD</td>
+                    <td><input type="number" class="form-control size-th" id="huella_cantidad"></td>
+                  </tr>
+                  <tr>
+                    <td class="vertical">OBSERVACIÓN</td>
+                    <td><input type="text" class="form-control size-td text-green" id="huella_notas"></td>
+                  </tr>
+                  <tr>
+                    <td colspan="2">
+                      <button type="button" class="btn btn-success btn-sm" onClick="GuardarHuella();">
+                        Guardar
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-info" data-dismiss="modal">Cerrar</button>
+          <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cerrar</button>
         </div>
       </div>
     </div>
@@ -1487,83 +1546,125 @@ Redireccionar();
     </div>
   </div>
   <!-- MODAL AJUSTE BÚSQUEDA -->
-  <div id="ModalAjustesBusqueda" class="modal fade bd-example-modal-lg" role="dialog">
-    <div class="modal-dialog modal-lg">
+  <div class="modal fade" id="ModalAjustesBusqueda" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="min-width: 50%;">
       <div class="modal-content">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">Configuracion de busqueda</h4>
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Configuración de búsqueda</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <table class="form" width="100%">
             <tr>
-              <td><img src="../resources/icons/pw/tag_stock.png" width="24" title="SOLO CON STOCK" heigth="24" align="absmiddle">&nbsp;Stock</td>
+              <td>
+                <img src="../resources/icons/pw/tag_stock.png" width="24" title="SOLO CON STOCK" heigth="24" align="absmiddle">
+                &nbsp;Stock
+              </td>
               <td>
                 <div id="DvChkStock" class="DivCheckBox DivCheckBoxTrue"></div>
               </td>
             </tr>
             <tr>
-              <td><img src="../resources/icons/pw/tag_discount.png" width="24" heigth="24" title="SOLO DESCUENTOS" align="absmiddle">&nbsp;Descuentos</td>
+              <td>
+                <img src="../resources/icons/pw/tag_discount.png" width="24" heigth="24" title="SOLO DESCUENTOS" align="absmiddle">
+                &nbsp;Descuentos
+              </td>
               <td>
                 <div id="DvChkDctos" class="DivCheckBox"></div>
               </td>
             </tr>
             <tr>
-              <td><img src="../resources/icons/pw/tag_marcado.png" width="24" title="PRODUCTO OFERTADO" heigth="24" align="absmiddle">&nbsp;Productos Ofertados</td>
+              <td>
+                <img src="../resources/icons/pw/tag_marcado.png" width="24" title="PRODUCTO OFERTADO" heigth="24" align="absmiddle">
+                &nbsp;Productos Ofertados
+              </td>
               <td>
                 <div id="DvChkOfertado" class="DivCheckBox"></div>
               </td>
             </tr>
             <tr>
-              <td><img src="../resources/icons/regalo.png" width="24" heigth="24" title="PRODUCTO BONIFICADO" align="absmiddle">&nbsp;Bonificados</td>
+              <td>
+                <img src="../resources/icons/regalo.png" width="24" heigth="24" title="PRODUCTO BONIFICADO" align="absmiddle">
+                &nbsp;Bonificados
+              </td>
               <td>
                 <div id="DvChkBonif" class="DivCheckBox"></div>
               </td>
             </tr>
             <tr>
-              <td><img src="../resources/icons/nuevo.png" width="24" title="PRODUCTOS NUEVO" heigth="24" align="absmiddle">&nbsp;Productos Nuevos (90 Dias)</td>
+              <td width="400">
+                <img src="../resources/icons/nuevo.png" width="24" title="PRODUCTOS NUEVO" heigth="24" align="absmiddle">
+                &nbsp;Productos Nuevos (90 Dias)
+              </td>
               <td>
                 <div id="DvChkNuevos" class="DivCheckBox"></div>
               </td>
             </tr>
             <tr>
-              <td><img src="../resources/icons/pw/tag_kit.png" width="24" title="PRODUCTOS KITS" heigth="24" align="absmiddle">&nbsp;KIT'S</td>
+              <td>
+                <img src="../resources/icons/pw/tag_kit.png" width="24" title="PRODUCTOS KITS" heigth="24" align="absmiddle">
+                &nbsp;KIT'S
+              </td>
               <td>
                 <div id="DvChkKits" class="DivCheckBox"></div>
               </td>
             </tr>
+          </table>
+          <table class="form mt-2" width="100%">
             <tr>
               <td>Proveedores</td>
-              <td><select id="txtGrupoArticulo" class="form-control" style="width:100%">
-                </select></td>
+              <td>
+                <select id="txtGrupoArticulo" class="form-select size-td" style="width:100%">
+                </select>
+              </td>
             </tr>
             <tr>
               <td>Numero Temporal</td>
-              <td align="center"><input type="text" id="txt_numero" class="form-control" readonly></td>
+              <td align="center">
+                <input type="text" id="txt_numero" class="form-control size-td" readonly>
+              </td>
             </tr>
             <tr>
               <td>Numero SAP</td>
-              <td align="center"><input type="text" id="txt_numero_sap" class="form-control" readonly></td>
+              <td align="center">
+                <input type="text" id="txt_numero_sap" class="form-control size-td" readonly>
+              </td>
             </tr>
             <tr>
               <td>Importar Plano [codigo,cantidad]</td>
-              <td align="center"><input type="file" id="filename" name="filename" class="form-control" readonly></td>
+              <td align="center">
+                <input type="file" id="filename" name="filename" class="form-control size-td" readonly>
+              </td>
             </tr>
           </table>
         </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-danger btn-sm" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- MODAL INFORMACIÓN DE BONIFICADOS -->
+  <div id="ModalInfoBonificados" class="modal fade bd-example-modal-lg" role="dialog">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">INFORMACIÓN DE BONIFICADOS</h4>
+        </div>
+        <div class="modal-body" id="ContenidoInfoBonificados"></div>
         <div class="modal-footer">
           <button type="button" class="btn btn-info" data-dismiss="modal">Cerrar</button>
         </div>
       </div>
     </div>
   </div>
-  <!-- DIV'S PARA RENDERIZAR LOS LOADING -->
-  <div id="Bloquear" style="display:none;"></div>
-  <div class="centrado-porcentual" style="display:none;background-color:transparent; width:30%; height:250px"></div>
 
   <!-- SCRIPT'S PARA EL DINAMISMO DE LA PÁGINA -->
   <script type="text/javascript" src="../lib/js/jquery-2.1.1.min.js?<?php echo (rand()); ?>"></script>
   <script type="text/javascript" src="../lib/js/jquery-ui-1.9.2.custom.js?<?php echo (rand()); ?>"></script>
+  <!-- <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script> -->
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
   <script
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.min.js"
     integrity="sha384-RuyvpeZCxMJCqVUGFI0Do1mQrods/hhxYlcVfGPOfQtPJh0JCw12tUAZ/Mv10S7D"

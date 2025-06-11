@@ -17,13 +17,62 @@ function verificar_url( $url ) {
 
 
 switch ( $_POST[ 'op' ] ) {
-  case 'B_INFO_MATERIAL':
-    {
-      $sp = mssql_init( 'P_LOTES_MATERIALES_S' );
-      mssql_bind( $sp, '@CODIGO', mb_strtoupper( $_POST[ "cod" ], "UTF-8" ), SQLVARCHAR, false, false );
-      mssql_bind( $sp, '@ORG', mb_strtoupper( $_POST[ "org" ], "UTF-8" ), SQLVARCHAR, false, false );
-      $r = mssql_execute( $sp );
-      while ( $row = mssql_fetch_array( $r ) ) {
+  case 'B_INFO_MATERIAL': {
+      $codigo = $_POST[ "cod" ];
+      $sql = "SELECT 
+               M.CODIGO_MATERIAL,
+               '1'+SUBSTRING(M.CODIGO_MATERIAL, 2, 10) AS CODIGO_FOTO,
+               M.DESCRIPCION,
+               M.DESCRIPCION2,
+               T.NOMBRES AS LAB,
+               M.CODIGO_SAP,
+               ISNULL(M.CONTROLADO, 0) AS CONTROLADO,
+               ISNULL(M.INSTITUCIONAL, 0) AS INSTITUCIONAL,
+               ISNULL(M.INVIMA, '') AS INVIMA,
+               M.BLOQUEO_VENTA,
+               ISNULL(M.EAN, '') AS EAN,
+               ISNULL(M.EMBALAJE, 0) AS EMBALAJE,
+               M.FECHA_CREACION,
+               DATEDIFF(DAY, M.FECHA_CREACION, GETDATE()) AS DIAS_CREACION
+            FROM T_MATERIALES M
+            LEFT JOIN T_TERCEROS T ON T.CODIGO_SAP = M.CODIGO_SAP
+            WHERE 
+              M.CODIGO_MATERIAL = '$codigo '";
+      $optCentros = '';
+      
+      if($_POST['org'] == '1000'){
+          $optCentros = "'MM01','MC01'";
+      }else{
+          $optCentros = "'RM01','RB01','RC01','RQ01'";
+      }
+      
+      $sqlSAP = "select 
+                        LTRIM(a.matnr, '0') as material,
+                        a.charg as lote,
+                        b.vfdat as vmcto,
+                        a.gesme as cantidad,
+                        a.lgpla as ubicacion,
+                        a.werks as centro,
+                        a.lgnum as almacen,
+                        a.lgtyp as tipo_mov
+                    from lqua a
+                    join mch1 as b on  a.matnr = b.matnr and a.charg = b.charg
+                    where 
+                     LTRIM(a.matnr, '0') = '$codigo' and 
+                     a.werks in($optCentros) and 
+                     a.lgtyp <> 'CUA' and 
+                     a.lgtyp <> '916'
+                    order by 
+                     a.werks,
+                     a.lgnum";
+
+      $resultadosSAP = generarArrayHana( $sqlSAP, 0 );
+
+      $datos = array();
+
+      $q = mssql_query( $sql );
+
+      while ( $row = mssql_fetch_array( $q ) ) {
 
         $ruta = "https://dfnas.pwmultiroma.com/imagenesMateriales/" . $row[ "CODIGO_FOTO" ] . '.png';
         $datos[] = array(
@@ -37,19 +86,16 @@ switch ( $_POST[ 'op' ] ) {
           'INVIMA' => utf8_encode( $row[ "INVIMA" ] ),
           'BLOQUEO_VENTA' => $row[ "BLOQUEO_VENTA" ],
           'EAN' => $row[ "EAN" ],
-          'CENTRO_SUMINISTRADOR' => $row[ "CENTRO_SUMINISTRADOR" ],
-          'ALMACEN' => $row[ "ALMACEN" ],
-          'STOCK' => $row[ "STOCK" ],
-          'LOTE' => $row[ "LOTE" ],
           'EMBALAJE' => $row[ "EMBALAJE" ],
-          'VENCIMIENTO' => $row[ "VENCIMIENTO" ],
           'FECHA_CREACION' => $row[ "FECHA_CREACION" ],
           'DIAS_CREACION' => $row[ "DIAS_CREACION" ],
-          'RUTA' => $ruta
+          'RUTA' => $ruta,
+          'INVENTARIO_LOTES' => $resultadosSAP
         );
       } //while
+
       echo json_encode( $datos );
-      mssql_free_result( $r );
+      mssql_free_result( $q );
       mssql_close();
     }
     break;
@@ -389,16 +435,6 @@ switch ( $_POST[ 'op' ] ) {
       $sql = "select 
 			  m.codigo_material,
 			  m.descripcion,
-			  lote = (  select  top 1  
-						  convert(varchar(30),d.vencimiento, 120) 
-						from t_materiales_stock d 
-						where 
-						  d.codigo_material = m.codigo_material and 
-						  d.oficina_ventas = '" . $_POST[ "bodega" ] . "' and   
-						  isnull(d.stock,0)>2 and d.vencimiento > getdate()  
-						order by 
-						  convert(varchar(30),d.vencimiento, 120)   
-			  ) ,
 			  m.valor_unitario,
 			  m.iva,
 			  m.descuento,
@@ -630,26 +666,83 @@ switch ( $_POST[ 'op' ] ) {
       }
       //------------------------------------------------------------------
       $datos = array();
-
       $q = mssql_query( $sql );
+      /*
+        * 20250529 - V1
+        * Ampliacion 29-05-2025 Christian Bula 
+        * Control de lotes desde SAP para informarlos en la descripción
+      */    
+        
+            $materialesADG = [];
+            while ($row = mssql_fetch_array($q, MSSQL_ASSOC)) {
+                $materialesADG[$row['codigo_material']] = $row;
+            }
+            mssql_free_result($q);
+           
+            $materialesList = "'" . implode("','", array_keys($materialesADG)) . "'";
+        
+            $centro = '';
+            switch($_POST[ "bodega" ]){
+                case "1100": $centro = 'MM01'; break;
+                case "1200": $centro = 'MC01'; break;
+                case "2100": $centro = 'RM01'; break;
+                case "2200": $centro = 'RB01'; break;
+                case "2300": $centro = 'RC01'; break;
+                case "2400": $centro = 'RQ01'; break;
+            }
+        
+            $sqlSAP = "select 
+                            LTRIM(a.matnr, '0') as material,
+                            a.charg as lote,
+                            b.vfdat as vmcto
+                        from lqua a
+                        join mch1 as b on  a.matnr = b.matnr and a.charg = b.charg
+                        where 
+                         LTRIM(a.matnr, '0') in($materialesList ) and 
+                         a.werks = '$centro' and 
+                         a.lgtyp <> 'CUA' and 
+                         a.lgtyp <> '916'";
+            $resultadosSAP = generarArrayHana($sqlSAP, 0);
+             // Indexar resultados SAP por material
+            $lotesSAP = [];
+            foreach ($resultadosSAP as $item) {
+                $material = $item['MATERIAL'];
+                $fechaLote = $item['VMCTO'];
+                if (empty($fechaLote)) continue;
+                if (!isset($lotesSAP[$material]) || strtotime($fechaLote) < strtotime($lotesSAP[$material])) {
+                    $lotesSAP[$material] = $fechaLote;
+                }
+            }
 
-      while ( $row = mssql_fetch_array( $q ) ) {
+     /*
+        * 20250529 - V1
+        * Ampliacion 29-05-2025 Christian Bula 
+        * Control de lotes desde SAP para informarlos en la descripción
+      */   
+    
+
+      foreach ($materialesADG as $row) {
+        /*
+         Control del lote
+        */  
+        $codigo = $row["codigo_material"];
+        $vmcto  = ($codigo !== null && isset($lotesSAP[$codigo])) ? $lotesSAP[$codigo] : 0;
+          
+          
         if ( $row[ 'descuento_adg' ] > 0 ) {
           $neto = round( ( $row[ "valor_unitario" ] * ( 1 - ( ( $row[ "descuento" ] + $row[ "descuento_adg" ] ) / 100 ) ) ) * ( 1 + ( $row[ "iva" ] / 100 ) ), 0 );
         } else {
           $neto = $row[ 'valor_neto' ];
-        }
-
-
+        }        
         if ( $clase == 'ZPWC' ) { //Restriccion para que los descuentos de clase ZPWC sean solo para clientes Droguistas es decir 100
           if ( $_POST[ 'Grp1' ] == '100' && ( int )$row[ "descuento_adg" ] > 0 ) {
 
-            $descripcion = 'OFERTA EXCLUSIVA CLIENTE WEB : ' . utf8_encode( trim( $row[ "descripcion" ] ) ) . ' - ' . utf8_encode( trim( $row[ "grupo_articulos" ] ) ) . ' - ' . utf8_decode( trim( $row[ "lote" ] ) );
+            $descripcion = 'OFERTA EXCLUSIVA CLIENTE WEB : ' . utf8_encode( trim( $row[ "descripcion" ] ) ) . ' - ' . utf8_encode( trim( $row[ "grupo_articulos" ] ) ) . ' - ' .  $vmcto ;
           } else {
-            $descripcion = utf8_encode( trim( $row[ "descripcion" ] ) ) . ' - ' . utf8_encode( trim( $row[ "grupo_articulos" ] ) ) . ' - ' . utf8_decode( trim( $row[ "lote" ] ) );
+            $descripcion = utf8_encode( trim( $row[ "descripcion" ] ) ) . ' - ' . utf8_encode( trim( $row[ "grupo_articulos" ] ) ) . ' - ' . $vmcto ;
           }
         } else {
-          $descripcion = utf8_encode( trim( $row[ "descripcion" ] ) ) . ' - ' . utf8_encode( trim( $row[ "grupo_articulos" ] ) ) . ' - ' . utf8_decode( trim( $row[ "lote" ] ) );
+          $descripcion = utf8_encode( trim( $row[ "descripcion" ] ) ) . ' - ' . utf8_encode( trim( $row[ "grupo_articulos" ] ) ) . ' - ' .  $vmcto ;
         }
         $datos[] = array(
           'codigo_material' => $row[ "codigo_material" ],
@@ -681,8 +774,8 @@ switch ( $_POST[ 'op' ] ) {
           'fecha_creacion' => $row[ "fecha_creacion" ],
           'img1' => $row[ "img1" ],
           'img2' => $row[ "img2" ],
-          'op_inf' => '0',
-          'SQL' => $sql
+          'op_inf' => '0'//,
+          //'SQL' => $sql
         );
         //print_r($datos);
       }
@@ -1444,6 +1537,8 @@ switch ( $_POST[ 'op' ] ) {
 			  p.oficina_ventas,
 			  p.codigo_sap,
 			  p.cliente,
+
+
 			  p.nit_cliente,
 			  p.fecha_pedido,
 			  p.valor_total,
@@ -1910,14 +2005,13 @@ switch ( $_POST[ 'op' ] ) {
 			  p.codigo_material,
 			  v.descripcion,
 			  p.puntos,
-			  v.stock
+			  1 as stock
 			from t_plan_puntos p 
-			inner join v_materiales v on v.codigo_material = p.codigo_material and
-			( v.oficina_ventas = p.oficina_ventas or v.organizacion_ventas = p.oficina_ventas)
+			inner join v_materiales v on v.codigo_material = p.codigo_material and ( v.oficina_ventas = p.oficina_ventas or v.organizacion_ventas = p.oficina_ventas)
 			where 
 			  (p.oficina_ventas = '" . $_POST[ 'oficina' ] . "' or p.oficina_ventas ='" . $_POST[ 'organizacion' ] . "') and
 			  v.lista = '58' and 
-			  v.oficina_ventas = '" . $_POST[ 'oficina' ] . "' and  v.stock > 0
+			  v.oficina_ventas = '" . $_POST[ 'oficina' ] . "' --and  v.stock > 0
 			  ";
     $q = GenerarArray( $sql, '' );
     echo json_encode( $q );
@@ -1927,14 +2021,14 @@ switch ( $_POST[ 'op' ] ) {
 			  p.codigo_material,
 			  v.descripcion,
 			  p.puntos,
-			  v.stock
+			  1 as stock
 			from t_plan_puntos p 
 			inner join v_materiales v on v.codigo_material = p.codigo_material and ( v.oficina_ventas = p.oficina_ventas or v.organizacion_ventas = p.oficina_ventas)
 			where 
 			  (p.oficina_ventas = '" . $_POST[ 'oficina' ] . "' or p.oficina_ventas ='" . $_POST[ 'organizacion' ] . "') and
 			  v.lista = '" . $_POST[ 'lista' ] . "' and 
 			  v.oficina_ventas = '" . $_POST[ 'oficina' ] . "' and 
-			  v.stock > 0 and 
+			 -- v.stock > 0 and 
 			  p.codigo_material = '" . $_POST[ 'codigo' ] . "'";
     $q = GenerarArray( $sql, '' );
     echo json_encode( $q );
@@ -2034,6 +2128,7 @@ switch ( $_POST[ 'op' ] ) {
       'observacion' => $_POST[ "nota" ]
     );
     $id = insertWhidthReturnId( $fields, 'T_CAR_SOL_DESBLOQUEO_PEDIDOS', true );
+
 
     if ( $id > 0 ) {
       echo json_encode( array(

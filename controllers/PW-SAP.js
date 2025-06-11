@@ -1,13 +1,11 @@
-// JavaScript Document
-var ArrProd = new Array();
-var ArrEan = new Array();
-var ArrCli = new Array();
-var Arr = "";
-var OfcN = "";
-var OfcS = "";
-var Perm_Cambiar_Bodega = '';
-
-
+let ArrProd = new Array();
+let ArrEan = new Array();
+let ArrCli = new Array();
+let Arr = "";
+let OfcN = "";
+let OfcS = "";
+let Perm_Cambiar_Bodega = '';
+// FUNCIÓN PARA VALIDAR ESTADO DE DESBLOQUEO
 const validaEstadoDesbloqueo = async () => {
   try {
     const pedido = $("#ped_numero_sap").val();
@@ -28,8 +26,7 @@ const validaEstadoDesbloqueo = async () => {
     return false; // Devuelve false en caso de error
   }
 };
-
-
+// FUNCIÓN PARA GESTIONAR SOLICITUD DE DESBLOQUEO
 const SolDesbloqueo = async () => {
   /*2024-10-04 Christian Bula 
    Se añade control para solo poder volver a montar la solicitud si el estado es (R:Rechazado - A: Aprobado)*/
@@ -43,12 +40,8 @@ const SolDesbloqueo = async () => {
       confirmButtonText: 'Entiendo, seguiré esperando...'
     });
     return;
-
   }
-
   /*2024-10-04 Christian Bula */
-
-
   Swal.fire({
     title: "Solicitud de desbloqueo del pedido #" + $("#ped_numero_sap").val(),
     html: `<textarea id="nota" class="swal2-input form-control"  placeholder="Si tienes una observacion , escribela aquí"></textarea>`,
@@ -62,7 +55,7 @@ const SolDesbloqueo = async () => {
     preConfirm: async () => {
       try {
         const nota = Swal.getPopup().querySelector('#nota').value;
-        resp = await enviarPeticion({
+        const resp = await enviarPeticion({
           link: '../models/PW-SAP.php',
           pedido: $("#ped_numero_sap").val(),
           op: 'enviar_sol_desbloqueo',
@@ -80,9 +73,7 @@ const SolDesbloqueo = async () => {
         Swal.fire("Ok", "Se envio la solicitud correctamente!", "success");
         Temporales();
       } catch (error) {
-        Swal.showValidationMessage(`
-          Request failed: ${error}
-        `);
+        Swal.showValidationMessage(`Request failed: ${error}`);
       }
     },
     allowOutsideClick: () => !Swal.isLoading()
@@ -90,17 +81,15 @@ const SolDesbloqueo = async () => {
     console.log(result)
   });
 }
-
+// FUNCIÓN PARA MOSTRAR ESTADO DE SOLICITUD DE DESBLOQUEO
 const MostrarEstadoSolDesbloqueo = async (pedido) => {
-
-  const data = {
+  const resp = await enviarPeticion({
     link: '../models/PW-SAP.php',
     op: 'datos_sol',
     pedido
-  }
+  });
 
-  resp = await enviarPeticion(data);
-  estado = ''
+  let estado = '';
 
   switch (resp[0].ESTADO) {
     case "0":
@@ -114,23 +103,16 @@ const MostrarEstadoSolDesbloqueo = async (pedido) => {
       break;
   }
 
-  Swal.fire("Estado de la solicitud", "Tu solicitud se encuentra  " + estado + "  <br> Nota :" + resp[0].RESPUESTA, "info")
-
+  Swal.fire("Estado de la solicitud", "Tu solicitud se encuentra  " + estado + "  <br> Nota :" + resp[0].RESPUESTA, "info");
+  Swal.fire("Estado de la solicitud", "Tu solicitud se encuentra  " + estado + "  <br> Nota :" + resp[0].RESPUESTA, "info");
 }
 
 const guardSolicitudesDesbloqueoPedidos = async () => {
-
   try {
-    const data = {
-      link: '../models/PW-SAP.php',
-      op: 'SOL_PENDIENTE'
-    }
-
-    resp = await enviarPeticion(data);
+    const resp = await enviarPeticion({link: '../models/PW-SAP.php', op: 'SOL_PENDIENTE'});
   } catch (e) {
     console.error(e)
   }
-
 }
 
 // 
@@ -1111,6 +1093,10 @@ $(function () {
   $('#btnMas').click(function () {
     $('#ModalMasCliente').modal('show');
   });
+
+  $('#btnMas2').click(function () {
+    $('#ModalAjustesBusqueda').modal('show');
+  });
 });
 
 const preLoadCliente = (codigo_sap) => {
@@ -1177,11 +1163,8 @@ const preLoadCliente = (codigo_sap) => {
     $("#txtFaltanteCliente").val(DataCliente.value).attr("disabled", true);
     CargarEvento();
     BuscarProductos();
-
   }
-
 }
-
 
 function GruposArticulos() {
   $.ajax({
@@ -1206,94 +1189,6 @@ function GruposArticulos() {
   });
 }
 
-//
-/*
-function datos_cupo(){
-  $.ajax({
-    type    : "POST",
-    encoding: "UTF-8",
-    url     : "../models/PW-SAP.php",
-    async   : false,
-    dataType: "json",
-    error   : function(OBJ, ERROR, JQERROR){
-    },
-    beforeSend : function(){
-    },
-    data: {
-      op     : "S_CUPO_CREDITO",
-      org    : $.trim($("#Organizacion").val()),
-      codigo : $.trim($("#txt_codigoSap").val())
-    },
-    success: function(data){
-      var datos = '';
-  	
-      if(data.length>0){
-        datos = [{
-            name: 'Disponible',
-            y: parseInt(data[0].DISPONIBLE),
-            sliced: true,
-            selected: true
-             }, {
-            name: 'Comprometido',
-            y: parseInt(data[0].COMPROMETIDO)
-            }];
-        $("#cupo_txt1").text('COMPROMETIDO : '+formatNum(data[0].COMPROMETIDO,'$'));
-        $("#cupo_txt2").text('DISPONIBLE   : '+formatNum(data[0].DISPONIBLE,'$'));
-      }else{
-        datos = [{
-            name: 'Disponible',
-            y: 100,
-            sliced: true,
-            selected: true
-             }, {
-            name: 'Comprometido',
-            y: 0
-            }];
-        $("#cupo_txt1").text('COMPROMETIDO : '+formatNum(0,'$'));
-        $("#cupo_txt2").text('DISPONIBLE   : '+$("#txt_cupo").val());
-      }
-    	
-             Highcharts.chart('container3', {
-          chart: {
-            plotBackgroundColor: null,
-            plotBorderWidth: null,
-            plotShadow: false,
-            type: 'pie'
-          },
-          title: {
-            text: 'CUPO DE CRÉDITO'
-          },
-          tooltip: {
-            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-          },
-          accessibility: {
-            point: {
-              valueSuffix: '%'
-            }
-          },
-          plotOptions: {
-            pie: {
-              allowPointSelect: true,
-              cursor: 'pointer',
-              dataLabels: {
-                enabled: true,
-                format: '<b>{point.name}</b>: {point.percentage:.1f} %'
-              }
-            }
-          },
-          series: [{
-            name: 'Brands',
-             // colorByPoint: true,
-            data: datos
-          }]
-        });	
-    }
-  }).fail(function(data){
-      console.error(data);
-  });	
-
-}
-*/
 function consultaOpciones(pedido, alm, rdespacho, rpuntoventa) {
   alm = alm || undefined;
   rdespacho = rdespacho || undefined;
@@ -1343,28 +1238,6 @@ function consultaOpciones(pedido, alm, rdespacho, rpuntoventa) {
 function Notificaciones() {
   var rol = $("#Rol").val();
   var ofi = $("#Ofi").val();
-  //Televentas 12
-  //Ventas 14
-  //Administradores 1
-  /*if(rol == 14 || rol == 12 || rol == 1){
-   if(ofi == 2100 || ofi == 2200 || ofi == 2300){
-    $.notify({// options
-      icon:    'glyphicon glyphicon-warning-sign',
-      title: '<strong>CONVENCIÓN</strong></br>',
-      message: '¡Vamos con toda! Convención 2022 ARUBA'+
-           '  tú puedes ¡ANIMO!',
-      url: '',
-      target: '_blank' 
-    },{// settings	
-      delay : 10000,
-      type: 'warning',
-      animate: {
-        enter: 'animated fadeInDown',
-        exit: 'animated fadeOutUp'
-      },
-    });
-     }
- }*/
   //DESCUENTOS ESPECIALES PAGINA WEB
   if (rol == 10) {
     if (ofi == 2100 || ofi == 2200 || ofi == 2300 || ofi == 2400) {
@@ -1384,7 +1257,6 @@ function Notificaciones() {
       });
     }
   }
-
 }
 //Funcion para carga de zonas de ventas para consulta de pedidos
 function PermisosZonas() {
@@ -1454,29 +1326,28 @@ function activaTab(tab) {
 };
 //-----------------------------Funcion de carga de cliente especifico para el caso de que el usuario sea tipo cliente y no tenga opcion de seleccionar mas 
 //funcion que carga la imagen de "cargando..."
-function LoadImg(texto) {
-  var n = 0;
-  html = '<center>'
-    + '<figure><img src="../resources/icons/preloader.gif" class="img-responsive"/></figure>'
-    + '<figcaption>' + texto + '</figcaption>'
-    + '<figcaption id="txtTimer">' + n + '</figcaption>'
-    + '</center>';
-  $(".centrado-porcentual").html(html);
-  //$(".form-control").attr("disabled",true);
-  $(".centrado-porcentual").show();
-  $("#Bloquear").show();
-  //Timer	
-  var l = document.getElementById("txtTimer");
-  window.setInterval(function () {
-    l.innerHTML = n;
-    n++;
+function LoadImg(texto = "Cargando...") {
+  let n = 0;
+
+  const html = `
+    <img src="../resources/icons/preloader.gif" alt="Cargando..." />
+    <figcaption style="font-size: 1.2em; margin-bottom: 5px;">${texto}</figcaption>
+    <figcaption id="txtTimer" style="font-weight: bold;">0</figcaption>`;
+
+  const loader = document.getElementById("loaderOverlay");
+  loader.innerHTML = html;
+  loader.style.display = "flex";
+
+  window.timerInterval = setInterval(() => {
+    document.getElementById("txtTimer").textContent = ++n;
   }, 1000);
 }
 
 function UnloadImg() {
-  $("#Bloquear").hide();
-  $(".centrado-porcentual").hide();
-  //$(".form-control").attr("disabled",false);
+  clearInterval(window.timerInterval);
+  const loader = document.getElementById("loaderOverlay");
+  loader.style.display = "none";
+  loader.innerHTML = "";
 }
 //funcion que desbloquea la pantalla
 function UnlockScreen(cadena) {
@@ -1595,8 +1466,8 @@ function EditarPedido(Numero, Tipo) {
         $("#txt_numero_sap").val(data[0].NUMERO_SAP);
         $("#txt_total").val(formatNum(data[0].VALOR_TOTAL, '$'));
         //---------------------------------------------------------
-        $("#liPedidos").removeClass("disabled disabledTab");
-        $("#btnPedidos").attr("data-toggle", "tab");
+        // $("#liPedidos").removeClass("disabled disabledTab");
+        $("#btnPedidos").attr("disabled", false);
         $("#txt_destinatario").attr('disabled', true);
         //$("#ModalOpciones").modal("hide");
         //---------------------------------------------------------*/
@@ -1781,8 +1652,8 @@ function Limpiar() {
   //Deshabilitar pestañas---------------------------------
   // $("#liProductos").addClass("disabled disabledTab");
   $("#btnProductos").attr("disabled", true);
-  $("#liPedidos").addClass("disabled disabledTab");
-  $("#btnPedidos").removeAttr("data-toggle", "tab");
+  // $("#liPedidos").addClass("disabled disabledTab");
+  $("#btnPedidos").attr("disabled", true);
   //------------------------------------------------------
   $('#txt_cliente').prop('readonly', false);
   $("#txt_oficina").attr('disabled', false);
@@ -1951,7 +1822,7 @@ function ordenar(op, ob) {
     cl = "glyphicon-triangle-bottom";
   }
   sortJSON(Arr, key, new_ord);
-  TableView(Arr, op, cl);
+  TableView(Arr);
 }
 
 function sortJSON(data, key, orden) {
@@ -1969,56 +1840,38 @@ function sortJSON(data, key, orden) {
 
 }
 
-function TableView(filas, n, cl) {
+function TableView(filas) {
   const op_inf = $("#DvChkKits").hasClass('DivCheckBoxTrue') ? 1 : 0;
   const org = $.trim($("#Organizacion").val());
 
-  // Generar encabezados de tabla con ordenamiento dinámico
-  const headers = [
-    { title: 'CODIGO', breakpoints: 'xs', sortable: false },
-    { title: 'DESCRIPCION', sortable: true, sortOrder: n === 1 ? cl : '' },
-    { title: 'VALOR', breakpoints: 'xs', sortable: true, sortOrder: n === 2 ? cl : '' },
-    { title: 'IVA', breakpoints: 'xs', sortable: false },
-    { title: 'DCTO', breakpoints: 'xs', sortable: true, sortOrder: n === 3 ? cl : '' },
-    { title: 'VNETO', breakpoints: 'xs', sortable: false },
-    { title: 'STOCK', breakpoints: 'xs', sortable: true, sortOrder: n === 4 ? cl : '' },
-    { title: 'CANTIDAD', width: '20px', sortable: false },
-    { title: 'TOTAL', breakpoints: 'xs', width: '120px', sortable: false },
-    { title: 'ID', visible: false, sortable: false },
-    { title: 'INFO', breakpoints: 'xs', sortable: false }
-  ];
-
-  // Construir el HTML de la tabla
   let tabla = `
-    <table class="table" align="center" width="100%" id="tableProd">
+    <table class="display" width="100%" id="tableProd">
       <thead>
-        <tr>
-          ${headers.map(header => `
-            <th ${header.breakpoints ? `data-breakpoints="${header.breakpoints}"` : ''}
-                ${header.width ? `style="width:${header.width}"` : ''}
-                ${header.visible === false ? 'data-visible="false"' : ''}
-                ${header.sortable ? `onclick="ordenar(${headers.findIndex(h => h.title === header.title)}, this)"` : ''}
-                class="${header.sortable ? 'ordenArr' : ''} ${header.sortOrder || ''}">
-              <span>${header.title}</span>
-            </th>
-          `).join('')}
+        <tr style="background-color: #cff4fc;">
+          <th class="size-th">CODIGO</th>
+          <th class="size-th">DESCRIPCION</th>
+          <th class="size-th">VALOR</th>
+          <th class="size-th">IVA</th>
+          <th class="size-th">DCTO</th>
+          <th class="size-th">VNETO</th>
+          <th class="size-th">STOCK</th>
+          <th class="size-th">CANTIDAD</th>
+          <th class="size-th">TOTAL</th>
+          <th class="size-th">ID</th>
+          <th class="size-th">INFO</th>
         </tr>
       </thead>
-      <tbody>
-  `;
+      <tbody>`;
 
-  // Generar filas de datos
+  let Bonifica;
+
   filas.forEach((d, i) => {
-    const Bonifica = d.bonificado != 0 && (parseInt(d.stock_bonificado) >= parseInt(d.cant_bonificado)) ? 1 : 0;
+    Bonifica = d.bonificado != 0 && (parseInt(d.stock_bonificado) >= parseInt(d.cant_bonificado)) ? 1 : 0;
     const cantPedido = d.cant_pedido == 0 ? '' : d.cant_pedido;
     const vlrPedido = d.cant_pedido == 0 ? '' : d.vlr_pedido;
 
-    // Generar iconos
     const img = Bonifica ?
-      `<img src="../resources/icons/regalo.png" width="24" height="24" 
-            onclick="InfoBon('${d.descripcion}','${d.desc_bonificado_n}','${d.stock}',
-                    '${d.stock_bonificado}','${d.condicion_b}','${d.stock_prepack}')" 
-            align="absmiddle">` : '';
+      `<img src="../resources/icons/regalo.png" width="24" height="24" onclick="InfoBon('${d.descripcion}','${d.desc_bonificado_n}','${d.stock}','${d.stock_bonificado}','${d.condicion_b}','${d.stock_prepack}')" align="absmiddle">` : '';
 
     const img_desc = parseInt(d.descuento_adg) > 0 ?
       `<span class="glyphicon glyphicon-star-empty alert-warning" aria-hidden="true"></span> <b>%</b> ` : '';
@@ -2026,7 +1879,6 @@ function TableView(filas, n, cl) {
     const img_new = parseInt(d.dias_creacion) <= 90 ?
       `<img src="../resources/icons/nuevo.png" width="24" title="* Producto Nuevo *" height="24" align="absmiddle">` : '';
 
-    // Iconos específicos para Roma
     let img_1 = '', img_2 = '', img_3 = '';
     if (org === '2000') {
       img_1 = parseInt(d.img1) === 1 ?
@@ -2039,73 +1891,60 @@ function TableView(filas, n, cl) {
     img_3 = ofertado === '4000' ?
       `<img src="../resources/icons/pw/tag_marcado.png" width="24" title="PRODUCTO OFERTADO" height="24" align="absmiddle">` : '';
 
-    // Construir fila
     tabla += `
       <tr>
-        <td>${img_new}${d.codigo_material}</td>
-        <td>${img_3} ${img} ${img_desc} ${d.descripcion} ${img_1} ${img_2}</td>
-        <td style="background-color:#64D4F7">${formatNum(d.valor_unitario, '$')}</td>
-        <td>${d.iva}</td>
-        <td>${d.descuento}</td>
-        <td style="background-color:#95F3E8">${formatNum(d.valor_neto, '$')}</td>
-        <td>${d.stock}</td>
-        <td>
-          <input type="number" 
-                 id="CAF${d.codigo_material}" 
-                 onKeyPress="return vnumeros(event)" 
-                 value="${cantPedido}" 
-                 class="form-control" 
-                 tabindex="${i + 1}"
-                 onBlur="AddProducto(
-                   '${$.trim(d.codigo_material)}',
-                   '${$.trim(d.valor_unitario)}',
-                   '${$.trim(d.iva)}',
-                   '${$.trim(d.descuento)}',
-                   this.value,
-                   '${$.trim(d.valor_neto)}',
-                   '${$.trim(d.stock)}',
-                   '${$.trim(d.vlr_pedido)}',
-                   '${$.trim(d.id_pedido)}',
-                   '${$.trim(Bonifica)}',
-                   '${$.trim(d.cant_bonificado)}',
-                   '${$.trim(d.cant_regular)}',
-                   '${$.trim(d.stock_bonificado)}'
-                 )">
-        </td>
-        <td>
-          <input type="text" class="form-control" id="TOF${d.codigo_material}" 
-                 value="${formatNum(vlrPedido, '$')}" disabled readonly>
-        </td>
-        <td>
-          <input type="text" class="form-control" value="${d.id_pedido}" 
-                 id="IDF${d.codigo_material}" disabled readonly>
-        </td>
+        <td class="size-td">${img_new}${d.codigo_material}</td>
+        <td class="size-td">${img_3} ${img} ${img_desc} ${d.descripcion} ${img_1} ${img_2}</td>
+        <td class="size-td" style="background-color:#64D4F7">${formatNum(d.valor_unitario, '$')}</td>
+        <td class="size-td">${d.iva}</td>
+        <td class="size-td">${d.descuento}</td>
+        <td class="size-td" style="background-color:#95F3E8">${formatNum(d.valor_neto, '$')}</td>
+        <td class="size-td">${d.stock}</td>
+        <td class="size-td"><input type="number" id="CAF${d.codigo_material}" value="${cantPedido}" class="form-control size-td cantidad" tabindex="${i + 1}" data-material='${JSON.stringify(d)}'></td>
+        <td><input type="text" class="form-control size-td" id="TOF${d.codigo_material}" value="${formatNum(vlrPedido, '$')}" disabled readonly></td>
+        <td><input type="text" class="form-control" value="${d.id_pedido}" id="IDF${d.codigo_material}" disabled readonly></td>
         <td align="center">
-          <button type="button" class="btn btn-sm btn-default" 
-                  onClick="InfoMaterial(
-                    '${$.trim(d.codigo_material)}',
-                    '${$.trim(d.valor_unitario, '$')}',
-                    '${$.trim(d.iva)}',
-                    '${$.trim(d.descuento)}',
-                    '${$.trim(d.descripcion)}',
-                    '${$.trim(d.stock)}',
-                    ${d.op_inf}
-                  )">
-            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+          <button type="button" class="btn btn-sm btn-outline-primary info-btn" style="font-weight: bolder; font-size: 15px;" data-material='${JSON.stringify(d)}'>
+            <i class="fa-solid fa-plus"></i>
           </button>
         </td>
-      </tr>
-    `;
+      </tr>`;
   });
 
-  tabla += `
-      </tbody>
-    </table>
-  `;
+  tabla += `</tbody></table>`;
 
   $("#dvResultProductos").html(tabla);
-  $('#tableProd').footable();
+
+  $('#tableProd').DataTable({
+    paging: false,
+    searching: false,
+    ordering: true,
+    info: false,
+    responsive: true,
+    columnDefs: [
+      // { targets: [9], visible: false },
+      { targets: [10], orderable: false }
+    ],
+    language: {
+      // search: "Buscar:",
+      zeroRecords: "No se encontraron registros",
+      infoEmpty: "No hay registros disponibles"
+    }
+  });
+
+  // Delegar eventos para campos dinámicos
+  $('#tableProd').on('blur', '.cantidad', function () {
+    const { codigo_material, valor_unitario, iva, descuento, valor_neto, stock, vlr_pedido, id_pedido, cant_bonificado, cant_regular, stock_bonificado } = $(this).data('material');
+    const cantidad = $(this).val();
+    AddProducto(codigo_material, valor_unitario, iva, descuento, cantidad, valor_neto, stock, vlr_pedido, id_pedido, Bonifica, cant_bonificado, cant_regular, stock_bonificado);
+  });
+
+  $('#tableProd').on('click', '.info-btn', function () {
+    const { codigo_material, valor_unitario, iva, descuento, descripcion, stock, op_inf } = $(this).data('material');
+    InfoMaterial(codigo_material, valor_unitario, iva, descuento, descripcion, stock, op_inf);
+  });
 }
+
 function GuardarShoping() {
   $.ajax({
     encoding: "UTF-8",
@@ -2340,14 +2179,14 @@ function BuscarProductoArr(isn) {
       }
     }
     if (Arr.length > 0) {
-      TableView(Arr, 1, 'glyphicon-triangle-bottom');
-      $("#n_resultados").html(Arr.length + ' Coincidencias encontradas');
+      TableView(Arr);
+      $("#n_resultados").text(Arr.length + ' Coincidencias encontradas');
     } else {
       $("#dvResultProductos").html('<div class="alert alert-danger" role="alert">'
         + '<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>'
         + '<span class="sr-only">Error:</span>  NO EXISTEN RESULTADOS PARA LAS CONDICIONES SELECCIONADAS'
         + '</div>');
-      $("#n_resultados").html('0 resultados');
+      $("#n_resultados").text('0 resultados');
     }
     $("#txt_bproductos").attr("disabled", false);
   }
@@ -2593,7 +2432,7 @@ function InfoMaterial(pcodigo, pvalor, piva, pdcto, pdesc, pstock, op) {
   const org = $("#Organizacion").val();
   const ofi = $("#txt_oficina").val();
   const lst = $("#txt_lista").val();
-  const opc = op === 0 ? 'B_INFO_MATERIAL' : 'B_INFO_KIT';
+  const opc = op === "0" ? 'B_INFO_MATERIAL' : 'B_INFO_KIT';
 
   // Cálculos financieros
   const v1 = Math.round(vunit - ((vunit * dcto) / 100));
@@ -2628,13 +2467,12 @@ function InfoMaterial(pcodigo, pvalor, piva, pdcto, pdesc, pstock, op) {
       $('#ContenidoInfoMateriales').html(`
         <div class="alert alert-info m-2">
           <i class="fas fa-spinner fa-spin"></i> Cargando...
-        </div>
-      `);
+        </div>`);
     },
     data: { op: opc, cod: pcodigo, org, ofi, lst },
     dataType: "json",
     success: function (data) {// console.log(data); return ;
-      if (op === 0) {
+      if (op === "0") {
         renderMaterialInfo(data, { vunit, v1, v2, v3, v4, iva, dcto });
       } else {
         renderKitInfo(data);
@@ -2646,8 +2484,7 @@ function InfoMaterial(pcodigo, pvalor, piva, pdcto, pdesc, pstock, op) {
       $('#ContenidoInfoMateriales').html(`
         <div class="alert alert-danger m-2">
           Error al cargar la información del material
-        </div>
-      `);
+        </div>`);
     }
   });
 }
@@ -2666,63 +2503,62 @@ function renderMaterialInfo(data, { vunit, v1, v2, v3, v4, iva, dcto }) {
       <td>${item.VMCTO}</td>
       <td>${parseInt(item.CANTIDAD)}</td>
       <td>${item.UBICACION}</td>
-    </tr>
-  `).join('');
+    </tr>`).join('');
 
   const html = `
     <div class="container-fluid">
       <div class="row">
         <!-- Columna de datos básicos -->
-        <div class="col-lg-6">
+        <div class="col-md-6">
           <div class="panel panel-info">
-            <div class="panel-heading">DATOS BASICOS</div>
+            <div class="panel-heading text-green bag-info">DATOS BÁSICOS</div>
             <table class="form" width="100%" align="center">
               <tbody>
                 <tr>
                   <td colspan="2" align="center">
                     <img src="https://dfnas.pwmultiroma.com/imagenesMateriales/no_imagen.png" 
-                         class="img-responsive img-material" width="400" height="345">
+                         class="img-responsive img-material w-100 img-fluid" height="345">
                   </td>
                 </tr>
                 <tr>
-                  <td><b>CODIGO</b></td>
-                  <td>${data[0].CODIGO_MATERIAL}</td>
+                  <td><b>CÓDIGO</b></td>
+                  <td class="text-green">${data[0].CODIGO_MATERIAL}</td>
                 </tr>
                 <tr>
                   <td><b>TEXTO CORTO</b></td>
-                  <td>${data[0].DESCRIPCION}</td>
+                  <td class="size-td text-green">${data[0].DESCRIPCION}</td>
                 </tr>
                 <tr>
                   <td><b>REGISTRO INFO</b></td>
-                  <td>${data[0].CODIGO_SAP}</td>
+                  <td class="text-green">${data[0].CODIGO_SAP}</td>
                 </tr>
                 <tr>
                   <td><b>TEXTO LARGO</b></td>
-                  <td>${data[0].DESCRIPCION2}</td>
+                  <td class="size-td text-green">${data[0].DESCRIPCION2}</td>
                 </tr>
                 <tr>
                   <td><b>LABORATORIO</b></td>
-                  <td>${data[0].LAB}</td>
+                  <td class="text-green">${data[0].LAB}</td>
                 </tr>
                 <tr>
                   <td><b>INVIMA</b></td>
-                  <td>${data[0].INVIMA}</td>
+                  <td class="text-green">${data[0].INVIMA}</td>
                 </tr>
                 <tr>
                   <td><b>EAN</b></td>
-                  <td>${data[0].EAN}</td>
+                  <td class="text-green">${data[0].EAN}</td>
                 </tr>
                 <tr>
                   <td><b>EMBALAJE</b></td>
-                  <td>${data[0].EMBALAJE}</td>
+                  <td class="text-green">${data[0].EMBALAJE}</td>
                 </tr>
                 <tr>
                   <td><b>FECHA CREACIÓN</b></td>
-                  <td>${data[0].FECHA_CREACION}</td>
+                  <td class="text-green">${data[0].FECHA_CREACION}</td>
                 </tr>
                 <tr>
                   <td><b>DIAS CREACIÓN</b></td>
-                  <td>${data[0].DIAS_CREACION}</td>
+                  <td class="text-green">${data[0].DIAS_CREACION}</td>
                 </tr>
                 <tr>
                   <td><b>CONTROLADO</b>: ${ctrl}</td>
@@ -2734,57 +2570,61 @@ function renderMaterialInfo(data, { vunit, v1, v2, v3, v4, iva, dcto }) {
         </div>
         
         <!-- Columna de datos de venta -->
-        <div class="col-lg-6">
+        <div class="col-md-6">
           <div class="panel panel-info">
-            <div class="panel-heading">DATOS DE VENTA</div>
+            <div class="panel-heading text-green bag-info">DATOS DE VENTA</div>
             <table class="form" width="100%" align="center">
               <tbody>
                 <tr>
                   <td><b>VLR BRUTO</b></td>
-                  <td>${formatNum(vunit, '$')}</td>
+                  <td class="text-green">${formatNum(vunit, '$')}</td>
                 </tr>
                 <tr>
                   <td><b>VLR NETO SIN IVA</b></td>
-                  <td>${formatNum(v1, '$')}</td>
+                  <td class="text-green">${formatNum(v1, '$')}</td>
                 </tr>
                 <tr>
                   <td><b>VLR NETO FINANCIERO</b></td>
-                  <td>${formatNum(v4, '$')}</td>
+                  <td class="text-green">${formatNum(v4, '$')}</td>
                 </tr>
                 <tr>
                   <td><b>VLR DESCUENTO</b></td>
-                  <td>${formatNum(v3, '$')}</td>
+                  <td class="text-green">${formatNum(v3, '$')}</td>
                 </tr>
                 <tr>
                   <td><b>VLR IVA</b></td>
-                  <td>${formatNum(v2, '$')}</td>
+                  <td class="text-green">${formatNum(v2, '$')}</td>
                 </tr>
                 <tr>
                   <td><b>PORCENTAJE DCTO</b></td>
-                  <td>${dcto}%</td>
+                  <td class="text-green">${dcto}%</td>
                 </tr>
                 <tr>
                   <td><b>PORCENTAJE IVA</b></td>
-                  <td>${iva}%</td>
+                  <td class="text-green">${iva}%</td>
                 </tr>
               </tbody>
             </table>
           </div>
         </div>
+      </div>
         
-        <!-- Columna de datos de ingreso -->
-        <div class="col-lg-12">
+      <!-- Columna de datos de ingreso -->
+      <div class="row mt-2">
+        <div class="col-md-12">
           <div class="panel panel-info">
-            <div class="panel-heading">INVENTARIO FISICO POR LOTES</div>
+            <div class="panel-heading">INVENTARIO FÍSICO POR LOTES</div>
             <table class="table" width="100%" align="center">
               <thead>
-                  <th>CENTRO</tb>
-                  <th>ALMACEN</td>
-                  <th>MOV</td>
-                  <th>LOTE</td>
-                  <th>VENCIMIENTO</td>
-                  <th>STOCK</td>
-                  <th>UBICACION</td>
+                  <tr>
+                    <th class="bag-info text-green">CENTRO</th>
+                    <th class="bag-info text-green">ALMACEN</th>
+                    <th class="bag-info text-green">MOV</th>
+                    <th class="bag-info text-green">LOTE</th>
+                    <th class="bag-info text-green">VENCIMIENTO</th>
+                    <th class="bag-info text-green">STOCK</th>
+                    <th class="bag-info text-green">UBICACION</th>
+                  </tr>
               </thead>
               <tbody>
                 ${stockRows}
@@ -2793,8 +2633,7 @@ function renderMaterialInfo(data, { vunit, v1, v2, v3, v4, iva, dcto }) {
           </div>
         </div>
       </div>
-    </div>
-  `;
+    </div>`;
 
   $('#ContenidoInfoMateriales').html(html);
 }
@@ -2860,20 +2699,8 @@ function WSInvent(codigo, oficina) {
   return cantidad;
 }
 //---------------------Funcion para agregar o eliminar un producto seleccionado
-function AddProducto(pcodigo,
-  pvalor,
-  piva,
-  pdcto,
-  pcant,
-  pneto,
-  pstock,
-  pvrlped,
-  pidped,
-  pbonifica,
-  pcantbon,
-  pcantreg,
-  pstobon) {
-
+function AddProducto(pcodigo, pvalor, piva, pdcto, pcant, pneto, pstock, pvrlped, pidped, pbonifica, pcantbon, pcantreg, pstobon) {
+  debugger;
   var oficina = $("#txt_oficina").val();
   var codigo = pcodigo;
   var cant = isNaN(pcant) || pcant == '' ? 0 : parseInt(pcant);
@@ -2960,6 +2787,7 @@ function AddProducto(pcodigo,
     $("#IDF" + pcodigo).val(0); // input id fila
   }
 }
+
 //--------------------------Funcion que construye el listado de destinatarios de mercancia 
 function Destinatarios(codSap, ciudad, direccion) {
   $.ajax({
@@ -3020,8 +2848,8 @@ function InsertarEncabezado() {
       success: function (data) { //alert(data);
         if (!isNaN(data) > 0) {
           numero = data;
-          $("#liPedidos").removeClass("disabled disabledTab");
-          $("#btnPedidos").attr("data-toggle", "tab");
+          // $("#liPedidos").removeClass("disabled disabledTab");
+          $("#btnPedidos").attr("disabled", false);
         } else {
           alert('ERROR: Al insertar el encabezado del pedido');
         }
@@ -3501,7 +3329,7 @@ function ListarPedido() {
           + '<tbody>' + detalle + '</tbody>'
           + '</table>';
         $("#dvResultPedidos").html(tabla);
-        $('#tablaConfirmar').footable();
+        // $('#tablaConfirmar').footable();
 
       } else {
         $("#dvResultPedidos").html('<div class="alert alert-danger" role="alert">'
@@ -3514,6 +3342,7 @@ function ListarPedido() {
     UnloadImg();
   });
 }
+
 //-----------------------------Actualizacion de notas de pedidos 
 function UpdNotas(ob) {
   var nota = $.trim($(ob).val());
@@ -3789,8 +3618,8 @@ function RecuperarPedido() {
       $("#txt_numero_sap").val(numero_sap);
       $("#txt_total").val(formatNum(valor, '$'));
       //---------------------------------------------------------
-      $("#liPedidos").removeClass("disabled disabledTab");
-      $("#btnPedidos").attr("data-toggle", "tab");
+      // $("#liPedidos").removeClass("disabled disabledTab");
+      $("#btnPedidos").attr("disabled", false);
       $("#ModalOpciones").modal("hide");
       activaTab('dvPedidos');
       //---------------------------------------------------------
@@ -7115,7 +6944,7 @@ function Presupuesto_datos() {
 
 function toggleButton(button, checkboxDivId) {
   // Alternar la clase 'btn-success' en el botón
-  $(button).toggleClass('btn-success');
+  $(button).toggleClass('btn-light btn-success');
 
   // Alternar el estado visual del "checkbox" simulado
   toggleDivCheckbox(checkboxDivId);
