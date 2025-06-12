@@ -1,7 +1,7 @@
 <?php
-/*DESARROLLADO POR ING CRISTIAN BULA 09-12-2016*/
-header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
-header("Expires: Sat, 1 Jul 2000 05:00:00 GMT"); // Fecha en el pasado
+/* DESARROLLADO POR ING CRISTIAN BULA 09-12-2016 */
+header("Cache-Control: no-cache, must-revalidate");
+header("Expires: Sat, 1 Jul 2000 05:00:00 GMT");
 include('../models/funciones.php');
 session_start();
 Redireccionar();
@@ -27,10 +27,6 @@ Redireccionar();
   <link type="text/css" rel="stylesheet" href="../resources/fontawesome/css/all.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.13.2/dist/sweetalert2.min.css">
   <style>
-    .swal2-popup {
-      font-size: 1.5rem !important;
-    }
-
     .modal-body {
       max-height: calc(100vh - 200px);
       overflow-y: auto;
@@ -109,7 +105,6 @@ Redireccionar();
     }
 
     .input-total {
-      /* width: 10%; */
       color: #055160;
       font-weight: 500;
     }
@@ -180,6 +175,17 @@ Redireccionar();
     .vertical {
       vertical-align: middle;
     }
+
+    .separador {
+      margin: 0;
+      padding: 0 0 0 7px;
+      background-color: #055160;
+      color: #cff4fc;
+    }
+
+    .size-a {
+      font-size: 14.5px;
+    }
   </style>
 </head>
 
@@ -205,17 +211,58 @@ Redireccionar();
   <div>
     <!-- MENÚ DE OPCIONES EN TABS -->
     <div class="container-fluid">
-      <nav class="row p-1">
-        <div class="nav nav-tabs" id="nav-tab" role="tablist">
-          <button class="nav-link active" id="btnClientes" data-bs-toggle="tab" data-bs-target="#dvClientes" type="button" role="tab" aria-controls="nav-home" aria-selected="true"><i class="fa-solid fa-user-tie"></i>&nbsp;Cliente</button>
-
-          <button class="nav-link" id="btnProductos" data-bs-toggle="tab" data-bs-target="#dvProductos" type="button" role="tab" aria-controls="nav-profile" aria-selected="false" disabled><i class="fa-solid fa-pills"></i>&nbsp;Productos</button>
-
-          <button class="nav-link" id="btnPedidos" data-bs-toggle="tab" data-bs-target="#dvPedidos" type="button" role="tab" aria-controls="nav-profile-2" aria-selected="false"><i class="fa-solid fa-file-invoice"></i>&nbsp;Pedido</button>
-
-          <button class="nav-link" id="nav-profile-tab-3" data-bs-toggle="tab" data-bs-target="#nav-profile-3" type="button" role="tab" aria-controls="nav-profile-3" aria-selected="false"><i class="fa-solid fa-list-check"></i>&nbsp;Gestión</button>
-        </div>
-      </nav>
+      <ul class="nav nav-tabs" id="nav-tab" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="btnClientes" data-bs-toggle="tab" data-bs-target="#dvClientes" type="button" role="tab" aria-controls="dvClientes" aria-selected="true">
+            <i class="fa-solid fa-user-tie"></i>&nbsp;Cliente
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="btnProductos" data-bs-toggle="tab" data-bs-target="#dvProductos" type="button" role="tab" aria-controls="dvProductos" aria-selected="false">
+            <i class="fa-solid fa-pills"></i>&nbsp;Productos
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="btnPedidos" data-bs-toggle="tab" data-bs-target="#dvPedidos" type="button" role="tab" aria-controls="dvPedidos" aria-selected="false">
+            <i class="fa-solid fa-file-invoice"></i>&nbsp;Pedido
+          </button>
+        </li>
+        <li class="nav-item dropdown" role="presentation">
+          <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
+            <i class="fa-solid fa-list-check"></i>&nbsp;Gestión</a>
+          <ul class="dropdown-menu">
+            <li>
+              <p class="separador"><strong>Pedidos</strong></p>
+            </li>
+            <li>
+              <a class="dropdown-item size-a" id="btnTemporales" data-bs-toggle="tab" href="#dvRecuperar" role="tab" aria-controls="dvRecuperar" aria-selected="false">
+                <i class="fa-solid fa-chevron-right"></i>&nbsp;Propios</a>
+            </li>
+            <li>
+              <a class="dropdown-item size-a" data-bs-toggle="tab" href="#dvExtra2" role="tab" aria-controls="dvExtra2" aria-selected="false">
+                <i class="fa-solid fa-chevron-right"></i>&nbsp;Terceros</a>
+            </li>
+            <li>
+              <p class="separador"><strong>Entregas</strong></p>
+            </li>
+            <li>
+              <a class="dropdown-item size-a" data-bs-toggle="tab" href="#dvExtra3" role="tab" aria-controls="dvExtra1" aria-selected="false">
+                <i class="fa-solid fa-chevron-right"></i>&nbsp;Unificar</a>
+            </li>
+            <li>
+              <a class="dropdown-item size-a" data-bs-toggle="tab" href="#dvExtra4" role="tab" aria-controls="dvExtra2" aria-selected="false">
+                <i class="fa-solid fa-chevron-right"></i>&nbsp;Faltantes</a>
+            </li>
+            <li>
+              <p class="separador"><strong>Facturas</strong></p>
+            </li>
+            <li>
+              <a class="dropdown-item size-a" data-bs-toggle="tab" href="#dvExtra5" role="tab" aria-controls="dvExtra1" aria-selected="false">
+                <i class="fa-solid fa-chevron-right"></i>&nbsp;Facturas</a>
+            </li>
+          </ul>
+        </li>
+      </ul>
     </div>
     <!-- CONTENIDO DE CADA TAB -->
     <div class="tab-content" id="nav-tabContent">
@@ -360,11 +407,29 @@ Redireccionar();
       </div>
       <!-- TAB PEDIDO -->
       <div class="tab-pane fade p-2" id="dvPedidos" role="tabpanel" aria-labelledby="nav-profile-tab">
-        <div id="dvResultPedidos"></div>
+        <div class="container-fluid">
+          <div id="listInfoPedido"></div>
+          <div id="dvResultPedidos"></div>
+        </div>
       </div>
       <!-- TAB GESTIÓN -->
-      <div class="tab-pane fade p-2" id="nav-profile-3" role="tabpanel" aria-labelledby="nav-profile-tab">
-        <p>gestión</p>
+      <div class="tab-pane fade" id="dvRecuperar" role="tabpanel">
+        <div class="container-fluid">
+          <div id="contenedorLeyendas"></div>
+          <div id="DvRecuperables"></div>
+        </div>
+      </div>
+      <div class="tab-pane fade" id="dvExtra2" role="tabpanel">
+        Contenido Extra 2
+      </div>
+      <div class="tab-pane fade" id="dvExtra3" role="tabpanel">
+        Contenido Extra 3
+      </div>
+      <div class="tab-pane fade" id="dvExtra4" role="tabpanel">
+        Contenido Extra 4
+      </div>
+      <div class="tab-pane fade" id="dvExtra5" role="tabpanel">
+        Contenido Extra 5
       </div>
     </div>
   </div>
@@ -374,12 +439,6 @@ Redireccionar();
   <!-- <div class="panel with-nav-tabs panel-info">
     <div class="panel-heading">
       <ul class="nav nav-tabs">
-        <li class="active"><a href="#dvClientes" data-toggle="tab">Cliente</a></li>
-
-        <li class="disabled disabledTab" id="liProductos"><a href="#dvProductos" id="btnProductos">Productos</a></li>
-
-        <li class="disabled disabledTab" id="liPedidos"><a href="#dvPedidos" id="btnPedidos">Pedido</a></li>
-
         <li class="dropdown"> <a href="#" data-toggle="dropdown">Gestión <span class="caret"></span></a>
           <ul class="dropdown-menu" role="menu">
             <li role="separator"><b>Pedidos</b></li>
@@ -429,8 +488,8 @@ Redireccionar();
           </div>
           <div id="dvResultPedidos"></div> -->
   <!---FIN DIV PEDIDOS--------------------------------------------------------------------------------------------->
-  <!-- </div>
-        <div class="tab-pane fade" id="dvRecuperar"> -->
+  <!-- <div class="tab-pane fade" id="dvRecuperar">
+  </div> -->
   <!---RECUPERAR PEDIDOS PROPIOS----------------------------------------------------------------------------------->
   <!-- <div id="DvRecuperables"></div> -->
   <!---FIN RECUPERAR PEDIDOS PROPIOS------------------------------------------------------------------------------->
@@ -694,17 +753,15 @@ Redireccionar();
   <div id="Bloquear" style="display: none;"></div>
   <div id="loaderOverlay" class="centrado-porcentual" style="display: none;"></div>
 
-  <!-------------------------MENU DE OPCIONES PARA PEDIDOS---------------------------------------------------------------------->
-  <div id="ModalOpciones" class="modal fade bd-example-modal-md" role="dialog">
-    <div class="modal-dialog modal-md">
-      <!-- Modal content-->
+  <!-- MODAL MENU DE OPCIONES PARA PEDIDOS -->
+  <div class="modal fade" id="ModalOpciones" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="min-width: 60%;">
       <div class="modal-content">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">Menú de opciones</h4>
+          <h1 class="modal-title fs-5">Menú de opciones</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <div class="modal-body" id="ContenidoModalOpciones">
-          <!--inputs ocultos--->
           <input type="hidden" id="ped_valor_total" disabled readonly>
           <input type="hidden" id="ped_destinatario" disabled readonly>
           <input type="hidden" id="ped_bodega" disabled readonly>
@@ -712,97 +769,101 @@ Redireccionar();
           <input type="hidden" id="ped_transferido" disabled readonly>
           <input type="hidden" id="ped_gestion" disabled readonly>
           <div class="container-liquid">
-            <!-- <div class="row">
-            <div class="col-md-12">
-                <div class="panel panel-info">
-                    <div class="panel-heading">Datos del cliente</div>
-                    <table class="">
-                      <tr>
-                        <th>Destinatario</th>
-                        <td id="info-cliente-codigo-sap"></td>
-                      </tr>
-                      <tr>
-                        <th>Razón comercial</th>
-                        <td id="info-cliente-nombres"></td>
-                      </tr>
-                    </table>
-                </div>
-            </div>
-          </div>-->
             <div class="row">
               <div class="col-md-4">
                 <div class="panel panel-info">
-                  <div class="panel-heading">Opciones</div>
+                  <div class="panel-heading bag-info text-green p-2">Opciones</div>
                   <ul class="list-group">
-                    <button type="button" class="list-group-item" onClick="SolDesbloqueo()" id="btn-sol-desbloqueo" title="Solicitar desbloqueo de pedido" style="display:none"> <i class="fa-solid fa-unlock text-danger"></i> Sol. Desbloqueo </button>
-                    <button type="button" id="btnMenu1" class="list-group-item" onClick="GuardarDirecto()" title="Guardar Directo"> <span class="glyphicon glyphicon-floppy-disk" style="" aria-hidden="true"></span> Guardar </button>
-                    <button type="button" id="btnMenu2" class="list-group-item" title="Recuperar pedido" onClick="RecuperarPedido()"> <span class="glyphicon glyphicon-repeat" style="" aria-hidden="true"></span> Recuperar </button>
-                    <button type="button" id="btnMenu3" class="list-group-item" onClick="VisualizarPedido()" title="Visualizar PDF"> <span class="glyphicon glyphicon-file" style="" aria-hidden="true"></span> Visualizar </button>
-                    <button type="button" id="btnMenu4" class="list-group-item" onClick="Rastreo()" title="Rastreo de pedido"> <span class="glyphicon glyphicon-screenshot" style="" aria-hidden="true"></span> Rastreo </button>
-                    <button type="button" id="btnMenu5" class="list-group-item" onClick="EliminarPedido()" title="Eliminar"> <span class="glyphicon glyphicon-trash" style="" aria-hidden="true"></span> Eliminar </button>
-                    <button type="button" id="btnMenu6" class="list-group-item" onClick="Entregas()" title="Generar entregas"> <span class="glyphicon glyphicon-check" style="" aria-hidden="true"></span> Entregas </button>
-                    <button type="button" id="btnMenu7" class="list-group-item" onClick="Ordenes()" title="Generar OT"> <span class="glyphicon glyphicon-shopping-cart" style="" aria-hidden="true"></span> OT - Logistica </button>
-                    <button type="button" id="btnMenu8" class="list-group-item" title="Generar Factura"> <span class="glyphicon glyphicon-list-alt" style="" aria-hidden="true"></span> Factura </button>
-                    <button type="button" id="btnMenu9" class="list-group-item" title="Refrescar"> <span class="glyphicon glyphicon-refresh" style="" aria-hidden="true"></span> Refrescar </button>
-                    <button type="button" id="btnMenu10" class="list-group-item" title="Log de modificaciones"> <span class="glyphicon glyphicon-zoom-in" style="" aria-hidden="true"></span> Historial </button>
+                    <button type="button" class="list-group-item text-start size-a" onClick="SolDesbloqueo()" id="btn-sol-desbloqueo" title="Solicitar desbloqueo de pedido" style="display: none;">
+                      <i class="fa-solid fa-unlock text-danger"></i> Sol. Desbloqueo
+                    </button>
+                    <button type="button" id="btnMenu1" class="list-group-item text-start size-a" onClick="GuardarDirecto()" title="Guardar Directo">
+                      <i class="fa-solid fa-floppy-disk"></i> Guardar
+                    </button>
+                    <button type="button" id="btnMenu2" class="list-group-item text-start size-a" title="Recuperar pedido" onClick="RecuperarPedido()">
+                      <i class="fa-solid fa-rotate-right"></i> Recuperar
+                    </button>
+                    <button type="button" id="btnMenu3" class="list-group-item text-start size-a" onClick="VisualizarPedido()" title="Visualizar PDF">
+                      <i class="fa-solid fa-file"></i> Visualizar
+                    </button>
+                    <button type="button" id="btnMenu4" class="list-group-item text-start size-a" onClick="Rastreo()" title="Rastreo de pedido">
+                      <i class="fa-solid fa-arrows-up-down-left-right"></i> Rastreo
+                    </button>
+                    <button type="button" id="btnMenu5" class="list-group-item text-start size-a" onClick="EliminarPedido()" title="Eliminar">
+                      <i class="fa-solid fa-trash-can"></i> Eliminar
+                    </button>
+                    <button type="button" id="btnMenu6" class="list-group-item text-start size-a" onClick="Entregas()" title="Generar entregas">
+                      <i class="fa-solid fa-check-double"></i> Entregas
+                    </button>
+                    <button type="button" id="btnMenu7" class="list-group-item text-start size-a" onClick="Ordenes()" title="Generar OT">
+                      <i class="fa-solid fa-cart-shopping"></i> OT - Logistica
+                    </button>
+                    <button type="button" id="btnMenu8" class="list-group-item text-start size-a" title="Generar Factura">
+                      <i class="fa-solid fa-file-invoice"></i> Factura
+                    </button>
+                    <button type="button" id="btnMenu9" class="list-group-item text-start size-a" title="Refrescar">
+                      <i class="fa-solid fa-arrows-rotate"></i> Refrescar
+                    </button>
+                    <button type="button" id="btnMenu10" class="list-group-item text-start size-a" title="Log de modificaciones">
+                      <i class="fa-solid fa-magnifying-glass-plus"></i> Historial
+                    </button>
                   </ul>
                 </div>
               </div>
               <div class="col-md-8" id="Result">
                 <div class="panel panel-info">
-                  <div class="panel-heading">Flujo de documentos</div>
+                  <div class="panel-heading bag-info text-green p-2">Flujo de documentos</div>
                   <table class="form" width="100%">
                     <tr>
                       <td>Usuario ADG</td>
-                      <td><input type="text" id="ped_usuario" class="form-control" disabled readonly></td>
+                      <td><input type="text" id="ped_usuario" class="form-control size-th" disabled readonly></td>
                     </tr>
                     <tr>
                       <td>Pedido ADG</td>
-                      <td><input type="text" id="ped_numero" class="form-control" disabled readonly></td>
+                      <td><input type="text" id="ped_numero" class="form-control size-th" disabled readonly></td>
                     </tr>
                     <tr>
                       <td>Dirección pedido</td>
-                      <td><input type="text" id="direccion_pedido" class="form-control" disabled readonly></td>
+                      <td><input type="text" id="direccion_pedido" class="form-control size-th" disabled readonly></td>
                     </tr>
                     <tr>
                       <td>Pedido SAP</td>
-                      <td><input type="text" id="ped_numero_sap" class="form-control" disabled readonly></td>
+                      <td><input type="text" id="ped_numero_sap" class="form-control size-th" disabled readonly></td>
                     </tr>
                     <tr>
                       <td>Entrega</td>
-                      <td><input type="text" id="ped_entrega" class="form-control" disabled readonly></td>
+                      <td><input type="text" id="ped_entrega" class="form-control size-th" disabled readonly></td>
                     </tr>
                     <tr>
                       <td>Orden</td>
-                      <td><input type="text" id="ped_ot" class="form-control" disabled readonly></td>
+                      <td><input type="text" id="ped_ot" class="form-control size-th" disabled readonly></td>
                     </tr>
                     <tr>
                       <td>Factura</td>
-                      <td><input type="text" id="ped_factura" class="form-control" disabled readonly></td>
+                      <td><input type="text" id="ped_factura" class="form-control size-th" disabled readonly></td>
                     </tr>
                     <tr>
                       <td>Notas</td>
-                      <td><textarea id="NotasRapidas" placeholder="Notas de pedidos" class="notas"></textarea></td>
-                    </tr>
-                    <tr>
-                      <td colspan="2"><button type="button" class="list-group-item" onClick="NotaRapida();" id="btnNotaRapida">
-                          <spam class="glyphicon glyphicon-check"></spam>
-                          Salvar Nota
-                        </button></td>
+                      <td><textarea id="NotasRapidas" placeholder="Notas de pedidos" class="form-control" style="background-color: #FFC;"></textarea></td>
                     </tr>
                   </table>
+                  <div>
+                    <button type="button" class="btn btn-light btn-sm btn-micro w-100" onClick="NotaRapida();" id="btnNotaRapida">
+                      <i class="fa-solid fa-check-double"></i> Salvar Nota
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-info" data-dismiss="modal">Cerrar</button>
+          <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cerrar</button>
         </div>
       </div>
     </div>
   </div>
-  <!-----------------------------VISUALIZAR PDF PEDIDO----------------------------------------------------------------------------->
+  <!-- MODAL VISUALIZAR PDF PEDIDO -->
   <div id="ModalPDF" class="modal fade bd-example-modal-lg" role="dialog">
     <div class="modal-dialog modal-lg">
       <!-- Modal content-->
@@ -821,7 +882,7 @@ Redireccionar();
       </div>
     </div>
   </div>
-  <!-----------------------------VISUALIZAR PDF FACTURA----------------------------------------------------------------------------->
+  <!-- MODAL VISUALIZAR PDF FACTURA -->
   <div id="ModalPDFfactura" class="modal fade bd-example-modal-lg" role="dialog">
     <div class="modal-dialog modal-lg">
       <!-- Modal content-->
@@ -840,7 +901,7 @@ Redireccionar();
       </div>
     </div>
   </div>
-  <!----------------------------INFORMACION DE MATERIALES-------------------------------------------------------------------->
+  <!-- MODAL INFORMACION DE MATERIALES -->
   <div class="modal fade" id="ModalInfoMaterial" tabindex="-1" aria-labelledby="ModalInfoMaterialLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
@@ -953,7 +1014,7 @@ Redireccionar();
       </div>
     </div>
   </div>
-  <!-------------------------RASTREO DE PEDIDOS - TRAZABILIDAD----------------------------------------------------------------->
+  <!-- MODAL RASTREO DE PEDIDOS - TRAZABILIDAD -->
   <div id="ModalRastreo" class="modal fade bd-example-modal-lg" role="dialog">
     <div class="modal-dialog modal-lg">
       <!-- Modal content-->
@@ -1130,7 +1191,7 @@ Redireccionar();
       </div>
     </div>
   </div>
-  <!-------------------------MENU DE ENTREGAS---------------------------------------------------------------------------------------->
+  <!-- MODAL MENU DE ENTREGAS -->
   <div id="ModalEntregas" class="modal fade bd-example-modal-lg" role="dialog">
     <div class="modal-dialog modal-lg">
       <!-- Modal content-->
@@ -1169,7 +1230,7 @@ Redireccionar();
       </div>
     </div>
   </div>
-  <!-------------------------MENU DE ORDENES DE TRANSPORTE----------------------------------------------------------------------------->
+  <!-- MODAL ORDENES DE TRANSPORTE -->
   <div id="ModalOrdenes" class="modal fade bd-example-modal-lg" role="dialog">
     <div class="modal-dialog modal-lg">
       <!-- Modal content-->
@@ -1204,7 +1265,7 @@ Redireccionar();
       </div>
     </div>
   </div>
-  <!-------------------------MENU DE ORDENES DE TRANSPORTE----------------------------------------------------------------------------->
+  <!-- MODAL LOG -->
   <div id="ModalLog" class="modal fade bd-example-modal-lg" role="dialog">
     <div class="modal-dialog modal-lg">
       <!-- Modal content-->
@@ -1222,7 +1283,7 @@ Redireccionar();
       </div>
     </div>
   </div>
-  <!------------------------------------------------------------------------------------------------>
+  <!-- MODAL FERIA VIRTUAL -->
   <div id="ModalFeriaVirtual" class="modal fade bd-example-modal-lg" role="dialog">
     <div class="modal-dialog modal-lg">
       <!-- Modal content-->
@@ -1291,7 +1352,7 @@ Redireccionar();
       </div>
     </div>
   </div>
-  <!-----------------------MODAL IMAGEN ANIVERSARIO------------------------------------------------------------------------->
+  <!-- MODAL IMAGEN ANIVERSARIO -->
   <div id="ModalFeriaMayo" class="modal fade bd-example-modal-lg" role="dialog">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
@@ -1308,7 +1369,7 @@ Redireccionar();
       </div>
     </div>
   </div>
-  <!-----------------------MODAL PLAN DE PUNTOS------------------------------------------------------------------------->
+  <!-- MODAL PLAN DE PUNTOS -->
   <div id="ModalPP" class="modal fade bd-example-modal-lg" role="dialog">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
@@ -1330,7 +1391,7 @@ Redireccionar();
       </div>
     </div>
   </div>
-  <!--DIV TOP 20 MAS VENDIDOS 100 Y 130------------------------------------------------------------------------------>
+  <!-- MODAL TOP 20 MAS VENDIDOS 100 Y 130 -->
   <div id="ModalTop20_100_130" class="modal fade bd-example-modal-lg" role="dialog">
     <div class="modal-dialog modal-lg">
       <!-- Modal content-->
@@ -1346,8 +1407,7 @@ Redireccionar();
       </div>
     </div>
   </div>
-  </div>
-  <!------------------------------------------------------------------------------------------------------------------------->
+  <!-- MODAL PP DETALLE -->
   <div id="ModalPPDetalle" class="modal fade bd-example-modal-lg" role="dialog">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
@@ -1551,7 +1611,7 @@ Redireccionar();
       <div class="modal-content">
         <div class="modal-header">
           <h1 class="modal-title fs-5" id="exampleModalLabel">Configuración de búsqueda</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <div class="modal-body">
           <table class="form" width="100%">
@@ -1639,7 +1699,7 @@ Redireccionar();
           </table>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-outline-danger btn-sm" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-outline-danger btn-sm" data-bs-dismiss="modal">Cerrar</button>
         </div>
       </div>
     </div>
@@ -1663,13 +1723,13 @@ Redireccionar();
   <!-- SCRIPT'S PARA EL DINAMISMO DE LA PÁGINA -->
   <script type="text/javascript" src="../lib/js/jquery-2.1.1.min.js?<?php echo (rand()); ?>"></script>
   <script type="text/javascript" src="../lib/js/jquery-ui-1.9.2.custom.js?<?php echo (rand()); ?>"></script>
-  <!-- <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script> -->
   <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
   <script
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.min.js"
     integrity="sha384-RuyvpeZCxMJCqVUGFI0Do1mQrods/hhxYlcVfGPOfQtPJh0JCw12tUAZ/Mv10S7D"
     crossorigin="anonymous">
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.13.2/dist/sweetalert2.all.min.js"></script>
   <script type="text/javascript" src="../lib/js/funciones.js?<?php echo (rand()); ?>"></script>
   <script type="text/javascript" src="../lib/js/servicios.js?<?php echo (rand()); ?>"></script>

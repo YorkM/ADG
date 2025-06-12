@@ -5,6 +5,20 @@ let Arr = "";
 let OfcN = "";
 let OfcS = "";
 let Perm_Cambiar_Bodega = '';
+// FUNCIÓN PARA REALIZAR CONFIRMACIONES
+const confirmAlert = async (title, text) => {
+    const result = await Swal.fire({
+        title: `${title}`,
+        text: `${text}`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Aceptar',
+        cancelButtonText: 'Cancelar'
+    });
+    return result;
+}
 // FUNCIÓN PARA VALIDAR ESTADO DE DESBLOQUEO
 const validaEstadoDesbloqueo = async () => {
   try {
@@ -28,8 +42,7 @@ const validaEstadoDesbloqueo = async () => {
 };
 // FUNCIÓN PARA GESTIONAR SOLICITUD DE DESBLOQUEO
 const SolDesbloqueo = async () => {
-  /*2024-10-04 Christian Bula 
-   Se añade control para solo poder volver a montar la solicitud si el estado es (R:Rechazado - A: Aprobado)*/
+  /*2024-10-04 Christian Bula: Se añade control para solo poder volver a montar la solicitud si el estado es (R:Rechazado - A: Aprobado)*/
   let status = await validaEstadoDesbloqueo();
 
   if (status) {
@@ -1740,27 +1753,28 @@ function Limpiar() {
 
 function InfoBon(descripcion, desc_bonificado_n, stock, stock_bonificado, condicion, stock_prepack) {
   Swal.fire({
-    title: 'BONIFICADO',
-    html: '<table border="0" class="form" width="100%">'
-      + '<tr>'
-      + '<td colspan="4" align="center"><b>CONDICION OFERTA : ' + condicion + '</b></td>'
-      + '</tr>'
-      + '<tr>'
-      + '<td align="left"><b>REGULAR</b></td>'
-      + '<td align="left">' + descripcion + '</td>'
-      + '<td align="left"><b>STOCK</b></td>'
-      + '<td align="left">' + stock + '</br>'
-      + '</tr>'
-      + '<tr>'
-      + '<td align="left" width="20%"><b>BONIFICADO</b></br>'
-      + '<td align="left">' + desc_bonificado_n + '</td>'
-      + '<td align="left"><b>STOCK</b></td>'
-      + '<td align="left">' + stock_bonificado + '</b>'
-      + '</tr>'
-      + '<tr>'
-      + '<td colspan="4" align="center"><b>OFERTAS DISPONIBLES : ' + stock_prepack + '</b></td>'
-      + '</tr>'
-      + '</table>',
+    title: "BONIFICADO",
+    html: `
+        <table border="0" class="form" width="100%">
+          <tr>
+            <td colspan="4" align="center"><b>CONDICION OFERTA: ${condicion}</b></td>
+          </tr>
+          <tr>
+            <td align="left"><b>REGULAR</b></td>
+            <td align="left">${descripcion}</td>
+            <td align="left" width="60"><b>STOCK</b></td>
+            <td align="left" width="60">${stock}</br>
+          </tr>
+          <tr>
+            <td align="left" width="100"><b>BONIFICADO</b></br>
+            <td align="left">${desc_bonificado_n}</td>
+            <td align="left"><b>STOCK</b></td>
+            <td align="left">${stock_bonificado}</b>
+          </tr>
+          <tr>
+            <td colspan="4" align="center"><b>OFERTAS DISPONIBLES : ${stock_prepack}</b></td>
+          </tr>
+        </table>`,
     showCloseButton: true,
     confirmButtonText: 'Cerrar'
   });
@@ -1921,6 +1935,7 @@ function TableView(filas) {
     ordering: true,
     info: false,
     responsive: true,
+    scrollX: true,
     columnDefs: [
       // { targets: [9], visible: false },
       { targets: [10], orderable: false }
@@ -2516,8 +2531,7 @@ function renderMaterialInfo(data, { vunit, v1, v2, v3, v4, iva, dcto }) {
               <tbody>
                 <tr>
                   <td colspan="2" align="center">
-                    <img src="https://dfnas.pwmultiroma.com/imagenesMateriales/no_imagen.png" 
-                         class="img-responsive img-material w-100 img-fluid" height="345">
+                    <img src="https://dfnas.pwmultiroma.com/imagenesMateriales/no_imagen.png" class="img-responsive img-material w-100 img-fluid" height="345">
                   </td>
                 </tr>
                 <tr>
@@ -2614,22 +2628,24 @@ function renderMaterialInfo(data, { vunit, v1, v2, v3, v4, iva, dcto }) {
         <div class="col-md-12">
           <div class="panel panel-info">
             <div class="panel-heading">INVENTARIO FÍSICO POR LOTES</div>
-            <table class="table" width="100%" align="center">
-              <thead>
-                  <tr>
-                    <th class="bag-info text-green">CENTRO</th>
-                    <th class="bag-info text-green">ALMACEN</th>
-                    <th class="bag-info text-green">MOV</th>
-                    <th class="bag-info text-green">LOTE</th>
-                    <th class="bag-info text-green">VENCIMIENTO</th>
-                    <th class="bag-info text-green">STOCK</th>
-                    <th class="bag-info text-green">UBICACION</th>
-                  </tr>
-              </thead>
-              <tbody>
-                ${stockRows}
-              </tbody>
-            </table>
+            <div style="overflow: auto;">
+              <table class="table" width="100%" align="center">
+                <thead>
+                    <tr>
+                      <th class="bag-info text-green">CENTRO</th>
+                      <th class="bag-info text-green">ALMACEN</th>
+                      <th class="bag-info text-green">MOV</th>
+                      <th class="bag-info text-green">LOTE</th>
+                      <th class="bag-info text-green">VENCIMIENTO</th>
+                      <th class="bag-info text-green">STOCK</th>
+                      <th class="bag-info text-green">UBICACION</th>
+                    </tr>
+                </thead>
+                <tbody>
+                  ${stockRows}
+                </tbody>
+              </table>            
+            </div>
           </div>
         </div>
       </div>
@@ -2698,20 +2714,20 @@ function WSInvent(codigo, oficina) {
   });
   return cantidad;
 }
-//---------------------Funcion para agregar o eliminar un producto seleccionado
-function AddProducto(pcodigo, pvalor, piva, pdcto, pcant, pneto, pstock, pvrlped, pidped, pbonifica, pcantbon, pcantreg, pstobon) {
-  debugger;
+// FUNCIÓN PARA AGERAGAR O ELIMINAR UN PRODUCTO SELECCIONADO
+async function AddProducto(pcodigo, pvalor, piva, pdcto, pcant, pneto, pstock, pvrlped, pidped, pbonifica, pcantbon, pcantreg, pstobon) {
   var oficina = $("#txt_oficina").val();
   var codigo = pcodigo;
   var cant = isNaN(pcant) || pcant == '' ? 0 : parseInt(pcant);
-  //Variables de control de envio de bonificacion-
+  // Variables de control de envio de bonificacion-
   var Bonifica = pbonifica;
   var CantBonifica = pcantbon;
   var CantRegular = parseInt(pcantreg);
   var StockBonifica = pstobon;
-  //Verificacion de aumento de cantidad segun bonificacion
+  // Verificacion de aumento de cantidad segun bonificacion
   if ((cant > 0) && (cant < CantRegular)) {
-    if (confirm("Este producto tiene una oferta " + CantRegular + " + " + CantBonifica + " desea aumentar su cantidad para que no deje perder esta promoción")) {
+    const result = await confirmAlert("Oferta Producto", `Este producto tiene una oferta ${CantRegular} + ${CantBonifica} ¿desea aumentar su cantidad para que no deje perder esta promoción?`);
+    if (result.isConfirmed) {
       cant = CantRegular;
       $("#CAF" + pcodigo).val(cant);
     }
@@ -3141,209 +3157,210 @@ function ConfirmarenviarPedidoEmail(numero) {
   })
 
 }
+// LISTAR PEDIDO TEMPORAL
+const ListarPedido = async () => {
+  try {
+    debugger;
+    $("#dvResultProductos").html("");
+    let numero = $("#txt_numero").val();
 
-//------------------Listar pedido temporal 
-function ListarPedido() {
-  $("#dvResultProductos").html("");
-  var numero = $("#txt_numero").val();
-  //alert(numero+'--'+$("#txt_oficina").val()+'--'+$("#txt_lista").val());
-  $.ajax({
-    type: "POST",
-    encoding: "UTF-8",
-    url: "../models/PW-SAP.php",
-    global: false,
-    async: true,
-    dataType: "json",
-    error: function (OBJ, ERROR, JQERROR) {
-      alert(JQERROR);
-    },
-    beforeSend: function () {
-      LoadImg('CARGANDO PEDIDO...');
-    },
-    data: {
-      op: "S_PEDIDO_DETALLE",
-      numero: numero
-    },
-    success: function (data) { //alert(data);return false;
-      if (data != '' && data != null) {
-        var cont = 0;
-        var vtotal = 0;
-        var vunit = 0;
-        var vneto = 0;
-        var vbruto = 0;
-        var ctotal = 0;
-        var tabla = '';
-        var detalle = '';
-        var notas = '';
-        var style = '';
-        for (var i = 0; i <= data.length - 1; i++) {
-          cont++;
-          vtotal += parseInt(data[i].valor_total);
-          vunit += parseInt(data[i].valor_unitario);
-          vneto += parseInt(data[i].valor_neto);
-          ctotal += parseInt(data[i].cantidad);
-          vbruto += parseInt(data[i].valor_bruto) * parseInt(data[i].cantidad);
-          notas = data[i].notas;
-          var Bonifica = 0; //variable creada para saber si el producto esta o no bonificado
-          if (data[i].cantidad == 0) {
-            data[i].cantidad = '';
-            data[i].valor_total = '';
-          } else {
-            data[i].valor_total = formatNum(data[i].valor_total, '$');
-          }
-          if (data[i].bonificado != 0 && (parseInt(data[i].stock_bonificado) >= parseInt(data[i].cant_bonificado))) {
-            Bonifica = 1;
-            img = '<img src="../resources/icons/regalo.png" width="24" heigth="24"' + 'onclick="InfoBon(\'' + data[i].descripcion + '\',\''
-              + data[i].desc_bonificado + '\',\''
-              + data[i].stock + '\',\''
-              + data[i].stock_bonificado + '\',\''
-              + data[i].condicion_b + '\',\''
-              + data[i].stock_prepack + '\')" align="absmiddle">';
-          } else {
-            Bonifica = 0;
-            img = '';
-          }
-          if (parseInt(data[i].stock) < parseInt(data[i].cantidad)) {
-            style = 'style = "background-color:#FB8A8B;"';
-          } else {
-            style = '';
-          }
-          //Nueva validacion para codigos bonificados.
-          var clase = '';
-          var acces = '';
-          var msj = '';
-          if (data[i].codigo.substr(0, 1) == '2' || data[i].codigo.substr(0, 1) == '3' || data[i].tipo == 'K') {
-            clase = 'class="aler alert-warning"';
-            acces = 'readonly disabled';
-            msj = '<b><i>(GRATIS)</i></b>'
-          }
-          if (data[i].tipo == 'K') {
-            clase = 'class="aler alert-info"';
-            acces = 'readonly disabled';
+    LoadImg('CARGANDO PEDIDO...');
 
-            msj = '<b><i>(KIT)</i></b>'
-          }
-          //-----------------------------------------
-          detalle += '<tr ' + clase + '>'
-            + '<td>' + data[i].codigo + '</td>'
-            + '<td>' + img + ' ' + data[i].descripcion + ' ' + msj + '</td>'
-            + '<td>' + formatNum(data[i].valor_unitario, '$') + '</td>'
-            + '<td>' + data[i].iva + '</td>'
-            + '<td>' + data[i].descuento + '</td>'
-            + '<td>' + formatNum(data[i].valor_neto, '$') + '</td>'
-            + '<td>' + data[i].stock + '</td>'
-            + '<td>'
-            + '<input ' + acces + ' ' + style + ' type="number" id="CAF' + data[i].codigo + '" onKeyPress="return vnumeros(event)" '
-            + 'value="' + data[i].cantidad + '" class="form-control" tabindex="' + (i + 1) + '"'
-            + 'onBlur="AddProducto(\'' + $.trim(data[i].codigo) + '\',\''
-            + $.trim(data[i].valor_unitario) + '\',\''
-            + $.trim(data[i].iva) + '\',\''
-            + $.trim(data[i].descuento) + '\',this.value,\''
-            + $.trim(data[i].valor_neto) + '\',\''
-            + $.trim(data[i].stock) + '\',\''
-            + $.trim(data[i].valor_total) + '\',\''
-            + $.trim(data[i].id) + '\',\''
-            + $.trim(Bonifica) + '\',\''
-            + $.trim(data[i].cant_bonificado) + '\',\''
-            + $.trim(data[i].cant_regular) + '\',\''
-            + $.trim(data[i].stock_bonificado) + '\');ListarPedido();" >'
-            + '</td>'
-            + '<td>'
-            + '<input type="text" class="form-control" id="TOF' + data[i].codigo + '" value="' + data[i].valor_total + '" disabled readonly>'
-            + '</td>'
-            + '<td>'
-            + '<input type="text" class="form-control" id="IDF' + data[i].codigo + '" value="' + data[i].id + '" disabled readonly>'
-            + '</td>'
-            + '</tr>';
-        }
+    const data = await enviarPeticion({op: "S_PEDIDO_DETALLE", link: "../models/PW-SAP.php", numero});
+    if (data.length) {
+      let cont = 0;
+      let vtotal = 0;
+      let vunit = 0;
+      let vneto = 0;
+      let vbruto = 0;
+      let ctotal = 0;
+      let tabla = '';
+      let detalle = '';
+      let notas = '';
+      let style = '';
 
-        var NumPed = $.trim($("#txt_numero").val());
-        var NumPedSAP = $.trim($("#txt_numero_sap").val());
-        var Rol = $.trim($("#Rol").val());
-        var btnEliminar = '';
-        let btnVerPdf = '';
-        let btnEnviarPdfEmail = '';
+      data.forEach((item, index) => {
+        cont++;
+        vtotal += parseInt(item.valor_total);
+        vunit += parseInt(item.valor_unitario);
+        vneto += parseInt(item.valor_neto);
+        ctotal += parseInt(item.cantidad);
+        vbruto += parseInt(item.valor_bruto) * parseInt(item.cantidad);
+        notas = item.notas;
+        let Bonifica = 0; // variable creada para saber si el producto esta o no bonificado
 
-        if (NumPedSAP == 0) {
-          btnEliminar = '<button type="button" class="btn btn-danger btn-sm" onClick="EliminarPW(\'' + NumPed + '\'); Limpiar(); activaTab(\'dvClientes\');">'
-            + '<span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Eliminar'
-            + '</button> ';
-
-          //valido si el modulo es abierto desde la programacion 
-
-          if ($("#link_pro").val() != '') {
-
-            if ($("#tipo_documento").val() == 'C') {
-              //valido si es cotizacion 
-              btnVerPdf = '<button class="btn btn-default btn-sm element-gestion-pedido" onClick="VisualizarPedido()" ><i class="glyphicon glyphicon-save-file text-danger " aria-hidden="true" type="button"></i>Ver en pdf</button>';
-
-              btnEnviarPdfEmail = '<button type="button" class="btn btn-default btn-sm element-gestion-pedido" onClick="ConfirmarenviarPedidoEmail(' + NumPed + ')"><i class="glyphicon glyphicon-envelope text-primary" aria-hidden="true"></i>Enviar por email</button>';
-            }
-          }
+        if (item.cantidad == 0) {
+          item.cantidad = '';
+          item.valor_total = '';
         } else {
-          if (Rol == 1 || Rol == 3 || Rol == 21 || Rol == 13) { //1:Administrador | 3:Gerente de ventas | 21:Coordinador pw | 13:Coordinador Televentas
-            btnEliminar = '<button type="button" class="btn btn-danger btn-sm" onClick="EliminarSAP(\'' + NumPedSAP + '\',\'' + NumPed + '\'); Limpiar(); activaTab(\'dvClientes\');">'
-              + '<span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Eliminar'
-              + '</button> ';
-          }
+          item.valor_total = formatNum(item.valor_total, '$');
         }
 
-        tabla = '<table class="table" width="100%">'
-          + '<body>'
-          + '<tr>'
-          + '<td colspan="2"><textarea id="Pnotas" class="notas" onblur="UpdNotas(this)" placeholder="Notas de pedido" >' + notas + '</textarea></td>'
-          + '</tr>'
-          + '<tr>'
-          + '<td>'
-          + '<button type="button" class="btn btn-success btn-sm" onClick="Guardar();">'
-          + '<span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span> Guardar'
-          + btnVerPdf + btnEnviarPdfEmail
-          + '</button>'
-          + '</td>'
-          + '<td align="right">'
-          + btnEliminar
-          + '</td>'
-          + '</tr>'
-          + '<tr><td>Subtotal</td><td>' + formatNum(vbruto, '$') + '</td></tr>'
-          + '<tr><td>Vlr IVA</td><td>' + formatNum(vtotal - vbruto, '$') + '</td></tr>'
-          + '<tr><td>Vlr Total</td><td>' + formatNum(vtotal, '$') + '</td></tr>'
-          + '<tr><td>Items</td><td>' + cont + '</td></tr>'
-          + '<tr><td>Productos</td><td>' + ctotal + '</td></tr>'
-          + '</tbody>'
-          + '</table>';
-        tabla += '<table class="table" align="center" id="tablaConfirmar">'
-          + '<thead>'
-          + '<tr>'
-          + '<th data-breakpoints="xs">CODIGO</th>'
-          + '<th>DESCRIPCION</th>'
-          + '<th data-breakpoints="xs">VALOR</th>'
-          + '<th data-breakpoints="xs">IVA</th>'
-          + '<th data-breakpoints="xs">DCTO</th>'
-          + '<th data-breakpoints="xs">VNETO</th>'
-          + '<th data-breakpoints="xs">STOCK</th>'
-          + '<th style="width:20px;">CANTIDAD</th>'
-          + '<th style="width:120px;" data-breakpoints="xs">TOTAL</th>'
-          + '<th data-visible="false">ID</th>'
-          + '</tr>'
-          + '</thead>'
-          + '<tbody>' + detalle + '</tbody>'
-          + '</table>';
-        $("#dvResultPedidos").html(tabla);
-        // $('#tablaConfirmar').footable();
+        let img = "";
+        if (item.bonificado != 0 && (parseInt(item.stock_bonificado) >= parseInt(item.cant_bonificado))) {
+          Bonifica = 1;
+          img = `<img src="../resources/icons/regalo.png" width="24" heigth="24" onclick="InfoBon('${item.descripcion}','${item.desc_bonificado}', '${item.stock}', '${item.stock_bonificado}', '${item.condicion_b}', '${item.stock_prepack}')" align="absmiddle">`;
+        }
 
+        if (parseInt(item.stock) < parseInt(item.cantidad)) {
+          style = 'style = "background-color: #FB8A8B;"';
+        }
+
+        // Nueva validación para códigos bonificados.
+        let clase = '';
+        let acces = '';
+        let msj = '';
+        if (item.codigo.substr(0, 1) == '2' || item.codigo.substr(0, 1) == '3' || item.tipo == 'K') {
+          clase = 'class="aler alert-warning"';
+          acces = "readonly disabled";
+          msj = "<b><i>(GRATIS)</i></b>";
+        }
+
+        if (item.tipo == 'K') {
+          clase = 'class="aler alert-info"';
+          acces = "readonly disabled";
+          msj = "<b><i>(KIT)</i></b>";
+        }
+
+        detalle += `
+        <tr ${clase}>
+          <td class="size-td">${item.codigo}</td>
+          <td class="size-td">${img} ${item.descripcion} ${msj}</td>
+          <td class="size-td">${formatNum(item.valor_unitario, "$")}</td>
+          <td class="size-td">${item.iva}</td>
+          <td class="size-td">${item.descuento}</td>
+          <td class="size-td">${formatNum(item.valor_neto, "$")}</td>
+          <td class="size-td">${item.stock}</td>
+          <td>
+            <input ${acces} ${style} type="number" id="CAF${item.codigo}" onKeyPress="return vnumeros(event)" value="${item.cantidad}" class="form-control size-td" tabindex="${(index + 1)}" onBlur="AddProducto('${$.trim(item.codigo)}', '${$.trim(item.valor_unitario)}', '${$.trim(item.iva)}', '${$.trim(item.descuento)}', this.value, '${$.trim(item.valor_neto)}', '${$.trim(item.stock)}', '${$.trim(item.valor_total)}', '${$.trim(item.id)}', '${$.trim(Bonifica)}', '${$.trim(item.cant_bonificado)}', '${$.trim(item.cant_regular)}', '${$.trim(item.stock_bonificado)}'); ListarPedido();">
+          </td>
+          <td>
+            <input type="text" class="form-control size-td" id="TOF${item.codigo}" value="${item.valor_total}" disabled readonly>
+          </td>
+          <td>
+            <input type="text" class="form-control size-td" id="IDF${item.codigo}" value="${item.id}" disabled readonly>
+          </td>
+        </tr>`;
+      });
+
+      let NumPed = $.trim($("#txt_numero").val());
+      let NumPedSAP = $.trim($("#txt_numero_sap").val());
+      let Rol = $.trim($("#Rol").val());
+      let btnEliminar = '';
+      let btnVerPdf = '';
+      let btnEnviarPdfEmail = '';
+
+      if (NumPedSAP == 0) {
+        btnEliminar = `
+        <button type="button" class="btn btn-danger btn-sm w-btn" onClick="EliminarPW('${NumPed}'); Limpiar(); activaTab('dvClientes');">
+          <i class="fa-solid fa-trash-can"></i>
+          Eliminar
+        </button>`;
+        // valido si el modulo es abierto desde la programación
+        if ($("#link_pro").val() != '') {
+          if ($("#tipo_documento").val() == 'C') {
+            // valido si es cotización 
+            btnVerPdf = `
+            <button type="button" class="btn btn-default btn-sm element-gestion-pedido" onClick="VisualizarPedido()">
+              <i class="glyphicon glyphicon-save-file text-danger" aria-hidden="true"></i>
+              Ver en pdf
+            </button>`;
+
+            btnEnviarPdfEmail = `
+            <button type="button" class="btn btn-default btn-sm element-gestion-pedido" onClick="ConfirmarenviarPedidoEmail('${NumPed}')">
+              <i class="glyphicon glyphicon-envelope text-primary" aria-hidden="true"></i>
+              Enviar por email
+            </button>`;
+          }
+        }
       } else {
-        $("#dvResultPedidos").html('<div class="alert alert-danger" role="alert">'
-          + '<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>'
-          + '<span class="sr-only">Error:</span>NO EXISTEN RESULTADOS PARA LAS CONDICIONES SELECCIONADAS'
-          + '</div>');
+        if (Rol == 1 || Rol == 3 || Rol == 21 || Rol == 13) { // 1:Administrador | 3:Gerente de ventas | 21:Coordinador pw | 13:Coordinador Televentas
+          btnEliminar = `
+          <button type="button" class="btn btn-danger btn-sm w-btn" onClick="EliminarSAP('${NumPedSAP}', '${NumPed}'); Limpiar(); activaTab('dvClientes');">
+            <i class="fa-solid fa-trash-can"></i>
+            Eliminar
+          </button>`;
+        }
       }
-    }
-  }).done(function () {
-    UnloadImg();
-  });
-}
 
-//-----------------------------Actualizacion de notas de pedidos 
+      const infoPedidoArray = [
+        {title: "Subtotal", value: formatNum(vbruto, '$')},
+        {title: "Valor Iva", value: formatNum(vtotal - vbruto, '$')},
+        {title: "Valor Total", value: formatNum(vtotal, '$')},
+        {title: "Items", value: cont},
+        {title: "Productos", value: ctotal},
+      ];
+
+      let itemsList = ``;
+      infoPedidoArray.forEach(item => {
+        itemsList += `
+          <li class="list-group-item d-flex justify-content-between">
+              <p class="m-0">${item.title}:</p>
+              <p class="m-0 text-green">${item.value}</p>
+          </li>`;
+      });
+
+      let infoPedido = `
+        <div class="d-flex justify-content-end align-items-center gap-3 mb-3">
+          <button type="button" class="btn btn-success btn-sm w-btn" onClick="Guardar();">
+            <i class="fa-solid fa-floppy-disk"></i>
+            Guardar
+            ${btnVerPdf} ${btnEnviarPdfEmail}
+          </button>
+          ${btnEliminar}
+        </div>
+        <textarea id="Pnotas" class="form-control mb-3" style="background-color: #FFC;" onblur="UpdNotas(this)" placeholder="Notas del pedido">${notas}</textarea>
+        <div class="mb-3">
+          <ul class="list-group">
+            ${itemsList}
+          </ul>
+        </div>`;
+      
+      let columns = ``;
+      ['CODIGO', 'DESCRIPCION', 'VALOR', 'IVA', 'DCTO', 'VNETO', 'STOCK', 'CANTIDAD', 'TOTAL', 'ID'].forEach(item => columns += `<th class="size-th">${item}</th>`);
+
+      tabla += `
+        <table class="display" style="width: 100%" id="tablaConfirmar">
+          <thead> 
+            <tr class="bag-info">
+              ${columns}
+            </tr>
+          </thead>
+        <tbody>${detalle}</tbody>
+        </table>`
+      $("#listInfoPedido").html(infoPedido);
+      $("#dvResultPedidos").html(tabla);
+
+      $('#tablaConfirmar').DataTable({
+        paging: false,
+        searching: false,
+        ordering: true,
+        info: false,
+        responsive: true,
+        scrollX: true,
+        language: {
+          zeroRecords: "No se encontraron registros",
+          infoEmpty: "No hay registros disponibles"
+        }
+      });
+
+    } else {
+      let alertMsg = `
+          <div class="alert alert-danger d-flex align-items-center" role="alert">
+            <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+            <div>
+              NO EXISTEN RESULTADOS PARA LAS CONDICIONES SELECCIONADAS
+            </div>
+          </div>`;
+      $("#dvResultPedidos").html(alertMsg);
+    }    
+  } catch (error) {
+    console.log(error);
+  } finally {
+    UnloadImg();
+  }
+}
+// ACTUALIZACIÓN DE NOTAS DE PEDIDO 
 function UpdNotas(ob) {
   var nota = $.trim($(ob).val());
   var nump = $.trim($("#txt_numero").val());
@@ -3369,174 +3386,171 @@ function UpdNotas(ob) {
 
   }
 }
-//-----------------------------Pedidos temporales pendientes por recuperar
-function Temporales() {
-  $.ajax({
-    type: "POST",
-    encoding: "UTF-8",
-    url: "../models/PW-SAP.php",
-    global: false,
-    beforeSend: function () {
-      LoadImg('CARGANDO...');
-    },
-    data: ({
-      op: "S_TEMPORALES"
-    }),
-    dataType: "json",
-    async: true,
-    success: function (data) {
-      if (data.length) {
-        let tabla = `<div class="alert alert-warning alert-dismissible" role="alert">
-          <strong>NOTA!</strong> Todos los pedidos que se encuentran para recuperación cuentan con una validez de 24 horas,
-          transcurrido este tiempo serán eliminados de manera automática por nuestro sistema.
-          </div>
-          <div class="btn-group" role="group" aria-label="...">
-            <button type="button" class="btn btn-sm btn-danger"><b>T</b>emporal</button>
-            <button type="button" class="btn btn-sm btn-warning"><b>P</b>edido</button>
-            <button type="button" class="btn btn-sm btn-success"><b>E</b>ntrega</button>
-            <button type="button" class="btn btn-sm btn-info"><b>O</b>rden</button>
-            <button type="button" class="btn btn-sm btn-primary"><b>F</b>actura</button>
-          </div>
-          <div id="VtotalPropios"></div>`;
+// PEDIDOS TEMPORALES PENDIENTES POR RECUPERAR
+const Temporales = async () => {
+  try {
+    LoadImg('Cargando ⏳⏳⌛');
+    const data = await enviarPeticion({op: "S_TEMPORALES", link: "../models/PW-SAP.php"});
+    if (data.length) {
+      let header = `    
+      <div class="alert alert-warning alert-dismissible mt-2" role="alert">
+        <strong>NOTA!</strong> Todos los pedidos que se encuentran para recuperación cuentan con una validez de 24 horas,
+        transcurrido este tiempo serán eliminados de manera automática por nuestro sistema.
+      </div>
+      <div class="mb-2">
+        <span class="badge text-bg-danger"><strong>T</strong>emporal</span>
+        <span class="badge text-bg-warning"><strong>P</strong>edido</span>
+        <span class="badge text-bg-success"><strong>E</strong>ntrega</span>
+        <span class="badge text-bg-info"><strong>O</strong>rden</span>
+        <span class="badge text-bg-primary"><strong>F</strong>actura</span>              
+      </div>            
+      <div id="VtotalPropios"></div>`;
 
-        tabla += `<table class="table" align="center" id="tableRescue">
+      let tabla = `
+      <table class="display" width="100%" id="tableRescue">
           <thead>
-            <tr>
-              <th>Fecha/Hora</th>
-              <th data-breakpoints="xs">Bodega</th>
-              <th data-breakpoints="xs">Numero</th>
-              <th>Nombres</th>
-              <th data-breakpoints="xs">Valor</th>
-              <th data-breakpoints="xs">Destinatario</th>
-              <th data-breakpoints="xs">Transferido</th>
-              <th data-breakpoints="xs">Opciones</th>
+            <tr class="bag-info">
+              <th class="size-th">FECHA/HORA</th>
+              <th class="size-th">BODEGA</th>
+              <th class="size-th">NÚMERO</th>
+              <th class="size-th">NOMBRES</th>
+              <th class="size-th">VALOR</th>
+              <th class="size-th">DESTINATARIO</th>
+              <th class="size-th">TRANSFERIDO</th>
+              <th class="size-th">OPCIONES</th>
             </tr>
           </thead>
           <body>`;
 
-        let cont = 0;
-        let total = 0;
-        let usr = '';
-        let visualizar = '';
-        for (let i = 0; i <= data.length - 1; i++) {
-          let transfer = '';
-
-          if (data[i].transferido == 1) {
-            if ($.trim(data[i].entrega) != '0') {
-              if ($.trim(data[i].ot) != '0') {
-                if ($.trim(data[i].factura) != '0') {
-                  transfer = `<button type="button" class="btn btn-primary btn-sm" onClick="Swal.fire('Excelente', 'Pedido N° ${data[i].numero_sap}','success');">
-                    <span aria-hidden="true"><b>F</b></span>
-                  </button>`;
-                } else {
-                  transfer = `<button type="button" class="btn btn-info btn-sm" onClick="Swal.fire('Excelente', 'Pedido N° ${data[i].numero_sap}','success');">
-                    <span aria-hidden="true"><b>O</b></span>
-                  </button>`;
-                }
+      let cont = 0;
+      let total = 0;
+      let usr = '';
+      let visualizar = '';
+      data.forEach(item => {
+        let transfer = '';
+        if (item.transferido == 1) {
+          if ($.trim(item.entrega) != '0') {
+            if ($.trim(item.ot) != '0') {
+              if ($.trim(item.factura) != '0') {
+                transfer = `
+                <button type="button" class="btn btn-primary btn-sm" onClick="Swal.fire('Excelente', 'Pedido N° ${item.numero_sap}','success');">
+                  <span aria-hidden="true"><b>F</b></span>
+                </button>`;
               } else {
-                transfer = `<button type="button" class="btn btn-success btn-sm" onClick="Swal.fire('Excelente', 'Pedido N° ${data[i].numero_sap}','success');">
-                  <span aria-hidden="true"><b>E</b></span>
+                transfer = `
+                <button type="button" class="btn btn-info btn-sm" onClick="Swal.fire('Excelente', 'Pedido N° ${item.numero_sap}','success');">
+                  <span aria-hidden="true"><b>O</b></span>
                 </button>`;
               }
             } else {
-              if ($.trim(data[i].sol_desbloqueo) != '' /*&& data[i].sol_desbloqueo!='3'*/) {
-                let estado_sol_des = "";
-                let color = "";
-
-                switch (data[i].sol_desbloqueo) {
-                  case "0":
-                    estado_sol_des = '<i class="fa-solid fa-lock " title="Solicitud enviada"></i>';
-                    color = 'warning'
-                    break;
-                  case "1":
-                    estado_sol_des = '<i class="fa-solid fa-lock "  title="Solicitud en revision"></i>';
-                    color = 'info'
-                    break;
-                  case "2":
-                    estado_sol_des = '<i class="fa-solid fa-lock "  title="Solicitud rechazada"></i>';
-                    color = 'danger'
-                    break;
-                  case "3":
-                    estado_sol_des = '<i class="fa-solid fa-circle-check  fa-bea"  title="Solicitud aprobada"></i>';
-                    color = 'success'
-                    break;
-                }
-                transfer += `<button onclick="MostrarEstadoSolDesbloqueo(${data[i].numero_sap})" class="btn btn-${color}">${estado_sol_des}</button>`;
-              } else {
-                transfer = `<button type="button" class="btn btn-warning btn-sm" onClick="Swal.fire('Excelente', 'Pedido N° ${data[i].numero_sap}','success');">
-                  <span aria-hidden="true"><b>P</b></span>
-                </button>`;
-              }
+              transfer = `
+              <button type="button" class="btn btn-success btn-sm" onClick="Swal.fire('Excelente', 'Pedido N° ${item.numero_sap}','success');">
+                <span aria-hidden="true"><b>E</b></span>
+              </button>`;
             }
           } else {
-            transfer = `<button type="button" class="btn btn-danger btn-sm" onClick="Swal.fire('Oops', 'Pendiente por transferir', 'error');">
-              <span aria-hidden="true"><b>T</b></span>
-            </button>`;
+            if ($.trim(item.sol_desbloqueo) != '') {
+              let estado_sol_des = "";
+              let color = "";
+
+              switch (item.sol_desbloqueo) {
+                case "0":
+                  estado_sol_des = '<i class="fa-solid fa-lock " title="Solicitud enviada"></i>';
+                  color = 'warning'
+                  break;
+                case "1":
+                  estado_sol_des = '<i class="fa-solid fa-lock "  title="Solicitud en revisión"></i>';
+                  color = 'info'
+                  break;
+                case "2":
+                  estado_sol_des = '<i class="fa-solid fa-lock "  title="Solicitud rechazada"></i>';
+                  color = 'danger'
+                  break;
+                case "3":
+                  estado_sol_des = '<i class="fa-solid fa-circle-check  fa-bea"  title="Solicitud aprobada"></i>';
+                  color = 'success'
+                  break;
+              }
+              transfer += `
+              <button onclick="MostrarEstadoSolDesbloqueo(${item.numero_sap})" class="btn btn-${color}">
+                ${estado_sol_des}
+              </button>`;
+            } else {
+              transfer = `
+              <button type="button" class="btn btn-warning btn-sm" onClick="Swal.fire('Excelente', 'Pedido N° ${item.numero_sap}','success');">
+                <span aria-hidden="true"><b>P</b></span>
+              </button>`;
+            }
           }
-
-          data[i].cliente = data[i].cliente.replace(/'/g, '');
-          data[i].cliente = data[i].cliente.replace(/"/g, '');
-
-          tabla += `<tr>
-                    <td>${data[i].fecha_pedido}</td>
-                    <td>${data[i].bodega}</td>
-                    <td>${data[i].numero}</td>
-                    <td>
-                      <P>${data[i].cliente}</P>
-                      <small style="font-weight: bold">Zona ventas: <span class="text-primary">${data[i].zona_ventas} - ${data[i].zona_descripcion}</span></small>
-                    </td>
-                    <td>${formatNum(data[i].valor_total, '$')}</td>
-                    <td>${data[i].destinatario}</td>
-                    <td align="center" width="4%">${transfer}</td>
-                    <td align="center" width="4%">
-                      <button type="button" class="btn btn-default btn-sm" 
-                        onClick="AbrirOpciones(
-                          '${$.trim(data[i].numero)}',
-                          '${$.trim(data[i].valor_total)}',
-                          '${$.trim(data[i].codigo_direccion)}',
-                          '${$.trim(data[i].direccion)}',
-                          '${$.trim(data[i].oficina_ventas)}',
-                          '${$.trim(data[i].codigo_sap)}',
-                          '${$.trim(data[i].transferido)}',
-                          '${$.trim(data[i].entrega)}',
-                          '${$.trim(data[i].ot)}',
-                          '${$.trim(data[i].numero_sap)}',
-                          '${$.trim(data[i].factura)}',
-                          'P',
-                          '${$.trim(data[i].notas)}',
-                          '${$.trim(data[i].usuario)}',
-                          '${$.trim(data[i].destinatario)}',
-                          '${$.trim(data[i].cliente)}'
-                        );"
-                        title="Menu de opciones">
-                          <span class="glyphicon glyphicon-th" aria-hidden="true"></span>
-                      </button>
-                    </td>
-                  </tr>`;
-
-          cont++;
-          total += parseFloat(data[i].valor_total);
+        } else {
+          transfer = `
+          <button type="button" class="btn btn-danger btn-sm" onClick="Swal.fire('Oops', 'Pendiente por transferir', 'error');">
+            <span aria-hidden="true"><b>T</b></span>
+          </button>`;
         }
-        tabla += `</tbody>
-                </table>`;
 
-        $("#DvRecuperables").html(tabla);
-        $('#tableRescue').footable();
-        $("#VtotalPropios").html(`<div class="alert alert-info" role="info"><b>VALOR TOTAL: ${formatNum(total, '$')}</b></div>`);
-      } else {
-        $("#DvRecuperables").html(`<div class="alert alert-danger" role="alert">
-                                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-                                    <span class="sr-only">Error:</span>NO EXISTEN RESULTADOS PARA LAS CONDICIONES SELECCIONADAS'
-                                  </div>`);
-      }
-    }
-  }).done(function () {
+        item.cliente = item.cliente.replace(/'/g, '');
+        item.cliente = item.cliente.replace(/"/g, '');
+
+        tabla += `
+        <tr>
+          <td class="size-td">${item.fecha_pedido}</td>
+          <td class="size-td">${item.bodega}</td>
+          <td class="size-td">${item.numero}</td>
+          <td class="size-td">
+            <P style="margin: 0;">${item.cliente}</P>
+            <small style="font-weight: bold">
+              Zona ventas: 
+              <span class="text-primary" style="font-size: 8px;">${item.zona_ventas} - ${item.zona_descripcion}</span>
+            </small>
+          </td>
+          <td class="size-td">${formatNum(item.valor_total, '$')}</td>
+          <td class="size-td">${item.destinatario}</td>
+          <td align="center" width="4%">${transfer}</td>
+          <td align="center" width="4%">
+            <button type="button" class="btn btn-outline-primary btn-sm" style="font-weight: bolder; font-size: 15px;" onClick="AbrirOpciones('${$.trim(item.numero)}', '${$.trim(item.valor_total)}', '${$.trim(item.codigo_direccion)}', '${$.trim(item.direccion)}', '${$.trim(item.oficina_ventas)}', '${$.trim(item.codigo_sap)}', '${$.trim(item.transferido)}', '${$.trim(item.entrega)}', '${$.trim(item.ot)}', '${$.trim(item.numero_sap)}', '${$.trim(item.factura)}', 'P', '${$.trim(item.notas)}', '${$.trim(item.usuario)}', '${$.trim(item.destinatario)}', '${$.trim(item.cliente)}');" title="Menu de opciones">
+              <i class="fa-solid fa-bars"></i>
+            </button>
+          </td>
+        </tr>`;
+        cont++;
+        total += parseFloat(item.valor_total);
+      });
+      tabla += `</tbody></table>`;
+
+      $("#contenedorLeyendas").html(header);
+      $("#VtotalPropios").html(`<div class="alert alert-info" role="info"><strong>VALOR TOTAL: ${formatNum(total, '$')}</strong></div>`);
+      $("#DvRecuperables").html(tabla);
+      $('#tableRescue').DataTable({
+        paging: false,
+        searching: false,
+        ordering: true,
+        info: false,
+        responsive: true,
+        scrollX: true,
+        columnDefs: [
+          { targets: [7], orderable: false }
+        ],
+        language: {
+          zeroRecords: "No se encontraron registros",
+          infoEmpty: "No hay registros disponibles"
+        }
+  });
+    } else {
+      let msgHtml = `
+      <div class="alert alert-danger" role="alert">
+        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+        <span class="sr-only">Error:</span>NO EXISTEN RESULTADOS PARA LAS CONDICIONES SELECCIONADAS'
+      </div>`;
+      $("#DvRecuperables").html(msgHtml);
+    }    
+  } catch (error) {
+    console.log(error);
+  } finally {
     UnloadImg();
-  }).fail(function (data) {
-    console.log(data);
-  })
+  }
 }
-
+// FUNCIÓN ABRIR OPCIONES
 function AbrirOpciones(numero, valor_total, destinatario, direccion, bodega, codigo_sap, transferido, entrega, ot, numero_sap, factura, gestion, notas, usuario, destinatario, cliente) {
   $("#ped_gestion").val(gestion);
   $("#ped_numero").val(numero);
@@ -3934,61 +3948,41 @@ function EliminarPedido() {
     Swal.fire("Oops", "No es posible eliminar un pedido que fue creado por otro usuario!", "error");
   }
 }
+// FUNCIÓN PARA ELIMINAR PEDIDO WEB
+const EliminarPW = async (numero) => {
+  try {
+    const result = await confirmAlert("Oops!!", "¿Está seguro(a) de eliminar el pedido?");
+    if (!result.isConfirmed) return;
 
-function EliminarPW(numero) {
-  $.ajax({
-    type: "POST",
-    encoding: "UTF-8",
-    url: "../models/PW-SAP.php",
-    global: false,
-    error: function (OBJ, ERROR, JQERROR) {
-      alert(JQERROR + " ");
-    },
-    data: ({
-      op: 'D_PEDIDO',
-      numero: numero
-    }),
-    dataType: "html",
-    async: true,
-    success: function (data) {
-      if (data == 0) {
-        Swal.fire("Excelente", "Pedido eliminado correctamente!", "success");
-        Temporales();
-      } else {
-        Swal.fire("Error", "Error al intentar eliminar pedido!", "error");
-      }
-    }
-  }).fail(function (data) {
-    console.log(data);
-  });
+    const data = await enviarPeticion({op: "D_PEDIDO", link: "../models/PW-SAP.php", numero});
+
+    if (data == 0) {
+      Swal.fire("Excelente", "Pedido eliminado correctamente!", "success");
+      Temporales();
+    } else {
+      Swal.fire("Error", "Error al intentar eliminar pedido!", "error");
+    }    
+  } catch (error) {
+    console.log(error);
+  }
 }
+// FUNCIÓN PARA ELIMINAR PEDIDO SAP
+const EliminarSAP = async (numero_sap, numero) => {
+   try {
+    const result = await confirmAlert("Oops!!", "¿Está seguro(a) de eliminar el pedido?");
+    if (!result.isConfirmed) return;
 
-function EliminarSAP(numero_sap, numero) {
-  $.ajax({
-    type: "POST",
-    encoding: "UTF-8",
-    url: "../models/WS-PW.php",
-    global: false,
-    error: function (OBJ, ERROR, JQERROR) {
-      alert(JQERROR + " ");
-    },
-    data: ({
-      op: 'ELIMINAR',
-      numero: numero_sap
-    }),
-    dataType: "json",
-    async: false,
-    success: function (data) {
-      if (data.Tipo != 'S') {
+    const data = await enviarPeticion({op: "ELIMINAR", link: "../models/PW-SAP.php", numero_sap});
+
+     if (data.Tipo != 'S') {
         Swal.fire("Error", data.Msj, "error");
       } else {
         EnviarMailAnulacion('E', numero, 'Pedido eliminado');
         EliminarPW(numero);
       }
-    }
-  }).fail(function (data) {
-    console.log(data);
-  });
+  } catch (error) {
+    console.log(error);
+  } 
 }
 
 function Rastreo() {
