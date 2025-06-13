@@ -44,7 +44,6 @@ const validaEstadoDesbloqueo = async () => {
 const SolDesbloqueo = async () => {
   /*2024-10-04 Christian Bula: Se añade control para solo poder volver a montar la solicitud si el estado es (R:Rechazado - A: Aprobado)*/
   let status = await validaEstadoDesbloqueo();
-
   if (status) {
     Swal.fire({
       title: '¡Oh no!',
@@ -103,7 +102,6 @@ const MostrarEstadoSolDesbloqueo = async (pedido) => {
   });
 
   let estado = '';
-
   switch (resp[0].ESTADO) {
     case "0":
       estado = 'Pendiente';
@@ -128,989 +126,9 @@ const guardSolicitudesDesbloqueoPedidos = async () => {
   }
 }
 
-// 
 const cerrarAlertaDesbloqueoPedidos = () => {
   $("#alarma_sol_desbloqueo").html('').hide()
 }
-
-$(function () {
-  /*
-    setInterval(function(){
-      dataPedidosDesbloqueo()
-      .then(resp=>{
-         
-
-
-        if(resp.length>0){
-          switch(resp[0].estado){
-            case "1": estado=' EN VERIFIACION '; color='info'; break;
-            case "2": estado=' RECHAZADA'; color='danger'; break;
-            case "3": estado=' APROBADA';color='success' ; break;
-          }
-          $("#alarma_sol_desbloqueo").html(`
-          <div class="row ">
-            <div class="col-md-10">
-            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-            El pedido #${resp[0].pedido} del cliente ${resp[0].cliente} se encuentra <b><span class="text-${color}">${estado}</span></b>         
-            </div>
-            <div class="col-md-2">
-            <button onclick="cerrarAlertaDesbloqueoPedidos()" class="btn btn-default text-danger" style="float:right;right   :0">x</button>
-            </div>
-          </div>
-            
-            
-            `).show("slow");
-        }
-      })
-      .catch(e=>{
-        console.error(e)
-      })
-    },5000)
-  */
-  //Validacion de permisos
-  Permisos();
-  //Nuevas notificaciones emergentes
-  Notificaciones(); //se quita porque se acabo la convencion
-  setInterval(function () {
-    Notificaciones();
-  }, 300000);
-  //----------------------------------------------------------	
-  var ofi_ = $("#Ofi").val();
-  if (ofi_ == 2100 || ofi_ == 2200 || ofi_ == 2300) {
-    //$("#ModalFeriaMayo").modal('show');
-  }
-  //Nueva distribucion de grupos 
-  CargaGruposClientes(1);
-  CargaGruposClientes(2);
-  //--------------------------
-  OfcS = OficinasVentas('S');
-  OfcN = OficinasVentas('N');
-  //Nuevo Filtro Bodega
-  $("#FiltroOficinaVentas").html(OfcS);
-  $("#FiltroOficinaVentas").change(function () {
-    GestionPedidos();
-  });
-  $("#txtZonas,#FiltroOficinaVentas,#txtClasePedido").select2();
-  //VALIDO SI EXISTE NIT PARA LOS CLIENTES
-  var DepId = $("#Dpto").val();
-  if (DepId == 10) {
-    if ($.trim($("#Nit").val()) == "") {
-
-      Swal.fire("Session Error", "No se logro cargar la informacion, salga del sistema e intente nuevamente!", "error");
-      setTimeout(function () {
-        parent.$("#iframe").trigger("click");
-      }, 3000);
-
-    } else {
-      LoadArrayCli();
-    }
-  } else {
-    LoadArrayCli();
-  }
-
-  //Tabulacion de pestañas de seleccion	
-  $("#btnProductos").click(function () {
-    VerificaPedido();
-    $("#txt_destinatario").attr('disabled', true);
-    $("#txt_oficina").attr('disabled', true);
-    $("#TxtIntegracion").attr('disabled', true);
-
-    if ($("#txt_bproductos").val() == '') {
-      $("#dvResultProductos").html('');
-    } else {
-      var n = 0;
-      if (validarSiNumero(valor) == 1) {
-        n = 1;
-      }
-      BuscarProductoArr(n);
-    }
-  });
-
-  //Eventos click 
-  $("#ContenidoPhone").html('<embed src="../../adg-phone/index.html?" frameborder="0" width="100%" height="500px">');
-  $("#btnPhone").click(function () {
-    $("#ModalPhone").modal('show');
-  })
-  //Refresh pedidos 
-  $("#btnMenu9").click(function () {
-    var num = $.trim($("#ped_numero").val());
-    consultaOpciones(num);
-    $.notify({ // options
-      icon: 'glyphicon glyphicon-warning-sign',
-      title: '<strong>ACTUALIZAR INFO PEDIDO ' + num + '</strong></br>',
-      message: 'Ejecutado correctamente',
-      url: '',
-      target: '_blank'
-    }, { // settings	
-      delay: 2000,
-      type: 'success',
-      animate: {
-        enter: 'animated fadeInDown',
-        exit: 'animated fadeOutUp'
-      },
-    });
-  });
-  //exportar la gestion
-  $("#exportar_gestion").click(function () {
-    Exportar('DvRecuperablesTerceros')
-  })
-  //------------------------------------------
-  $("#btnMenu10").click(function () {
-    LogDatos();
-  });
-  //------------------------------------------
-  $("#btnPedidos").click(function () {
-    WSInvenTotal();
-    ListarPedido();
-  });
-  $("#btnTemporales").click(function () {
-    Temporales();
-  });
-  $("#btnAddEntregas").click(function () {
-    LimpiarEntregas();
-
-    if ($("#link_pro").val() != '0') {
-      $('#ClienteEntregas').val($("#txt_cliente").val()).attr("disabled", true);;
-      $("#CodigoSAPEntregas").val($("#txt_codigoSap").val());
-    }
-
-  });
-  $("#btnEventos").click(function () {
-
-
-    ListarEvento();
-  });
-  $("#btListaFacts").click(function () {
-    LimpiarFacturas();
-    if ($("#link_pro").val() != '0') {
-      $("#txtFactCodigoCliente").val($("#txt_codigoSap").val());
-      $("#txtFactCliente").val($("#txt_cliente").val()).attr("disabled", true);
-    }
-
-  });
-
-  $("#btnTempTerceros").click(function () {
-    ZonasVentas();
-    LimpiarGestionPedido();
-    if ($("#link_pro").val() != '0') {
-      $("#txtCodigoSAP").val($("#txt_codigoSap").val());
-      $("#txtCliente").val($("#txt_cliente").val()).attr("disabled", true);
-    }
-  });
-  $("#btnMenu8").click(function () {
-    var num = $.trim($("#ped_factura").val());
-    VisualizarFactura(num);
-  });
-  $("#txtFecha1,#txtFecha2,#EntregasFecha1,#EntregasFecha2,#txtFactFecha1,#txtFactFecha2,#txtFaltanteFecha1,#txtFaltanteFecha2").val(FechaActual());
-  $("#txtFecha1,#txtFecha2,#EntregasFecha1,#EntregasFecha2,#txtFactFecha1,#txtFactFecha2,#txtFaltanteFecha1,#txtFaltanteFecha2").datepicker({
-    changeMonth: true,
-    changeYear: true,
-    monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-    monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
-    dateFormat: 'dd-mm-yy',
-    width: 100,
-    heigth: 100
-  });
-  //Inicializacion
-  $("#dvCentros").hide();
-  //Busqueda de clientes para filtro de pedidos 
-  $('#txtCliente').autocomplete({
-    source: function (request, response) {
-      Arr_cli = ArrCli;
-      valor = $.trim($("#txtCliente").val());
-      if (validarSiNumero(valor) == 1) {
-        Arr_cli = FiltrarCli(valor, Arr_cli, 1);
-      } else {
-        div_cadena = valor;
-        div_cadena = div_cadena.split(" ");
-        for (var x = 0; x < div_cadena.length; x++) {
-          expr = $.trim(div_cadena[x]);
-          Arr_cli = FiltrarCli(expr, Arr_cli, 2);
-        }
-      }
-      response(Arr_cli.slice(0, 10));
-    },
-    maxResults: 10,
-    minLength: 3,
-    search: function () { },
-    open: function (event, ui) { },
-
-    select: function (event, ui) {
-      $("#txtCodigoSAP").val(ui.item.codigo_sap);
-
-    }
-  });
-
-
-  $('#txtCliente').on('keyup', function () {
-    if ($(this).val() == '') {
-      $("#txtCodigoSAP").val('');
-    }
-  });
-
-
-  //Busqueda de clientes gestion de entregas
-  $('#ClienteEntregas').autocomplete({
-    source: function (request, response) {
-      Arr_cli = ArrCli;
-      valor = $.trim($("#ClienteEntregas").val());
-      if (validarSiNumero(valor) == 1) {
-        Arr_cli = FiltrarCli(valor, Arr_cli, 1);
-      } else {
-        div_cadena = valor;
-
-
-        div_cadena = div_cadena.split(" ");
-        for (var x = 0; x < div_cadena.length; x++) {
-          expr = $.trim(div_cadena[x]);
-          Arr_cli = FiltrarCli(expr, Arr_cli, 2);
-        }
-      }
-      response(Arr_cli.slice(0, 10));
-    },
-    maxResults: 10,
-    minLength: 3,
-    search: function () { },
-    open: function (event, ui) { },
-    select: function (event, ui) {
-      $("#CodigoSAPEntregas").val(ui.item.codigo_sap);
-    }
-  });
-
-  $('#ClienteEntregas').on('keyup', function () {
-    if ($(this).val() == '') {
-      $("#CodigoSAPEntregas").val('');
-      $("#DvListaEntregas").html('');
-    }
-  });
-  //Busqueda de clientes en facturacion
-  $('#txtFactCliente').autocomplete({
-    source: function (request, response) {
-      Arr_cli = ArrCli;
-      valor = $.trim($("#txtFactCliente").val());
-      if (validarSiNumero(valor) == 1) {
-        Arr_cli = FiltrarCli(valor, Arr_cli, 1);
-      } else {
-        div_cadena = valor;
-        div_cadena = div_cadena.split(" ");
-        for (var x = 0; x < div_cadena.length; x++) {
-          expr = $.trim(div_cadena[x]);
-          Arr_cli = FiltrarCli(expr, Arr_cli, 2);
-        }
-      }
-      response(Arr_cli.slice(0, 10));
-    },
-    maxResults: 10,
-    minLength: 3,
-    search: function () { },
-    open: function (event, ui) { },
-    select: function (event, ui) {
-      $("#txtFactCodigoCliente").val(ui.item.codigo_sap);
-    }
-  });
-
-  //Busqueda de clientes en faltantes
-  $('#txtFaltanteCliente').autocomplete({
-    source: function (request, response) {
-      Arr_cli = ArrCli;
-      valor = $.trim($("#txtFaltanteCliente").val());
-      if (validarSiNumero(valor) == 1) {
-        Arr_cli = FiltrarCli(valor, Arr_cli, 1);
-      } else {
-        div_cadena = valor;
-        div_cadena = div_cadena.split(" ");
-        for (var x = 0; x < div_cadena.length; x++) {
-          expr = $.trim(div_cadena[x]);
-          Arr_cli = FiltrarCli(expr, Arr_cli, 2);
-        }
-      }
-      response(Arr_cli.slice(0, 10));
-    },
-    maxResults: 10,
-    minLength: 3,
-    search: function () { },
-    open: function (event, ui) { },
-    select: function (event, ui) {
-      $("#txtFaltanteCodigoCliente").val(ui.item.codigo_sap);
-    }
-  });
-
-  $('#txtFactCliente').on('keyup', function () {
-    if ($(this).val() == '') {
-      $("#txtFactCodigoCliente").val('');
-      $("#DvListaFacturas").html('');
-    }
-  });
-  //----------------------------------------------------
-  $("#OficinaEntregas").on('change', function () {
-    GestionEntregas();
-  });
-  //Busqueda o carga de cliente segun departamento
-
-  if (DepId == 10) {
-    $("#colCliente").html('<select id="txt_cliente" class="form-select size-text"></select>');
-    $("#txt_cliente").on('change', function () {
-      CargarClienteSeleccionado();
-    });
-    $("#tr_cliente_fact").hide();
-    $("#tr_cliente_faltante").hide();
-  } else {
-    $("#tr_cliente_fact").show();
-    $("#tr_cliente_faltante").show();
-    $("#colCliente").html(`<div class="input-group">
-								  <input type="text" id="txt_cliente" class="form-control size-text" placeholder="Búsqueda de clientes" tabindex="1">
-								  <span class="input-group-btn">
-									<button class="btn btn-light btn-micro" type="button" title="Búsqueda de cliente por voz" onclick="iniciarVozATexto('txt_cliente',this)">
-										<i class="fa-solid fa-microphone"></i>&nbsp;
-									</button>
-								  </span>
-								</div>`);
-
-
-    $('#txt_cliente').autocomplete({
-      source: function (request, response) { //alert();
-        Arr_cli = ArrCli;
-        valor = $.trim($("#txt_cliente").val());
-        //
-        if (validarSiNumero(valor) == 1) {
-          Arr_cli = FiltrarCli(valor, Arr_cli, 1);
-        } else {
-          div_cadena = valor;
-          div_cadena = div_cadena.split(" ");
-          //
-          for (var x = 0; x < div_cadena.length; x++) {
-            expr = $.trim(div_cadena[x]);
-            Arr_cli = FiltrarCli(expr, Arr_cli, 2);
-          } //for 
-        }
-        response(Arr_cli.slice(0, 10));
-      },
-      maxResults: 10,
-      minLength: 3,
-      search: function () { },
-      open: function (event, ui) { },
-      select: function (event, ui) {
-        $("#TxtIntegracion").attr('disabled', true);
-        $("#txt_nit").val(ui.item.nit);
-        $("#txt_dir").val(ui.item.direccion);
-        $("#txt_tel").val(ui.item.telefonos);
-        $("#txt_mail").val(ui.item.email);
-        $("#txt_ciudad").val(ui.item.ciudad);
-        $("#txt_cupo").val(formatNum(ui.item.cupo_credito, '$'));
-        //--------------------------------------------------
-        $("#txt_oficina").html(OfcN);
-        $("#txt_oficina option[value='" + ui.item.bodega + "']").attr("selected", true);
-        //Validamos los permisos para cambio de bodega y activamos o desactivamos esta opcion.
-        if (Perm_Cambiar_Bodega != 'S') {
-          $("#txt_oficina").attr("disabled", true);
-        } else {
-          $("#txt_oficina").attr("disabled", false);
-        }
-        //-------------------------------------------------------------------------------------------------------------
-        $("#txt_condicion").val(ui.item.condicion_pago);
-        $("#txt_lista").val(ui.item.lista);
-        $("#txt_vendedor").val(ui.item.vendedor);
-        $("#txt_televendedor").val(ui.item.televendedor);
-        $("#txt_vendedor_tel").val(ui.item.telefono_vendedor);
-        $("#txt_televendedor_tel").val(ui.item.telefono_televendedor);
-        $("#txt_codigoSap").val(ui.item.codigo_sap);
-        $("#txt_descuento").val(ui.item.descuento_financiero);
-        $("#txt_plazo").val(ui.item.dias_pago + ' dias');
-        Destinatarios(ui.item.codigo_sap, ui.item.ciudad, ui.item.direccion);
-        Presupuesto_datos();
-        Cartera_edades();
-        if (ui.item.institucional == 1) {
-          $("#txt_institucional").val('SI');
-        } else {
-          $("#txt_institucional").val('NO');
-        }
-        if (ui.item.controlados == 1) {
-          $("#txt_controlado").val('SI');
-        } else {
-          $("#txt_controlado").val('NO');
-        }
-        //Activacion de tabs de productos
-        // $("#liProductos").removeClass("disabled disabledTab");
-        $("#btnProductos").attr("disabled", false);
-        //Grupos de clientes-----------------------------------
-        $("#txtGrp1").val(ui.item.grupo1);
-        $("#txtGrp2").val(ui.item.grupo2);
-        $("#txtGrp1,#txtGrp2").prop('disabled', true)
-        //-----------------------------------
-        CargarEvento();
-        BuscarProductos();
-        //-----------------------------------
-
-
-      }
-    });
-  } //fin si
-  Limpiar();
-  //Filtros descuentos, bonificados y stock
-  $(".DivCheckBox").click(function () {
-    var id = $(this).attr('id');
-    if ($(this).hasClass('DivCheckBoxTrue')) {
-      $(this).removeClass('DivCheckBoxTrue');
-    } else {
-      $(this).addClass('DivCheckBoxTrue');
-    }
-    //id del div
-    id = $(this).attr("id");
-    if (id == 'DvChkKits') {
-      BuscarProductos();
-    }
-
-    //if($("#txt_bproductos").val()!=''){
-    var n = 0;
-    var sto = 0;
-    if (validarSiNumero(valor) == 1) {
-      n = 1;
-    }
-    if ($("#DvChkStock").hasClass('DivCheckBoxTrue')) {
-      sto = 1;
-    } //solo con stock
-    if (sto == 1) {
-      BuscarProductoArr(n);
-    } else {
-      if (id == 'DvChkStock') {
-        Swal.fire({
-          title: "¿Esta seguro?",
-          text: "Esta opción puede tornar lenta las búsquedas, esta seguro de continuar?",
-          icon: "question",
-          confirmButtonColor: "#82ED81",
-          cancelButtonColor: "#FFA3A4",
-          confirmButtonText: "Si,continuar",
-          cancelButtonText: "No,cancelar",
-          showLoaderOnConfirm: true,
-          showCancelButton: true,
-        }).then((result) => {
-          if (result.value) {
-            BuscarProductos();
-          } else {
-            $("#DvChkStock").addClass('DivCheckBoxTrue');
-          }
-        });
-      } else {
-        BuscarProductoArr(n);
-      }
-    }
-    // }
-  });
-  $("#txt_reg").on('change', function () {
-    if ($("#txt_bproductos").val() != '') {
-      BuscarProductoArr();
-    }
-  });
-  $("#txt_oficina").change(function () {
-    if ($("#txt_codigoSap").val() != '') {
-      BuscarProductos();
-      if ($("#txt_bproductos").val() != '') {
-        BuscarProductoArr();
-      }
-    }
-  });
-  $("#txt_orden").on('change', function () {
-    if ($("#txt_bproductos").val() != '') {
-      BuscarProductoArr();
-    }
-  });
-  CargarEvento();
-  $("#selTipos").change(function () {
-    ListarEvento();
-  });
-  //Teclas de acceso rapido
-  $(document).keyup(function (e) {
-    tecla = e.keyCode;
-    //Ubicar y limpiar caja de texto de busqueda de productos
-    if (tecla == 113) { //Funcion tecla F2 
-      var sw = 0;
-      if ($("#liProductos").hasClass("disabled")) {
-        sw = 1;
-      }
-      if (sw == 0) {
-        activaTab("dvProductos");
-        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-          var target = e.target.attributes.href.value;
-          $(target + ' #txt_bproductos').focus();
-        });
-        $('#txt_bproductos').focus();
-        $("#txt_bproductos").val('');
-      }
-    }
-    if (tecla == 115) { //Funcion tecla F4
-      var sw = 0;
-      if ($("#liPedidos").hasClass("disabled")) {
-        sw = 1;
-      }
-      if (sw == 0) {
-        activaTab("dvPedidos");
-        Guardar();
-      }
-    }
-
-
-  });
-  //==================================NUEVO PARA EDICION DE PEDIDOS======================================================
-  $("#btnEditar").click(function () {
-    $("#ModalEditarPedidos").modal("show");
-  });
-
-  $("#btnEstadisticas").click(function () {
-    // Comportamiento();
-    $("#ModalEstadisticas").modal("show");
-    $("#container").html(`<div class="alert alert-danger">Cargando...</div>`);
-    dataComportamiento()
-      .then(resp => {
-
-        let claves = pasarMeses(resp.claves);
-
-        Highcharts.chart('container', {
-          chart: {
-            type: 'column'
-          },
-          title: {
-            text: 'Compras mes a mes'
-          },
-          subtitle: {
-            text: '12 meses atrás'
-          },
-          xAxis: {
-            categories: claves,
-            crosshair: true
-          },
-          yAxis: {
-            min: 0,
-            title: {
-              text: 'Valor compra'
-            }
-          },
-          legend: {
-            enabled: false
-          },
-          tooltip: {
-            headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
-            pointFormat: `<span style="color:{point.color}">{point.name}</span>: <b>{point.y:,.0f}</b> of total<br/>`
-          },
-          plotOptions: {
-            column: {
-              pointPadding: 0.2,
-              borderWidth: 0
-            },
-            dataLabels: {
-              enabled: true,
-            }
-          },
-          series: [{
-            name: 'valores',
-            data: resp.datos
-
-          },]
-        });
-
-      })
-      .catch(err => {
-        console.log(err);
-        $("#container").html(`<div class="alert alert-danger">Se produjo un error!</div>`);
-      })
-
-    $("#container2").html(`<div class="alert alert-warning">Cargando...</div>`);
-    top10_materiales()
-      .then(resp => {
-
-        let ano = new Date().getFullYear();
-        let mes = new Date().getMonth() + 1;
-        let pluginArrayArg = new Array();
-        let jsonArray = '';
-
-        resp.forEach(item => {
-
-          let dato = new Object();
-          dato.name = '(' + item.codigo_material + ') ' + item.descripcion;
-          dato.y = Math.round(item.frecuencia);
-          pluginArrayArg.push(dato);
-        })
-        jsonArray = JSON.parse(JSON.stringify(pluginArrayArg));
-
-        if (pluginArrayArg.length > 0) {
-
-          Highcharts.chart('container2', {
-            chart: {
-              type: 'column'
-            },
-            title: {
-              text: 'TOP 20 DE PRODUCTOS MAS COMPRADOS'
-            },
-            subtitle: {
-              text: 'Frecuencia de compra : ' + ano
-            },
-            accessibility: {
-              announceNewData: {
-                enabled: true
-              }
-            },
-            xAxis: {
-              type: 'category'
-            },
-            yAxis: {
-              title: {
-                text: 'Frecuencia de compra'
-              }
-
-            },
-            legend: {
-              enabled: false
-            },
-            plotOptions: {
-              series: {
-                borderWidth: 0,
-                dataLabels: {
-                  enabled: true,
-                  format: '{point.y:f}'
-                }
-              }
-            },
-
-            tooltip: {
-              headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
-              pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:f}</b> <br/>'
-            },
-
-            series: [{
-              name: "Browsers",
-              colorByPoint: true,
-              data: jsonArray
-            }]
-
-          });
-        } else {
-
-          $("#container2").html('<h4>TOP 20 DE PRODUCTOS MAS COMPRADOS</h4><br><div class="alert alert-danger">Sin resultados!</div>');
-
-        }
-
-      }).catch(err => {
-        console.error(err);
-        $("#container2").html(`<div class="alert alert-danger">Se produjo un error!</div>`);
-      });
-
-
-    $("#container3").html(`<div class="alert alert-info">Cargando...</div>`);
-    datos_cupo()
-      .then(resp => {
-
-        let datos = '';
-
-        if (resp.length > 0) {
-          datos = [{
-            name: 'Disponible',
-            y: parseInt(resp[0].DISPONIBLE),
-            sliced: true,
-            selected: true
-          }, {
-            name: 'Comprometido',
-            y: parseInt(resp[0].COMPROMETIDO)
-          }];
-          $("#cupo_txt1").text('COMPROMETIDO : ' + formatNum(resp[0].COMPROMETIDO, '$'));
-          $("#cupo_txt2").text('DISPONIBLE   : ' + formatNum(resp[0].DISPONIBLE, '$'));
-        } else {
-          datos = [{
-            name: 'Disponible',
-            y: 100,
-            sliced: true,
-            selected: true
-          }, {
-            name: 'Comprometido',
-            y: 0
-          }];
-          $("#cupo_txt1").text('COMPROMETIDO : ' + formatNum(0, '$'));
-          $("#cupo_txt2").text('DISPONIBLE   : ' + $("#txt_cupo").val());
-        }
-
-        Highcharts.chart('container3', {
-          chart: {
-            plotBackgroundColor: null,
-            plotBorderWidth: null,
-            plotShadow: false,
-            type: 'pie'
-          },
-          title: {
-            text: 'CUPO DE CRÉDITO'
-          },
-          tooltip: {
-            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-          },
-          accessibility: {
-            point: {
-              valueSuffix: '%'
-            }
-          },
-          plotOptions: {
-            pie: {
-              allowPointSelect: true,
-              cursor: 'pointer',
-              dataLabels: {
-                enabled: true,
-                format: '<b>{point.name}</b>: {point.percentage:.1f} %'
-              }
-            }
-          },
-          series: [{
-            name: 'Brands',
-            // colorByPoint: true,
-            data: datos
-          }]
-        });
-      })
-      .catch(err => {
-        console.error(err);
-        $("#container3").html(`<div class="alert alert-danger">Se produjo un error!</div>`);
-      });
-
-  });
-
-
-  $("#btnBuscarEditar").click(function () {
-    if ($("#EdtNumeroPedido").val() != '' && $("#EdtNumeroPedido").val() > 0) {
-      EditarPedido($("#EdtNumeroPedido").val(), $("#EdtTipo").val());
-    }
-  });
-
-  $("#txt_bproductos").keyup(function (e) {
-    tecla = (document.all) ? e.keyCode : e.which;
-    valor = $.trim($(this).val());
-    if (valor != "") {
-      if ($(this).val().length > 2) {
-        if (tecla == 13) {
-          //verifico si solo son numer
-          //busco por codigo sap o codigo de barras
-          if (validarSiNumero(valor) == 1) {
-            //busco por codigo de barras
-            BuscarProductoArr(1);
-          } else {
-            BuscarProductoArr(0);
-          }
-
-        }
-      }
-    } else {
-      $("#dvResultProductos").html("");
-      $("#n_resultados").text("");
-    }
-
-  });
-  //--Fin se coloca para mitigar el problema mobil
-  $("#txt_bproductos").focusout(function (e) {
-    valor = $.trim($(this).val());
-    if (valor != "") {
-      if ($(this).val().length > 2) {
-        //verifico si solo son numer
-        //busco por codigo sap o codigo de barras
-        if (validarSiNumero(valor) == 1) {
-          //busco por codigo de barras
-          BuscarProductoArr(1);
-        } else {
-          BuscarProductoArr(0);
-        }
-      }
-    } else {
-      $("#dvResultProductos").html("");
-      $("#n_resultados").text("");
-    }
-  });
-  //--Fin se coloca para mitigar el problema mobil
-  //------nuevo para carga de archivo plano 
-  $("#filename").val('');
-  $("#filename").change(function (e) {
-    var ext = $("input#filename").val().split(".").pop().toLowerCase();
-    if ($.inArray(ext, ["csv"]) == -1) {
-      alert('Solo se permiten archivos CSV');
-      $("#filename").val('');
-      return false;
-    }
-    if (e.target.files != undefined) {
-      $("#ModalAjustesBusqueda").modal("hide");
-      LoadImg("Subiendo CSV");
-      var reader = new FileReader();
-      reader.onload = function (e) {
-        var csvval = e.target.result.split("\n");
-        var SiAdd = new Array();
-        var NoAdd = '';
-
-        for (var i = 0; i < csvval.length; i++) { //for 1		
-          var row = csvval[i];
-          if (row != '') {
-            var col = row.split(',');
-            var desc = escapeRegExp($.trim(col[0]));
-            var SwAdd = 0;
-            Arr = ArrProd;
-            Arr = recursiva(desc, Arr, 0, 0, 0, 1);
-
-            if (Arr.length > 0) {
-              for (var x = 0; x < Arr.length; x++) { //for 2									
-                d = Arr[0];
-                for (var y = 0; y < SiAdd.length; y++) {
-                  if (SiAdd[y].codigo == $.trim(d.codigo_material)) {
-                    SwAdd = 1
-                  }
-                }
-                if (SwAdd == 0) {
-                  cant = parseInt($.trim(col[1]));
-                  reg = parseInt($.trim(d.cant_regular));
-                  if ((reg > 0) && (reg > cant)) {
-                    UnloadImg()
-                    if (confirm("El producto " + $.trim(d.descripcion) + " presenta bonificado,"
-                      + "desea aumentar la cantidad a " + reg + " unidades para ganarlo?")) {
-                      cant = reg;
-                    }
-                    LoadImg("Subiendo CSV");
-                  }
-                  AddProductoPlano($.trim(d.codigo_material),
-                    $.trim(d.valor_unitario),
-                    $.trim(d.iva),
-                    $.trim(d.descuento),
-                    cant,
-                    $.trim(d.valor_neto),
-                    $.trim(d.stock),
-                    $.trim(d.vlr_pedido),
-                    $.trim(d.id_pedido),
-                    $.trim(0),
-                    $.trim(d.cant_bonificado),
-                    $.trim(d.cant_regular),
-                    $.trim(d.stock_bonificado));
-                  d = {
-                    'codigo': desc
-                  }
-                  SiAdd.push(d);
-                } else {
-                  NoAdd += $.trim(col[0]) + ",\n";
-                }
-              } //fin for 2	
-            } else {
-              NoAdd += $.trim(col[0]) + ",\n";
-            }
-          } //fin if
-        } //fin for 1	
-
-        WSInvenTotal();
-        ListarPedido();
-        activaTab("dvPedidos");
-        $("#filename").val('');
-        UnloadImg();
-        if (NoAdd != '') {
-          Swal.fire('Codigos no encontrados o no validos', NoAdd, 'warning');
-        }
-      };
-      reader.readAsText(e.target.files.item(0));
-    }
-    return false;
-  });
-  if ($("#Rol").val() == '10' || $("#Dpto").val() == '11') {
-    console.log('cliente o transferencista no carga competencia')
-  } else {
-    ListarCompetencia();
-  }
-
-  //Ferias virtuales
-  $("#btnFeriaVirtual").click(function () {
-    var cod = $("#txt_codigoSap").val();
-    if (cod != '') {
-      $("#ModalFeriaVirtual").modal('show');
-      QueryFeria(4);
-
-    } else {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Oops...',
-        text: 'Debe seleccionar un cliente!.'
-      });
-    }
-  });
-  //Ferias Virtuales
-
-
-  //Grupos Articulos
-  GruposArticulos();
-  $("#txtGrupoArticulo").change(function () {
-    $("#txt_bproductos").val($.trim($(this).val()));
-    BuscarProductoArr(0);
-  });
-  //Grupos Articulos	
-  //Descuentos ir------------------------------------------------------------
-  $("#btnDescuentos").on('click', function () {
-    activaTab('dvProductos');
-    if ($("#txtGrp1").val() == '100') {
-      $("#txt_bproductos").val('OFERTA EXCLUSIVA CLIENTE WEB');
-    } else {
-      $("#txt_bproductos").val('*');
-    }
-
-    $("#DvChkDctos").addClass("DivCheckBoxTrue");
-    BuscarProductoArr(0);
-  });
-  //Descuentos ir------------------------------------------------------------
-
-  //carga por defecto el usuario que se le esta haciendo la gestion en el 0102 
-  //
-  if ($("#link_pro").val() != '') {
-    preLoadCliente($("#link_pro").val());
-  }
-
-  $("#TxtIntegracion").change(function () {
-    if ($("#link_pro").val() != '') {
-      BuscarProductos();
-    }
-
-  });
-
-
-  //Nuevo filtro para ofertas
-  $("#txtFilter").val('');
-  $('#txtFilter').on('input', function () {
-    var filtro = $(this).val().toLowerCase();
-
-    // Iterar sobre los paneles y ocultar/mostrar según el filtro
-    $('.panel-default').each(function () {
-      var textoGrupo = $(this).find('.col-md-4:eq(1)').text().toLowerCase();
-      if (textoGrupo.includes(filtro)) {
-        $(this).show();
-      } else {
-        $(this).hide();
-      }
-    });
-  });
-
-  //Plan de puntos para clientes.
-  $("#btnPuntos").click(function () {
-
-    if ($("#txt_codigoSap").val() != '') {
-      consultarPuntos($("#txt_codigoSap").val());
-    } else {
-      Swal.fire({
-        icon: 'error',
-        title: 'Oops...',
-        text: 'Debe seleccionar un cliente.!.'
-      });
-    }
-  });
-
-  $("#buy-now").click(function () {
-    crearPedidoRedencion();
-  })
-
-  var valor_rol = $("#Rol").val(); // Obtiene el valor del input
-  var valoresPermitidosrol = ["12", "1", "44", "72", "13", "14"];
-
-  // Mostrar u ocultar los divs según el valor de Rol
-  $("#cartera_edades, #Presupuesto_datos").toggle(valoresPermitidosrol.includes(valor_rol));
-
-  $('#btnMas').click(function () {
-    $('#ModalMasCliente').modal('show');
-  });
-
-  $('#btnMas2').click(function () {
-    $('#ModalAjustesBusqueda').modal('show');
-  });
-});
 
 const preLoadCliente = (codigo_sap) => {
 
@@ -1129,7 +147,6 @@ const preLoadCliente = (codigo_sap) => {
     DataCliente = DataCliente[0];
 
 
-    //$("#TxtIntegracion").attr('disabled',true); 
     $("#txt_nit").val(DataCliente.nit);
     $("#txt_dir").val(DataCliente.direccion);
     $("#txt_tel").val(DataCliente.telefonos);
@@ -3499,7 +2516,7 @@ const Temporales = async () => {
           <td class="size-td">${item.numero}</td>
           <td class="size-td">
             <P style="margin: 0;">${item.cliente}</P>
-            <small style="font-weight: bold">
+            <small style="font-weight: bold;">
               Zona ventas: 
               <span class="text-primary" style="font-size: 8px;">${item.zona_ventas} - ${item.zona_descripcion}</span>
             </small>
@@ -4589,258 +3606,223 @@ function LimpiarGestionPedido() {
   $("#DvRecuperablesTerceros").html('');
   $("#VtotalTerceros").html('');
 }
+// FUNCIÓN GESTIÓN DE PEDIDOS
+const GestionPedidos = async () => {
+  try {
+    LoadImg('Cargando... ⏳⏳⏳');
+    let TemporalesHistoria = $("#txtTemporalesHistoria").val();
 
-function GestionPedidos() {
-  var TemporalesHistoria = $("#txtTemporalesHistoria").val();
+    const dataPeticion = {
+      link: "../models/PW-SAP.php",
+      zona: $.trim($("#txtZonas").val()),
+      codigo: $.trim($("#txtCodigoSAP").val()),
+      fh1: $.trim($("#txtFecha1").val()),
+      fh2: $.trim($("#txtFecha2").val()),
+      clase: $.trim($("#txtClasePedido").val()),
+      oficina: $.trim($("#FiltroOficinaVentas").val())
+    }
 
-  if (TemporalesHistoria == 'N') {
-    $.ajax({
-      type: "POST",
-      encoding: "UTF-8",
-      url: "../models/PW-SAP.php",
-      global: false,
-      beforeSend: function () {
-        LoadImg('CARGANDO...');
-      },
-      data: ({
-        op: "S_GESTION_PEDIDOS",
-        zona: $.trim($("#txtZonas").val()),
-        codigo: $.trim($("#txtCodigoSAP").val()),
-        fh1: $.trim($("#txtFecha1").val()),
-        fh2: $.trim($("#txtFecha2").val()),
-        clase: $.trim($("#txtClasePedido").val()),
-        oficina: $.trim($("#FiltroOficinaVentas").val())
-      }),
-      dataType: "json",
-      async: true,
-      success: function (data) {
-        console.log(data);
-        if (data.length) {
-          let tabla = `<table class="table" align="center" id="tableRescueTerceros">
-            <thead>
-              <tr>
-                <th>Fecha/Hora</th>
-                <th data-breakpoints="xs">Bodega</th>
-                <th data-breakpoints="xs">Clase/Numero</th>
-                <th>Nombres</th>
-                <th data-breakpoints="xs">Valor</th>
-                <th data-breakpoints="xs">Destinatario</th>
-                <th data-breakpoints="xs">Transferido</th>
-                <th data-breakpoints="xs">Opciones</th>
-                <th data-breakpoints="xs">Tipo</th>
-              </tr>
-            </thead>
-            <body>`;
+    let cont = 0;
+    let total = 0;
+    let usr = '';
+    let visualizar = '';
 
-          let cont = 0;
-          let total = 0;
-          let usr = '';
-          let visualizar = '';
-          for (let i = 0; i <= data.length - 1; i++) {
-            let transfer = '';
-            let btnText = '';
-            if (data[i].transferido == 1) {
-              if ($.trim(data[i].entrega) != '0') {
-                if ($.trim(data[i].ot) != '0') {
-                  if ($.trim(data[i].factura) != '0') {
-                    transfer = `<button type="button" class="btn btn-primary btn-sm" onClick="Swal.fire('Excelente', 'Pedido N° ${data[i].numero_sap}','success');">
-                      <span aria-hidden="true"><b>F</b></span>
-                    </button>`;
-                    btnText = 'F';
-                  } else {
-                    transfer = `<button type="button" class="btn btn-info btn-sm" onClick="Swal.fire('Excelente', 'Pedido N° ${data[i].numero_sap}','success');">
-                      <span aria-hidden="true"><b>O</b></span>
-                    </button>`;
-                    btnText = 'O';
-                  }
-                } else {
-                  transfer = `<button type="button" class="btn btn-success btn-sm" onClick="Swal.fire('Excelente', 'Pedido N° ${data[i].numero_sap}','success');">
-                    <span aria-hidden="true"><b>E</b></span>
+    let headerTabla = `
+    <div class="mb-2">
+      <button type="button" class="btn btn-sm btn-danger w-btn" onClick="FiltrosTipoPedidos('T')"><b>T</b>emporal</button>
+      <button type="button" class="btn btn-sm btn-warning w-btn" onClick="FiltrosTipoPedidos('P')"><b>P</b>edido</button>
+      <button type="button" class="btn btn-sm btn-success w-btn" onClick="FiltrosTipoPedidos('E')"><b>E</b>ntrega</button>
+      <button type="button" class="btn btn-sm btn-info w-btn" onClick="FiltrosTipoPedidos('O')"><b>O</b>rden</button>
+      <button type="button" class="btn btn-sm btn-primary w-btn" onClick="FiltrosTipoPedidos('F')"><b>F</b>actura</button>
+      <button type="button" class="btn btn-sm btn-light w-btn btn-micro" onClick="FiltrosTipoPedidos('A')"><b>TODOS</b></button>
+    </div>
+    <table class="display" width="100%" id="tableRescueTerceros">
+      <thead>
+        <tr class="bag-info">
+          <th class="size-th">FECHA/HORA</th>
+          <th class="size-th">BODEGA</th>
+          <th class="size-th">CLASE/NÚMERO</th>
+          <th class="size-th">NOMBRES</th>
+          <th class="size-th">VALOR</th>
+          <th class="size-th">DESTINATARIO</th>
+          <th class="size-th">TRANSFERIDO</th>
+          <th class="size-th">OPCIONES</th>
+          <th class="size-th">TIPO</th>
+        </tr>
+      </thead>
+      <body>`;
+
+    if (TemporalesHistoria == 'N') {
+      console.log("N");
+      const data = await enviarPeticion({op: "S_GESTION_PEDIDOS", ...dataPeticion});
+      if (data.length) {
+        data.forEach(item => {
+          let transfer = '';
+          let btnText = '';
+          if (item.transferido == 1) {
+            if ($.trim(item.entrega) != '0') {
+              if ($.trim(item.ot) != '0') {
+                if ($.trim(item.factura) != '0') {
+                  transfer = `
+                  <button type="button" class="btn btn-primary btn-sm" onClick="Swal.fire('Excelente', 'Pedido N° ${item.numero_sap}','success');">
+                    <span aria-hidden="true"><b>F</b></span>
                   </button>`;
-                  btnText = 'E';
+                  btnText = 'F';
+                } else {
+                  transfer = `
+                  <button type="button" class="btn btn-info btn-sm" onClick="Swal.fire('Excelente', 'Pedido N° ${item.numero_sap}','success');">
+                    <span aria-hidden="true"><b>O</b></span>
+                  </button>`;
+                  btnText = 'O';
                 }
               } else {
-                if ($.trim(data[i].sol_desbloqueo) != '' /* && data[i].sol_desbloqueo!='3'*/) {
-                  estado_sol_des = "";
-
-                  switch (data[i].sol_desbloqueo) {
-                    case "0":
-                      estado_sol_des = '<i class="fa-solid fa-lock text-warning" title="Solicitud enviada"></i>';
-                      break;
-                    case "1":
-                      estado_sol_des = '<i class="fa-solid fa-lock text-info"  title="Solicitud en revision"></i>';
-                      break;
-                    case "2":
-                      estado_sol_des = '<i class="fa-solid fa-lock text-danger"  title="Solicitud rechazada"></i>';
-                      break;
-                    case "3":
-                      estado_sol_des = '<i class="fa-solid fa-circle-check text-success fa-bea"  title="Solicitud aprobada"></i>';
-                      break;
-                  }
-                  transfer += `<button onclick="MostrarEstadoSolDesbloqueo(${data[i].numero_sap})" class="btn btn-default">${estado_sol_des}</button>`;
-                  btnText = ''
-                } else {
-                  transfer = `<button type="button" class="btn btn-warning btn-sm" onClick="Swal.fire('Excelente', 'Pedido N° ${data[i].numero_sap}','success');">
-                    <span aria-hidden="true"><b>P</b></span>
-                  </button>`;
-                  btnText = 'P';
-                }
+                transfer = `
+                <button type="button" class="btn btn-success btn-sm" onClick="Swal.fire('Excelente', 'Pedido N° ${item.numero_sap}','success');">
+                  <span aria-hidden="true"><b>E</b></span>
+                </button>`;
+                btnText = 'E';
               }
             } else {
-              transfer = `<button type="button" class="btn btn-danger btn-sm" onClick="Swal.fire('Oops', 'Pendiente por transferir', 'error');">
-                <span aria-hidden="true"><b>T</b></span>
-              </button>`;
-              btnText = 'T';
+              if ($.trim(item.sol_desbloqueo) != '') {
+                let estado_sol_des = "";
+                switch (item.sol_desbloqueo) {
+                  case "0":
+                    estado_sol_des = '<i class="fa-solid fa-lock text-warning" title="Solicitud enviada"></i>';
+                    break;
+                  case "1":
+                    estado_sol_des = '<i class="fa-solid fa-lock text-info"  title="Solicitud en revision"></i>';
+                    break;
+                  case "2":
+                    estado_sol_des = '<i class="fa-solid fa-lock text-danger"  title="Solicitud rechazada"></i>';
+                    break;
+                  case "3":
+                    estado_sol_des = '<i class="fa-solid fa-circle-check text-success fa-bea"  title="Solicitud aprobada"></i>';
+                    break;
+                }
+                transfer += `
+                <button onclick="MostrarEstadoSolDesbloqueo(${item.numero_sap})" class="btn btn-default">
+                  ${estado_sol_des}
+                </button>`;
+                btnText = ''
+              } else {
+                transfer = `
+                <button type="button" class="btn btn-warning btn-sm" onClick="Swal.fire('Excelente', 'Pedido N° ${item.numero_sap}','success');">
+                  <span aria-hidden="true"><b>P</b></span>
+                </button>`;
+                btnText = 'P';
+              }
             }
+          } else {
+            transfer = `
+            <button type="button" class="btn btn-danger btn-sm" onClick="Swal.fire('Oops', 'Pendiente por transferir', 'error');">
+              <span aria-hidden="true"><b>T</b></span>
+            </button>`;
+            btnText = 'T';
+          }
 
-            data[i].cliente = data[i].cliente.replace(/'/g, '');
-            data[i].cliente = data[i].cliente.replace(/"/g, '');
+          item.cliente = item.cliente.replace(/'/g, '');
+          item.cliente = item.cliente.replace(/"/g, '');
 
-            tabla += `<tr>
-              <td>${data[i].fecha_pedido}</td>
-              <td>${data[i].bodega}</td>
-              <td>${data[i].clase} - ${data[i].numero_sap}</td>
-              <td>
-                 <P>${data[i].cliente}</P>
-                  <small style="font-weight: bold">Zona ventas: <span class="text-primary">${data[i].zona_ventas} - ${data[i].zona_descripcion}</span></small>
-              </td>
-              <td>${formatNum(data[i].valor_total, '$')}</td>
-              <td>${data[i].destinatario}</td>
-              <td align="center" width="4%">${transfer}</td>
-              <td align="center" width="4%">
-              <button type="button" class="btn btn-default btn-sm" onClick="AbrirOpciones('${$.trim(data[i].numero)}',
-              '${$.trim(data[i].valor_total)}',
-              '${$.trim(data[i].codigo_direccion)}',
-              '${$.trim(data[i].direccion)}',
-              '${$.trim(data[i].oficina_ventas)}',
-              '${$.trim(data[i].codigo_sap)}',
-              '${$.trim(data[i].transferido)}',
-              '${$.trim(data[i].entrega)}',
-              '${$.trim(data[i].ot)}',
-              '${$.trim(data[i].numero_sap)}',
-              '${$.trim(data[i].factura)}',
-              'T',
-              '${$.trim(data[i].notas)}',
-              '${$.trim(data[i].usuario)}',
-              '${$.trim(data[i].destinatario)}',
-              '${$.trim(data[i].cliente)}');"
-              title="Menu de opciones">
-              <span class="glyphicon glyphicon-th" aria-hidden="true"></span>
+          headerTabla += `
+          <tr>
+            <td class="size-td">${item.fecha_pedido}</td>
+            <td class="size-td">${item.bodega}</td>
+            <td class="size-td">${item.clase} - ${item.numero_sap}</td>
+            <td class="size-td">
+                <p style="margin: 0;">${item.cliente}</p>
+                <small style="font-weight: bold;">Zona ventas: 
+                  <span class="text-primary" style="font-size: 8px;">${item.zona_ventas} - ${item.zona_descripcion}</span>
+                </small>
+            </td>
+            <td class="size-td">${formatNum(item.valor_total, '$')}</td>
+            <td class="size-td">${item.destinatario}</td>
+            <td align="center" width="4%">${transfer}</td>
+            <td align="center" width="4%">
+              <button type="button" class="btn btn-outline-primary btn-sm" style="font-weight: bolder; font-size: 15px;" onClick="AbrirOpciones('${$.trim(item.numero)}', '${$.trim(item.valor_total)}', '${$.trim(item.codigo_direccion)}', '${$.trim(item.direccion)}', '${$.trim(item.oficina_ventas)}', '${$.trim(item.codigo_sap)}', '${$.trim(item.transferido)}', '${$.trim(item.entrega)}', '${$.trim(item.ot)}', '${$.trim(item.numero_sap)}', '${$.trim(item.factura)}', 'T', '${$.trim(item.notas)}', '${$.trim(item.usuario)}', '${$.trim(item.destinatario)}', '${$.trim(item.cliente)}');" title="Menu de opciones">
+                <i class="fa-solid fa-bars"></i>
               </button>
-              </td>
-              <td>${btnText}</td>
-              </tr>`;
+            </td>
+            <td>${btnText}</td>
+          </tr>`;
 
-            cont++;
-            total += parseFloat(data[i].valor_total);
-          }
-          tabla += `</tbody>
-              </table>`;
-          $("#VtotalTerceros").html(`<div class="alert alert-info" role="info"><b>VALOR TOTAL: ${formatNum(total, '$')}</b></div>`);
-          $("#DvRecuperablesTerceros").html(tabla);
-          $('#tableRescueTerceros').footable();
-        } else {
-          $("#VtotalTerceros").html('');
-          $("#DvRecuperablesTerceros").html(`<div class="alert alert-danger" role="alert">
-
-            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-            <span class="sr-only">Error:</span>NO EXISTEN RESULTADOS PARA LAS CONDICIONES SELECCIONADAS
-          </div>`);
-        }
+          cont++;
+          total += parseFloat(item.valor_total);
+        });
+        headerTabla += `</tbody></table>`;
+        $("#VtotalTerceros").html(`<div class="alert alert-info" role="info"><b>VALOR TOTAL: ${formatNum(total, '$')}</b></div>`);
+        $("#DvRecuperablesTerceros").html(headerTabla);
+      } else {
+        $("#VtotalTerceros").html('');
+        let msgHtml = `
+        <div class="alert alert-danger" role="alert">
+          <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+          <span class="sr-only">Error:</span>NO EXISTEN RESULTADOS PARA LAS CONDICIONES SELECCIONADAS
+        </div>`;
+        $("#DvRecuperablesTerceros").html(msgHtml);
       }
-    }).done(function () {
-      UnloadImg();
-    }).fail(function (data) {
-      console.error(data);
-      UnloadImg();
-      Swal.fire("Oops..!", data, "error");
-    });
-  } else {
-    //Busqueda y recuperacion de pedidos historicos
-    $.ajax({
-      type: "POST",
-      encoding: "UTF-8",
-      url: "../models/PW-SAP.php",
-      global: false,
-      error: function (OBJ, ERROR, JQERROR) {
-        alert(JQERROR);
-      },
-      beforeSend: function () {
-        LoadImg('CARGANDO...');
-      },
-      data: ({
-        op: "S_GESTION_PEDIDOS_HISTORIA",
-        zona: $.trim($("#txtZonas").val()),
-        codigo: $.trim($("#txtCodigoSAP").val()),
-        fh1: $.trim($("#txtFecha1").val()),
-        fh2: $.trim($("#txtFecha2").val()),
-        clase: $.trim($("#txtClasePedido").val()),
-        oficina: $.trim($("#FiltroOficinaVentas").val())
-      }),
-      dataType: "json",
-      async: true,
-      success: function (data) {
-        if (data.length) {
-          let tabla = `<table class="table" align="center" id="tableRescueTercerosHistoria">
-            <thead>
-              <tr>
-                <th>Fecha/Hora</th>
-                <th data-breakpoints="xs">Bodega</th>
-                <th data-breakpoints="xs">Clase/Numero</th>
-                <th>Nombres</th>
-                <th data-breakpoints="xs">Valor</th>
-                <th data-breakpoints="xs">Destinatario</th>
-                <th data-breakpoints="xs">Transferido</th>
-                <th data-breakpoints="xs">Recuperar</th>
-                <th data-breakpoints="xs">Tipo</th>
-                </tr>
-            </thead>
-            <body>`;
+    } else {
+      console.log("V");
+      const data = await enviarPeticion({op: "S_GESTION_PEDIDOS_HISTORIA", ...dataPeticion});
+      if (data.length) {
+        data.forEach(item => {
+          headerTabla += `
+          <tr>
+            <td class="size-td">${item.fecha_pedido}</td>
+            <td class="size-td">${item.bodega}</td>
+            <td class="size-td">${item.clase} ' - ' ${item.numero}</td>
+            <td class="size-td">${item.cliente}</td>
+            <td class="size-td">${formatNum(item.valor_total, '$')}</td>
+            <td class="size-td">${item.destinatario}</td>
+            <td class="size-td" align="center" width="4%">
+              <button type="button" class="btn btn-danger btn-sm">
+                <span class="glyphicon glyphicon-time" aria-hidden="true"></span>
+              </button>
+            </td>
+            <td align="center" width="4%">
+              <button type="button" class="btn btn-default btn-sm" onClick="RecuperarHistorico(${$.trim(item.numero)})">
+                <span class="glyphicon glyphicon-transfer" aria-hidden="true"></span>
+              </button>
+            </td>
+            <td>T</td>
+          </tr>`;
 
-          let cont = 0;
-          let total = 0;
-          let usr = '';
-          let visualizar = '';
-          for (let i = 0; i <= data.length - 1; i++) {
-            tabla += `<tr>
-                        <td>${data[i].fecha_pedido}</td>
-                        <td>${data[i].bodega}</td>
-                        <td>${data[i].clase} ' - ' ${data[i].numero}</td>
-                        <td>${data[i].cliente}</td>
-                        <td>${formatNum(data[i].valor_total, '$')}</td>
-                        <td>${data[i].destinatario}</td>
-                        <td align="center" width="4%">
-                          <button type="button" class="btn btn-danger btn-sm">
-                            <span class="glyphicon glyphicon-time" aria-hidden="true"></span>
-                          </button>
-                        </td>
-                        <td align="center" width="4%">
-                          <button type="button" class="btn btn-default btn-sm" onClick="RecuperarHistorico(${$.trim(data[i].numero)})">
-                            <span class="glyphicon glyphicon-transfer" aria-hidden="true"></span>
-                          </button>
-                        </td>
-                        <td>T</td>
-                      </tr>`;
-
-            cont++;
-            total += parseFloat(data[i].valor_total);
-          }
-          tabla += `</tbody>
-              </table>`;
-          $("#VtotalTerceros").html(`<div class="alert alert-info" role="info"><b>VALOR TOTAL: ${formatNum(total, '$')}</b></div>`);
-          $("#DvRecuperablesTerceros").html(tabla);
-          $('#tableRescueTerceros').footable();
-        } else {
-          $("#VtotalTerceros").html('');
-          $("#DvRecuperablesTerceros").html(`<div class="alert alert-danger" role="alert">
-            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-            <span class="sr-only">Error:</span>NO EXISTEN RESULTADOS PARA LAS CONDICIONES SELECCIONADAS
-          </div>`);
-        }
+          cont++;
+          total += parseFloat(item.valor_total);
+        });
+        headerTabla += `</tbody></table>`;
+        $("#VtotalTerceros").html(`<div class="alert alert-info" role="info"><b>VALOR TOTAL: ${formatNum(total, '$')}</b></div>`);
+        $("#DvRecuperablesTerceros").html(headerTabla);
+      } else {
+         $("#VtotalTerceros").html('');
+         let msgHtml = `
+         <div class="alert alert-danger" role="alert">
+          <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+          <span class="sr-only">Error:</span>NO EXISTEN RESULTADOS PARA LAS CONDICIONES SELECCIONADAS
+         </div>`
+        $("#DvRecuperablesTerceros").html(msgHtml);
       }
-    }).done(function () {
-      UnloadImg();
+    }
+
+    $('#tableRescueTerceros').DataTable({
+      paging: false,
+      searching: false,
+      ordering: true,
+      info: false,
+      responsive: true,
+      scrollX: true,
+      columnDefs: [
+        { targets: [8], orderable: false }
+      ],
+      language: {
+        zeroRecords: "No se encontraron registros",
+        infoEmpty: "No hay registros disponibles"
+      }
     });
+
+  } catch (error) {
+    console.log(error);
+  } finally {
+    UnloadImg();
   }
 }
 
@@ -5476,412 +4458,6 @@ function NumeroSAP(numTMP) {
   return result;
 }
 
-/*
-function top10_materiales(){
-  var ano  = new Date().getFullYear();
-  var mes  = new Date().getMonth()+1;
-  var pluginArrayArg = new Array();
-  var jsonArray = '';
-	
-  $.ajax({ 
-    type: "POST",
-    url: "../models/PW-SAP.php",
-    beforeSend: function(){
-    },
-    data : ({
-      op  : 'B_TOP20_MATERIALES',
-      cod : $("#txt_codigoSap").val(),
-      org : $("#Organizacion").val(),
-      ano : ano,
-      mes : mes
-    }),
-    dataType: "json",
-    async:false,
-    success: function(data){ console.log(data);
-         //console.log(data);
-          
-        for(var i=0; i<=data.length-1; i++){
-         var dato = new Object();
-           dato.name = '('+data[i].codigo_material+') '+data[i].descripcion;
-           dato.y    = Math.round(data[i].frecuencia);
-           pluginArrayArg.push(dato);
-        }
-        jsonArray = JSON.parse(JSON.stringify(pluginArrayArg));
-    }
-  }).fail(function(data){
-    console.error(data)
-  });
-   // Create the chart
-	
-  if(pluginArrayArg.length>0){
-  	
-    Highcharts.chart('container2', {
-      chart: {
-        type: 'column'
-      },
-      title: {
-        text: 'TOP 10 DE PRODUCTOS MAS COMPRADOS'
-      },
-      subtitle: {
-        text: 'Frecuencia de compra : '+ano
-      },
-      accessibility: {
-        announceNewData: {
-          enabled: true
-        }
-      },
-      xAxis: {
-        type: 'category'
-      },
-      yAxis: {
-        title: {
-          text: 'Frecuencia de compra'
-        }
-
-      },
-      legend: {
-        enabled: false
-      },
-      plotOptions: {
-        series: {
-          borderWidth: 0,
-          dataLabels: {
-            enabled: true,
-            format: '{point.y:f}'
-          }
-        }
-      },
-
-      tooltip: {
-        headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
-        pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:f}</b> <br/>'
-      },
-
-      series: [
-        {
-          name: "Browsers",
-          colorByPoint: true,
-          data: jsonArray
-        }
-      ]
-
-    });	   
-  }else{
-  	
-    $("#container2").html('<h4>TOP 10 DE PRODUCTOS MAS COMPRADOS</h4><br><div class="alert alert-danger">Sin resultados!</div>');
-  	
-  }
-
-}*/
-
-
-/*
-
-function Comportamiento(){
-var datos     = new Array();
-var datos_ant = new Array();
-var ano       = new Date().getFullYear();
-var mes       = new Date().getMonth()+1;
-var ano_ant   = new Date().getFullYear()-1;
-$.ajax({ 
-    type: "POST",
-    url: "../models/PW-SAP.php",
-    beforeSend: function(){
-    },
-    data : ({
-      op  : 'B_FACTURACION_MES',
-      cod : $("#txt_codigoSap").val(),
-      org : $("#Organizacion").val(),
-      ano : ano,
-      mes : mes
-    }),
-    dataType: "json",
-    async:false,
-    success: function(data){ console.log({'Comportamiento':data});
-      for(var i=0; i<=data.length-1; i++){
-        switch(mes){
-        case 1:{  datos.push(parseFloat(data[i].Ene));
-          }break
-        case 2:{  datos.push(parseFloat(data[i].Ene));
-                    datos.push(parseFloat(data[i].Feb));
-        }break
-        case 3:{  datos.push(parseFloat(data[i].Ene));
-              datos.push(parseFloat(data[i].Feb));
-              datos.push(parseFloat(data[i].Mar));
-        }break
-        case 4:{  datos.push(parseFloat(data[i].Ene));
-              datos.push(parseFloat(data[i].Feb));
-              datos.push(parseFloat(data[i].Mar));
-              datos.push(parseFloat(data[i].Abr));
-        }break
-        case 5:{  datos.push(parseFloat(data[i].Ene));
-              datos.push(parseFloat(data[i].Feb));
-              datos.push(parseFloat(data[i].Mar));
-              datos.push(parseFloat(data[i].Abr));
-              datos.push(parseFloat(data[i].May));
-        }break
-        case 6:{  datos.push(parseFloat(data[i].Ene));
-              datos.push(parseFloat(data[i].Feb));
-              datos.push(parseFloat(data[i].Mar));
-              datos.push(parseFloat(data[i].Abr));
-              datos.push(parseFloat(data[i].May));
-              datos.push(parseFloat(data[i].Jun));
-        }break
-        case 7:{  datos.push(parseFloat(data[i].Ene));
-              datos.push(parseFloat(data[i].Feb));
-              datos.push(parseFloat(data[i].Mar));
-              datos.push(parseFloat(data[i].Abr));
-              datos.push(parseFloat(data[i].May));
-              datos.push(parseFloat(data[i].Jun));
-              datos.push(parseFloat(data[i].Jul));
-        }break
-        case 8:{  datos.push(parseFloat(data[i].Ene));
-              datos.push(parseFloat(data[i].Feb));
-              datos.push(parseFloat(data[i].Mar));
-              datos.push(parseFloat(data[i].Abr));
-              datos.push(parseFloat(data[i].May));
-              datos.push(parseFloat(data[i].Jun));
-              datos.push(parseFloat(data[i].Jul));
-              datos.push(parseFloat(data[i].Ago));
-        }break
-        case 9:{  datos.push(parseFloat(data[i].Ene));
-              datos.push(parseFloat(data[i].Feb));
-              datos.push(parseFloat(data[i].Mar));
-              datos.push(parseFloat(data[i].Abr));
-              datos.push(parseFloat(data[i].May));
-              datos.push(parseFloat(data[i].Jun));
-              datos.push(parseFloat(data[i].Jul));
-              datos.push(parseFloat(data[i].Ago));
-              datos.push(parseFloat(data[i].Sep));
-          }break
-        case 10:{ datos.push(parseFloat(data[i].Ene));
-              datos.push(parseFloat(data[i].Feb));
-              datos.push(parseFloat(data[i].Mar));
-              datos.push(parseFloat(data[i].Abr));
-              datos.push(parseFloat(data[i].May));
-              datos.push(parseFloat(data[i].Jun));
-              datos.push(parseFloat(data[i].Jul));
-              datos.push(parseFloat(data[i].Ago));
-              datos.push(parseFloat(data[i].Sep));
-              datos.push(parseFloat(data[i].Oct));
-          }break
-        case 11:{ datos.push(parseFloat(data[i].Ene));
-              datos.push(parseFloat(data[i].Feb));
-              datos.push(parseFloat(data[i].Mar));
-              datos.push(parseFloat(data[i].Abr));
-              datos.push(parseFloat(data[i].May));
-              datos.push(parseFloat(data[i].Jun));
-              datos.push(parseFloat(data[i].Jul));
-              datos.push(parseFloat(data[i].Ago));
-              datos.push(parseFloat(data[i].Sep));
-              datos.push(parseFloat(data[i].Oct));
-              datos.push(parseFloat(data[i].Nov));
-          }break
-        case 12:{ datos.push(parseFloat(data[i].Ene));
-              datos.push(parseFloat(data[i].Feb));
-              datos.push(parseFloat(data[i].Mar));
-              datos.push(parseFloat(data[i].Abr));
-              datos.push(parseFloat(data[i].May));
-              datos.push(parseFloat(data[i].Jun));
-              datos.push(parseFloat(data[i].Jul));
-              datos.push(parseFloat(data[i].Ago));
-              datos.push(parseFloat(data[i].Sep));
-              datos.push(parseFloat(data[i].Oct));
-              datos.push(parseFloat(data[i].Nov));
-              datos.push(parseFloat(data[i].Dic));
-         }break
-      }
-      }
-      JSON.parse(JSON.stringify(datos));
-    	
-    }
- }).fail(function(data){
-   console.error(data);
- });
-	
- $.ajax({ 
-    type: "POST",
-    url: "../models/PW-SAP.php",
-    beforeSend: function(){
-    },
-    data : ({
-      op  : 'B_FACTURACION_MES',
-      cod : $("#txt_codigoSap").val(),
-      org : $("#Organizacion").val(),
-      ano : ano_ant,
-      mes : mes
-    }),
-    dataType: "json",
-    async:false,
-    success: function(data){ 
-      console.log({data});
-      for(var i=0; i<=data.length-1; i++){
-       switch(mes){
-        case 1:{  datos_ant.push(parseFloat(data[i].Ene));
-          }break
-        case 2:{  datos_ant.push(parseFloat(data[i].Ene));
-                    datos_ant.push(parseFloat(data[i].Feb));
-        }break
-        case 3:{  datos_ant.push(parseFloat(data[i].Ene));
-              datos_ant.push(parseFloat(data[i].Feb));
-              datos_ant.push(parseFloat(data[i].Mar));
-        }break
-        case 4:{  datos_ant.push(parseFloat(data[i].Ene));
-              datos_ant.push(parseFloat(data[i].Feb));
-              datos_ant.push(parseFloat(data[i].Mar));
-              datos_ant.push(parseFloat(data[i].Abr));
-        }break
-        case 5:{  datos_ant.push(parseFloat(data[i].Ene));
-              datos_ant.push(parseFloat(data[i].Feb));
-              datos_ant.push(parseFloat(data[i].Mar));
-              datos_ant.push(parseFloat(data[i].Abr));
-              datos_ant.push(parseFloat(data[i].May));
-        }break
-        case 6:{  datos_ant.push(parseFloat(data[i].Ene));
-              datos_ant.push(parseFloat(data[i].Feb));
-              datos_ant.push(parseFloat(data[i].Mar));
-              datos_ant.push(parseFloat(data[i].Abr));
-              datos_ant.push(parseFloat(data[i].May));
-              datos_ant.push(parseFloat(data[i].Jun));
-        }break
-        case 7:{  datos_ant.push(parseFloat(data[i].Ene));
-              datos_ant.push(parseFloat(data[i].Feb));
-              datos_ant.push(parseFloat(data[i].Mar));
-              datos_ant.push(parseFloat(data[i].Abr));
-              datos_ant.push(parseFloat(data[i].May));
-              datos_ant.push(parseFloat(data[i].Jun));
-              datos_ant.push(parseFloat(data[i].Jul));
-        }break
-        case 8:{  datos_ant.push(parseFloat(data[i].Ene));
-              datos_ant.push(parseFloat(data[i].Feb));
-              datos_ant.push(parseFloat(data[i].Mar));
-              datos_ant.push(parseFloat(data[i].Abr));
-              datos_ant.push(parseFloat(data[i].May));
-              datos_ant.push(parseFloat(data[i].Jun));
-              datos_ant.push(parseFloat(data[i].Jul));
-              datos_ant.push(parseFloat(data[i].Ago));
-        }break
-        case 9:{  datos_ant.push(parseFloat(data[i].Ene));
-              datos_ant.push(parseFloat(data[i].Feb));
-              datos_ant.push(parseFloat(data[i].Mar));
-              datos_ant.push(parseFloat(data[i].Abr));
-              datos_ant.push(parseFloat(data[i].May));
-              datos_ant.push(parseFloat(data[i].Jun));
-              datos_ant.push(parseFloat(data[i].Jul));
-              datos_ant.push(parseFloat(data[i].Ago));
-              datos_ant.push(parseFloat(data[i].Sep));
-          }break
-        case 10:{ datos_ant.push(parseFloat(data[i].Ene));
-              datos_ant.push(parseFloat(data[i].Feb));
-              datos_ant.push(parseFloat(data[i].Mar));
-              datos_ant.push(parseFloat(data[i].Abr));
-              datos_ant.push(parseFloat(data[i].May));
-              datos_ant.push(parseFloat(data[i].Jun));
-              datos_ant.push(parseFloat(data[i].Jul));
-              datos_ant.push(parseFloat(data[i].Ago));
-              datos_ant.push(parseFloat(data[i].Sep));
-              datos_ant.push(parseFloat(data[i].Oct));
-          }break
-        case 11:{ datos_ant.push(parseFloat(data[i].Ene));
-              datos_ant.push(parseFloat(data[i].Feb));
-              datos_ant.push(parseFloat(data[i].Mar));
-              datos_ant.push(parseFloat(data[i].Abr));
-              datos_ant.push(parseFloat(data[i].May));
-              datos_ant.push(parseFloat(data[i].Jun));
-              datos_ant.push(parseFloat(data[i].Jul));
-              datos_ant.push(parseFloat(data[i].Ago));
-              datos_ant.push(parseFloat(data[i].Sep));
-              datos_ant.push(parseFloat(data[i].Oct));
-              datos_ant.push(parseFloat(data[i].Nov));
-          }break
-        case 12:{ datos_ant.push(parseFloat(data[i].Ene));
-              datos_ant.push(parseFloat(data[i].Feb));
-              datos_ant.push(parseFloat(data[i].Mar));
-              datos_ant.push(parseFloat(data[i].Abr));
-              datos_ant.push(parseFloat(data[i].May));
-              datos_ant.push(parseFloat(data[i].Jun));
-              datos_ant.push(parseFloat(data[i].Jul));
-              datos_ant.push(parseFloat(data[i].Ago));
-              datos_ant.push(parseFloat(data[i].Sep));
-              datos_ant.push(parseFloat(data[i].Oct));
-              datos_ant.push(parseFloat(data[i].Nov));
-              datos_ant.push(parseFloat(data[i].Dic));
-         }break
-       }
-      }
-      JSON.parse(JSON.stringify(datos_ant));
-
-	
-    }
- }).fail(function(data){
-   console.error(data);
- });
-   
-  if(datos.length>0){
-
-    Highcharts.chart('container', {
-      chart: {
-      type: 'spline'
-      },
-      title: {
-      text: 'COMPORTAMIENTO DE VENTAS AÑO '+ano_ant+' - '+ano
-      },
-      subtitle: {
-      text: ''
-      },
-      xAxis: {
-      categories: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun','Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
-      },
-      yAxis: {
-      title: {
-        text: 'Ventas'
-      },
-      labels: {
-        formatter: function () {
-        return formatNum(this.value,'$');
-        }
-      }
-      },
-      tooltip: {
-      crosshairs: true,
-      shared: true
-      },
-      plotOptions: {
-      spline: {
-        marker: {
-        radius: 4,
-        lineColor: '#666666',
-        lineWidth: 1
-        }
-      }
-      },
-      series: [
-         {
-          name: ano,
-          marker: {
-            symbol: 'square'
-          },
-          data: datos
-
-          }, 
-         {
-          name: ano_ant,
-          marker: {
-            symbol: 'diamond'
-          },
-          data: datos_ant
-          }
-        ]
-    });		
-  	
-     
-  }else{
-    $("#container").html('<h4>COMPORTAMIENTO DE VENTAS AÑO '+ano_ant+' - '+ano+'</h4><div class="alert alert-danger">Sin resultados!</div>')
-  }
-
-}
-*/
-
 function datos_cupo() {
 
   return new Promise((resolve, reject) => {
@@ -5903,7 +4479,6 @@ function datos_cupo() {
     });
   });
 }
-
 
 function top10_materiales() {
 
@@ -6634,307 +5209,119 @@ const crearEntregaRedencionSAP = async (numero) => {
   }
   return numEntregaSAP;
 }
-
-function Cartera_edades() {
-  $.ajax({
-    type: "POST",
-    encoding: "UTF-8",
-    url: "../models/PW-SAP.php",
-    dataType: "json",
-    error: function (OBJ, ERROR, JQERROR) {
-      alert(JQERROR);
-    },
-    data: {
+// FUNCIÓN OBTENER CARTERA EDADES
+const crearCard = (titulo, valor) => `
+  <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2">
+    <div class="panel panel-default custom-card shadow-sm">
+      <div class="panel-body" style="padding: 5px;">
+        <h5 style="font-size: 12px; margin: 0 0 5px 0;">${titulo}</h5>
+        <p style="font-size: 12px; margin: 0;">${valor}</p>
+      </div>
+    </div>
+  </div>`;
+// FUNCIÓN OBTENER CARTERA EDADES
+const Cartera_edades = async () => {
+  try {
+    const resp = await enviarPeticion({
       op: "Cartera_edades",
+      link: "../models/PW-SAP.php",
       org: $("#Organizacion").val(),
       codigo_sap: $("#txt_codigoSap").val()
-    },
-    async: true,
-    success: function (resp) {
-      let cardHtml = `
+    });
+
+    const data = resp.length > 0 ? resp[0] : {
+      C_SIN_VENCER: 0,
+      C_1_30: 0,
+      C_31_60: 0,
+      C_61_90: 0,
+      C_91_120: 0,
+      C_120: 0
+    };
+
+    const edades = [
+      ["SIN VENCER", "C_SIN_VENCER"],
+      ["1-30 DÍAS", "C_1_30"],
+      ["31-60 DÍAS", "C_31_60"],
+      ["61-90 DÍAS", "C_61_90"],
+      ["91-120 DÍAS", "C_91_120"],
+      ["+120 DÍAS", "C_120"]
+    ];
+
+    let cardHtml = `
       <div class="panel panel-info">
         <div class="panel-heading">
-          <h3 class="panel-title custom-thead" style="font-size: 14px;  font-weight: bold;">CARTERA EDADES</h3>
+          <h3 class="panel-title custom-thead" style="font-size: 14px; font-weight: bold;">CARTERA EDADES</h3>
         </div>
         <div class="panel-body" style="padding: 5px;">
           <div class="row">`;
 
-      // Definir valores por defecto (0) si no hay respuesta
-      const data = resp.length > 0 ? resp[0] : {
-        C_SIN_VENCER: 0,
-        C_1_30: 0,
-        C_31_60: 0,
-        C_61_90: 0,
-        C_91_120: 0,
-        C_120: 0
-      };
+    edades.forEach(([label, key]) => {
+      const valor = formatNum(data[key], '$');
+      cardHtml += crearCard(label, valor);
+    });
 
-      cardHtml += `
-            <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2" >
-              <div class="panel panel-default custom-card shadow-sm">
-                <div class="panel-body" style="padding: 5px;">
-                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">SIN VENCER</h5>
-                  <p style="font-size: 12px; margin: 0;">${formatNum(data.C_SIN_VENCER, '$')}</p>
-                </div>
-              </div>
-            </div>
-            <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2" >
-              <div class="panel panel-default custom-card shadow-sm">
-                <div class="panel-body" style="padding: 5px;">
-                  <h5 style="font-size: 12px; margin: 0 0 5px 0; ">1-30 DÍAS</h5>
-                  <p style="font-size: 12px; margin: 0;">${formatNum(data.C_1_30, '$')}</p>
-                </div>
-              </div>
-            </div>
-            <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2">
-              <div class="panel panel-default custom-card shadow-sm">
-                <div class="panel-body" style="padding: 5px;">
-                  <h5 style="font-size: 12px; margin: 0 0 5px 0; ">31-60 DÍAS</h5>
-                  <p style="font-size: 12px; margin: 0;">${formatNum(data.C_31_60, '$')}</p>
-                </div>
-              </div>
-            </div>
-            <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2">
-              <div class="panel panel-default custom-card shadow-sm">
-                <div class="panel-body" style="padding: 5px;">
-                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">61-90 DÍAS</h5>
-                  <p style="font-size: 12px; margin: 0;">${formatNum(data.C_61_90, '$')}</p>
-                </div>
-              </div>
-            </div>
-            <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2">
-              <div class="panel panel-default custom-card shadow-sm">
-                <div class="panel-body" style="padding: 5px;">
-                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">91-120 DÍAS</h5>
-                  <p style="font-size: 12px; margin: 0;">${formatNum(data.C_91_120, '$')}</p>
-                </div>
-              </div>
-            </div>
-            <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2">
-              <div class="panel panel-default custom-card shadow-sm">
-                <div class="panel-body" style="padding: 5px;">
-                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">+120 DÍAS</h5>
-                  <p style="font-size: 12px; margin: 0;">${formatNum(data.C_120, '$')}</p>
-                </div>
-              </div>
-            </div>`;
+    cardHtml += `</div></div></div>`;
+    $("#cartera_edades").html(cardHtml);
 
-      cardHtml += `</div></div></div>`;
-      $("#cartera_edades").html(cardHtml);
-    }
-  });
-}
-
-function Presupuesto_datos() {
-  $.ajax({
-    type: "POST",
-    encoding: "UTF-8",
-    url: "../models/PW-SAP.php",
-    dataType: "json",
-    error: function (OBJ, ERROR, JQERROR) {
-      alert("Error: " + JQERROR);
-    },
-    data: {
+  } catch (error) {
+    console.log(error);
+  }
+};
+// FUNCIÓN OBTENER PRESUPUESTO DATOS
+const crearCardP = (titulo, valor) => `
+  <div class="col-xs-12 col-sm-6 col-md-4">
+    <div class="panel panel-default custom-card shadow-sm">
+      <div class="panel-body" style="padding: 5px;">
+        <h5 style="font-size: 12px; margin: 0 0 5px 0;">${titulo}</h5>
+        <p style="font-size: 12px; margin: 0;">${valor}</p>
+      </div>
+    </div>
+  </div>`;
+// FUNCIÓN OBTENER PRESUPUESTO DATOS
+const Presupuesto_datos = async () => {
+  try {
+    const resp = await enviarPeticion({
       op: "Presupuesto_datos",
+      link: "../models/PW-SAP.php",
       org: $("#Organizacion").val(),
       codigo_sap: $("#txt_codigoSap").val()
-    },
-    async: true,
-    success: function (resp) {
-      let cardHtml = `
+    });
+
+    const labels = [
+      ["VALOR PRESUPUESTO", "VALOR_PRESUPUESTO", true],
+      ["VALOR NETO TOTAL", "VlrNetoTotal", true],
+      ["% CUMP. PRESUPUESTO", "%CumpPpto", false, "%"],
+      ["FALTA", "Falta", true],
+      ["DEBERÍA LLEVAR", "DeberiaLlevar", true],
+      ["% D. LLEVAR", "%_D_LLV", false, "%"],
+      ["% EXCESO/DÉFICIT", "%_ExcesoODéficit", false, "%"],
+      ["PROY. VS PROM.", "ProyVsProm", true],
+      ["% PROY. VS PROM.", "%_ProyVsProm", false, "%"],
+      ["PROY. DIARIA (100%)", "ProyDiaria(100%)", true]
+    ];
+
+    let cardHtml = `
       <div class="panel panel-info">
         <div class="panel-heading">
-          <h3 class="panel-title custom-thead" style="font-size: 13px;  font-weight: bold;">DATOS DE PRESUPUESTO</h3>
+          <h3 class="panel-title custom-thead" style="font-size: 13px; font-weight: bold;">DATOS DE PRESUPUESTO</h3>
         </div>
         <div class="panel-body" style="padding: 5px;">
           <div class="row">`;
 
-      if (!resp || resp.length === 0) {
-        // Si no hay datos, mostrar valores cero
-        cardHtml += `
-            <div class="col-xs-12 col-sm-6 col-md-4">
-              <div class="panel panel-default custom-card shadow-sm">
-                <div class="panel-body" style="padding: 5px;">
-                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">VALOR PRESUPUESTO</h5>
-                  <p style="font-size: 12px; margin: 0;">${(0).toLocaleString()}</p>
-                </div>
-              </div>
-            </div>
-            <div class="col-xs-12 col-sm-6 col-md-4">
-              <div class="panel panel-default custom-card shadow-sm">
-                <div class="panel-body" style="padding: 5px;">
-                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">VALOR NETO TOTAL</h5>
-                  <p style="font-size: 12px; margin: 0;">${(0).toLocaleString()}</p>
-                </div>
-              </div>
-            </div>
-            <div class="col-xs-12 col-sm-6 col-md-4">
-              <div class="panel panel-default custom-card shadow-sm">
-                <div class="panel-body" style="padding: 5px;">
-                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">% CUMP. PRESUPUESTO</h5>
-                  <p style="font-size: 12px; margin: 0;">0.00%</p>
-                </div>
-              </div>
-            </div>
-            <div class="col-xs-12 col-sm-6 col-md-4">
-              <div class="panel panel-default custom-card shadow-sm">
-                <div class="panel-body" style="padding: 5px;">
-                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">FALTA</h5>
-                  <p style="font-size: 12px; margin: 0;">${(0).toLocaleString()}</p>
-                </div>
-              </div>
-            </div>
-            <div class="col-xs-12 col-sm-6 col-md-4">
-              <div class="panel panel-default custom-card shadow-sm">
-                <div class="panel-body" style="padding: 5px;">
-                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">DEBERÍA LLEVAR</h5>
-                  <p style="font-size: 12px; margin: 0;">${(0).toLocaleString()}</p>
-                </div>
-              </div>
-            </div>
-            <div class="col-xs-12 col-sm-6 col-md-4">
-              <div class="panel panel-default custom-card shadow-sm">
-                <div class="panel-body" style="padding: 5px;">
-                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">% D. LLEVAR</h5>
-                  <p style="font-size: 12px; margin: 0;">0.00%</p>
-                </div>
-              </div>
-            </div>
-            <div class="col-xs-12 col-sm-6 col-md-4">
-              <div class="panel panel-default custom-card shadow-sm">
-                <div class="panel-body" style="padding: 5px;">
-                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">% EXCESO/DÉFICIT</h5>
-                  <p style="font-size: 12px; margin: 0;">0.00%</p>
-                </div>
-              </div>
-            </div>
-            <div class="col-xs-12 col-sm-6 col-md-4">
-              <div class="panel panel-default custom-card shadow-sm">
-                <div class="panel-body" style="padding: 5px;">
-                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">PROY. VS PROM.</h5>
-                  <p style="font-size: 12px; margin: 0;">${(0).toLocaleString()}</p>
-                </div>
-              </div>
-            </div>
-            <div class="col-xs-12 col-sm-6 col-md-4">
-              <div class="panel panel-default custom-card shadow-sm">
-                <div class="panel-body" style="padding: 5px;">
-                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">% PROY. VS PROM.</h5>
-                  <p style="font-size: 12px; margin: 0;">0.00%</p>
-                </div>
-              </div>
-            </div>
-            <div class="col-xs-12 col-sm-6 col-md-4">
-              <div class="panel panel-default custom-card shadow-sm">
-                <div class="panel-body" style="padding: 5px;">
-                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">PROY. DIARIA (100%)</h5>
-                  <p style="font-size: 12px; margin: 0;">${(0).toLocaleString()}</p>
-                </div>
-              </div>
-            </div>`;
-      } else {
-        resp.forEach(row => {
-          // Convertir las cadenas a números, si son null o undefined, asignar 0
-          const VALOR_PRESUPUESTO = parseFloat(row.VALOR_PRESUPUESTO) || 0;
-          const VlrNetoTotal = parseFloat(row.VlrNetoTotal) || 0;
-          const porCumpPpto = parseFloat(row["%CumpPpto"]) || 0;
-          const Falta = parseFloat(row.Falta) || 0;
-          const DeberiaLlevar = parseFloat(row.DeberiaLlevar) || 0;
-          const por_D_LLV = parseFloat(row["%_D_LLV"]) || 0;
-          const por_ExcesoDeficit = parseFloat(row["%_ExcesoODéficit"]) || 0;
-          const ProyVsProm = parseFloat(row.ProyVsProm) || 0;
-          const por_ProyVsProm = parseFloat(row["%_ProyVsProm"]) || 0;
-          const ProyDiaria = parseFloat(row["ProyDiaria(100%)"]) || 0;
+    const data = resp && resp.length ? resp[0] : {};
 
-          cardHtml += `
-            <div class="col-xs-12 col-sm-6 col-md-4" >
-              <div class="panel panel-default custom-card shadow-sm">
-                <div class="panel-body" style="padding: 5px;">
-                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">VALOR PRESUPUESTO</h5>
-                  <p style="font-size: 12px; margin: 0;">${VALOR_PRESUPUESTO.toLocaleString()}</p>
-                </div>
-              </div>
-            </div>
-            <div class="col-xs-12 col-sm-6 col-md-4">
-              <div class="panel panel-default custom-card shadow-sm">
-                <div class="panel-body" style="padding: 5px;">
-                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">VALOR NETO TOTAL</h5>
-                  <p style="font-size: 12px; margin: 0;">${VlrNetoTotal.toLocaleString()}</p>
-                </div>
-              </div>
-            </div>
-            <div class="col-xs-12 col-sm-6 col-md-4">
-              <div class="panel panel-default custom-card shadow-sm">
-                <div class="panel-body" style="padding: 5px;">
-                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">% CUMP. PRESUPUESTO</h5>
-                  <p style="font-size: 12px; margin: 0;">${porCumpPpto.toFixed(2)}%</p>
-                </div>
-              </div>
-            </div>
-            <div class="col-xs-12 col-sm-6 col-md-4">
-              <div class="panel panel-default custom-card shadow-sm">
-                <div class="panel-body" style="padding: 5px;">
-                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">FALTA</h5>
-                  <p style="font-size: 12px; margin: 0;">${Falta.toLocaleString()}</p>
-                </div>
-              </div>
-            </div>
-            <div class="col-xs-12 col-sm-6 col-md-4">
-              <div class="panel panel-default custom-card shadow-sm">
-                <div class="panel-body" style="padding: 5px;">
-                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">DEBERÍA LLEVAR</h5>
-                  <p style="font-size: 12px; margin: 0;">${DeberiaLlevar.toLocaleString()}</p>
-                </div>
-              </div>
-            </div>
-            <div class="col-xs-12 col-sm-6 col-md-4">
-              <div class="panel panel-default custom-card shadow-sm">
-                <div class="panel-body" style="padding: 5px;">
-                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">% D. LLEVAR</h5>
-                  <p style="font-size: 12px; margin: 0;">${por_D_LLV.toFixed(2)}%</p>
-                </div>
-              </div>
-            </div>
-            <div class="col-xs-12 col-sm-6 col-md-4">
-              <div class="panel panel-default custom-card shadow-sm">
-                <div class="panel-body" style="padding: 5px;">
-                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">% EXCESO/DÉFICIT</h5>
-                  <p style="font-size: 12px; margin: 0;">${por_ExcesoDeficit.toFixed(2)}%</p>
-                </div>
-              </div>
-            </div>
-            <div class="col-xs-12 col-sm-6 col-md-4">
-              <div class="panel panel-default custom-card shadow-sm">
-                <div class="panel-body" style="padding: 5px;">
-                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">PROY. VS PROM.</h5>
-                  <p style="font-size: 12px; margin: 0;">${ProyVsProm.toLocaleString()}</p>
-                </div>
-              </div>
-            </div>
-            <div class="col-xs-12 col-sm-6 col-md-4">
-              <div class="panel panel-default custom-card shadow-sm">
-                <div class="panel-body" style="padding: 5px;">
-                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">% PROY. VS PROM.</h5>
-                  <p style="font-size: 12px; margin: 0;">${por_ProyVsProm.toFixed(2)}%</p>
-                </div>
-              </div>
-            </div>
-            <div class="col-xs-12 col-sm-6 col-md-4">
-              <div class="panel panel-default custom-card shadow-sm">
-                <div class="panel-body" style="padding: 5px;">
-                  <h5 style="font-size: 12px; margin: 0 0 5px 0;">PROY. DIARIA (100%)</h5>
-                  <p style="font-size: 12px; margin: 0;">${ProyDiaria.toLocaleString()}</p>
-                </div>
-              </div>
-            </div>`;
-        });
-      }
+    labels.forEach(([label, key, isNumber, suffix = ""]) => {
+      let rawValue = parseFloat(data[key]) || 0;
+      let value = isNumber ? rawValue.toLocaleString() : `${rawValue.toFixed(2)}${suffix}`;
+      cardHtml += crearCardP(label, value);
+    });
 
-      cardHtml += `</div></div></div>`;
-      $("#Presupuesto_datos").html(cardHtml);
-    }
-  });
-}
+    cardHtml += `</div></div></div>`;
+    $("#Presupuesto_datos").html(cardHtml);
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 function toggleButton(button, checkboxDivId) {
   // Alternar la clase 'btn-success' en el botón
@@ -6972,12 +5359,6 @@ function BotonOfertas(button) {
 function BotonDescuentos(button) {
   toggleButton(button, 'DvChkDctos');
 }
-
-/*function filtrarPorCodigos(objeto1, objeto2) {
-  const codigosFiltro = objeto2.map(item => item.CODIGO_MATERIAL);
-  const resultado = objeto1.filter(item => codigosFiltro.includes(item.codigo_material));
-  return resultado;
-}*/
 
 function filtrarPorCodigos(objeto1, objeto2) {
   const mapaGrupo130 = new Map(objeto2.map(item => [item.CODIGO_MATERIAL, item.GRUPO_130]));
@@ -7115,7 +5496,6 @@ async function Top_20_mas_vendidos_con_copi() {
   $tabla.append($tbody);
   $('#TablaTop20_100_130').empty().append($tabla);
 
-  // Evento click fila
   $(document).off('click', '.fila-producto').on('click', '.fila-producto', function () {
     const $fila = $(this);
     const codigoMaterial = $fila.data('codigo');
@@ -7126,6 +5506,943 @@ async function Top_20_mas_vendidos_con_copi() {
     $fila.addClass('table-active');
   });
 
-  // Mostrar modal
   $('#ModalTop20_100_130').modal('show');
 }
+
+// EJECUCIÓN DE LAS FUNCIONALIDADES AL CARGAR EL DOM
+$(function () { 
+  Permisos(); // Validacion de permisos
+  Notificaciones(); // Nuevas notificaciones emergentes - se quita porque se acabo la convencion
+  setInterval(function () {
+    Notificaciones();
+  }, 300000);
+  
+  CargaGruposClientes(1); // Nueva distribucion de grupos 
+  CargaGruposClientes(2);
+
+  OfcS = OficinasVentas('S');
+  OfcN = OficinasVentas('N');
+  $("#FiltroOficinaVentas").html(OfcS);
+  $("#FiltroOficinaVentas").change(function () {
+    GestionPedidos();
+  });
+
+  $("#txtZonas,#FiltroOficinaVentas,#txtClasePedido").select2();
+
+  // VALIDO SI EXISTE NIT PARA LOS CLIENTES
+  let DepId = $("#Dpto").val();
+  if (DepId == 10) {
+    if ($.trim($("#Nit").val()) == "") {
+      Swal.fire("Session Error", "No se logro cargar la informacion, salga del sistema e intente nuevamente!", "error");
+      setTimeout(function () {
+        parent.$("#iframe").trigger("click");
+      }, 3000);
+    } else {
+      LoadArrayCli();
+    }
+  } else {
+    LoadArrayCli();
+  }
+
+  // Tabulacion de pestañas de seleccion	
+  $("#btnProductos").click(function () {
+    VerificaPedido();
+    $("#txt_destinatario").attr('disabled', true);
+    $("#txt_oficina").attr('disabled', true);
+    $("#TxtIntegracion").attr('disabled', true);
+
+    if ($("#txt_bproductos").val() == '') {
+      $("#dvResultProductos").html('');
+    } else {
+      let n = 0;
+      if (validarSiNumero(valor) == 1) {
+        n = 1;
+      }
+      BuscarProductoArr(n);
+    }
+  });
+
+  // Eventos click 
+  $("#ContenidoPhone").html('<embed src="../../adg-phone/index.html?" frameborder="0" width="100%" height="500px">');
+  $("#btnPhone").click(function () {
+    $("#ModalPhone").modal('show');
+  });
+
+  // Refresh pedidos 
+  $("#btnMenu9").click(function () {
+    let num = $.trim($("#ped_numero").val());
+    consultaOpciones(num);
+    $.notify({
+      icon: 'glyphicon glyphicon-warning-sign',
+      title: '<strong>ACTUALIZAR INFO PEDIDO ' + num + '</strong></br>',
+      message: 'Ejecutado correctamente',
+      url: '',
+      target: '_blank'
+    }, {
+      delay: 2000,
+      type: 'success',
+      animate: {
+        enter: 'animated fadeInDown',
+        exit: 'animated fadeOutUp'
+      },
+    });
+  });
+
+  $("#exportar_gestion").click(function () {
+    Exportar('DvRecuperablesTerceros')
+  });
+
+  $("#btnMenu10").click(function () {
+    LogDatos();
+  });
+
+  $("#btnPedidos").click(function () {
+    WSInvenTotal();
+    ListarPedido();
+  });
+
+  $("#btnTemporales").click(function () {
+    Temporales();
+  });
+
+  $("#btnAddEntregas").click(function () {
+    LimpiarEntregas();
+    if ($("#link_pro").val() != '0') {
+      $('#ClienteEntregas').val($("#txt_cliente").val()).attr("disabled", true);;
+      $("#CodigoSAPEntregas").val($("#txt_codigoSap").val());
+    }
+  });
+
+  $("#btnEventos").click(function () {
+    ListarEvento();
+  });
+
+  $("#btListaFacts").click(function () {
+    LimpiarFacturas();
+    if ($("#link_pro").val() != '0') {
+      $("#txtFactCodigoCliente").val($("#txt_codigoSap").val());
+      $("#txtFactCliente").val($("#txt_cliente").val()).attr("disabled", true);
+    }
+  });
+
+  $("#btnTempTerceros").click(function () {
+    ZonasVentas();
+    LimpiarGestionPedido();
+    if ($("#link_pro").val() != '0') {
+      $("#txtCodigoSAP").val($("#txt_codigoSap").val());
+      $("#txtCliente").val($("#txt_cliente").val()).attr("disabled", true);
+    }
+  });
+
+  $("#btnMenu8").click(function () {
+    var num = $.trim($("#ped_factura").val());
+    VisualizarFactura(num);
+  });
+
+  $("#txtFecha1,#txtFecha2,#EntregasFecha1,#EntregasFecha2,#txtFactFecha1,#txtFactFecha2,#txtFaltanteFecha1,#txtFaltanteFecha2").val(FechaActual());
+  $("#txtFecha1,#txtFecha2,#EntregasFecha1,#EntregasFecha2,#txtFactFecha1,#txtFactFecha2,#txtFaltanteFecha1,#txtFaltanteFecha2").datepicker({
+    changeMonth: true,
+    changeYear: true,
+    monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+    monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+    dateFormat: 'dd-mm-yy',
+    width: 100,
+    heigth: 100
+  });
+
+  $("#dvCentros").hide();
+
+  //Busqueda de clientes para filtro de pedidos 
+  $('#txtCliente').autocomplete({
+    source: function (request, response) {
+      let Arr_cli = ArrCli;
+      valor = $.trim($("#txtCliente").val());
+      if (validarSiNumero(valor) == 1) {
+        Arr_cli = FiltrarCli(valor, Arr_cli, 1);
+      } else {
+        div_cadena = valor;
+        div_cadena = div_cadena.split(" ");
+        for (var x = 0; x < div_cadena.length; x++) {
+          expr = $.trim(div_cadena[x]);
+          Arr_cli = FiltrarCli(expr, Arr_cli, 2);
+        }
+      }
+      response(Arr_cli.slice(0, 10));
+    },
+    maxResults: 10,
+    minLength: 3,
+    search: function () { },
+    open: function (event, ui) { },
+    select: function (event, ui) {
+      $("#txtCodigoSAP").val(ui.item.codigo_sap);
+    }
+  });
+
+  $('#txtCliente').on('keyup', function () {
+    if ($(this).val() == '') {
+      $("#txtCodigoSAP").val('');
+    }
+  });
+
+  // Busqueda de clientes gestion de entregas
+  $('#ClienteEntregas').autocomplete({
+    source: function (request, response) {
+      let Arr_cli = ArrCli;
+      valor = $.trim($("#ClienteEntregas").val());
+      if (validarSiNumero(valor) == 1) {
+        Arr_cli = FiltrarCli(valor, Arr_cli, 1);
+      } else {
+        div_cadena = valor;
+
+
+        div_cadena = div_cadena.split(" ");
+        for (var x = 0; x < div_cadena.length; x++) {
+          expr = $.trim(div_cadena[x]);
+          Arr_cli = FiltrarCli(expr, Arr_cli, 2);
+        }
+      }
+      response(Arr_cli.slice(0, 10));
+    },
+    maxResults: 10,
+    minLength: 3,
+    search: function () { },
+    open: function (event, ui) { },
+    select: function (event, ui) {
+      $("#CodigoSAPEntregas").val(ui.item.codigo_sap);
+    }
+  });
+
+  $('#ClienteEntregas').on('keyup', function () {
+    if ($(this).val() == '') {
+      $("#CodigoSAPEntregas").val('');
+      $("#DvListaEntregas").html('');
+    }
+  });
+
+  // Busqueda de clientes en facturacion
+  $('#txtFactCliente').autocomplete({
+    source: function (request, response) {
+      let Arr_cli = ArrCli;
+      valor = $.trim($("#txtFactCliente").val());
+      if (validarSiNumero(valor) == 1) {
+        Arr_cli = FiltrarCli(valor, Arr_cli, 1);
+      } else {
+        div_cadena = valor;
+        div_cadena = div_cadena.split(" ");
+        for (var x = 0; x < div_cadena.length; x++) {
+          expr = $.trim(div_cadena[x]);
+          Arr_cli = FiltrarCli(expr, Arr_cli, 2);
+        }
+      }
+      response(Arr_cli.slice(0, 10));
+    },
+    maxResults: 10,
+    minLength: 3,
+    search: function () { },
+    open: function (event, ui) { },
+    select: function (event, ui) {
+      $("#txtFactCodigoCliente").val(ui.item.codigo_sap);
+    }
+  });
+
+  // Busqueda de clientes en faltantes
+  $('#txtFaltanteCliente').autocomplete({
+    source: function (request, response) {
+      let Arr_cli = ArrCli;
+      valor = $.trim($("#txtFaltanteCliente").val());
+      if (validarSiNumero(valor) == 1) {
+        Arr_cli = FiltrarCli(valor, Arr_cli, 1);
+      } else {
+        div_cadena = valor;
+        div_cadena = div_cadena.split(" ");
+        for (var x = 0; x < div_cadena.length; x++) {
+          expr = $.trim(div_cadena[x]);
+          Arr_cli = FiltrarCli(expr, Arr_cli, 2);
+        }
+      }
+      response(Arr_cli.slice(0, 10));
+    },
+    maxResults: 10,
+    minLength: 3,
+    search: function () { },
+    open: function (event, ui) { },
+    select: function (event, ui) {
+      $("#txtFaltanteCodigoCliente").val(ui.item.codigo_sap);
+    }
+  });
+
+  $('#txtFactCliente').on('keyup', function () {
+    if ($(this).val() == '') {
+      $("#txtFactCodigoCliente").val('');
+      $("#DvListaFacturas").html('');
+    }
+  });
+
+  $("#OficinaEntregas").on('change', function () {
+    GestionEntregas();
+  });
+  
+  // Busqueda o carga de cliente segun departamento
+  if (DepId == 10) {
+    $("#colCliente").html('<select id="txt_cliente" class="form-select size-text"></select>');
+
+    $("#txt_cliente").on('change', function () {
+      CargarClienteSeleccionado();
+    });
+
+    $("#tr_cliente_fact").hide();
+    $("#tr_cliente_faltante").hide();
+  } else {
+    $("#tr_cliente_fact").show();
+    $("#tr_cliente_faltante").show();
+    let inputCliente = `
+    <div class="input-group">
+      <input type="text" id="txt_cliente" class="form-control size-text" placeholder="Búsqueda de clientes" tabindex="1">
+      <span class="input-group-btn">
+      <button class="btn btn-light btn-micro" type="button" title="Búsqueda de cliente por voz" onclick="iniciarVozATexto('txt_cliente',this)">
+        <i class="fa-solid fa-microphone"></i>&nbsp;
+      </button>
+      </span>
+    </div>`;
+    $("#colCliente").html(inputCliente);
+
+    $('#txt_cliente').autocomplete({
+      source: function (request, response) {
+        Arr_cli = ArrCli;
+        valor = $.trim($("#txt_cliente").val());
+        //
+        if (validarSiNumero(valor) == 1) {
+          Arr_cli = FiltrarCli(valor, Arr_cli, 1);
+        } else {
+          div_cadena = valor;
+          div_cadena = div_cadena.split(" ");
+          for (var x = 0; x < div_cadena.length; x++) {
+            expr = $.trim(div_cadena[x]);
+            Arr_cli = FiltrarCli(expr, Arr_cli, 2);
+          }
+        }
+        response(Arr_cli.slice(0, 10));
+      },
+      maxResults: 10,
+      minLength: 3,
+      search: function () { },
+      open: function (event, ui) { },
+      select: function (event, ui) {
+        $("#TxtIntegracion").attr('disabled', true);
+        $("#txt_nit").val(ui.item.nit);
+        $("#txt_dir").val(ui.item.direccion);
+        $("#txt_tel").val(ui.item.telefonos);
+        $("#txt_mail").val(ui.item.email);
+        $("#txt_ciudad").val(ui.item.ciudad);
+        $("#txt_cupo").val(formatNum(ui.item.cupo_credito, '$'));
+        
+        $("#txt_oficina").html(OfcN);
+        $("#txt_oficina option[value='" + ui.item.bodega + "']").attr("selected", true);
+        //Validamos los permisos para cambio de bodega y activamos o desactivamos esta opcion.
+        if (Perm_Cambiar_Bodega != 'S') {
+          $("#txt_oficina").attr("disabled", true);
+        } else {
+          $("#txt_oficina").attr("disabled", false);
+        }
+        
+        $("#txt_condicion").val(ui.item.condicion_pago);
+        $("#txt_lista").val(ui.item.lista);
+        $("#txt_vendedor").val(ui.item.vendedor);
+        $("#txt_televendedor").val(ui.item.televendedor);
+        $("#txt_vendedor_tel").val(ui.item.telefono_vendedor);
+        $("#txt_televendedor_tel").val(ui.item.telefono_televendedor);
+        $("#txt_codigoSap").val(ui.item.codigo_sap);
+        $("#txt_descuento").val(ui.item.descuento_financiero);
+        $("#txt_plazo").val(ui.item.dias_pago + ' dias');
+        Destinatarios(ui.item.codigo_sap, ui.item.ciudad, ui.item.direccion);
+        Presupuesto_datos();
+        Cartera_edades();
+        if (ui.item.institucional == 1) {
+          $("#txt_institucional").val('SI');
+        } else {
+          $("#txt_institucional").val('NO');
+        }
+        if (ui.item.controlados == 1) {
+          $("#txt_controlado").val('SI');
+        } else {
+          $("#txt_controlado").val('NO');
+        }
+        $("#btnProductos").attr("disabled", false);
+        // Grupos de clientes
+        $("#txtGrp1").val(ui.item.grupo1);
+        $("#txtGrp2").val(ui.item.grupo2);
+        $("#txtGrp1,#txtGrp2").prop('disabled', true);
+        
+        CargarEvento();
+        BuscarProductos();
+      }
+    });
+  }
+
+  Limpiar();
+
+  //Filtros descuentos, bonificados y stock
+  $(".DivCheckBox").click(function () {
+    var id = $(this).attr('id');
+    if ($(this).hasClass('DivCheckBoxTrue')) {
+      $(this).removeClass('DivCheckBoxTrue');
+    } else {
+      $(this).addClass('DivCheckBoxTrue');
+    }
+    //id del div
+    id = $(this).attr("id");
+    if (id == 'DvChkKits') {
+      BuscarProductos();
+    }
+
+    //if($("#txt_bproductos").val()!=''){
+    var n = 0;
+    var sto = 0;
+    if (validarSiNumero(valor) == 1) {
+      n = 1;
+    }
+    if ($("#DvChkStock").hasClass('DivCheckBoxTrue')) {
+      sto = 1;
+    } //solo con stock
+    if (sto == 1) {
+      BuscarProductoArr(n);
+    } else {
+      if (id == 'DvChkStock') {
+        Swal.fire({
+          title: "¿Esta seguro?",
+          text: "Esta opción puede tornar lenta las búsquedas, esta seguro de continuar?",
+          icon: "question",
+          confirmButtonColor: "#82ED81",
+          cancelButtonColor: "#FFA3A4",
+          confirmButtonText: "Si,continuar",
+          cancelButtonText: "No,cancelar",
+          showLoaderOnConfirm: true,
+          showCancelButton: true,
+        }).then((result) => {
+          if (result.value) {
+            BuscarProductos();
+          } else {
+            $("#DvChkStock").addClass('DivCheckBoxTrue');
+          }
+        });
+      } else {
+        BuscarProductoArr(n);
+      }
+    }
+    // }
+  });
+  $("#txt_reg").on('change', function () {
+    if ($("#txt_bproductos").val() != '') {
+      BuscarProductoArr();
+    }
+  });
+  $("#txt_oficina").change(function () {
+    if ($("#txt_codigoSap").val() != '') {
+      BuscarProductos();
+      if ($("#txt_bproductos").val() != '') {
+        BuscarProductoArr();
+      }
+    }
+  });
+  $("#txt_orden").on('change', function () {
+    if ($("#txt_bproductos").val() != '') {
+      BuscarProductoArr();
+    }
+  });
+  CargarEvento();
+  $("#selTipos").change(function () {
+    ListarEvento();
+  });
+  //Teclas de acceso rapido
+  $(document).keyup(function (e) {
+    tecla = e.keyCode;
+    //Ubicar y limpiar caja de texto de busqueda de productos
+    if (tecla == 113) { //Funcion tecla F2 
+      var sw = 0;
+      if ($("#liProductos").hasClass("disabled")) {
+        sw = 1;
+      }
+      if (sw == 0) {
+        activaTab("dvProductos");
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+          var target = e.target.attributes.href.value;
+          $(target + ' #txt_bproductos').focus();
+        });
+        $('#txt_bproductos').focus();
+        $("#txt_bproductos").val('');
+      }
+    }
+    if (tecla == 115) { //Funcion tecla F4
+      var sw = 0;
+      if ($("#liPedidos").hasClass("disabled")) {
+        sw = 1;
+      }
+      if (sw == 0) {
+        activaTab("dvPedidos");
+        Guardar();
+      }
+    }
+
+
+  });
+  //==================================NUEVO PARA EDICION DE PEDIDOS======================================================
+  $("#btnEditar").click(function () {
+    $("#ModalEditarPedidos").modal("show");
+  });
+
+  $("#btnEstadisticas").click(function () {
+    // Comportamiento();
+    $("#ModalEstadisticas").modal("show");
+    $("#container").html(`<div class="alert alert-danger">Cargando...</div>`);
+    dataComportamiento()
+      .then(resp => {
+
+        let claves = pasarMeses(resp.claves);
+
+        Highcharts.chart('container', {
+          chart: {
+            type: 'column'
+          },
+          title: {
+            text: 'Compras mes a mes'
+          },
+          subtitle: {
+            text: '12 meses atrás'
+          },
+          xAxis: {
+            categories: claves,
+            crosshair: true
+          },
+          yAxis: {
+            min: 0,
+            title: {
+              text: 'Valor compra'
+            }
+          },
+          legend: {
+            enabled: false
+          },
+          tooltip: {
+            headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+            pointFormat: `<span style="color:{point.color}">{point.name}</span>: <b>{point.y:,.0f}</b> of total<br/>`
+          },
+          plotOptions: {
+            column: {
+              pointPadding: 0.2,
+              borderWidth: 0
+            },
+            dataLabels: {
+              enabled: true,
+            }
+          },
+          series: [{
+            name: 'valores',
+            data: resp.datos
+
+          },]
+        });
+
+      })
+      .catch(err => {
+        console.log(err);
+        $("#container").html(`<div class="alert alert-danger">Se produjo un error!</div>`);
+      })
+
+    $("#container2").html(`<div class="alert alert-warning">Cargando...</div>`);
+    top10_materiales()
+      .then(resp => {
+
+        let ano = new Date().getFullYear();
+        let mes = new Date().getMonth() + 1;
+        let pluginArrayArg = new Array();
+        let jsonArray = '';
+
+        resp.forEach(item => {
+
+          let dato = new Object();
+          dato.name = '(' + item.codigo_material + ') ' + item.descripcion;
+          dato.y = Math.round(item.frecuencia);
+          pluginArrayArg.push(dato);
+        })
+        jsonArray = JSON.parse(JSON.stringify(pluginArrayArg));
+
+        if (pluginArrayArg.length > 0) {
+
+          Highcharts.chart('container2', {
+            chart: {
+              type: 'column'
+            },
+            title: {
+              text: 'TOP 20 DE PRODUCTOS MAS COMPRADOS'
+            },
+            subtitle: {
+              text: 'Frecuencia de compra : ' + ano
+            },
+            accessibility: {
+              announceNewData: {
+                enabled: true
+              }
+            },
+            xAxis: {
+              type: 'category'
+            },
+            yAxis: {
+              title: {
+                text: 'Frecuencia de compra'
+              }
+
+            },
+            legend: {
+              enabled: false
+            },
+            plotOptions: {
+              series: {
+                borderWidth: 0,
+                dataLabels: {
+                  enabled: true,
+                  format: '{point.y:f}'
+                }
+              }
+            },
+
+            tooltip: {
+              headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+              pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:f}</b> <br/>'
+            },
+
+            series: [{
+              name: "Browsers",
+              colorByPoint: true,
+              data: jsonArray
+            }]
+
+          });
+        } else {
+
+          $("#container2").html('<h4>TOP 20 DE PRODUCTOS MAS COMPRADOS</h4><br><div class="alert alert-danger">Sin resultados!</div>');
+
+        }
+
+      }).catch(err => {
+        console.error(err);
+        $("#container2").html(`<div class="alert alert-danger">Se produjo un error!</div>`);
+      });
+
+
+    $("#container3").html(`<div class="alert alert-info">Cargando...</div>`);
+    datos_cupo()
+      .then(resp => {
+
+        let datos = '';
+
+        if (resp.length > 0) {
+          datos = [{
+            name: 'Disponible',
+            y: parseInt(resp[0].DISPONIBLE),
+            sliced: true,
+            selected: true
+          }, {
+            name: 'Comprometido',
+            y: parseInt(resp[0].COMPROMETIDO)
+          }];
+          $("#cupo_txt1").text('COMPROMETIDO : ' + formatNum(resp[0].COMPROMETIDO, '$'));
+          $("#cupo_txt2").text('DISPONIBLE   : ' + formatNum(resp[0].DISPONIBLE, '$'));
+        } else {
+          datos = [{
+            name: 'Disponible',
+            y: 100,
+            sliced: true,
+            selected: true
+          }, {
+            name: 'Comprometido',
+            y: 0
+          }];
+          $("#cupo_txt1").text('COMPROMETIDO : ' + formatNum(0, '$'));
+          $("#cupo_txt2").text('DISPONIBLE   : ' + $("#txt_cupo").val());
+        }
+
+        Highcharts.chart('container3', {
+          chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false,
+            type: 'pie'
+          },
+          title: {
+            text: 'CUPO DE CRÉDITO'
+          },
+          tooltip: {
+            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+          },
+          accessibility: {
+            point: {
+              valueSuffix: '%'
+            }
+          },
+          plotOptions: {
+            pie: {
+              allowPointSelect: true,
+              cursor: 'pointer',
+              dataLabels: {
+                enabled: true,
+                format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+              }
+            }
+          },
+          series: [{
+            name: 'Brands',
+            // colorByPoint: true,
+            data: datos
+          }]
+        });
+      })
+      .catch(err => {
+        console.error(err);
+        $("#container3").html(`<div class="alert alert-danger">Se produjo un error!</div>`);
+      });
+
+  });
+
+
+  $("#btnBuscarEditar").click(function () {
+    if ($("#EdtNumeroPedido").val() != '' && $("#EdtNumeroPedido").val() > 0) {
+      EditarPedido($("#EdtNumeroPedido").val(), $("#EdtTipo").val());
+    }
+  });
+
+  $("#txt_bproductos").keyup(function (e) {
+    tecla = (document.all) ? e.keyCode : e.which;
+    valor = $.trim($(this).val());
+    if (valor != "") {
+      if ($(this).val().length > 2) {
+        if (tecla == 13) {
+          //verifico si solo son numer
+          //busco por codigo sap o codigo de barras
+          if (validarSiNumero(valor) == 1) {
+            //busco por codigo de barras
+            BuscarProductoArr(1);
+          } else {
+            BuscarProductoArr(0);
+          }
+
+        }
+      }
+    } else {
+      $("#dvResultProductos").html("");
+      $("#n_resultados").text("");
+    }
+
+  });
+  //--Fin se coloca para mitigar el problema mobil
+  $("#txt_bproductos").focusout(function (e) {
+    valor = $.trim($(this).val());
+    if (valor != "") {
+      if ($(this).val().length > 2) {
+        //verifico si solo son numer
+        //busco por codigo sap o codigo de barras
+        if (validarSiNumero(valor) == 1) {
+          //busco por codigo de barras
+          BuscarProductoArr(1);
+        } else {
+          BuscarProductoArr(0);
+        }
+      }
+    } else {
+      $("#dvResultProductos").html("");
+      $("#n_resultados").text("");
+    }
+  });
+  //--Fin se coloca para mitigar el problema mobil
+  //------nuevo para carga de archivo plano 
+  $("#filename").val('');
+  $("#filename").change(function (e) {
+    var ext = $("input#filename").val().split(".").pop().toLowerCase();
+    if ($.inArray(ext, ["csv"]) == -1) {
+      alert('Solo se permiten archivos CSV');
+      $("#filename").val('');
+      return false;
+    }
+    if (e.target.files != undefined) {
+      $("#ModalAjustesBusqueda").modal("hide");
+      LoadImg("Subiendo CSV");
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        var csvval = e.target.result.split("\n");
+        var SiAdd = new Array();
+        var NoAdd = '';
+
+        for (var i = 0; i < csvval.length; i++) { //for 1		
+          var row = csvval[i];
+          if (row != '') {
+            var col = row.split(',');
+            var desc = escapeRegExp($.trim(col[0]));
+            var SwAdd = 0;
+            Arr = ArrProd;
+            Arr = recursiva(desc, Arr, 0, 0, 0, 1);
+
+            if (Arr.length > 0) {
+              for (var x = 0; x < Arr.length; x++) { //for 2									
+                d = Arr[0];
+                for (var y = 0; y < SiAdd.length; y++) {
+                  if (SiAdd[y].codigo == $.trim(d.codigo_material)) {
+                    SwAdd = 1
+                  }
+                }
+                if (SwAdd == 0) {
+                  cant = parseInt($.trim(col[1]));
+                  reg = parseInt($.trim(d.cant_regular));
+                  if ((reg > 0) && (reg > cant)) {
+                    UnloadImg()
+                    if (confirm("El producto " + $.trim(d.descripcion) + " presenta bonificado,"
+                      + "desea aumentar la cantidad a " + reg + " unidades para ganarlo?")) {
+                      cant = reg;
+                    }
+                    LoadImg("Subiendo CSV");
+                  }
+                  AddProductoPlano($.trim(d.codigo_material),
+                    $.trim(d.valor_unitario),
+                    $.trim(d.iva),
+                    $.trim(d.descuento),
+                    cant,
+                    $.trim(d.valor_neto),
+                    $.trim(d.stock),
+                    $.trim(d.vlr_pedido),
+                    $.trim(d.id_pedido),
+                    $.trim(0),
+                    $.trim(d.cant_bonificado),
+                    $.trim(d.cant_regular),
+                    $.trim(d.stock_bonificado));
+                  d = {
+                    'codigo': desc
+                  }
+                  SiAdd.push(d);
+                } else {
+                  NoAdd += $.trim(col[0]) + ",\n";
+                }
+              } //fin for 2	
+            } else {
+              NoAdd += $.trim(col[0]) + ",\n";
+            }
+          } //fin if
+        } //fin for 1	
+
+        WSInvenTotal();
+        ListarPedido();
+        activaTab("dvPedidos");
+        $("#filename").val('');
+        UnloadImg();
+        if (NoAdd != '') {
+          Swal.fire('Codigos no encontrados o no validos', NoAdd, 'warning');
+        }
+      };
+      reader.readAsText(e.target.files.item(0));
+    }
+    return false;
+  });
+  if ($("#Rol").val() == '10' || $("#Dpto").val() == '11') {
+    console.log('cliente o transferencista no carga competencia')
+  } else {
+    ListarCompetencia();
+  }
+
+  //Ferias virtuales
+  $("#btnFeriaVirtual").click(function () {
+    var cod = $("#txt_codigoSap").val();
+    if (cod != '') {
+      $("#ModalFeriaVirtual").modal('show');
+      QueryFeria(4);
+
+    } else {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Oops...',
+        text: 'Debe seleccionar un cliente!.'
+      });
+    }
+  });
+  //Ferias Virtuales
+
+
+  //Grupos Articulos
+  GruposArticulos();
+  $("#txtGrupoArticulo").change(function () {
+    $("#txt_bproductos").val($.trim($(this).val()));
+    BuscarProductoArr(0);
+  });
+  //Grupos Articulos	
+  //Descuentos ir------------------------------------------------------------
+  $("#btnDescuentos").on('click', function () {
+    activaTab('dvProductos');
+    if ($("#txtGrp1").val() == '100') {
+      $("#txt_bproductos").val('OFERTA EXCLUSIVA CLIENTE WEB');
+    } else {
+      $("#txt_bproductos").val('*');
+    }
+
+    $("#DvChkDctos").addClass("DivCheckBoxTrue");
+    BuscarProductoArr(0);
+  });
+  //Descuentos ir------------------------------------------------------------
+
+  //carga por defecto el usuario que se le esta haciendo la gestion en el 0102 
+  //
+  if ($("#link_pro").val() != '') {
+    preLoadCliente($("#link_pro").val());
+  }
+
+  $("#TxtIntegracion").change(function () {
+    if ($("#link_pro").val() != '') {
+      BuscarProductos();
+    }
+
+  });
+
+
+  //Nuevo filtro para ofertas
+  $("#txtFilter").val('');
+  $('#txtFilter').on('input', function () {
+    var filtro = $(this).val().toLowerCase();
+
+    // Iterar sobre los paneles y ocultar/mostrar según el filtro
+    $('.panel-default').each(function () {
+      var textoGrupo = $(this).find('.col-md-4:eq(1)').text().toLowerCase();
+      if (textoGrupo.includes(filtro)) {
+        $(this).show();
+      } else {
+        $(this).hide();
+      }
+    });
+  });
+
+  //Plan de puntos para clientes.
+  $("#btnPuntos").click(function () {
+
+    if ($("#txt_codigoSap").val() != '') {
+      consultarPuntos($("#txt_codigoSap").val());
+    } else {
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Debe seleccionar un cliente.!.'
+      });
+    }
+  });
+
+  $("#buy-now").click(function () {
+    crearPedidoRedencion();
+  })
+
+  let valor_rol = $("#Rol").val();
+  let valoresPermitidosrol = ["12", "1", "44", "72", "13", "14"];
+
+  // Mostrar u ocultar los divs según el valor de Rol
+  $("#cartera_edades, #Presupuesto_datos").toggle(valoresPermitidosrol.includes(valor_rol));
+
+  $('#btnMas').click(function () {
+    $('#ModalMasCliente').modal('show');
+  });
+
+  $('#btnMas2').click(function () {
+    $('#ModalAjustesBusqueda').modal('show');
+  });
+});

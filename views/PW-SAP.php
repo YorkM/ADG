@@ -168,7 +168,8 @@ Redireccionar();
       font-size: 11px;
     }
 
-    #ui-id-1 {
+    #ui-id-1,
+    #ui-id-2 {
       font-size: 13px;
     }
 
@@ -179,12 +180,20 @@ Redireccionar();
     .separador {
       margin: 0;
       padding: 0 0 0 7px;
-      background-color: #055160;
-      color: #cff4fc;
+      color: #055160;
     }
 
     .size-a {
       font-size: 14.5px;
+    }
+
+    #select2-txtZonas-container,
+    #select2-FiltroOficinaVentas-container,
+    #select2-txtClasePedido-container,
+    #select2-FiltroOficinaVentas-results,
+    #select2-txtClasePedido-results,
+    #select2-txtZonas-results {
+      font-size: 14px !important;
     }
   </style>
 </head>
@@ -239,7 +248,7 @@ Redireccionar();
                 <i class="fa-solid fa-chevron-right"></i>&nbsp;Propios</a>
             </li>
             <li>
-              <a class="dropdown-item size-a" data-bs-toggle="tab" href="#dvExtra2" role="tab" aria-controls="dvExtra2" aria-selected="false">
+              <a class="dropdown-item size-a" id="btnTempTerceros" data-bs-toggle="tab" href="#dvRecuperarTerceros" role="tab" aria-controls="dvRecuperarTerceros" aria-selected="false">
                 <i class="fa-solid fa-chevron-right"></i>&nbsp;Terceros</a>
             </li>
             <li>
@@ -413,14 +422,77 @@ Redireccionar();
         </div>
       </div>
       <!-- TAB GESTIÓN -->
+      <!-- RECUPERAR PEDIDDOS PROPIOS -->
       <div class="tab-pane fade" id="dvRecuperar" role="tabpanel">
         <div class="container-fluid">
           <div id="contenedorLeyendas"></div>
           <div id="DvRecuperables"></div>
         </div>
       </div>
-      <div class="tab-pane fade" id="dvExtra2" role="tabpanel">
-        Contenido Extra 2
+      <!-- RECUPERAR PEDIDOS TERCEROS -->
+      <div class="tab-pane fade p-2" id="dvRecuperarTerceros" role="tabpanel">
+        <input type="hidden" id="txtCodigoSAP" readonly disabled>
+        <div class="div-container">
+          <table style="width: 100%;">
+            <thead>
+              <tr class="custom-tr">
+                <th class="custom-thead" colspan="3">PEDIDOS DE TERCEROS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="custom-tr">
+                <td class="size-text">Cliente</td>
+                <td><input type="text" id="txtCliente" placeholder="Cliente" class="form-control size-text shadow-sm"></td>
+              </tr>
+              <tr>
+                <td class="size-text">Zona de ventas</td>
+                <td><select id="txtZonas" class="form-control size-text shadow-sm" style="width:100%">
+                  </select></td>
+              </tr>
+              <tr class="custom-tr">
+                <td class="size-text">Clase de Pedido</td>
+                <td><select id="txtClasePedido" class="form-control size-text shadow-sm" style="width:100%">
+                    <option value="T" selected>TODOS</option>
+                    <option value="ZPWA">ZPWA - ADMINISTRADOR</option>
+                    <option value="ZPWV">ZPWV - VENDEDOR</option>
+                    <option value="ZPWL">ZPWL - TELEVENDEDOR</option>
+                    <option value="ZPWP">ZPWP - PROVEEDOR</option>
+                    <option value="ZPWT">ZPWT - TRANSFERENCISTA</option>
+                    <option value="ZPWC">ZPWC - CLIENTE</option>
+                    <option value="ZPIC">ZPIC - INTEGRACION COMERCIAL</option>
+                  </select></td>
+              </tr>
+              <tr class="custom-tr">
+                <td class="size-text">Oficina de ventas</td>
+                <td colspan="2"><select id="FiltroOficinaVentas" class="form-control size-text shadow-sm" style="width:100%">
+                  </select></td>
+              </tr>
+              <tr class="custom-tr">
+                <td class="size-text">Fecha Inicial</td>
+                <td colspan="2"><input type="text" id="txtFecha1" placeholder="Fecha Inicial" class="form-control size-text shadow-sm"></td>
+              </tr>
+              <tr class="custom-tr">
+                <td class="size-text">Fecha Final</td>
+                <td colspan="2"><input type="text" id="txtFecha2" placeholder="Fecha Final" class="form-control size-text shadow-sm"></td>
+              </tr>
+              <tr class="custom-tr">
+                <td class="size-text">Temporales Historia</td>
+                <td colspan="2"><select id="txtTemporalesHistoria" class="form-control size-text shadow-sm" style="width:100%">
+                    <option value="N" selected>NO</option>
+                    <option value="S">SI</option>
+                  </select></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="">
+            <button class="btn btn-info btn-sm w-btn" onClick="GestionPedidos();">Buscar</button>
+            <button class="btn btn-success btn-sm w-btn" id="exportar_gestion">Exportar</button>
+            <button class="btn btn-light btn-sm w-btn btn-micro" onClick="LimpiarGestionPedido();">Limpiar</button>
+          </div>
+          <hr>
+        </div>        
+        <div id="VtotalTerceros"></div>
+        <div id="DvRecuperablesTerceros"></div>
       </div>
       <div class="tab-pane fade" id="dvExtra3" role="tabpanel">
         Contenido Extra 3
@@ -433,322 +505,6 @@ Redireccionar();
       </div>
     </div>
   </div>
-
-
-
-  <!-- <div class="panel with-nav-tabs panel-info">
-    <div class="panel-heading">
-      <ul class="nav nav-tabs">
-        <li class="dropdown"> <a href="#" data-toggle="dropdown">Gestión <span class="caret"></span></a>
-          <ul class="dropdown-menu" role="menu">
-            <li role="separator"><b>Pedidos</b></li>
-            <li><a href="#dvRecuperar" id="btnTemporales" data-toggle="tab"><span class="glyphicon glyphicon-menu-right"></span>Propios</a></li>
-            <li><a href="#dvRecuperarTerceros" id="btnTempTerceros" data-toggle="tab"><span class="glyphicon glyphicon-menu-right"></span>Terceros</a></li>
-            <li role="separator" id="separadorEntregas"><b>Entregas</b></li>
-            <li><a href="#dvAddEntregas" id="btnAddEntregas" data-toggle="tab"><span class="glyphicon glyphicon-menu-right"></span>Unificar</a></li>
-            <li><a href="#dvFaltantes" id="btnFaltantes" data-toggle="tab"><span class="glyphicon glyphicon-menu-right"></span>Faltantes</a></li>
-            <li role="separator" id="separadorFacturas"><b>Facturas</b></li>
-            <li><a href="#dvListaFacts" id="btListaFacts" data-toggle="tab"><span class="glyphicon glyphicon-menu-right"></span>Facturación</a></li>
-            <li role="separator" id="separadorEventos"><b>Eventos</b></li>
-            <li><a href="#dvEventos" data-toggle="tab" id="btnEventos"><span class="glyphicon glyphicon-menu-right"></span>Ofertas</a></li>
-          </ul>
-        </li>
-      </ul>
-    </div>
-
-    <div class="panel-body">
-      <div class="tab-content">
-        <div class="tab-pane fade in active" id="dvClientes"> -->
-
-  <!---INICIO DIV CLIENTES----------------------------------------------------------------------------------------->
-
-  <!---FIN DIV CLIENTES-------------------------------------------------------------------------------------------->
-  <!-- </div>
-        <div class="tab-pane fade" id="dvProductos"> -->
-  <!---INICIO DIV PRODUCTOS---------------------------------------------------------------------------------------->
-
-
-  <!---FIN DIV PRODUCTOS------------------------------------------------------------------------------------------->
-  <!-- </div>
-        <div class="tab-pane fade" id="dvPedidos"> -->
-  <!---INICIO DIV PEDIDOS------------------------------------------------------------------------------------------>
-  <!-- <div id="ModalInfoBonificados" class="modal fade bd-example-modal-lg" role="dialog">
-            <div class="modal-dialog modal-lg">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <button type="button" class="close" data-dismiss="modal">&times;</button>
-                  <h4 class="modal-title">INFORMACION DE BONIFICADOS</h4>
-                </div>
-                <div class="modal-body" id="ContenidoInfoBonificados"></div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-info" data-dismiss="modal">Cerrar</button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div id="dvResultPedidos"></div> -->
-  <!---FIN DIV PEDIDOS--------------------------------------------------------------------------------------------->
-  <!-- <div class="tab-pane fade" id="dvRecuperar">
-  </div> -->
-  <!---RECUPERAR PEDIDOS PROPIOS----------------------------------------------------------------------------------->
-  <!-- <div id="DvRecuperables"></div> -->
-  <!---FIN RECUPERAR PEDIDOS PROPIOS------------------------------------------------------------------------------->
-  <!-- </div>
-        <div class="tab-pane fade" id="dvRecuperarTerceros"> -->
-  <!---RECUPERAR PEDIDOS DE TERCEROS------------------------------------------------------------------------------->
-  <!-- <input type="hidden" id="txtCodigoSAP" readonly disabled>
-          <table class="form" align="center" width="100%">
-            <thead>
-              <tr>
-                <th colspan="3">PEDIDOS DE TERCEROS</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Cliente</td>
-                <td><input type="text" id="txtCliente" placeholder="Cliente" class="form-control"></td>
-              </tr>
-              <tr>
-                <td>Zona de ventas</td>
-                <td><select id="txtZonas" class="form-control" style="width:100%">
-                  </select></td>
-              </tr>
-              <tr>
-                <td>Clase de Pedido</td>
-                <td><select id="txtClasePedido" class="form-control" style="width:100%">
-                    <option value="T" selected>TODOS</option>
-                    <option value="ZPWA">ZPWA - ADMINISTRADOR</option>
-                    <option value="ZPWV">ZPWV - VENDEDOR</option>
-                    <option value="ZPWL">ZPWL - TELEVENDEDOR</option>
-                    <option value="ZPWP">ZPWP - PROVEEDOR</option>
-                    <option value="ZPWT">ZPWT - TRANSFERENCISTA</option>
-                    <option value="ZPWC">ZPWC - CLIENTE</option>
-                    <option value="ZPIC">ZPIC - INTEGRACION COMERCIAL</option>
-                  </select></td>
-              </tr>
-              <tr>
-                <td>Oficina de ventas</td>
-                <td colspan="2"><select id="FiltroOficinaVentas" class="form-control" style="width:100%">
-                  </select></td>
-              </tr>
-              <tr>
-                <td>Fechas Inicial</td>
-                <td colspan="2"><input type="text" id="txtFecha1" placeholder="Fecha Inicial" class="form-control"></td>
-              </tr>
-              <tr>
-                <td>Fechas Final</td>
-                <td colspan="2"><input type="text" id="txtFecha2" placeholder="Fecha Final" class="form-control"></td>
-              </tr>
-              <tr>
-                <td>Temporales Historia</td>
-                <td colspan="2"><select id="txtTemporalesHistoria" class="form-control" style="width:100%">
-                    <option value="N" selected>NO</option>
-                    <option value="S">SI</option>
-                  </select></td>
-              </tr>
-              <tr>
-                <td colspan="3"><button class="btn btn-info btn-sm" onClick="GestionPedidos();">Buscar</button>
-                  <button class="btn btn-default btn-sm" onClick="LimpiarGestionPedido();">Limpiar</button>
-                  <button class="btn btn-success btn-sm" id="exportar_gestion">Exportar</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <div class="btn-group" role="group" aria-label="...">
-            <button type="button" class="btn btn-sm btn-danger" onClick="FiltrosTipoPedidos('T')"><b>T</b>emporal</button>
-            <button type="button" class="btn btn-sm btn-warning" onClick="FiltrosTipoPedidos('P')"><b>P</b>edido</button>
-            <button type="button" class="btn btn-sm btn-success" onClick="FiltrosTipoPedidos('E')"><b>E</b>ntrega</button>
-            <button type="button" class="btn btn-sm btn-info" onClick="FiltrosTipoPedidos('O')"><b>O</b>rden</button>
-            <button type="button" class="btn btn-sm btn-primary" onClick="FiltrosTipoPedidos('F')"><b>F</b>actura</button>
-            <button type="button" class="btn btn-sm btn-default" onClick="FiltrosTipoPedidos('A')"><b>TODOS</b></button>
-          </div>
-          <div id="VtotalTerceros"></div>
-          <div id="DvRecuperablesTerceros"></div> -->
-  <!---FIN RECUPERAR PEDIDOS DE TERCEROS--------------------------------------------------------------------------->
-  <!-- </div>
-        <div class="tab-pane fade" id="dvAddEntregas">
-          <input type="hidden" id="CodigoSAPEntregas" class="form-control">
-          <table class="form" align="center" width="100%">
-            <thead>
-              <tr>
-                <th colspan="3">GESTION DE ENTREGAS</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Cliente</td>
-                <td><input type="text" id="ClienteEntregas" placeholder="Cliente" class="form-control"></td>
-              </tr>
-              <tr>
-                <td>Oficina</td>
-                <td><select id="OficinaEntregas" class="form-control">
-                  </select></td>
-              </tr>
-              <tr>
-                <td>Fechas Inicial</td>
-                <td colspan="2"><input type="text" id="EntregasFecha1" placeholder="Fecha Inicial" class="form-control"></td>
-              </tr>
-              <tr>
-                <td>Fechas Final</td>
-                <td colspan="2"><input type="text" id="EntregasFecha2" placeholder="Fecha Final" class="form-control"></td>
-              </tr>
-              <tr>
-                <td colspan="3">
-                  <div class="btn-group" role="group" aria-label="...">
-                    <button class="btn btn-info btn-sm" onClick="GestionEntregas();">Buscar</button>
-                    <button class="btn btn-success btn-sm" onClick="UnificarEntrega();">Crear Entrega</button>
-                    <button class="btn btn-default btn-sm" onClick="LimpiarEntregas();">Limpiar</button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <div id="DvListaEntregas"></div>
-        </div>
-        <div class="tab-pane fade" id="dvListaFacts">
-          <input type="hidden" id="txtFactCodigoCliente" class="form-control" readonly disabled>
-          <table class="form" align="center" width="100%">
-            <thead>
-              <tr>
-                <th colspan="3">FACTURACIÓN DE TERCEROS</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr id="tr_cliente_fact">
-                <td>Cliente</td>
-                <td><input type="text" id="txtFactCliente" placeholder="Cliente" class="form-control"></td>
-              </tr>
-              <tr>
-                <td>Numero factura</td>
-                <td><input type="text" id="txtNumFact" placeholder="Numero de factura" class="form-control"></td>
-              </tr>
-              <tr>
-                <td>Fechas Inicial</td>
-                <td colspan="2"><input type="text" id="txtFactFecha1" placeholder="Fecha Inicial" class="form-control"></td>
-              </tr>
-              <tr>
-                <td>Fechas Final</td>
-                <td colspan="2"><input type="text" id="txtFactFecha2" placeholder="Fecha Final" class="form-control"></td>
-              </tr>
-              <tr>
-                <td colspan="3"><button class="btn btn-info btn-sm" onClick="ListarFacturas();">Buscar</button>
-                  <button class="btn btn-default btn-sm" onClick="LimpiarFacturas();">Limpiar</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <div id="VtotalFacturas"></div>
-          <div id="DvListaFacturas"></div>
-        </div>
-        <div class="tab-pane fade" id="dvFaltantes">
-          <input type="hidden" id="txtFaltanteCodigoCliente" class="form-control" readonly disabled>
-          <table class="form" align="center" width="100%">
-            <thead>
-              <tr>
-                <th colspan="3">LISTADO DE FALTANTES</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr id="tr_cliente_faltante">
-                <td>Cliente</td>
-                <td><input type="text" id="txtFaltanteCliente" placeholder="Cliente" class="form-control"></td>
-              </tr>
-              <tr>
-                <td>Fechas Inicial</td>
-                <td colspan="2"><input type="text" id="txtFaltanteFecha1" placeholder="Fecha Inicial" class="form-control"></td>
-              </tr>
-              <tr>
-                <td>Fechas Final</td>
-                <td colspan="2"><input type="text" id="txtFaltanteFecha2" placeholder="Fecha Final" class="form-control"></td>
-              </tr>
-              <tr>
-                <td colspan="3"><button class="btn btn-info btn-sm" onClick="Faltante();">Buscar</button>
-                  <button class="btn btn-success btn-sm" onClick="fnExcelReport('tdFaltantes');">Exportar</button>
-                  <button class="btn btn-default btn-sm" onClick="LimpiarFaltantes();">Limpiar</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <div id="VtotalFaltante"></div>
-          <div id="DvListaFaltante"></div>
-        </div>
-        <div class="tab-pane fade" id="dvEventos"> -->
-  <!---INICIO DIV EVENTOS------------------------------------------------------------------------------------------>
-  <!--       <table class="form" width="100%">
-              <tr> 
-               <td>
-                  <label for="selTipos">TIPOS</label>
-                   <select class="form-control" id="selTipos" >
-                      <option value="T">Todos</option>
-					  <option value="BON">Bonificados</option>
-					  <option value="DES">Descuentos</option>
-                   </select>
-               </td>
-               <td>
-                   <div class="input-group"> 
-
-
-					<span class="input-group-addon" id="basic-addon1">
-						<i class="fa-solid fa-gifts" style="width: 30px;"></i>
-					</span>
-					<input type="text" id="CantBoni" class="form-control" disabled readonly>
-				  </div>
-              </td>
-              <td>    
-                  <div class="input-group"> 
-					<span class="input-group-addon" id="basic-addon1">
-						<i class="fa fa-tags" style="width: 30px;"></i>
-					</span>
-					<input type="text" id="CantDesc" class="form-control" disabled readonly>
-				</div>
-               </td>
-              </tr>
-             </table>-->
-  <!-- <div class="row">
-            <div class="col-md-4">
-              <div class="input-group"> <span class="input-group-addon" id="basic-addon1"> <i class="fa-solid fa-filter" style="width: 30px;"></i> </span>
-                <select class="form-control blog" id="selTipos">
-                  <option value="T">Todos</option>
-                  <option value="BON">Bonificados</option>
-                  <option value="DES">Descuentos</option>
-                </select>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="input-group"> <span class="input-group-addon" id="basic-addon1"> <i class="fa-solid fa-gifts" style="width: 30px;"></i> </span>
-                <input type="text" id="CantBoni" class="form-control" disabled readonly>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="input-group"> <span class="input-group-addon" id="basic-addon1"> <i class="fa fa-tags" style="width: 30px;"></i> </span>
-                <input type="text" id="CantDesc" class="form-control" disabled readonly>
-              </div>
-            </div>
-          </div>
-          </br>
-          <div class="row">
-            <div class="col-md-12">
-              <div class="input-group"> <span class="input-group-addon" id="basic-addon1"> <i class="fa-solid fa-newspaper" style="width: 30px;"></i> </span>
-                <form autocomplete="off">
-                  <input type="text" id="txtFilter" class="form-control" placeholder="Filtro por líneas..." autocomplete="off" value="" />
-                </form>
-              </div>
-            </div>
-          </div>
-          </br>
-          <div id="ResultEventos"></div> -->
-  <!---FIN DIV EVENTOS--------------------------------------------------------------------------------------------->
-  <!-- </div>
-      </div>
-    </div>
-  </div> -->
-
-
-
-
-
-
-
   <!-- DIV'S PARA RENDERIZAR LOS LOADING -->
   <div id="Bloquear" style="display: none;"></div>
   <div id="loaderOverlay" class="centrado-porcentual" style="display: none;"></div>
