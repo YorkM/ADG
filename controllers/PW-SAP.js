@@ -354,7 +354,6 @@ function ZonasVentas() {
 function activaTab(tab) {
   $('.nav-tabs a[href="#' + tab + '"]').tab('show');
 };
-//-----------------------------Funcion de carga de cliente especifico para el caso de que el usuario sea tipo cliente y no tenga opcion de seleccionar mas 
 //funcion que carga la imagen de "cargando..."
 function LoadImg(texto = "Cargando...") {
   let n = 0;
@@ -386,75 +385,55 @@ function UnlockScreen(cadena) {
   setInterval(DesbloquearPantalla, 3000);
 }
 //FUNCION QUE CARGA EL ARRAY DE LOS TERCEROS DE LA ORGANIZACION X
-function LoadArrayCli() {
-  $.ajax({
-    type: "POST",
-    encoding: "UTF-8",
-    url: "../models/PW-SAP.php",
-    dataType: "json",
-    async: false,
-    beforeSend: function () {
-      LoadImg('CARGANDO CLIENTE...');
-    },
-    data: {
-      op: "B_CLIENTE",
+const LoadArrayCli = async () => {
+  try {
+    LoadImg('Cargando clientes... ⏳⏳⏳');
+    await new Promise(requestAnimationFrame);
+
+    const data = await enviarPeticion({
+      op: "B_CLIENTE", 
+      link: "../models/PW-SAP.php",
       org: $("#Organizacion").val(),
       sw: 'a'
-    },
-    success: function (data) {
+    });
 
-
-      if (data.length > 0) {
-
-        for (var i = 0; i < data.length; i++) {
-          d = data[i];
-          det = {
-            'value': d.nombres + '|' + d.razon_comercial,
-            'nombres': d.nombres,
-            'razon_comercial': d.razon_comercial,
-            'codigo_sap': $.trim(d.codigo_sap),
-            'nit': $.trim(d.nit),
-            'email': d.email,
-            'telefonos': d.telefonos,
-            'cupo_credito': d.cupo_credito,
-            'direccion': d.direccion,
-            'ciudad': d.ciudad,
-            'bodega': d.bodega,
-            'bodega_desc': d.bodega_desc,
-            'lista': d.lista,
-            'condicion_pago': d.condicion_pago,
-            'vendedor': d.vendedor,
-            'televendedor': d.televendedor,
-            //--
-            'telefono_vendedor': d.telefono_vendedor,
-            'telefono_televendedor': d.telefono_televendedor,
-            //--
-            'institucional': d.institucional,
-            'controlados': d.controlados,
-            'dias_pago': d.dias_pago,
-            'descuento_financiero': d.descuento_financiero,
-            //--
-            'grupo1': d.grupo1,
-            'grupo2': d.grupo2,
-            'grupo3': d.grupo3,
-            'grupo4': d.grupo4,
-            'grupo5': d.grupo5
-          } //det
-          ArrCli.push(det);
-
-
-        } //for   for(var i=0;i<data.length;i++){
-
-      } //				
-
+    if (data.length) {
+      ArrCli = data.map(item => ({
+        value: item.nombres + '|' + item.razon_comercial,
+        nombres: item.nombres,
+        razon_comercial: item.razon_comercial,
+        codigo_sap: $.trim(item.codigo_sap),
+        nit: $.trim(item.nit),
+        email: item.email,
+        telefonos: item.telefonos,
+        cupo_credito: item.cupo_credito,
+        direccion: item.direccion,
+        ciudad: item.ciudad,
+        bodega: item.bodega,
+        bodega_desc: item.bodega_desc,
+        lista: item.lista,
+        condicion_pago: item.condicion_pago,
+        vendedor: item.vendedor,
+        televendedor: item.televendedor,
+        telefono_vendedor: item.telefono_vendedor,
+        telefono_televendedor: item.telefono_televendedor,
+        institucional: item.institucional,
+        controlados: item.controlados,
+        dias_pago: item.dias_pago,
+        descuento_financiero: item.descuento_financiero,
+        grupo1: item.grupo1,
+        grupo2: item.grupo2,
+        grupo3: item.grupo3,
+        grupo4: item.grupo4,
+        grupo5: item.grupo5
+      }));
     }
-  }).done(function () {
+  } catch (error) {
+    console.error(error);
+  } finally {
     UnloadImg();
-  }).fail(function (data) {
-    console.log(data);
-    UnlockScreen('TERCEROS');
-  });
-}
+  }
+};
 
 function validarSiNumero(numero) {
   x = 0;
@@ -647,7 +626,7 @@ function CargarCliente(codSAP, sw) {
   }
   //BuscarProductos();
 }
-//-----------------------Limpieza y actualizacion de campos
+// LIMPIEZA Y ACTUALIZACIÓN DE CAMPOS
 function Limpiar() {
   $("#txt_cliente").focus();
   //Organizacion de ventas traida desde el menu
@@ -1317,7 +1296,7 @@ function BuscarProductos() {
     async: true,
     dataType: "json",
     beforeSend: function () {
-      LoadImg('CARGANDO PORTAFOLIO...');
+      LoadImg('Cargando portafolio... ⏳⏳⏳');
     },
     data: {
       op: op_sw,
@@ -1386,7 +1365,7 @@ function BuscarProductos() {
     UnloadImg();
   }).fail(function (data) {
     console.error(data);
-    UnlockScreen('PRODUCTOS');
+    // UnlockScreen('PRODUCTOS');
   });
 }
 
@@ -2033,7 +2012,7 @@ function InserUpdateSAP(op, numero, numeroSAP) {
     url: "../models/WS-PW.php",
     global: false,
     beforeSend: function () {
-      LoadImg('GUARDANDO...');
+      LoadImg('Guardando... ⏳⏳⏳');
     },
     data: ({
       op: op,
@@ -2177,11 +2156,10 @@ function ConfirmarenviarPedidoEmail(numero) {
 // LISTAR PEDIDO TEMPORAL
 const ListarPedido = async () => {
   try {
-    debugger;
     $("#dvResultProductos").html("");
     let numero = $("#txt_numero").val();
 
-    LoadImg('CARGANDO PEDIDO...');
+    LoadImg('Cargando pedido... ⏳⏳⏳');
 
     const data = await enviarPeticion({op: "S_PEDIDO_DETALLE", link: "../models/PW-SAP.php", numero});
     if (data.length) {
@@ -2406,7 +2384,7 @@ function UpdNotas(ob) {
 // PEDIDOS TEMPORALES PENDIENTES POR RECUPERAR
 const Temporales = async () => {
   try {
-    LoadImg('Cargando ⏳⏳⌛');
+    LoadImg('Cargando... ⏳⏳⌛');
     const data = await enviarPeticion({op: "S_TEMPORALES", link: "../models/PW-SAP.php"});
     if (data.length) {
       let header = `    
@@ -2781,7 +2759,7 @@ function Guardar() {
             url: "../models/WS-PW.php",
             global: false,
             beforeSend: function () {
-              LoadImg('GUARDANDO...');
+              LoadImg('Guardando... ⏳⏳⏳');
             },
             data: ({
               op: op,
@@ -3469,7 +3447,6 @@ function Ordenes() {
                 Swal.fire("Error", data.Msj, "error");
               } else {
                 // Extraer el número de OT del mensaje
-                //debugger;
                 let nueva_ot = '';
                 let rdespa = opcionesRecojo.recojeDespachos ? '1' : '0';
                 let rpunto = opcionesRecojo.recojePuntoVenta ? '1' : '0';
@@ -3653,7 +3630,6 @@ const GestionPedidos = async () => {
       <body>`;
 
     if (TemporalesHistoria == 'N') {
-      console.log("N");
       const data = await enviarPeticion({op: "S_GESTION_PEDIDOS", ...dataPeticion});
       if (data.length) {
         data.forEach(item => {
@@ -3761,7 +3737,6 @@ const GestionPedidos = async () => {
         $("#DvRecuperablesTerceros").html(msgHtml);
       }
     } else {
-      console.log("V");
       const data = await enviarPeticion({op: "S_GESTION_PEDIDOS_HISTORIA", ...dataPeticion});
       if (data.length) {
         data.forEach(item => {
@@ -3851,7 +3826,7 @@ function RecuperarHistorico(numero) {
           alert(JQERROR);
         },
         beforeSend: function () {
-          LoadImg('RESTAURANDO...');
+          LoadImg('Restaurando... ⏳⏳⏳');
         },
         data: ({
           op: "G_PEDIDOS_HISTORIA_TMP",
@@ -3956,83 +3931,82 @@ function GuardarDirecto() {
   }
 
 }
-
-function GestionEntregas() {
+// FUNCIÓN PARA GESTIONAR ENTREGAS
+const GestionEntregas = async () => {
   if ($.trim($("#CodigoSAPEntregas").val()) != '') {
-    $.ajax({
-      type: "POST",
-      encoding: "UTF-8",
-      url: "../models/PW-SAP.php",
-      global: false,
-      error: function (OBJ, ERROR, JQERROR) {
-        alert(JQERROR);
-      },
-      beforeSend: function () {
-        LoadImg('CARGANDO...');
-      },
-      data: ({
+    try {
+      LoadImg('Cargando... ⏳⏳⏳');
+      const data = await enviarPeticion({
         op: "S_ENTREGAS",
+        link: "../models/PW-SAP.php",
         oficina: $.trim($("#OficinaEntregas").val()),
         codigo: $.trim($("#CodigoSAPEntregas").val()),
         fh1: $.trim($("#EntregasFecha1").val()),
         fh2: $.trim($("#EntregasFecha2").val())
-      }),
-      dataType: "json",
-      async: true,
-      success: function (data) { //alert(data);$("#DvListaEntregas").html(data);		return false;
-        if (data != '' && data != null) {
-          var tabla = '<table class="table" align="center" id="tableEntregas">'
-            + '<thead>'
-            + '<tr>'
-            + '<th>Numero</th>'
-            + '<th>Fecha</th>'
-            + '<th data-breakpoints="xs">Clase</th>'
-            + '<th data-breakpoints="xs">Usuario</th>'
-            + '<th data-breakpoints="xs">Valor</th>'
-            + '<th data-breakpoints="xs">Add</th>'
-            + '<th data-breakpoints="xs">CodDir</th>'
-            + '</tr>'
-            + '</thead>'
-            + '<body>';
-          var cont = 0;
-          var total = 0;
-          var usr = '';
-          var visualizar = '';
-          for (var i = 0; i <= data.length - 1; i++) {
-            tabla += '<tr>'
-              + '<td>' + data[i].numero + '</td>'
-              + '<td>' + data[i].fecha_pedido + '</td>'
-              + '<td>' + data[i].clase + '</td>'
-              + '<td>' + data[i].usuario + '</td>'
-              + '<td>' + formatNum(data[i].valor, '$') + '</td>'
-              + '<td align="center">'
-              + '<label class="contenedor">'
-              + '<input type="checkbox">'
-              + '<span class="checkmark"></span>'
-              + '</label>'
-              + '</td>'
-              + '<td>' + data[i].cod_direccion + '</td>'
-              + '</tr>';
-          }
-          tabla += '</body></table>';
-          $("#DvListaEntregas").html(tabla);
-        } else {
-          $("#DvListaEntregas").html('<div class="alert alert-danger" role="alert">'
-            + '<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>'
-            + '<span class="sr-only">Error:</span>NO EXISTEN RESULTADOS PARA LAS CONDICIONES SELECCIONADAS'
-            + '</div>');
-        }
-      }
+      });
 
-    }).done(function () {
+      if (data.length) {
+        let tabla = `
+        <table class="display" width="100%" id="tableEntregas">
+          <thead>
+            <tr>
+              <th>Numero</th>
+              <th>Fecha</th>
+              <th>Clase</th>
+              <th>Usuario</th>
+              <th>Valor</th>
+              <th>Add</th>
+              <th>CodDir</th>
+            </tr>
+          </thead>
+          <body>`; 
+
+        data.forEach(item => {
+          tabla += 
+          `<tr>
+            <td>${item.numero}</td>
+            <td>${item.fecha_pedido}</td>
+            <td>${item.clase}</td>
+            <td>${item.usuario}</td>
+            <td>${formatNum(item.valor, '$')}</td>
+            <td align="center">
+              <label class="contenedor">
+              <input type="checkbox">
+              <span class="checkmark"></span>
+              </label>
+            </td>
+            <td>${item.cod_direccion}</td>
+          </tr>`;
+        });
+        tabla += `</body></table>`;
+        $("#DvListaEntregas").html(tabla);
+
+        $('#tableEntregas').DataTable({
+          paging: false,
+          searching: false,
+          ordering: true,
+          info: false,
+          responsive: true,
+          scrollX: true,
+          language: {
+            zeroRecords: "No se encontraron registros",
+            infoEmpty: "No hay registros disponibles"
+          }
+        });
+      } else {
+        let msgHtml = `
+        <div class="alert alert-danger" role="alert">
+          <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+          <span class="sr-only">Error:</span>NO EXISTEN RESULTADOS PARA LAS CONDICIONES SELECCIONADAS
+        </div>`;
+        $("#DvListaEntregas").html(msgHtml);
+      }      
+    } catch (error) {
+      console.log(error);
+    } finally {
       UnloadImg();
-    }).fail(function (data) {
-      console.error(data);
-      UnloadImg();
-    });
-  } else {
-    Swal.fire('Error', 'Debe seleccionar un cliente', 'error');
-  }
+    }
+  } else Swal.fire('Error', 'Debe seleccionar un cliente', 'error');
 }
 
 function LimpiarEntregas() {
@@ -4041,11 +4015,11 @@ function LimpiarEntregas() {
   $("#DvListaEntregas").html('');
   $("#ClienteEntregas").focus();
 }
-
-function UnificarEntrega() {
-  var numeros = '';
-  var CodDir = 0;
-  var ContDir = 0;
+// FUNCIÓN PARA UNIFICAR ENTREGAS
+const UnificarEntrega = async () => {
+  let numeros = '';
+  let CodDir = 0;
+  let ContDir = 0;
   $("#tableEntregas tr:gt(0)").each(function (index, element) {
     if ($(this).find("td").eq(5).find("input").is(":checked")) {
       numeros += $.trim($(this).find("td").eq(0).html()) + ',';
@@ -4057,154 +4031,89 @@ function UnificarEntrega() {
     }
   });
 
-
   if (ContDir > 1) {
-    //console.log('No es posible crear una entrega unificada, los pedidos seleccionados poseen direcciones de despacho diferentes');
-    Swal.fire("No es posible crear una entrega unificada",
-      "Los pedidos seleccionados poseen direcciones de despacho diferentes",
-      "error");
+    Swal.fire("No es posible crear una entrega unificada", "Los pedidos seleccionados poseen direcciones de despacho diferentes", "error");
   } else {
-    if (numeros != '') { //alert(numeros);
-      $.ajax({
-        type: "POST",
-        encoding: "UTF-8",
-        url: "../models/WS-PW.php",
-        global: false,
-        error: function (OBJ, ERROR, JQERROR) {
-          alert(JQERROR);
-        },
-        beforeSend: function () {
-          LoadImg('CARGANDO...');
-        },
-        data: ({
-          op: "UNIFICA_ENTREGAS",
-          numeros: numeros
-        }),
-        dataType: "json",
-        async: true,
-        success: function (data) {
-          if (data.Tipo == 'S') {
-            Swal.fire({
-              title: data.Msj + ", desea generar la OT?",
-              text: "Despues de aceptar no podra reversar la operacion!",
-              icon: "question",
-              confirmButtonColor: "#82ED81",
-              cancelButtonColor: "#FFA3A4",
-              confirmButtonText: "Enviar!",
-              cancelButtonText: "No Enviar",
-              showLoaderOnConfirm: true,
-              showCancelButton: true,
-            }).then((result) => {
-              if (result.value) {
-                var entrega = data.Msj.replace(/\D/g, '');
-                var almacen = '';
-                switch ($.trim($("#OficinaEntregas").val())) {
-                  case '1100':
-                    almacen = 'D01';
-                    break; //Monteria
-                  case '1200':
-                    almacen = 'C01';
-                    break; //Cartagena 
-                  case '2100':
-                    almacen = 'M01';
-                    break; //Medellin
-                  case '2200':
-                    almacen = 'B01';
-                    break; //Bogota
-                  case '2300':
-                    almacen = 'L01';
-                    break; //Cali
-                  case '2400':
-                    almacen = 'R01';
-                    break; //Barranquilla
-                }
-                $.ajax({
-                  type: "POST",
-                  encoding: "UTF-8",
-                  url: "../models/WS-PW.php",
-                  global: false,
-                  error: function (OBJ, ERROR, JQERROR) {
-                    alert(JQERROR + " ");
-                  },
-                  data: ({
-                    op: 'CREA_ORDENES',
-                    almacen: almacen,
-                    entrega: entrega
-                  }),
-                  dataType: "json",
-                  async: false,
-                  success: function (data) { //alert(data);
-                    if (data.Tipo != 'S') {
-                      Swal.fire("Error", data.Msj, "error");
-                    } else {
-                      Swal.fire("Excelente", data.Msj, "success");
-                    }
-                    GestionEntregas();
-                  }
-                }).done(function (data) {
-                  //console.log(data);	
-                });
-              } else {
-                Swal.fire("Cancelado", "La operacion de guardado de pedido ha sido cancelada!", "error");
-              }
-            });
-            return false;
+    if (numeros != '') {
+      try {
+        LoadImg('Cargando... ⏳⏳⏳');
+        const data = await enviarPeticion({op: "UNIFICA_ENTREGAS", link: "../models/WS-PW.php", numeros});
+        if (data.Tipo == 'S') {
+          const result = await confirmAlert(`${data.Msj}, desea generar la OT?`, "Despues de aceptar no podra reversar la operación!");
+          if (result.isConfirmed) {
+            let entrega = data.Msj.replace(/\D/g, '');
+            let almacen = '';
+            switch ($.trim($("#OficinaEntregas").val())) {
+              case '1100':
+                almacen = 'D01';
+                break; // Monteria
+              case '1200':
+                almacen = 'C01';
+                break; // Cartagena 
+              case '2100':
+                almacen = 'M01';
+                break; // Medellin
+              case '2200':
+                almacen = 'B01';
+                break; // Bogota
+              case '2300':
+                almacen = 'L01';
+                break; // Cali
+              case '2400':
+                almacen = 'R01';
+                break; // Barranquilla
+            }
+            const data = await enviarPeticion({op: "", link: "", almacen, entrega});
+            if (data.Tipo != 'S') {
+              Swal.fire("Error", data.Msj, "error");
+            } else {
+              Swal.fire("Excelente", data.Msj, "success");
+            }
+            GestionEntregas();
           } else {
-            Swal.fire("Oops..!", data.Msj, "error");
-            return false;
+            Swal.fire("Cancelado", "La operación de guardado de pedido ha sido cancelada!", "error");
           }
+        } else {
+          Swal.fire("Oops..!", data.Msj, "error");
+          return false;
         }
-      }).done(function () {
+      } catch (error) {
+        console.log(error);
+      } finally {
         UnloadImg();
-      });
+      }     
     } else {
       Swal.fire('Error', 'Debe seleccionar por lo menos una entrega', 'error');
     }
   }
-
-
 }
 
 function ExcelFactura(num) {
-  if (num != 0 && num != '') {
-    window.open("../resources/Excel/ExcelFactura.php?num=" + num);
-  } else {
-    Swal.fire('Error', 'El pedido no posee factura.', 'error');
-  }
+  if (num != 0 && num != '') window.open("../resources/Excel/ExcelFactura.php?num=" + num);
+  else Swal.fire('Error', 'El pedido no posee factura.', 'error');
 }
 
 function ExcelPedido(num) {
-  if (num != 0 && num != '') {
-    window.open("../resources/Excel/ExcelPedido.php?num=" + num);
-  } else {
-    Swal.fire('Error', 'El pedido no posee pedido SAP.', 'error');
-  }
+  if (num != 0 && num != '') window.open("../resources/Excel/ExcelPedido.php?num=" + num);
+  else Swal.fire('Error', 'El pedido no posee pedido SAP.', 'error');
 }
 
 function ExcelEntrega(numE, numP) {
-  if (numE != 0 && numE != '') {
-    window.open("../resources/Excel/ExcelEntrega.php?num=" + numP);
-  } else {
-    Swal.fire('Error', 'El pedido no posee pedido SAP.', 'error');
-  }
+  if (numE != 0 && numE != '') window.open("../resources/Excel/ExcelEntrega.php?num=" + numP);
+  else Swal.fire('Error', 'El pedido no posee pedido SAP.', 'error');
 }
 
 function ExcelOrden(num) {
-  if (num != 0 && num != '') {
-    window.open("../resources/Excel/ExcelOrden.php?num=" + num);
-  } else {
-    Swal.fire('Error', 'El pedido no posee pedido SAP.', 'error');
-  }
+  if (num != 0 && num != '') window.open("../resources/Excel/ExcelOrden.php?num=" + num);
+  else Swal.fire('Error', 'El pedido no posee pedido SAP.', 'error');
 }
 
 function TxtFactura(num) {
-  if (num != 0 && num != '') {
-    window.open("../resources/TXT/TxtFactura.php?num=" + num);
-  } else {
-    Swal.fire('Error', 'El pedido no posee factura.', 'error');
-  }
+  if (num != 0 && num != '') window.open("../resources/TXT/TxtFactura.php?num=" + num);
+  else Swal.fire('Error', 'El pedido no posee factura.', 'error');
 }
 
+// TODO: REFACTORIZAR FUNCIÓN LISTAR FACTURAS
 function ListarFacturas() {
   var DepId = $.trim($("#Dpto").val());
   var codigo = '';
@@ -4318,92 +4227,89 @@ function LimpiarFacturas() {
 }
 
 function LimpiarFaltantes() {
-
   $("#txtFaltanteCodigoCliente").val('');
   $("#txtFaltanteCliente").val('');
   $("#VtotalFaltante").html('');
   $("#DvListaFaltante").html('');
   $("#txtFaltanteCliente").focus();
 }
+// FUNCIÓN FALTANTES
+const Faltante = async () => {
+  let DepId = $.trim($("#Dpto").val());
+  let codigo = '';
 
-function Faltante() {
-  var DepId = $.trim($("#Dpto").val());
-  var codigo = '';
   if (DepId != 10) {
     codigo = $("#txtFaltanteCodigoCliente").val();
   } else {
     codigo = $("#txt_codigoSap").val();
   }
-  var fh1 = $("#txtFaltanteFecha1").val();
-  var fh2 = $("#txtFaltanteFecha2").val();
-  var fact = $("#txtNumFact").val();
-  if ((codigo != '') || (fact != '')) {
-    $.ajax({
-      type: "POST",
-      encoding: "UTF-8",
-      url: "../models/PW-SAP.php",
-      global: false,
-      error: function (OBJ, ERROR, JQERROR) {
-        alert(JQERROR + " ");
-      },
-      beforeSend: function () {
-        LoadImg('CARGANDO...');
-      },
-      data: ({
-        op: 'S_FALTANTES',
-        codigo: codigo,
-        fh1: fh1,
-        fh2: fh2,
-        fact: fact
-      }),
-      dataType: "json",
-      async: true,
-      success: function (data) { //alert(data);
-        if (data != '' && data != null) {
-          var tabla = '<table class="table" align="center" id="tdFaltantes">'
-            + '<thead>'
-            + '<tr>'
-            + '<th data-breakpoints="xs">Cliente</th>'
-            + '<th data-breakpoints="xs">No Pedido</th>'
-            + '<th data-breakpoints="xs">Codigo</th>'
-            + '<th data-breakpoints="xs">Descripcion</th>'
-            + '<th data-breakpoints="xs">Cant Entrega</th>'
-            + '<th data-breakpoints="xs">Cant Pedido</th>'
-            + '<th data-breakpoints="xs">No Entrega</th>'
-            + '</tr>'
-            + '</thead>'
-            + '<body>';
-          var cont = 0;
-          var total = 0;
-          var usr = '';
-          var visualizar = '';
-          for (var i = 0; i <= data.length - 1; i++) {
-            tabla += '<tr>'
-              + '<td>' + data[i].CODIGO_SAP + '</td>'
-              + '<td>' + data[i].NUMERO + '</td>'
-              + '<td>' + data[i].CODIGO_MATERIAL + '</td>'
-              + '<td>' + data[i].DESCRIPCION + '</td>'
-              + '<td>' + data[i].CANTIDAD + '</td>'
-              + '<td>' + data[i].CANT_PED + '</td>'
-              + '<td>' + data[i].ENTREGA + '</td>'
-              + '</tr>';
-            //total+=parseFloat(data[i].VALOR);
+
+  let fh1 = $("#txtFaltanteFecha1").val();
+  let fh2 = $("#txtFaltanteFecha2").val();
+  let fact = $("#txtNumFact").val();
+
+  if (codigo != '' || fact != undefined) {
+    try {
+      LoadImg('Cargando... ⏳⏳⏳');
+      const data = await enviarPeticion({op: "S_FALTANTES", link: "../models/PW-SAP.php", codigo, fh1, fh2, fact});
+      if (data != '' && data != null) {
+         let tabla = `
+         <table class="table" align="center" id="tdFaltantes">
+          <thead>
+            <tr>
+              <th>Cliente</th>
+              <th>No Pedido</th>
+              <th>Codigo</th>
+              <th>Descripcion</th>
+              <th>Cant Entrega</th>
+              <th>Cant Pedido</th>
+              <th>No Entrega</th>
+            </tr>
+          </thead>
+          <body>`;
+
+        data.forEach(item => {
+          tabla += `
+          <tr>
+            <td>${item.CODIGO_SAP}</td>
+            <td>${item.NUMERO}</td>
+            <td>${item.CODIGO_MATERIAL}</td>
+            <td>${item.DESCRIPCION}</td>
+            <td>${item.CANTIDAD}</td>
+            <td>${item.CANT_PED}</td>
+            <td>${item.ENTREGA}</td>
+          </tr>`;
+        });
+        tabla += `</body></table>`;
+        $("#DvListaFaltante").html(tabla);
+        $("#VtotalFaltante").html('');
+
+        $('#tdFaltantes').DataTable({
+          paging: false,
+          searching: false,
+          ordering: true,
+          info: false,
+          responsive: true,
+          scrollX: true,
+          language: {
+            zeroRecords: "No se encontraron registros",
+            infoEmpty: "No hay registros disponibles"
           }
-          tabla += '</body></table>';
-          $("#DvListaFaltante").html(tabla);
-          //$("#VtotalFaltante").html('<div class="alert alert-info" role="info"><b>VALOR TOTAL: '+formatNum(total,'$')+'</b></div>');
-          $("#VtotalFaltante").html('');
-        } else {
-          $("#VtotalFaltante").html('');
-          $("#DvListaFaltante").html('<div class="alert alert-danger" role="alert">'
-            + '<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>'
-            + '<span class="sr-only">Error:</span>NO EXISTEN RESULTADOS PARA LAS CONDICIONES SELECCIONADAS' + '</div>');
-        }
+        });
+      } else {
+        let msgHtml = `
+        <div class="alert alert-danger" role="alert">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          <span class="sr-only">Error:</span>NO EXISTEN RESULTADOS PARA LAS CONDICIONES SELECCIONADAS
+        </div>`;
+        $("#VtotalFaltante").html('');
+        $("#DvListaFaltante").html(msgHtml);
       }
-    }).done(function (data) {
+    } catch (error) {
+      console.log(error);
+    } finally {
       UnloadImg();
-      //console.log(data);	
-    });
+    }
   } else {
     Swal.fire('Error', 'Debe seleccionar un cliente', 'error');
   }
@@ -5147,7 +5053,7 @@ const crearPedidoRedencion = async () => {
       try {
         $("#ModalPP").modal('hide');
         $("#ModalPPDetalle").modal('hide');
-        LoadImg('Generando solicitud, por favor espere...');
+        LoadImg('Generando solicitud, por favor espere... ⏳⏳⏳');
         const resp = await enviarPeticion(data);
         if (!resp.error) {
           if (resp.cod_error == 0) {
@@ -5509,6 +5415,22 @@ async function Top_20_mas_vendidos_con_copi() {
   $('#ModalTop20_100_130').modal('show');
 }
 
+const validarCargaClientes = () => {
+  let DepId = $("#Dpto").val();
+  if (DepId == 10) {
+    if ($.trim($("#Nit").val()) == "") {
+      Swal.fire("Session Error", "No se logro cargar la informacion, salga del sistema e intente nuevamente!", "error");
+      setTimeout(function () {
+        parent.$("#iframe").trigger("click");
+      }, 3000);
+    } else {
+      LoadArrayCli();
+    }
+  } else {
+    LoadArrayCli();
+  }
+}
+
 // EJECUCIÓN DE LAS FUNCIONALIDADES AL CARGAR EL DOM
 $(function () { 
   Permisos(); // Validacion de permisos
@@ -5530,19 +5452,7 @@ $(function () {
   $("#txtZonas,#FiltroOficinaVentas,#txtClasePedido").select2();
 
   // VALIDO SI EXISTE NIT PARA LOS CLIENTES
-  let DepId = $("#Dpto").val();
-  if (DepId == 10) {
-    if ($.trim($("#Nit").val()) == "") {
-      Swal.fire("Session Error", "No se logro cargar la informacion, salga del sistema e intente nuevamente!", "error");
-      setTimeout(function () {
-        parent.$("#iframe").trigger("click");
-      }, 3000);
-    } else {
-      LoadArrayCli();
-    }
-  } else {
-    LoadArrayCli();
-  }
+  validarCargaClientes();
 
   // Tabulacion de pestañas de seleccion	
   $("#btnProductos").click(function () {
@@ -5783,6 +5693,7 @@ $(function () {
   });
   
   // Busqueda o carga de cliente segun departamento
+  let DepId = $("#Dpto").val();
   if (DepId == 10) {
     $("#colCliente").html('<select id="txt_cliente" class="form-select size-text"></select>');
 
@@ -5806,27 +5717,102 @@ $(function () {
     </div>`;
     $("#colCliente").html(inputCliente);
 
+    // $('#txt_cliente').autocomplete({
+    //   source: function (request, response) {
+    //     Arr_cli = ArrCli;
+    //     valor = $.trim($("#txt_cliente").val());
+    //     //
+    //     if (validarSiNumero(valor) == 1) {
+    //       Arr_cli = FiltrarCli(valor, Arr_cli, 1);
+    //     } else {
+    //       div_cadena = valor;
+    //       div_cadena = div_cadena.split(" ");
+    //       for (var x = 0; x < div_cadena.length; x++) {
+    //         expr = $.trim(div_cadena[x]);
+    //         Arr_cli = FiltrarCli(expr, Arr_cli, 2);
+    //       }
+    //     }
+    //     response(Arr_cli.slice(0, 10));
+    //   },
+    //   maxResults: 10,
+    //   minLength: 3,
+    //   search: function () { },
+    //   open: function (event, ui) { },
+    //   select: function (event, ui) {
+    //     $("#TxtIntegracion").attr('disabled', true);
+    //     $("#txt_nit").val(ui.item.nit);
+    //     $("#txt_dir").val(ui.item.direccion);
+    //     $("#txt_tel").val(ui.item.telefonos);
+    //     $("#txt_mail").val(ui.item.email);
+    //     $("#txt_ciudad").val(ui.item.ciudad);
+    //     $("#txt_cupo").val(formatNum(ui.item.cupo_credito, '$'));
+        
+    //     $("#txt_oficina").html(OfcN);
+    //     $("#txt_oficina option[value='" + ui.item.bodega + "']").attr("selected", true);
+    //     //Validamos los permisos para cambio de bodega y activamos o desactivamos esta opcion.
+    //     if (Perm_Cambiar_Bodega != 'S') {
+    //       $("#txt_oficina").attr("disabled", true);
+    //     } else {
+    //       $("#txt_oficina").attr("disabled", false);
+    //     }
+        
+    //     $("#txt_condicion").val(ui.item.condicion_pago);
+    //     $("#txt_lista").val(ui.item.lista);
+    //     $("#txt_vendedor").val(ui.item.vendedor);
+    //     $("#txt_televendedor").val(ui.item.televendedor);
+    //     $("#txt_vendedor_tel").val(ui.item.telefono_vendedor);
+    //     $("#txt_televendedor_tel").val(ui.item.telefono_televendedor);
+    //     $("#txt_codigoSap").val(ui.item.codigo_sap);
+    //     $("#txt_descuento").val(ui.item.descuento_financiero);
+    //     $("#txt_plazo").val(ui.item.dias_pago + ' dias');
+    //     Destinatarios(ui.item.codigo_sap, ui.item.ciudad, ui.item.direccion);
+    //     Presupuesto_datos();
+    //     Cartera_edades();
+    //     if (ui.item.institucional == 1) {
+    //       $("#txt_institucional").val('SI');
+    //     } else {
+    //       $("#txt_institucional").val('NO');
+    //     }
+    //     if (ui.item.controlados == 1) {
+    //       $("#txt_controlado").val('SI');
+    //     } else {
+    //       $("#txt_controlado").val('NO');
+    //     }
+    //     $("#btnProductos").attr("disabled", false);
+    //     // Grupos de clientes
+    //     $("#txtGrp1").val(ui.item.grupo1);
+    //     $("#txtGrp2").val(ui.item.grupo2);
+    //     $("#txtGrp1,#txtGrp2").prop('disabled', true);
+        
+    //     CargarEvento();
+    //     BuscarProductos();
+    //   }
+    // });
+    
+    let timer;
+
     $('#txt_cliente').autocomplete({
       source: function (request, response) {
-        Arr_cli = ArrCli;
-        valor = $.trim($("#txt_cliente").val());
-        //
-        if (validarSiNumero(valor) == 1) {
-          Arr_cli = FiltrarCli(valor, Arr_cli, 1);
-        } else {
-          div_cadena = valor;
-          div_cadena = div_cadena.split(" ");
-          for (var x = 0; x < div_cadena.length; x++) {
-            expr = $.trim(div_cadena[x]);
-            Arr_cli = FiltrarCli(expr, Arr_cli, 2);
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+          const termino = $.trim(request.term).toLowerCase();
+
+          if (termino.length < 3) {
+            response([]);
+            return;
           }
-        }
-        response(Arr_cli.slice(0, 10));
+
+          // Filtrado más limpio y eficiente
+          const resultados = ArrCli.filter(cli =>
+            cli.nombres.toLowerCase().includes(termino) ||
+            cli.razon_comercial.toLowerCase().includes(termino) ||
+            cli.nit.includes(termino)
+          );
+
+          response(resultados.slice(0, 10)); // devolver máximo 10
+        }, 150); // Delay para evitar saturar la UI
       },
-      maxResults: 10,
       minLength: 3,
-      search: function () { },
-      open: function (event, ui) { },
       select: function (event, ui) {
         $("#TxtIntegracion").attr('disabled', true);
         $("#txt_nit").val(ui.item.nit);
@@ -5835,16 +5821,16 @@ $(function () {
         $("#txt_mail").val(ui.item.email);
         $("#txt_ciudad").val(ui.item.ciudad);
         $("#txt_cupo").val(formatNum(ui.item.cupo_credito, '$'));
-        
+
         $("#txt_oficina").html(OfcN);
         $("#txt_oficina option[value='" + ui.item.bodega + "']").attr("selected", true);
-        //Validamos los permisos para cambio de bodega y activamos o desactivamos esta opcion.
+
         if (Perm_Cambiar_Bodega != 'S') {
           $("#txt_oficina").attr("disabled", true);
         } else {
           $("#txt_oficina").attr("disabled", false);
         }
-        
+
         $("#txt_condicion").val(ui.item.condicion_pago);
         $("#txt_lista").val(ui.item.lista);
         $("#txt_vendedor").val(ui.item.vendedor);
@@ -5854,25 +5840,20 @@ $(function () {
         $("#txt_codigoSap").val(ui.item.codigo_sap);
         $("#txt_descuento").val(ui.item.descuento_financiero);
         $("#txt_plazo").val(ui.item.dias_pago + ' dias');
+
         Destinatarios(ui.item.codigo_sap, ui.item.ciudad, ui.item.direccion);
         Presupuesto_datos();
         Cartera_edades();
-        if (ui.item.institucional == 1) {
-          $("#txt_institucional").val('SI');
-        } else {
-          $("#txt_institucional").val('NO');
-        }
-        if (ui.item.controlados == 1) {
-          $("#txt_controlado").val('SI');
-        } else {
-          $("#txt_controlado").val('NO');
-        }
+
+        $("#txt_institucional").val(ui.item.institucional == 1 ? 'SI' : 'NO');
+        $("#txt_controlado").val(ui.item.controlados == 1 ? 'SI' : 'NO');
+
         $("#btnProductos").attr("disabled", false);
-        // Grupos de clientes
+
         $("#txtGrp1").val(ui.item.grupo1);
         $("#txtGrp2").val(ui.item.grupo2);
         $("#txtGrp1,#txtGrp2").prop('disabled', true);
-        
+
         CargarEvento();
         BuscarProductos();
       }
@@ -5889,13 +5870,12 @@ $(function () {
     } else {
       $(this).addClass('DivCheckBoxTrue');
     }
-    //id del div
+    
     id = $(this).attr("id");
     if (id == 'DvChkKits') {
       BuscarProductos();
     }
 
-    //if($("#txt_bproductos").val()!=''){
     var n = 0;
     var sto = 0;
     if (validarSiNumero(valor) == 1) {

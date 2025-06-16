@@ -18,8 +18,7 @@ Redireccionar();
   <title>Modulo de pedidos WEB - SAP</title>
   <link type="text/css" rel="stylesheet" href="../resources/css/start/jquery-ui-1.9.2.custom.css?<?php echo (rand()); ?>" />
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link type="text/css" rel="stylesheet" href="../resources/css/Animate.css?<?php echo (rand()); ?>">
   <link type="text/css" rel="stylesheet" href="../resources/css/BootstrapTabs.css?<?php echo (rand()); ?>">
   <link type="text/css" rel="stylesheet" href="../resources/select2-bootstrap4-theme/select2-bootstrap4.css">
@@ -125,6 +124,10 @@ Redireccionar();
       .input-total {
         text-align: center;
       }
+
+      .w-btn {
+        width: 112px;
+      }
     }
 
     .centrado-porcentual {
@@ -169,7 +172,10 @@ Redireccionar();
     }
 
     #ui-id-1,
-    #ui-id-2 {
+    #ui-id-2,
+    #ui-id-3,
+    #ui-id-4,
+    #ui-id-5 {
       font-size: 13px;
     }
 
@@ -255,18 +261,18 @@ Redireccionar();
               <p class="separador"><strong>Entregas</strong></p>
             </li>
             <li>
-              <a class="dropdown-item size-a" data-bs-toggle="tab" href="#dvExtra3" role="tab" aria-controls="dvExtra1" aria-selected="false">
+              <a class="dropdown-item size-a" id="btnAddEntregas" data-bs-toggle="tab" href="#dvAddEntregas" role="tab" aria-controls="dvAddEntregas" aria-selected="false">
                 <i class="fa-solid fa-chevron-right"></i>&nbsp;Unificar</a>
             </li>
             <li>
-              <a class="dropdown-item size-a" data-bs-toggle="tab" href="#dvExtra4" role="tab" aria-controls="dvExtra2" aria-selected="false">
+              <a class="dropdown-item size-a" id="btnFaltantes" data-bs-toggle="tab" href="#dvFaltantes" role="tab" aria-controls="dvFaltantes" aria-selected="false">
                 <i class="fa-solid fa-chevron-right"></i>&nbsp;Faltantes</a>
             </li>
             <li>
               <p class="separador"><strong>Facturas</strong></p>
             </li>
             <li>
-              <a class="dropdown-item size-a" data-bs-toggle="tab" href="#dvExtra5" role="tab" aria-controls="dvExtra1" aria-selected="false">
+              <a class="dropdown-item size-a" id="btListaFacts" data-bs-toggle="tab" href="#dvListaFacts" role="tab" aria-controls="dvListaFacts" aria-selected="false">
                 <i class="fa-solid fa-chevron-right"></i>&nbsp;Facturas</a>
             </li>
           </ul>
@@ -446,12 +452,12 @@ Redireccionar();
               </tr>
               <tr>
                 <td class="size-text">Zona de ventas</td>
-                <td><select id="txtZonas" class="form-control size-text shadow-sm" style="width:100%">
+                <td><select id="txtZonas" class="form-select size-text shadow-sm" style="width:100%">
                   </select></td>
               </tr>
               <tr class="custom-tr">
                 <td class="size-text">Clase de Pedido</td>
-                <td><select id="txtClasePedido" class="form-control size-text shadow-sm" style="width:100%">
+                <td><select id="txtClasePedido" class="form-select size-text shadow-sm" style="width:100%">
                     <option value="T" selected>TODOS</option>
                     <option value="ZPWA">ZPWA - ADMINISTRADOR</option>
                     <option value="ZPWV">ZPWV - VENDEDOR</option>
@@ -464,7 +470,7 @@ Redireccionar();
               </tr>
               <tr class="custom-tr">
                 <td class="size-text">Oficina de ventas</td>
-                <td colspan="2"><select id="FiltroOficinaVentas" class="form-control size-text shadow-sm" style="width:100%">
+                <td colspan="2"><select id="FiltroOficinaVentas" class="form-select size-text shadow-sm" style="width:100%">
                   </select></td>
               </tr>
               <tr class="custom-tr">
@@ -477,34 +483,135 @@ Redireccionar();
               </tr>
               <tr class="custom-tr">
                 <td class="size-text">Temporales Historia</td>
-                <td colspan="2"><select id="txtTemporalesHistoria" class="form-control size-text shadow-sm" style="width:100%">
+                <td colspan="2"><select id="txtTemporalesHistoria" class="form-select size-text shadow-sm" style="width:100%">
                     <option value="N" selected>NO</option>
                     <option value="S">SI</option>
                   </select></td>
               </tr>
             </tbody>
           </table>
-          <div class="">
-            <button class="btn btn-info btn-sm w-btn" onClick="GestionPedidos();">Buscar</button>
-            <button class="btn btn-success btn-sm w-btn" id="exportar_gestion">Exportar</button>
+          <div>
+            <button class="btn btn-outline-primary btn-sm w-btn" onClick="GestionPedidos();">Buscar</button>
+            <button class="btn btn-outline-success btn-sm w-btn" id="exportar_gestion">Exportar</button>
             <button class="btn btn-light btn-sm w-btn btn-micro" onClick="LimpiarGestionPedido();">Limpiar</button>
           </div>
           <hr>
-        </div>        
+        </div>
         <div id="VtotalTerceros"></div>
         <div id="DvRecuperablesTerceros"></div>
       </div>
-      <div class="tab-pane fade" id="dvExtra3" role="tabpanel">
-        Contenido Extra 3
+      <div class="tab-pane fade p-2" id="dvAddEntregas" role="tabpanel">
+        <input type="hidden" id="CodigoSAPEntregas" class="form-control">
+        <div class="div-container">
+          <table style="width: 100%;">
+            <thead>
+              <tr class="custom-tr">
+                <th class="custom-thead" colspan="3">GESTION DE ENTREGAS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="custom-tr">
+                <td class="size-text">Cliente</td>
+                <td><input type="text" id="ClienteEntregas" placeholder="Cliente" class="form-control size-text shadow-sm"></td>
+              </tr>
+              <tr class="custom-tr">
+                <td class="size-text">Oficina</td>
+                <td><select id="OficinaEntregas" class="form-select size-text shadow-sm">
+                  </select></td>
+              </tr>
+              <tr class="custom-tr">
+                <td class="size-text">Fecha Inicial</td>
+                <td colspan="2"><input type="text" id="EntregasFecha1" placeholder="Fecha Inicial" class="form-control size-text shadow-sm"></td>
+              </tr>
+              <tr class="custom-tr">
+                <td class="size-text">Fecha Final</td>
+                <td colspan="2"><input type="text" id="EntregasFecha2" placeholder="Fecha Final" class="form-control size-text shadow-sm"></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="mt-2">
+            <button class="btn btn-outline-primary btn-sm w-btn" onClick="GestionEntregas();">Buscar</button>
+            <button class="btn btn-outline-success btn-sm w-btn" onClick="UnificarEntrega();">Crear Entrega</button>
+            <button class="btn btn-light btn-sm w-btn btn-micro" onClick="LimpiarEntregas();">Limpiar</button>
+          </div>
+        </div>
+        <hr>
+        <div id="DvListaEntregas"></div>
       </div>
-      <div class="tab-pane fade" id="dvExtra4" role="tabpanel">
-        Contenido Extra 4
+      <div class="tab-pane fade p-2" id="dvFaltantes" role="tabpanel">
+        <input type="hidden" id="txtFaltanteCodigoCliente" class="form-control" readonly disabled>
+        <div class="div-container">
+          <table style="width: 100%;">
+            <thead>
+              <tr class="custom-tr">
+                <th class="custom-thead" colspan="3">LISTADO DE FALTANTES</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="custom-tr" id="tr_cliente_faltante">
+                <td class="size-text">Cliente</td>
+                <td><input type="text" id="txtFaltanteCliente" placeholder="Cliente" class="form-control size-text shadow-sm"></td>
+              </tr>
+              <tr class="custom-tr">
+                <td class="size-text">Fecha Inicial</td>
+                <td colspan="2"><input type="text" id="txtFaltanteFecha1" placeholder="Fecha Inicial" class="form-control size-text shadow-sm"></td>
+              </tr>
+              <tr class="custom-tr">
+                <td class="size-text">Fecha Final</td>
+                <td colspan="2"><input type="text" id="txtFaltanteFecha2" placeholder="Fecha Final" class="form-control size-text shadow-sm"></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="mt-2">
+            <button class="btn btn-outline-primary btn-sm w-btn" onClick="Faltante();">Buscar</button>
+            <button class="btn btn-outline-success btn-sm w-btn" onClick="fnExcelReport('tdFaltantes');">Exportar</button>
+            <button class="btn btn-light btn-sm w-btn btn-micro" onClick="LimpiarFaltantes();">Limpiar</button>
+          </div>
+        </div>
+        <hr>
+        <div id="VtotalFaltante"></div>
+        <div id="DvListaFaltante"></div>
       </div>
-      <div class="tab-pane fade" id="dvExtra5" role="tabpanel">
-        Contenido Extra 5
+      <div class="tab-pane fade p-2" id="dvListaFacts" role="tabpanel">
+        <input type="hidden" id="txtFactCodigoCliente" class="form-control" readonly disabled>
+        <div class="div-container">
+          <table style="width: 100%;">
+            <thead>
+              <tr class="custom-tr">
+                <th class="custom-thead" colspan="3">FACTURACIÓN DE TERCEROS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="custom-tr" id="tr_cliente_fact">
+                <td class="size-text">Cliente</td>
+                <td><input type="text" id="txtFactCliente" placeholder="Cliente" class="form-control size-text shadow-sm"></td>
+              </tr>
+              <tr class="custom-tr">
+                <td class="size-text">Numero factura</td>
+                <td><input type="text" id="txtNumFact" placeholder="Numero de factura" class="form-control size-text shadow-sm"></td>
+              </tr>
+              <tr class="custom-tr">
+                <td class="size-text">Fecha Inicial</td>
+                <td colspan="2"><input type="text" id="txtFactFecha1" placeholder="Fecha Inicial" class="form-control size-text shadow-sm"></td>
+              </tr>
+              <tr class="custom-tr">
+                <td class="size-text">Fecha Final</td>
+                <td colspan="2"><input type="text" id="txtFactFecha2" placeholder="Fecha Final" class="form-control size-text shadow-sm"></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="mt-2">
+            <button class="btn btn-outline-primary btn-sm w-btn" onClick="ListarFacturas();">Buscar</button>
+            <button class="btn btn-light btn-sm w-btn btn-micro" onClick="LimpiarFacturas();">Limpiar</button>
+          </div>
+          <hr>
+          <div id="VtotalFacturas"></div>
+          <div id="DvListaFacturas"></div>
+        </div>
       </div>
     </div>
   </div>
+  
   <!-- DIV'S PARA RENDERIZAR LOS LOADING -->
   <div id="Bloquear" style="display: none;"></div>
   <div id="loaderOverlay" class="centrado-porcentual" style="display: none;"></div>
@@ -707,7 +814,7 @@ Redireccionar();
                   </tr>
                   <tr>
                     <td class="vertical">COMPETENCIA</td>
-                    <td><select id="shoping_competencia" class="form-control size-th"></select></td>
+                    <td><select id="shoping_competencia" class="form-select size-th"></select></td>
                   </tr>
                   <tr>
                     <td class="vertical">VALOR COMPETENCIA</td>
@@ -1211,7 +1318,7 @@ Redireccionar();
             <tbody>
               <tr>
                 <td>Tipo</td>
-                <td><select id="EdtTipo" class="form-control">
+                <td><select id="EdtTipo" class="form-select">
                     <option value="0">ADG (Temporal)</option>
                     <option value="1">SAP (Real)</option>
                   </select></td>
@@ -1343,12 +1450,12 @@ Redireccionar();
               </tr>
               <tr>
                 <td>Grupo 1</td>
-                <td><select class="form-control" id="txtGrp1" readonly disabled>
+                <td><select class="form-select" id="txtGrp1" readonly disabled>
                   </select></td>
               </tr>
               <tr>
                 <td>Grupo 2</td>
-                <td><select class="form-control" id="txtGrp2" readonly disabled>
+                <td><select class="form-select" id="txtGrp2" readonly disabled>
                   </select></td>
               </tr>
             </tbody>
@@ -1480,12 +1587,8 @@ Redireccionar();
   <script type="text/javascript" src="../lib/js/jquery-2.1.1.min.js?<?php echo (rand()); ?>"></script>
   <script type="text/javascript" src="../lib/js/jquery-ui-1.9.2.custom.js?<?php echo (rand()); ?>"></script>
   <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-  <script
-    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.min.js"
-    integrity="sha384-RuyvpeZCxMJCqVUGFI0Do1mQrods/hhxYlcVfGPOfQtPJh0JCw12tUAZ/Mv10S7D"
-    crossorigin="anonymous">
-  </script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.13.2/dist/sweetalert2.all.min.js"></script>
   <script type="text/javascript" src="../lib/js/funciones.js?<?php echo (rand()); ?>"></script>
   <script type="text/javascript" src="../lib/js/servicios.js?<?php echo (rand()); ?>"></script>
