@@ -25,6 +25,7 @@ Redireccionar();
   <link type="text/css" rel="stylesheet" href="../resources/select2/css/select2.css">
   <link type="text/css" rel="stylesheet" href="../resources/fontawesome/css/all.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.13.2/dist/sweetalert2.min.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
   <style>
     .modal-body {
       max-height: calc(100vh - 200px);
@@ -244,14 +245,18 @@ Redireccionar();
         </li>
         <li class="nav-item dropdown" role="presentation">
           <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
-            <i class="fa-solid fa-list-check"></i>&nbsp;Gestión</a>
+            <i class="fa-solid fa-list-check"></i>
+            &nbsp;Gestión
+          </a>
           <ul class="dropdown-menu">
             <li>
               <p class="separador"><strong>Pedidos</strong></p>
             </li>
             <li>
               <a class="dropdown-item size-a" id="btnTemporales" data-bs-toggle="tab" href="#dvRecuperar" role="tab" aria-controls="dvRecuperar" aria-selected="false">
-                <i class="fa-solid fa-chevron-right"></i>&nbsp;Propios</a>
+                <i class="fa-solid fa-chevron-right"></i>
+                &nbsp;Propios
+              </a>
             </li>
             <li>
               <a class="dropdown-item size-a" id="btnTempTerceros" data-bs-toggle="tab" href="#dvRecuperarTerceros" role="tab" aria-controls="dvRecuperarTerceros" aria-selected="false">
@@ -262,18 +267,33 @@ Redireccionar();
             </li>
             <li>
               <a class="dropdown-item size-a" id="btnAddEntregas" data-bs-toggle="tab" href="#dvAddEntregas" role="tab" aria-controls="dvAddEntregas" aria-selected="false">
-                <i class="fa-solid fa-chevron-right"></i>&nbsp;Unificar</a>
+                <i class="fa-solid fa-chevron-right"></i>
+                &nbsp;Unificar
+              </a>
             </li>
             <li>
               <a class="dropdown-item size-a" id="btnFaltantes" data-bs-toggle="tab" href="#dvFaltantes" role="tab" aria-controls="dvFaltantes" aria-selected="false">
-                <i class="fa-solid fa-chevron-right"></i>&nbsp;Faltantes</a>
+                <i class="fa-solid fa-chevron-right"></i>
+                &nbsp;Faltantes
+              </a>
             </li>
             <li>
               <p class="separador"><strong>Facturas</strong></p>
             </li>
             <li>
               <a class="dropdown-item size-a" id="btListaFacts" data-bs-toggle="tab" href="#dvListaFacts" role="tab" aria-controls="dvListaFacts" aria-selected="false">
-                <i class="fa-solid fa-chevron-right"></i>&nbsp;Facturas</a>
+                <i class="fa-solid fa-chevron-right"></i>
+                &nbsp;Facturación
+              </a>
+            </li>
+            <li>
+              <p class="separador" id="separadorEventos"><strong>Eventos</strong></p>
+            </li>
+            <li>
+              <a class="dropdown-item size-a" id="btnEventos" data-bs-toggle="tab" href="#dvEventos" role="tab" aria-controls="dvEventos" aria-selected="false">
+                <i class="fa-solid fa-chevron-right"></i>
+                &nbsp;Ofertas
+              </a>
             </li>
           </ul>
         </li>
@@ -609,9 +629,47 @@ Redireccionar();
           <div id="DvListaFacturas"></div>
         </div>
       </div>
+      <div class="tab-pane fade p-2" id="dvEventos" role="tabpanel">
+        <div class="container-fluid">
+          <div class="row mb-2">
+            <div class="col-md-4 mb-1">
+              <div class="input-group">
+                <span class="input-group-text" id="basic-addon1"><i class="fa-solid fa-filter text-secondary" style="width: 30px;"></i></span>
+                <select class="form-select blog" id="selTipos">
+                  <option value="T">Todos</option>
+                  <option value="BON">Bonificados</option>
+                  <option value="DES">Descuentos</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-4 mb-1">
+              <div class="input-group">
+                <span class="input-group-text" id="basic-addon1"><i class="fa-solid fa-gifts text-primary" style="width: 30px;"></i></span>
+                <input type="text" id="CantBoni" class="form-control" disabled readonly>
+              </div>
+            </div>
+            <div class="col-md-4 mb-1">
+              <div class="input-group">
+                <span class="input-group-text" id="basic-addon1"><i class="fa fa-tags text-warning" style="width: 30px;"></i></span>
+                <input type="text" id="CantDesc" class="form-control" disabled readonly>
+              </div>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-12">
+              <div class="input-group"> 
+                <span class="input-group-text" id="basic-addon1"><i class="fa-solid fa-newspaper text-success" style="width: 30px;"></i></span>
+                <input type="text" id="txtFilter" class="form-control shadow-sm" placeholder="Filtro por líneas..." autocomplete="off">
+              </div>
+            </div>
+          </div>
+          <div id="ResultEventos"></div>
+        </div>
+      </div>
     </div>
   </div>
-  
+  <!-- FIN CONTENIDO PRINCIPAL -->
+
   <!-- DIV'S PARA RENDERIZAR LOS LOADING -->
   <div id="Bloquear" style="display: none;"></div>
   <div id="loaderOverlay" class="centrado-porcentual" style="display: none;"></div>
@@ -1590,6 +1648,7 @@ Redireccionar();
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.13.2/dist/sweetalert2.all.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
   <script type="text/javascript" src="../lib/js/funciones.js?<?php echo (rand()); ?>"></script>
   <script type="text/javascript" src="../lib/js/servicios.js?<?php echo (rand()); ?>"></script>
   <script type="text/javascript" src="../resources/HighCharts/code/highcharts.js?<?php echo (rand()); ?>"></script>
