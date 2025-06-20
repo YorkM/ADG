@@ -224,6 +224,8 @@ switch ( $_POST[ 'op' ] ) {
       $lista1 . "','" .
       $lista2 . "');";
       $q = mssql_query( $sql );
+      if ($q) echo json_encode(['ok' => true, 'msg' => "Se insertaron los datos correctamente"]);
+      else echo json_encode(['ok' => false, 'msg' => "Error al insertar los datos"]);
       mssql_close();
     }
     break;
@@ -1783,6 +1785,8 @@ switch ( $_POST[ 'op' ] ) {
 										'" . $_POST[ 'stock' ] . "',
 										'" . $_SESSION[ "ses_NumOrg" ] . "');";
       $q = mssql_query( $sql );
+      if ($q) echo json_encode(['ok' => true, 'msg' => "Datos insertados corretamente"]);
+      else echo json_encode(['ok' => false, 'msg' => "Datos no insertados"]);
       mssql_close();
     }
     break;

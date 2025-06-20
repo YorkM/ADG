@@ -89,7 +89,7 @@ Redireccionar();
 
     .custom-total {
       background-color: #cff4fc;
-      width: 30%;
+      width: 35%;
       margin: 0 auto;
       position: fixed;
       bottom: 10px;
@@ -99,7 +99,7 @@ Redireccionar();
       justify-content: center;
       align-items: center;
       gap: 20px;
-      padding: 8px;
+      padding: 10px 8px;
       border-radius: 5px;
       z-index: 50;
     }
@@ -115,11 +115,12 @@ Redireccionar();
       font-weight: 500;
     }
 
-    @media (max-width: 768px) {
+    @media (max-width: 1200px) {
       .custom-total {
-        width: 70%;
+        width: 50%;
         flex-direction: column;
         gap: 0;
+        padding: 5px 0;
       }
 
       .input-total {
@@ -131,21 +132,37 @@ Redireccionar();
       }
     }
 
-    .centrado-porcentual {
-      position: fixed;
-      width: 100vw;
-      height: 100vh;
-      background-color: rgba(255, 255, 255, 0.8);
-      z-index: 9999;
+    @media (max-width: 768px) {
+      .custom-total {
+        width: 70%;
+        flex-direction: column;
+        gap: 0;
+        padding: 5px 0;
+      }
 
+      .input-total {
+        text-align: center;
+      }
+
+      .w-btn {
+        width: 112px;
+      }
+    }
+    
+    #loaderOverlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background-color: rgba(255, 255, 255, 0.8);
+      display: none;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
-      flex-direction: column;
-      text-align: center;
+      overflow: hidden;
     }
 
-    .centrado-porcentual img {
+    #loaderOverlay img {
       max-width: 500px;
       height: 300px;
       margin-bottom: 10px;
@@ -192,6 +209,14 @@ Redireccionar();
 
     .size-a {
       font-size: 14.5px;
+    }
+
+    .size-10 {
+      font-size: 10px !important;
+    }
+
+    .size-12 {
+      font-size: 12px !important;
     }
 
     #select2-txtZonas-container,
@@ -319,45 +344,45 @@ Redireccionar();
               <tr class="custom-tr">
                 <td class="size-text">Oficina Ventas (Bodega)</td>
                 <td>
-                  <select id="txt_oficina" class="form-select size-text shadow-sm">
+                  <select id="txt_oficina" class="form-select size-td shadow-sm">
                   </select>
                 </td>
               </tr>
               <tr class="custom-tr">
                 <td class="size-text">Destinatario</td>
                 <td>
-                  <select id="txt_destinatario" class="form-select size-text shadow-sm">
+                  <select id="txt_destinatario" class="form-select size-td shadow-sm">
                   </select>
                 </td>
               </tr>
               <tr class="custom-tr">
                 <td class="size-text">Teléfono</td>
                 <td>
-                  <input type="text" id="txt_tel" class="form-control size-text" disabled>
+                  <input type="text" id="txt_tel" class="form-control size-td" disabled>
                 </td>
               </tr>
               <tr class="custom-tr">
                 <td class="size-text">Email</td>
                 <td>
-                  <input type="text" id="txt_mail" class="form-control size-text" disabled>
+                  <input type="text" id="txt_mail" class="form-control size-td" disabled>
                 </td>
               </tr>
               <tr class="custom-tr" id="trCupo" style="display: none">
                 <td class="size-text">Cupo Crédito</td>
                 <td>
-                  <input type="text" id="txt_cupo" class="form-control size-text" disabled>
+                  <input type="text" id="txt_cupo" class="form-control size-td" disabled>
                 </td>
               </tr>
               <tr class="custom-tr" id="trCondicion" style="display: none">
                 <td class="size-text">Plazo</td>
                 <td>
-                  <input type="text" id="txt_plazo" class="form-control size-text" disabled />
+                  <input type="text" id="txt_plazo" class="form-control size-td" disabled />
                 </td>
               </tr>
               <tr class="custom-tr" id="trTipoPed" style="display: none">
                 <td class="size-text">Pedido de Integración</td>
                 <td>
-                  <select id="TxtIntegracion" class="form-select size-text shadow-sm  .select-pedido-integracion">
+                  <select id="TxtIntegracion" class="form-select size-td shadow-sm  .select-pedido-integracion">
                     <option value="N" selected>NO</option>
                     <option value="S">SI</option>
                   </select>
@@ -468,7 +493,7 @@ Redireccionar();
             <tbody>
               <tr class="custom-tr">
                 <td class="size-text">Cliente</td>
-                <td><input type="text" id="txtCliente" placeholder="Cliente" class="form-control size-text shadow-sm"></td>
+                <td><input type="text" id="txtCliente" placeholder="Ingrese el cliente" class="form-control size-td shadow-sm"></td>
               </tr>
               <tr>
                 <td class="size-text">Zona de ventas</td>
@@ -476,7 +501,7 @@ Redireccionar();
                   </select></td>
               </tr>
               <tr class="custom-tr">
-                <td class="size-text">Clase de Pedido</td>
+                <td class="size-td">Clase de Pedido</td>
                 <td><select id="txtClasePedido" class="form-select size-text shadow-sm" style="width:100%">
                     <option value="T" selected>TODOS</option>
                     <option value="ZPWA">ZPWA - ADMINISTRADOR</option>
@@ -490,20 +515,20 @@ Redireccionar();
               </tr>
               <tr class="custom-tr">
                 <td class="size-text">Oficina de ventas</td>
-                <td colspan="2"><select id="FiltroOficinaVentas" class="form-select size-text shadow-sm" style="width:100%">
+                <td colspan="2"><select id="FiltroOficinaVentas" class="form-select size-td shadow-sm" style="width:100%">
                   </select></td>
               </tr>
               <tr class="custom-tr">
                 <td class="size-text">Fecha Inicial</td>
-                <td colspan="2"><input type="text" id="txtFecha1" placeholder="Fecha Inicial" class="form-control size-text shadow-sm"></td>
+                <td colspan="2"><input type="text" id="txtFecha1" placeholder="Fecha Inicial" class="form-control size-td shadow-sm"></td>
               </tr>
               <tr class="custom-tr">
                 <td class="size-text">Fecha Final</td>
-                <td colspan="2"><input type="text" id="txtFecha2" placeholder="Fecha Final" class="form-control size-text shadow-sm"></td>
+                <td colspan="2"><input type="text" id="txtFecha2" placeholder="Fecha Final" class="form-control size-td shadow-sm"></td>
               </tr>
               <tr class="custom-tr">
                 <td class="size-text">Temporales Historia</td>
-                <td colspan="2"><select id="txtTemporalesHistoria" class="form-select size-text shadow-sm" style="width:100%">
+                <td colspan="2"><select id="txtTemporalesHistoria" class="form-select size-td shadow-sm" style="width:100%">
                     <option value="N" selected>NO</option>
                     <option value="S">SI</option>
                   </select></td>
@@ -532,20 +557,20 @@ Redireccionar();
             <tbody>
               <tr class="custom-tr">
                 <td class="size-text">Cliente</td>
-                <td><input type="text" id="ClienteEntregas" placeholder="Cliente" class="form-control size-text shadow-sm"></td>
+                <td><input type="text" id="ClienteEntregas" placeholder="Ingrese el cliente" class="form-control size-td shadow-sm"></td>
               </tr>
               <tr class="custom-tr">
                 <td class="size-text">Oficina</td>
-                <td><select id="OficinaEntregas" class="form-select size-text shadow-sm">
+                <td><select id="OficinaEntregas" class="form-select size-td shadow-sm">
                   </select></td>
               </tr>
               <tr class="custom-tr">
                 <td class="size-text">Fecha Inicial</td>
-                <td colspan="2"><input type="text" id="EntregasFecha1" placeholder="Fecha Inicial" class="form-control size-text shadow-sm"></td>
+                <td colspan="2"><input type="text" id="EntregasFecha1" placeholder="Fecha Inicial" class="form-control size-td shadow-sm"></td>
               </tr>
               <tr class="custom-tr">
                 <td class="size-text">Fecha Final</td>
-                <td colspan="2"><input type="text" id="EntregasFecha2" placeholder="Fecha Final" class="form-control size-text shadow-sm"></td>
+                <td colspan="2"><input type="text" id="EntregasFecha2" placeholder="Fecha Final" class="form-control size-td shadow-sm"></td>
               </tr>
             </tbody>
           </table>
@@ -570,15 +595,15 @@ Redireccionar();
             <tbody>
               <tr class="custom-tr" id="tr_cliente_faltante">
                 <td class="size-text">Cliente</td>
-                <td><input type="text" id="txtFaltanteCliente" placeholder="Cliente" class="form-control size-text shadow-sm"></td>
+                <td><input type="text" id="txtFaltanteCliente" placeholder="Ingrese el cliente" class="form-control size-td shadow-sm"></td>
               </tr>
               <tr class="custom-tr">
                 <td class="size-text">Fecha Inicial</td>
-                <td colspan="2"><input type="text" id="txtFaltanteFecha1" placeholder="Fecha Inicial" class="form-control size-text shadow-sm"></td>
+                <td colspan="2"><input type="text" id="txtFaltanteFecha1" placeholder="Fecha Inicial" class="form-control size-td shadow-sm"></td>
               </tr>
               <tr class="custom-tr">
                 <td class="size-text">Fecha Final</td>
-                <td colspan="2"><input type="text" id="txtFaltanteFecha2" placeholder="Fecha Final" class="form-control size-text shadow-sm"></td>
+                <td colspan="2"><input type="text" id="txtFaltanteFecha2" placeholder="Fecha Final" class="form-control size-td shadow-sm"></td>
               </tr>
             </tbody>
           </table>
@@ -604,7 +629,7 @@ Redireccionar();
             <tbody>
               <tr class="custom-tr" id="tr_cliente_fact">
                 <td class="size-text">Cliente</td>
-                <td><input type="text" id="txtFactCliente" placeholder="Cliente" class="form-control size-text shadow-sm"></td>
+                <td><input type="text" id="txtFactCliente" placeholder="Ingrese el cliente" class="form-control size-text shadow-sm"></td>
               </tr>
               <tr class="custom-tr">
                 <td class="size-text">Numero factura</td>
@@ -657,7 +682,7 @@ Redireccionar();
           </div>
           <div class="row mb-3">
             <div class="col-md-12">
-              <div class="input-group"> 
+              <div class="input-group">
                 <span class="input-group-text" id="basic-addon1"><i class="fa-solid fa-newspaper text-success" style="width: 30px;"></i></span>
                 <input type="text" id="txtFilter" class="form-control shadow-sm" placeholder="Filtro por líneas..." autocomplete="off">
               </div>
@@ -670,9 +695,9 @@ Redireccionar();
   </div>
   <!-- FIN CONTENIDO PRINCIPAL -->
 
-  <!-- DIV'S PARA RENDERIZAR LOS LOADING -->
+  <!-- DIV'S PARA RENDERIZAR EL LOADING -->
   <div id="Bloquear" style="display: none;"></div>
-  <div id="loaderOverlay" class="centrado-porcentual" style="display: none;"></div>
+  <div id="loaderOverlay" class="" style="display: none;"></div>
 
   <!-- MODAL MENU DE OPCIONES PARA PEDIDOS -->
   <div class="modal fade" id="ModalOpciones" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -785,39 +810,43 @@ Redireccionar();
     </div>
   </div>
   <!-- MODAL VISUALIZAR PDF PEDIDO -->
-  <div id="ModalPDF" class="modal fade bd-example-modal-lg" role="dialog">
-    <div class="modal-dialog modal-lg">
-      <!-- Modal content-->
+  <div class="modal fade" id="ModalPDF" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="min-width: 60%;">
       <div class="modal-content">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">VISUALIZAR PEDIDO</h4>
+          <h1 class="modal-title fs-5">VISUALIZAR PEDIDO</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
-        <div class="modal-body" id="ContenidoPDF"> </div>
+        <div class="modal-body" id="ContenidoPDF">
+
+        </div>
         <div class="modal-footer">
-          <div class="btn-group" role="group" aria-label="...">
-            <button type="button" class="btn btn-success btn-sm" onClick="DescargarExcel('PEDIDO')"> <span class="glyphicon glyphicon-cloud-download" aria-hidden="true"></span> Excel </button>
-            <button type="button" class="btn btn-info btn-sm" data-dismiss="modal">Cerrar</button>
-          </div>
+          <button type="button" class="btn btn-success btn-sm" onClick="DescargarExcel('PEDIDO')">
+            <i class="fa-solid fa-download"></i>
+            Excel
+          </button>
+          <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cerrar</button>
         </div>
       </div>
     </div>
   </div>
   <!-- MODAL VISUALIZAR PDF FACTURA -->
-  <div id="ModalPDFfactura" class="modal fade bd-example-modal-lg" role="dialog">
-    <div class="modal-dialog modal-lg">
-      <!-- Modal content-->
+  <div class="modal fade" id="ModalPDFfactura" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="min-width: 60%;">
       <div class="modal-content">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">VISUALIZAR FACTURA</h4>
+          <h1 class="modal-title fs-5">VISUALIZAR FACTURA</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
-        <div class="modal-body" id="ContenidoPDFfactura"> </div>
+        <div class="modal-body" id="ContenidoPDFfactura">
+
+        </div>
         <div class="modal-footer">
-          <div class="btn-group" role="group" aria-label="...">
-            <button type="button" class="btn btn-success btn-sm" onClick="DescargarExcel('FACTURA')"> <span class="glyphicon glyphicon-cloud-download" aria-hidden="true"></span> Excel </button>
-            <button type="button" class="btn btn-info btn-sm" data-dismiss="modal">Cerrar</button>
-          </div>
+          <button type="button" class="btn btn-success btn-sm" onClick="DescargarExcel('FACTURA')">
+            <i class="fa-solid fa-download"></i>
+            Excel
+          </button>
+          <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cerrar</button>
         </div>
       </div>
     </div>
@@ -853,36 +882,35 @@ Redireccionar();
           </ul>
           <div class="tab-content pt-3">
             <div class="tab-pane fade show active" id="ContenidoInfoMateriales" role="tabpanel" aria-labelledby="info-tab">
-              <!-- Contenido dinámico -->
             </div>
             <div class="tab-pane fade" id="ContenidoShoppingMateriales" role="tabpanel" aria-labelledby="shop-tab">
-              <table class="table">
+              <table width="100%">
                 <tbody>
-                  <tr>
-                    <td class="vertical">CODIGO</td>
+                  <tr class="custom-tr">
+                    <td class="vertical size-td">CODIGO</td>
                     <td><input type="text" class="form-control size-th" id="shoping_codmaterial" readonly></td>
                   </tr>
-                  <tr>
-                    <td class="vertical">DESCRIPCIÓN</td>
+                  <tr class="custom-tr">
+                    <td class="vertical size-td">DESCRIPCIÓN</td>
                     <td><input type="text" class="form-control size-td text-green" id="shoping_descripcion" readonly></td>
                   </tr>
-                  <tr>
-                    <td class="vertical">VALOR ACTUAL</td>
+                  <tr class="custom-tr">
+                    <td class="vertical size-td">VALOR ACTUAL</td>
                     <td><input type="text" class="form-control size-th" id="shoping_preciomaterial" readonly></td>
                   </tr>
-                  <tr>
-                    <td class="vertical">COMPETENCIA</td>
+                  <tr class="custom-tr">
+                    <td class="vertical size-td">COMPETENCIA</td>
                     <td><select id="shoping_competencia" class="form-select size-th"></select></td>
                   </tr>
-                  <tr>
-                    <td class="vertical">VALOR COMPETENCIA</td>
+                  <tr class="custom-tr">
+                    <td class="vertical size-td">VALOR COMPETENCIA</td>
                     <td><input type="number" class="form-control size-th" id="shoping_valor"></td>
                   </tr>
-                  <tr>
-                    <td class="vertical">OBSERVACIÓN</td>
+                  <tr class="custom-tr">
+                    <td class="vertical size-td">OBSERVACIÓN</td>
                     <td><input type="text" class="form-control size-td" id="shoping_observacion"></td>
                   </tr>
-                  <tr>
+                  <tr class="custom-tr">
                     <td colspan="2">
                       <button type="button" class="btn btn-success btn-sm" onClick="GuardarShoping();">
                         Guardar
@@ -899,25 +927,25 @@ Redireccionar();
               </div>
               <input type="hidden" class="form-control" id="huella_stock" readonly>
               <input type="hidden" class="form-control" id="huella_dcto" readonly>
-              <table class="table">
+              <table width="100%">
                 <tbody>
-                  <tr>
-                    <td class="vertical">CODIGO</td>
+                  <tr class="custom-tr">
+                    <td class="vertical size-td">CODIGO</td>
                     <td><input type="text" class="form-control size-th" id="huella_codmaterial" readonly></td>
                   </tr>
-                  <tr>
-                    <td class="vertical">DESCRIPCIÓN</td>
+                  <tr class="custom-tr">
+                    <td class="vertical size-td">DESCRIPCIÓN</td>
                     <td><input type="text" class="form-control size-td text-green" id="huella_descripcion" readonly></td>
                   </tr>
-                  <tr>
-                    <td class="vertical">CANTIDAD</td>
+                  <tr class="custom-tr">
+                    <td class="vertical size-td">CANTIDAD</td>
                     <td><input type="number" class="form-control size-th" id="huella_cantidad"></td>
                   </tr>
-                  <tr>
-                    <td class="vertical">OBSERVACIÓN</td>
+                  <tr class="custom-tr">
+                    <td class="vertical size-td">OBSERVACIÓN</td>
                     <td><input type="text" class="form-control size-td text-green" id="huella_notas"></td>
                   </tr>
-                  <tr>
+                  <tr class="custom-tr">
                     <td colspan="2">
                       <button type="button" class="btn btn-success btn-sm" onClick="GuardarHuella();">
                         Guardar
@@ -936,19 +964,18 @@ Redireccionar();
     </div>
   </div>
   <!-- MODAL RASTREO DE PEDIDOS - TRAZABILIDAD -->
-  <div id="ModalRastreo" class="modal fade bd-example-modal-lg" role="dialog">
-    <div class="modal-dialog modal-lg">
-      <!-- Modal content-->
+  <div class="modal fade" id="ModalRastreo" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="min-width: 60%;">
       <div class="modal-content">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">SEGUIMIENTO / RASTREO DE PEDIDOS</h4>
+          <h1 class="modal-title fs-5">SEGUIMIENTO / RASTREO DE PEDIDOS</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
-        <div class="modal-body pre-scrollable">
+        <div class="modal-body">
           <table class="form" width="100%">
             <tbody>
               <tr>
-                <td>Organización</td>
+                <td style="width: 300px;">Organización</td>
                 <td id="txt_org"></td>
               </tr>
               <tr>
@@ -964,19 +991,19 @@ Redireccionar();
                 <td id="txt_nit"></td>
               </tr>
               <tr>
-                <td>Codigo Interno:</td>
+                <td>Código Interno:</td>
                 <td id="txt_cod_sap"></td>
               </tr>
               <tr>
-                <td>Direcciòn:</td>
+                <td>Dirección:</td>
                 <td id="txt_direccion"></td>
               </tr>
               <!-----------------PEDIDO-------------------------------------------------------->
               <tr>
-                <td colspan="4"><b>PEDIDO</b></td>
+                <td class="bag-info text-green" colspan="4"><b>PEDIDO</b></td>
               </tr>
               <tr>
-                <td>Numero Pedido</td>
+                <td>Número Pedido</td>
                 <td id="txt_num_ped"></td>
               </tr>
               <tr>
@@ -992,11 +1019,11 @@ Redireccionar();
                 <td id="txt_usuario_ot"></td>
               </tr>
               <!-----------------ENTREGAS-------------------------------------------------------->
-              <tr>
+              <tr class="bag-info text-green">
                 <td colspan="4"><b>ENTREGA</b></td>
               </tr>
               <tr>
-                <td>Numero entrega</td>
+                <td>Número entrega</td>
                 <td id="txt_num_ent"></td>
               </tr>
               <tr>
@@ -1008,7 +1035,7 @@ Redireccionar();
                 <td id="txt_fecha_ent"></td>
               </tr>
               <!-----------------SEPARACION-------------------------------------------------------->
-              <tr>
+              <tr class="bag-info text-green">
                 <td colspan="4"><b>SEPARACION</b></td>
               </tr>
               <tr>
@@ -1016,7 +1043,7 @@ Redireccionar();
                 <td id="txt_usuario_sep"></td>
               </tr>
               <tr>
-                <td>Numero OT.</td>
+                <td>Número OT.</td>
                 <td id="txt_numero_ot"></td>
               </tr>
               <tr>
@@ -1032,15 +1059,15 @@ Redireccionar();
                 <td id="txt_fecha_fin_ot"></td>
               </tr>
               <!-----------------FACTURACION-------------------------------------------------------->
-              <tr>
-                <td colspan="3"><b>FACTURACION</b></td>
+              <tr class="bag-info text-green">
+                <td colspan="3"><b>FACTURACIÓN</b></td>
               </tr>
               <tr>
                 <td>Usuario</td>
                 <td id="txt_usuario_fact"></td>
               </tr>
               <tr>
-                <td>Numero/Tipo</td>
+                <td>Número/Tipo</td>
                 <td id="txt_numero_fact"></td>
               </tr>
               <tr>
@@ -1052,7 +1079,7 @@ Redireccionar();
                 <td id="txt_fecha_fin_fact"></td>
               </tr>
               <!-----------------EMPAQUE-------------------------------------------------------->
-              <tr>
+              <tr class="bag-info text-green">
                 <td colspan="3"><b>EMPAQUE</b></td>
               </tr>
               <tr>
@@ -1080,7 +1107,7 @@ Redireccionar();
                 <td id="txt_cajas_emp"></td>
               </tr>
               <!-----------------TRANSPORTE-------------------------------------------------------->
-              <tr>
+              <tr class="bag-info text-green">
                 <td colspan="6"><b>TRANSPORTE</b></td>
               </tr>
               <tr>
@@ -1107,32 +1134,33 @@ Redireccionar();
           </table>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+          <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cerrar</button>
         </div>
       </div>
     </div>
   </div>
   <!-- MODAL MENU DE ENTREGAS -->
-  <div id="ModalEntregas" class="modal fade bd-example-modal-lg" role="dialog">
-    <div class="modal-dialog modal-lg">
-      <!-- Modal content-->
+  <div class="modal fade" id="ModalEntregas" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="min-width: 60%;">
       <div class="modal-content">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">ENTREGA DE PEDIDO</h4>
+          <h1 class="modal-title fs-5">ENTREGA DE PEDIDO</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
-        <div class="modal-body pre-scrollable">
+        <div class="modal-body">
           <table class="form" width="100%">
-            <thead>
-              <th>POS</th>
-              <th>CODIGO</th>
-              <th>DESCRIPCION</th>
-              <th>CANTIDAD</th>
-              <th>PEDIDO</th>
-              <th>DESCUENTO</th>
-              <th>ENTREGA</th>
-              <th>ANULAR</th>
-              <th>STOCK</th>
+            <thead class="custom-thead">
+              <tr>
+                <th>POS</th>
+                <th>CODIGO</th>
+                <th>DESCRIPCION</th>
+                <th>CANTIDAD</th>
+                <th>PEDIDO</th>
+                <th>DESCUENTO</th>
+                <th>ENTREGA</th>
+                <th>ANULAR</th>
+                <th>STOCK</th>
+              </tr>
             </thead>
             <tbody id="tdDetalleEntregas">
             </tbody>
@@ -1141,26 +1169,28 @@ Redireccionar();
         <div class="modal-footer">
           <p align="left" id="valor_entrega"></p>
           <p align="left" id="valor_entrega_iva"></p>
-          <div class="btn-group" role="group" aria-label="...">
-            <button type="button" class="btn btn-success btn-sm" onClick="DescargarExcel('ENTREGA')"> <span class="glyphicon glyphicon-cloud-download" aria-hidden="true"></span> Excel </button>
+          <div>
+            <button type="button" class="btn btn-success btn-sm" onClick="DescargarExcel('ENTREGA')">
+              <i class="fa-solid fa-download"></i>
+              Excel
+            </button>
             <button type="button" class="btn btn-warning btn-sm" onClick="ModificarEntrega();">Editar/Guardar</button>
             <button type="button" class="btn btn-danger btn-sm" onClick="EliminarEntrega();">Eliminar</button>
-            <button type="button" class="btn btn-info btn-sm" data-dismiss="modal">Cerrar</button>
+            <button type="button" class="btn btn-outline-danger btn-sm" data-bs-dismiss="modal">Cerrar</button>
           </div>
         </div>
       </div>
     </div>
   </div>
   <!-- MODAL ORDENES DE TRANSPORTE -->
-  <div id="ModalOrdenes" class="modal fade bd-example-modal-lg" role="dialog">
-    <div class="modal-dialog modal-lg">
-      <!-- Modal content-->
+  <div class="modal fade" id="ModalOrdenes" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="min-width: 60%;">
       <div class="modal-content">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">ORDEN DE TRANSPORTE</h4>
+          <h1 class="modal-title fs-5">ORDEN DE TRANSPORTE</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
-        <div class="modal-body pre-scrollable">
+        <div class="modal-body">
           <table class="form" width="100%">
             <thead>
               <th>POS</th>
@@ -1176,53 +1206,55 @@ Redireccionar();
           </table>
         </div>
         <div class="modal-footer">
-          <p align="left" id="valor_orden"></p>
-          <div class="btn-group" role="group" aria-label="...">
-            <button type="button" class="btn btn-success btn-sm" onClick="DescargarExcel('OT')"> <span class="glyphicon glyphicon-cloud-download" aria-hidden="true"></span> Excel </button>
-            <button type="button" class="btn btn-danger btn-sm" id="btnEliminaOT" onClick="EliminarOT();">Eliminar</button>
-            <button type="button" class="btn btn-info btn-sm" data-dismiss="modal">Cerrar</button>
+          <div>
+            <p align="left" id="valor_orden"></p>
+            <button type="button" class="btn btn-success btn-sm" onClick="DescargarExcel('OT')">
+              <span class="glyphicon glyphicon-cloud-download" aria-hidden="true"></span>
+              Excel
+            </button>
+            <button type="button" class="btn btn-danger btn-sm" id="btnEliminaOT" onClick="EliminarOT();">
+              Eliminar
+            </button>
+            <button type="button" class="btn btn-outline-danger btn-sm" data-bs-dismiss="modal">Cerrar</button>
           </div>
         </div>
       </div>
     </div>
   </div>
   <!-- MODAL LOG -->
-  <div id="ModalLog" class="modal fade bd-example-modal-lg" role="dialog">
-    <div class="modal-dialog modal-lg">
-      <!-- Modal content-->
+  <div class="modal fade" id="ModalLog" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="min-width: 60%;">
       <div class="modal-content">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">LOG DE CAMBIOS</h4>
+          <h1 class="modal-title fs-5">LOG DE CAMBIOS</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
-        <div class="modal-body pre-scrollable" id="DetalleLog"> </div>
+        <div class="modal-body" id="DetalleLog">
+
+        </div>
         <div class="modal-footer">
-          <div class="btn-group" role="group" aria-label="...">
-            <button type="button" class="btn btn-info btn-sm" data-dismiss="modal">Cerrar</button>
-          </div>
+          <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cerrar</button>
         </div>
       </div>
     </div>
   </div>
   <!-- MODAL FERIA VIRTUAL -->
-  <div id="ModalFeriaVirtual" class="modal fade bd-example-modal-lg" role="dialog">
-    <div class="modal-dialog modal-lg">
-      <!-- Modal content-->
+  <div class="modal fade" id="ModalFeriaVirtual" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="min-width: 60%;">
       <div class="modal-content">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">SEGUIMIENTO GRAN FERIA VIRTUAL MAYO</h4>
+          <h1 class="modal-title fs-5">SEGUIMIENTO GRAN FERIA VIRTUAL MAYO</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
-        <div class="modal-body pre-scrollable">
-
+        <div class="modal-body" id="DetalleLog">
           <div class="panel with-nav-tabs panel-info">
             <div class="panel-heading">
               <ul class="nav nav-tabs">
                 <li class=""><a href="#dvGenericos" data-toggle="tab" onClick="QueryFeria(1)">POPULARES</a></li>
-                <li class=""><a href="#dvPopulares" data-toggle="tab" onClick="QueryFeria(2)">GENERICOS</a></li><!---->
-                <li class=""><a href="#dvFarma" data-toggle="tab" onClick="QueryFeria(3)">FARMA</a></li><!---->
-                <li class="active"><a href="#dvOTC" data-toggle="tab" onClick="QueryFeria(4)">OTC</a></li><!---->
-                <li class=""><a href="#dvGranSorteo" data-toggle="tab" onClick="QueryFeria(5)">RESUMEN</a></li><!---->
+                <li class=""><a href="#dvPopulares" data-toggle="tab" onClick="QueryFeria(2)">GENERICOS</a></li>
+                <li class=""><a href="#dvFarma" data-toggle="tab" onClick="QueryFeria(3)">FARMA</a></li>
+                <li class="active"><a href="#dvOTC" data-toggle="tab" onClick="QueryFeria(4)">OTC</a></li>
+                <li class=""><a href="#dvGranSorteo" data-toggle="tab" onClick="QueryFeria(5)">RESUMEN</a></li>
               </ul>
             </div>
             <div class="panel-body">
@@ -1258,7 +1290,8 @@ Redireccionar();
                 <div id="dvGranSorteo" class="tab-pane fade in" role="dialog">
                   <div class="alert alert-danger" role="alert">
                     <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
-                    Estimado cliente, ten presente que solo podras reclamar las boletas semanales siempre y cuando cumplas con todas las semanas
+                    Estimado cliente, ten presente que solo podras reclamar las boletas semanales siempre y cuando cumplas
+                    con todas las semanas
                   </div>
                   <div id="dvGranSorteoDetalle"></div>
                 </div>
@@ -1267,153 +1300,157 @@ Redireccionar();
           </div>
         </div>
         <div class="modal-footer">
-          <p align="left" id="valor_orden"></p>
+          <div>
+            <p align="left" id="valor_orden"></p>
+          </div>
+          <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cerrar</button>
         </div>
-
       </div>
     </div>
   </div>
   <!-- MODAL IMAGEN ANIVERSARIO -->
-  <div id="ModalFeriaMayo" class="modal fade bd-example-modal-lg" role="dialog">
-    <div class="modal-dialog modal-lg">
+  <div class="modal fade" id="ModalFeriaMayo" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="min-width: 60%;">
       <div class="modal-content">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">GRAN FERIA VIRTUAL MAYO</h4>
+          <h1 class="modal-title fs-5">GRAN FERIA VIRTUAL MAYO</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
-        <div class="modal-body" id="">
-          <img src="../resources/icons/semana4.png" width="100%" heigth="100%" />
+        <div class="modal-body" id="DetalleLog">
+          <img src="../resources/icons/semana4.png" width="100%" heigth="100%">
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-info" data-dismiss="modal">Cerrar</button>
+          <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cerrar</button>
         </div>
       </div>
     </div>
   </div>
   <!-- MODAL PLAN DE PUNTOS -->
-  <div id="ModalPP" class="modal fade bd-example-modal-lg" role="dialog">
-    <div class="modal-dialog modal-lg">
+  <div class="modal fade" id="ModalPP" tabindex="-1" aria-labelledby="ModalPPLabel" aria-hidden="true">
+    <div class="modal-dialog" style="min-width: 70%;">
       <div class="modal-content">
-        <div class="modal-header bg-info">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title text-weight" id="tdCodigoSapPuntos"></h4>
-          <h4 class="modal-title text-weight" id="tdAcumuladoPuntos"></h4>
+        <div class="modal-header">
+          <h5 class="modal-title" id="ModalPPLabel">Información de Puntos</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body" id="">
-          <div class="row">
-            <div class="col-md-12">
-              <div id="dvMaterialespuntos"></div>
-            </div>
+        <div class="modal-body pt-0">
+          <div class="mb-3 bg-primary text-center py-2 text-white" style="position: sticky; top: 0; z-index: 1000;">
+            <p class="m-0" style="font-size: 15px;" id="tdCodigoSapPuntos"></p>
+            <p class="m-0" style="font-size: 14px;" id="tdAcumuladoPuntos"></p>
           </div>
+          <div id="dvMaterialespuntos"></div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-info" data-dismiss="modal">Cerrar</button>
+          <button type="button" class="btn btn-outline-danger btn-sm" data-bs-dismiss="modal">Cerrar</button>
         </div>
       </div>
     </div>
   </div>
   <!-- MODAL TOP 20 MAS VENDIDOS 100 Y 130 -->
-  <div id="ModalTop20_100_130" class="modal fade bd-example-modal-lg" role="dialog">
-    <div class="modal-dialog modal-lg">
-      <!-- Modal content-->
+  <div class="modal fade" id="ModalTop20_100_130" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="min-width: 60%;">
       <div class="modal-content">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">Top 20 Productos destacados</h4>
+          <h1 class="modal-title fs-5">Top 20 Productos destacados</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
-        <div class="modal-body" id="TablaTop20_100_130"> </div>
+        <div class="modal-body" id="TablaTop20_100_130">
+
+        </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-info" data-dismiss="modal">Cerrar</button>
+          <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cerrar</button>
         </div>
       </div>
     </div>
   </div>
   <!-- MODAL PP DETALLE -->
-  <div id="ModalPPDetalle" class="modal fade bd-example-modal-lg" role="dialog">
-    <div class="modal-dialog modal-lg">
+  <div class="modal fade" id="ModalPPDetalle" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="min-width: 60%;">
       <div class="modal-content">
-        <div class="modal-header bg-info">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title text-weight">Redimir </h4>
+        <div class="modal-header">
+          <h1 class="modal-title fs-5">Redimir</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
-        <div class="modal-body" id="">
+        <div class="modal-body">
           <input type="hidden" id="redimePuntos" disabled readonly>
           <input type="hidden" id="redimeProducto" disabled readonly>
           <div class="row">
-            <div class="col-md-6 text-center"><img src="" alt="" width="340" height="340" id="imgDetalle"></div>
+            <div class="col-md-6 text-center">
+              <img src="" alt="" width="340" height="340" id="imgDetalle">
+            </div>
             <div class="col-md-6">
               <div class="row">
                 <div class="col-md-12" id="descripcionDetallePuntos"></div>
                 <div class="col-md-12" id="puntosDetalle"></div>
                 <div class="col-md-12" id="stockDetalle"></div>
                 <div class="col-md-12">
-                  <button id="buy-now" class="btn btn-lg  btn-success"> <i class="fa-solid fa-arrow-up-right-from-square"></i> Redimir </button>
+                  <button id="buy-now" class="btn btn-lg btn-success">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    Redimir
+                  </button>
                 </div>
               </div>
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-info" data-dismiss="modal">Cerrar</button>
+          <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cerrar</button>
         </div>
       </div>
     </div>
   </div>
   <!-- MODAL EDITAR PEDIDOS -->
-  <div id="ModalEditarPedidos" class="modal fade bd-example-modal-lg" role="dialog">
-    <div class="modal-dialog modal-lg">
+  <div class="modal fade" id="ModalEditarPedidos" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="min-width: 60%;">
       <div class="modal-content">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">MODIFICAR PEDIDOS SAP</h4>
+          <h1 class="modal-title fs-5">MODIFICAR PEDIDOS SAP</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <div class="modal-body">
-          <!-- Modal Cuerpo-->
-          <div class="alert alert-warning alert-dismissible" role="alert"> <strong>NOTA!</strong> Solo podran ser editados o modificados aquellos pedidos que no tengan entregas o procesos siguientes a la toma. </div>
+          <div class="alert alert-warning alert-dismissible" role="alert"> <strong>NOTA!</strong> Solo podrán ser editados
+            o modificados aquellos pedidos que no tengan entregas o procesos siguientes a la toma. </div>
           <table class="form" width="100%">
-            <thead>
-            </thead>
             <tbody>
               <tr>
                 <td>Tipo</td>
-                <td><select id="EdtTipo" class="form-select">
+                <td>
+                  <select id="EdtTipo" class="form-select">
                     <option value="0">ADG (Temporal)</option>
                     <option value="1">SAP (Real)</option>
-                  </select></td>
+                  </select>
+                </td>
               </tr>
               <tr>
                 <td>Número</td>
-                <td><input type="text" class="form-control" id="EdtNumeroPedido" onKeyPress="return vnumeros(event)"></td>
+                <td>
+                  <input type="text" class="form-control" id="EdtNumeroPedido" onKeyPress="return vnumeros(event)">
+                </td>
               </tr>
-              <!--<tr>
-                         <td>Solicitante</td>
-                         <td><input type="text" class="form-control" id="EdtSolicitante"></td>
-                       </tr>
-                       <tr>
-                         <td>Codigo SAP</td>
-                         <td><input type="text" class="form-control" id="EdtCodigoSAP"></td>
-                       </tr>-->
               <tr>
-                <td colspan="2"><button type="button" class="btn btn-default " id="btnBuscarEditar"> <span class="glyphicon glyphicon-search" aria-hidden="true"></span>&nbsp;BUSCAR </button></td>
+                <td colspan="2">
+                  <button type="button" class="btn btn-default " id="btnBuscarEditar">
+                    <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                    &nbsp;BUSCAR
+                  </button>
+                </td>
               </tr>
             </tbody>
           </table>
-          <!-- Modal Cuerpo-->
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-info" data-dismiss="modal">Cerrar</button>
+          <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cerrar</button>
         </div>
       </div>
     </div>
   </div>
   <!-- MODAL ESTADISTICAS -->
-  <div id="ModalEstadisticas" class="modal fade bd-example-modal-lg" role="dialog">
-    <div class="modal-dialog modal-lg">
-      <!-- Modal content-->
+  <div class="modal fade" id="ModalEstadisticas" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="min-width: 60%;">
       <div class="modal-content">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">ESTADISTICAS</h4>
+          <h1 class="modal-title fs-5">ESTADISTICAS</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <div class="modal-body">
           <figure class="highcharts-figure">
@@ -1432,96 +1469,97 @@ Redireccionar();
           </figure>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-info" data-dismiss="modal">Cerrar</button>
+          <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cerrar</button>
         </div>
       </div>
     </div>
   </div>
   <!-- MODAL MAS CLIENTE -->
-  <div id="ModalMasCliente" class="modal fade bd-example-modal-lg" role="dialog">
-    <div class="modal-dialog modal-lg">
-      <!-- Modal content-->
+  <div class="modal fade" id="ModalMasCliente" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="min-width: 60%;">
       <div class="modal-content">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">INFORMACION ADICIONAL DE CLIENTE</h4>
+          <h1 class="modal-title fs-5">INFORMACIÓN ADICIONAL DE CLIENTE</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <div class="modal-body">
           <table class="form" width="100%">
             <tbody>
               <tr>
-                <td>Codigo</td>
-                <td><input type="text" id="txt_codigoSap" class="form-control" readonly></td>
-              <tr> </tr>
+                <td>Código</td>
+                <td><input type="text" id="txt_codigoSap" class="form-control size-td" readonly></td>
+              </tr>
               <tr>
                 <td>Nit</td>
-                <td><input type="text" id="txt_nit" class="form-control" readonly></td>
+                <td><input type="text" id="txt_nit" class="form-control size-td" readonly></td>
               </tr>
               <tr>
                 <td>Ciudad</td>
-                <td><input type="text" id="txt_ciudad" class="form-control" readonly></td>
+                <td><input type="text" id="txt_ciudad" class="form-control size-td" readonly></td>
               </tr>
-              <td>Direccion</td>
-              <td><input type="text" id="txt_dir" class="form-control" readonly></td>
+              <tr>
+                <td>Dirección</td>
+                <td><input type="text" id="txt_dir" class="form-control size-td" readonly></td>
               </tr>
               <tr>
                 <td>Vendedor</td>
                 <td>
-                  <div class="input-group"> <span class="input-group-addon" id="basic-addon1"> <span class="glyphicon glyphicon-user" aria-hidden="true"></span> </span>
-                    <input type="text" class="form-control" id="txt_vendedor" aria-describedby="basic-addon1" readonly>
+                  <div class="input-group">
+                    <span class="input-group-addon" id="basic-addon1"> <span class="glyphicon glyphicon-user" aria-hidden="true"></span></span>
+                    <input type="text" class="form-control size-td" id="txt_vendedor" aria-describedby="basic-addon1" readonly>
                   </div>
-                  <div class="input-group"> <span class="input-group-addon" id="basic-addon1"> <span class="glyphicon glyphicon-earphone" aria-hidden="true"></span> </span>
-                    <input type="text" class="form-control" id="txt_vendedor_tel" aria-describedby="basic-addon1" readonly>
+                  <div class="input-group">
+                    <span class="input-group-addon" id="basic-addon1"> <span class="glyphicon glyphicon-earphone" aria-hidden="true"></span></span>
+                    <input type="text" class="form-control size-td" id="txt_vendedor_tel" aria-describedby="basic-addon1" readonly>
                   </div>
                 </td>
               </tr>
               <tr>
                 <td>Televendedor</td>
                 <td>
-                  <div class="input-group"> <span class="input-group-addon" id="basic-addon1"> <span class="glyphicon glyphicon-user" aria-hidden="true"></span> </span>
-                    <input type="text" class="form-control" id="txt_televendedor" aria-describedby="basic-addon1" readonly>
+                  <div class="input-group">
+                    <span class="input-group-addon" id="basic-addon1"> <span class="glyphicon glyphicon-user" aria-hidden="true"></span></span>
+                    <input type="text" class="form-control size-td" id="txt_televendedor" aria-describedby="basic-addon1" readonly>
                   </div>
-                  <div class="input-group"> <span class="input-group-addon" id="basic-addon1"> <span class="glyphicon glyphicon-earphone" aria-hidden="true"></span> </span>
-                    <input type="text" class="form-control" id="txt_televendedor_tel" aria-describedby="basic-addon1" readonly>
+                  <div class="input-group">
+                    <span class="input-group-addon" id="basic-addon1"> <span class="glyphicon glyphicon-earphone" aria-hidden="true"></span></span>
+                    <input type="text" class="form-control size-td" id="txt_televendedor_tel" aria-describedby="basic-addon1" readonly>
                   </div>
                 </td>
               </tr>
               <tr>
                 <td>Lista Precios</td>
-                <td><input type="text" id="txt_lista" class="form-control" readonly></td>
+                <td><input type="text" id="txt_lista" class="form-control size-td" readonly></td>
               </tr>
               <tr>
-                <td>Condicion de Pago</td>
-                <td><input type="text" id="txt_condicion" class="form-control" readonly></td>
+                <td>Condición de Pago</td>
+                <td><input type="text" id="txt_condicion" class="form-control size-td" readonly></td>
               </tr>
               <tr>
                 <td>Institucionales</td>
-                <td><input type="text" id="txt_institucional" class="form-control" readonly>
+                <td><input type="text" id="txt_institucional" class="form-control size-td" readonly>
               </tr>
               <tr>
                 <td>Controlados</td>
-                <td><input type="text" id="txt_controlado" class="form-control" readonly></td>
+                <td><input type="text" id="txt_controlado" class="form-control size-td" readonly></td>
               </tr>
               <tr>
                 <td>Descuento Financiero %</td>
-                <td><input type="text" id="txt_descuento" class="form-control" readonly /></td>
+                <td><input type="text" id="txt_descuento" class="form-control size-td" readonly /></td>
               </tr>
               <tr>
                 <td>Grupo 1</td>
-                <td><select class="form-select" id="txtGrp1" readonly disabled>
-                  </select></td>
+                <td><select class="form-select size-td" id="txtGrp1" readonly disabled></select></td>
               </tr>
               <tr>
                 <td>Grupo 2</td>
-                <td><select class="form-select" id="txtGrp2" readonly disabled>
-                  </select></td>
+                <td><select class="form-select size-td" id="txtGrp2" readonly disabled></select></td>
               </tr>
             </tbody>
-
           </table>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-info" data-dismiss="modal">Cerrar</button>
+          <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cerrar</button>
         </div>
       </div>
     </div>
@@ -1626,16 +1664,18 @@ Redireccionar();
     </div>
   </div>
   <!-- MODAL INFORMACIÓN DE BONIFICADOS -->
-  <div id="ModalInfoBonificados" class="modal fade bd-example-modal-lg" role="dialog">
-    <div class="modal-dialog modal-lg">
+  <div class="modal fade" id="ModalInfoBonificados" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="min-width: 60%;">
       <div class="modal-content">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">INFORMACIÓN DE BONIFICADOS</h4>
+          <h1 class="modal-title fs-5">INFORMACIÓN DE BONIFICADOS</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
-        <div class="modal-body" id="ContenidoInfoBonificados"></div>
+        <div class="modal-body" id="ContenidoInfoBonificados">
+
+        </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-info" data-dismiss="modal">Cerrar</button>
+          <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cerrar</button>
         </div>
       </div>
     </div>

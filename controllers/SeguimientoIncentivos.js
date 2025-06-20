@@ -122,10 +122,10 @@ const getResumenIncentivos = async () => {
             <table class="table table-bordered table-hover table-sm" id="tablaResumen2" style="width: 100%;">
                 <thead class="table-info">        
                     <tr>
-                        <th>Laboratorio</th>
-                        <th>Concepto</th>
-                        <th>Documento</th>
-                        <th>Valor Final</th>                       
+                        <th>LABORATORIO</th>
+                        <th>CONCEPTO</th>
+                        <th>DOCUMENTO</th>
+                        <th>VALOR FINAL</th>                       
                     </tr>
                 </thead>
                 <tbody>`;
@@ -339,13 +339,13 @@ const gestionarSeguimiento = async (item) => {
                 <table class="table table-bordered table-sm mx-auto" id="tablaLiquidacion" style="width: 100%;">
                     <thead class="table-info">
                         <tr>
-                            <th>Valor Nota</th>
-                            <th>Número Nota</th>
-                            <th>Liquidación FDV (88%)</th>                            
-                            <th>Mercadeo (5%)</th>
-                            <th>Gerencia Comercial (3%)</th>
-                            <th>Coordinador Contact Center (2%)</th>
-                            <th>Coordinador Comercial (2%)</th>
+                            <th>VALOR NOTA</th>
+                            <th>NÚMERO NOTA</th>
+                            <th>LIQUIDACIÓN FDV (88%)</th>                            
+                            <th>MERCADEO (5%)</th>
+                            <th>GERENCIA COMERCIAL (3%)</th>
+                            <th>COORDINADOR CONTACT CENTER (2%)</th>
+                            <th>COORDINADOR COMERCIAL (2%)</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -366,21 +366,21 @@ const gestionarSeguimiento = async (item) => {
                 <table class="table table-bordered table-hover table-sm mx-auto" id="tablaLiquidacionZonas" style="width: 100%;">
                     <thead class="table-info">
                         <tr>
-                            <th colspan="4">Rappels</th>
+                            <th colspan="4">RAPPELS</th>
                             <th class="custom-td" colspan="4">${descProveedor} ${meses[fechaRappelsMes]} ${fechaRappelsAnio}</th>                           
                         </tr>
                         <tr>
                             <th colspan="8" style="background-color: white;"></th>                            
                         </tr>
                         <tr>
-                            <th>Zona</th>
-                            <th>Nombre Zona</th>
-                            <th>${(tipoSeguimiento === "VALOR NETO") ? "Valores" : "Cantidades"}</th>
-                            <th>% Liquidación</th>                            
-                            <th>Valor Zona</th>
-                            <th>Valor Cada Uno</th>
-                            <th>Nota</th>
-                            <th>Medio</th>
+                            <th>ZONA</th>
+                            <th>NOMBRE ZONA</th>
+                            <th>${(tipoSeguimiento === "VALOR NETO") ? "VALORES" : "CANTIDADES"}</th>
+                            <th>% LIQUIDACIÓN</th>                            
+                            <th>VALOR ZONA</th>
+                            <th>VALOR X CADA UNO</th>
+                            <th>NOTA</th>
+                            <th>MEDIO</th>
                         </tr>
                     </thead>
                     <tbody>`;

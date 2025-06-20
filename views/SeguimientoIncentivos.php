@@ -32,37 +32,37 @@
         }
 
         #tablaIncentivos thead tr th {
-            font-size: 15px !important;
+            font-size: 14px !important;
             font-weight: 400;
             color: #055160;
         }
 
         #tablaPorcentajes thead tr th {
-            font-size: 15px !important;
+            font-size: 14px !important;
             font-weight: 400;
             color: #055160;
         }
 
         #tablaResumen thead tr th {
-            font-size: 15px !important;
+            font-size: 14px !important;
             font-weight: 400;
             color: #055160;
         }
 
         #tablaResumen2 thead tr th {
-            font-size: 15px !important;
+            font-size: 14px !important;
             font-weight: 400;
             color: #055160;
         }
 
         #tablaLiquidacion thead tr th {
-            font-size: 15px !important;
+            font-size: 14px !important;
             font-weight: 400;
             color: #055160;
         }
 
         #tablaLiquidacionZonas thead tr th {
-            font-size: 15px !important;
+            font-size: 14px !important;
             font-weight: 400;
             color: #055160;
         }
@@ -118,7 +118,7 @@
 
     <div class="alert alert-info mb-2" style="font-weight: 400;"><i class="fa-solid fa-star fa-flip"></i>&nbsp;0126 - SEGUIMIENTO INCENTIVOS</div>
 
-    <div>
+    <div class="container-fluid">
         <nav class="row p-1">
             <div class="nav nav-tabs" id="nav-tab" role="tablist">
                 <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true"><i class="fa fa-pencil"></i>&nbsp;Creación</button>
@@ -217,16 +217,16 @@
                         <thead class="table-info">
                             <tr>
                                 <th>N°</th>
-                                <th>Oficina Ventas</th>
-                                <th>Proveedor - GA</th>
-                                <th>Descripción</th>
-                                <th>Cuota en Valores</th>
-                                <th>Cuota en Impactos</th>
-                                <th>Tipo Seguimiento</th>
-                                <th>Fecha Inicio</th>
-                                <th>Fecha Final</th>
-                                <th class="text-center">Seguimiento</th>
-                                <th class="text-center">Editar</th>
+                                <th>OFICINA VENTAS</th>
+                                <th>PROVEEDOR - GA</th>
+                                <th>DESCRIPCIÓN</th>
+                                <th>CUOTA EN VALORES</th>
+                                <th>CUOTA EN IMPACTOS</th>
+                                <th>TIPO DE SEGUIMIENTO</th>
+                                <th>FECHA INICIO</th>
+                                <th>FECHA FINAL</th>
+                                <th class="text-center">SEGUIMIENTO</th>
+                                <th class="text-center">EDITAR</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -241,14 +241,14 @@
                     <table class="table table-bordered table-sm" id="tablaPorcentajes">
                         <thead class="table-info">
                             <tr>
-                                <th>Cuota en Valores</th>
-                                <th>Cuota Actual</th>
-                                <th>Cuota en Impactos</th>
-                                <th>Impacto Actual</th>
-                                <th>Diferencia Faltante en Valores</th>
-                                <th>Diferencia Faltante en Impactos</th>
-                                <th>% Cumplimiento Cuota</th>
-                                <th>% Cumplimiento Impactos</th>
+                                <th>CUOTA EN VALORES</th>
+                                <th>CUOTA ACTUAL</th>
+                                <th>CUOTA EN IMPACTOS</th>
+                                <th>IMPACTO ACTUAL</th>
+                                <th>DIFERECIA FALTANTE EN VALORES</th>
+                                <th>DIFERECIA FALTANTE EN IMPACTOS</th>
+                                <th>% CUMPLIMIENTO CUOTA</th>
+                                <th>% CUMPLIMIENTO IMPACTOS</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -270,19 +270,19 @@
                     <table class="table table-bordered table-hover table-sm mx-auto" id="tablaResumen" style="width: 60%;">
                         <thead class="table-info">
                             <tr>
-                                <th>Rappels</th>
-                                <th>Seguimiento Incentivo</th>
+                                <th>RAPPELS</th>
+                                <th>SEGUIMIENTO INCENTIVOS</th>
                                 <th colspan="3" id="descProveedor" style="font-size: 14px !important;"></th>
                             </tr>
                             <tr>
                                 <td colspan="6" style="background-color: white;"></td>                                
                             </tr>
                             <tr>
-                                <th>Zona</th>
-                                <th>Nombre Zona</th>
-                                <th>Cantidad</th>
-                                <th>Cantidad Impactos</th>
-                                <th>Suma de Valor Neto</th>
+                                <th>ZONA</th>
+                                <th>NOMBRE ZONA</th>
+                                <th>CANTIDAD</th>
+                                <th>CANTIDAD IMPACTOS</th>
+                                <th>SUMA DE VALOR NETO</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -303,7 +303,7 @@
             <div class="tab-pane fade p-2" id="nav-profile-2" role="tabpanel" aria-labelledby="nav-profile-tab">
                 <input type="hidden" id="seguimientoOculto">               
                 <h4 class="text-center text-green mb-3">Gestionar Datos Nota Crédito</h4>
-                <div class="shadow-sm" style="width: 98%; margin: 0 auto;">
+                <div style="width: 98%; margin: 0 auto;">
                     <div class="row justify-content-center mb-2" style="border: 1px solid #ccc; padding: 15px; border-radius: 5px;">
                         <div class="col-md-5">
                             <div class="form-group">

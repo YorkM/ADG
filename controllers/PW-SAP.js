@@ -231,104 +231,62 @@ async function consultaOpciones(pedido, alm = undefined, rdespacho = undefined, 
     console.error(error);
   } 
 }
-
+// FUNCIÓN NOTIFICACIONES
 function Notificaciones() {
-  var rol = $("#Rol").val();
-  var ofi = $("#Ofi").val();
-  //DESCUENTOS ESPECIALES PAGINA WEB
+  let rol = $("#Rol").val();
+  let ofi = $("#Ofi").val();
+  // Descuentos especiales página web
   if (rol == 10) {
     if (ofi == 2100 || ofi == 2200 || ofi == 2300 || ofi == 2400) {
-      showToastr("success", "¡Tenemos descuentos exclusivos para clientes WEB compra ya!", `<strong>PROMOCIONES!</strong></br>`);
-      // $.notify({
-      //   icon: 'glyphicon glyphicon-warning-sign',
-      //   title: '<strong>PROMOCIONES!</strong></br>',
-      //   message: '¡Tenemos descuentos exclusivos para clientes WEB compra ya!',
-      //   url: '',
-      //   target: '_blank'
-      // }, {
-      //   delay: 10000,
-      //   type: 'success',
-      //   animate: {
-      //     enter: 'animated fadeInDown',
-      //     exit: 'animated fadeOutUp'
-      //   },
-      // });
+      showToastr("success", "¡Tenemos descuentos exclusivos para clientes WEB compra ya!", `<strong>PROMOCIONES!</strong></br>`);     
     }
   }
 }
-//Funcion para carga de zonas de ventas para consulta de pedidos
-function PermisosZonas() {
-  var rol = $("#Rol").val();
-  var sw = 0;
-  $.ajax({
-    type: "POST",
-    encoding: "UTF-8",
-    url: "../models/PW-SAP.php",
-    async: false,
-    dataType: "json",
-    error: function (OBJ, ERROR, JQERROR) { },
-    beforeSend: function () { },
-    data: {
-      op: "S_PERMISO_ZONA",
-      rol: rol
-    },
-    success: function (data) {
-      if (data.length > 0) {
-        sw = 1
-      }
-    }
-  }).fail(function (data) {
-    console.error(data);
-  });
+// FUNCIÓN PARA CARGA DE ZONAS DE VENTAS PARA CONSULTA DE PEDIDOS
+const PermisosZonas = async () => {
+  let sw = 0;
+  try {
+    let rol = $("#Rol").val();
+    
+    const data = await enviarPeticion({op: "S_PERMISO_ZONA", link: "../models/PW-SAP.php", rol});
+    if (data.length > 0) sw = 1;
+  } catch (error) {
+    console.error(error);
+  }
   return sw;
 }
-
-function ZonasVentas() {
-
-  var sw = PermisosZonas();
-  var idUsr = $("#UsrId").val();
-  $.ajax({
-    type: "POST",
-    encoding: "UTF-8",
-    url: "../models/PW-SAP.php",
-    async: false,
-    dataType: "json",
-    error: function (OBJ, ERROR, JQERROR) { },
-    beforeSend: function () { },
-    data: {
-      op: "S_ZONAS_VENTA",
-      sw: sw,
-      idUsr: idUsr
-    },
-    success: function (data) {
-      var zonas = '';
-      if (data.length > 0) {
-        if (sw == 1) {
-          zonas = '<option value="0">000000 - TODAS</option>';
-        }
-        for (var i = 0; i < data.length; i++) {
-          zonas += '<option value="' + data[i].zona + '">' + data[i].zona + ' - ' + data[i].descripcion + '</option>';
-        } //for	
-      } else {
-        zonas = '<option value="999999">NO TIENE ZONA ASIGNADA SOLICITAR AL ADMINISTRADOR</option>';
+// FUNCIÓN PARA CARGA DE ZONAS DE VENTAS 
+const ZonasVentas = async () => {
+  try {
+    let zonas = "";
+    let sw = await PermisosZonas();
+    let idUsr = $("#UsrId").val();
+  
+    const data = await enviarPeticion({op: "S_ZONAS_VENTA", link: "../models/PW-SAP.php", sw, idUsr});
+    if (data.length > 0) {
+      if (sw == 1) {
+        zonas = `<option value="0">000000 - TODAS</option>`;
       }
-      $("#txtZonas").html(zonas);
+
+      data.forEach(item => zonas += `<option value="${item.zona}">${item.zona} - ${item.descripcion}</option>`);
+
+    } else {
+      zonas = `<option value="999999">NO TIENE ZONA ASIGNADA SOLICITAR AL ADMINISTRADOR</option>`;
     }
-  }).fail(function (data) {
-    console.error(data);
-  });
+    $("#txtZonas").html(zonas);    
+  } catch (error) {
+    console.error(error);
+  }  
 }
-//Funcion de activacion de Tabs
-function activaTab(tab) {
-  $('.nav-tabs a[href="#' + tab + '"]').tab('show');
-};
-//funcion que carga la imagen de "cargando..."
+// FUNCIÓN DE ACTIVACIÓN DE TABS
+function activaTab(tab) { $(`.nav-tabs a[href="#${tab}"]`).tab("show"); };
+// FUNCIÓN LOADING DE LA APP
 function LoadImg(texto = "Cargando...") {
   let n = 0;
 
   const html = `
     <img src="../resources/icons/preloader.gif" alt="Cargando..." />
-    <figcaption style="font-size: 1.2em; margin-bottom: 5px;">${texto}</figcaption>
+    <figcaption style="font-size: 25px; margin-bottom: 5px; font-weight: bold;">${texto}</figcaption>
     <figcaption id="txtTimer" style="font-weight: bold;">0</figcaption>`;
 
   const loader = document.getElementById("loaderOverlay");
@@ -336,26 +294,35 @@ function LoadImg(texto = "Cargando...") {
   loader.style.display = "flex";
 
   window.timerInterval = setInterval(() => {
-    document.getElementById("txtTimer").textContent = ++n;
+    if (document.getElementById("txtTimer")) document.getElementById("txtTimer").textContent = ++n;
   }, 1000);
 }
-
+// FUNCIÓN PARA DESMONTAR LOADING
 function UnloadImg() {
   clearInterval(window.timerInterval);
   const loader = document.getElementById("loaderOverlay");
   loader.style.display = "none";
   loader.innerHTML = "";
 }
-//funcion que desbloquea la pantalla
+// FUNCIÓN QUE DESBLOQUEA LA PANTALLA
 function UnlockScreen(cadena) {
-  $(".centrado-porcentual").html(' <center><img src="../resources/icons/llorar.png"   /></center><br><center><h3 style="width:90%; padding-left:0; margin-left:0">AL PARECER HA OCURRIDO UN ERROR AL CARGAR LOS ' + cadena + ', POR FAVOR VUELVE A INTENTARLO</h3>  </center><br>');
+  let errorHTML = `
+  <center>
+    <img src="../resources/icons/llorar.png">
+  </center><br>
+  <center>
+    <h3 style="width:90%; padding-left:0; margin-left:0">
+      AL PARECER HA OCURRIDO UN ERROR AL CARGAR LOS ${cadena}, POR FAVOR VUELVE A INTENTARLO
+    </h3>  
+  </center><br>`;
+  $(".centrado-porcentual-pw").html(errorHTML);
   $(".form-control").attr("disabled", false);
   setInterval(DesbloquearPantalla, 3000);
 }
-//FUNCION QUE CARGA EL ARRAY DE LOS TERCEROS DE LA ORGANIZACION X
+// FUNCION QUE CARGA EL ARRAY DE LOS TERCEROS DE LA ORGANIZACION X
 const LoadArrayCli = async () => {
   try {
-    LoadImg('Cargando información... espere un momento ⏳⏳⏳');
+    LoadImg('Cargando información... Espere un momento ⏳⏳⏳');
     await new Promise(requestAnimationFrame);
 
     const data = await enviarPeticion({
@@ -402,83 +369,59 @@ const LoadArrayCli = async () => {
     UnloadImg();
   }
 };
-
+// FUNCIÓN PARA VALIDAR SI ES UN NÚMERO
 function validarSiNumero(numero) {
   x = 0;
-  if (/^([0-9])*$/.test(numero)) {
-    x = 1;
-  }
+  if (/^([0-9])*$/.test(numero)) x = 1;
   return x;
 }
-
-function EditarPedido(Numero, Tipo) {
-  $.ajax({
-    type: "POST",
-    encoding: "UTF-8",
-    url: "../models/PW-SAP.php",
-    dataType: "json",
-    error: function (OBJ, ERROR, JQERROR) {
-      alert(JQERROR);
-    },
-    data: {
-      op: "S_EDITAR_PW",
-      Numero: Numero,
-      Tipo: Tipo
-    },
-    async: false,
-    success: function (data) {
-      if (data != '' && data != null) {
-        $("#ModalEditarPedidos").modal("hide");
-        $("#ped_numero").val(data[0].NUMERO);
-        $("#ped_valor_total").val(data[0].VALOR_TOTAL);
-        $("#ped_destinatario").val(data[0].DESTINATARIO);
-        $("#ped_bodega").val(data[0].OFICINA_VENTAS);
-        $("#ped_codigo_sap").val(data[0].CODIGO_SAP);
-        $("#ped_transferido").val(data[0].TRANSFERIDO);
-        $("#ped_numero_sap").val(data[0].NUMERO_SAP)
-        //---------------------------------------------------------
-        CargarCliente(data[0].CODIGO_SAP, 'c');
-        BuscarProductos();
-        $("#txt_numero").val(data[0].NUMERO);
-        $("#txt_numero_sap").val(data[0].NUMERO_SAP);
-        $("#txt_total").val(formatNum(data[0].VALOR_TOTAL, '$'));
-        //---------------------------------------------------------
-        // $("#liPedidos").removeClass("disabled disabledTab");
-        $("#btnPedidos").attr("disabled", false);
-        $("#txt_destinatario").attr('disabled', true);
-        //$("#ModalOpciones").modal("hide");
-        //---------------------------------------------------------*/
-      } else {
-        Swal.fire({
-          icon: 'error',
-          title: 'Oops...',
-          text: 'Pedido no encontrado!.'
-        });
-      }
+// FUNCIÓN PARA EDITAR UN PEDIDO
+const EditarPedido = async (Numero, Tipo) => {
+  try {
+    const data = await enviarPeticion({ op: "S_EDITAR_PW", link: "../models/PW-SAP.php", Numero, Tipo });
+    if (data.length) {
+      const item = data[0];
+      $("#ModalEditarPedidos").modal("hide");
+      $("#ped_numero").val(item.NUMERO);
+      $("#ped_valor_total").val(item.VALOR_TOTAL);
+      $("#ped_destinatario").val(item.DESTINATARIO);
+      $("#ped_bodega").val(item.OFICINA_VENTAS);
+      $("#ped_codigo_sap").val(item.CODIGO_SAP);
+      $("#ped_transferido").val(item.TRANSFERIDO);
+      $("#ped_numero_sap").val(item.NUMERO_SAP);
+      
+      CargarCliente(item.CODIGO_SAP, 'c');
+      BuscarProductos();
+      $("#txt_numero").val(item.NUMERO);
+      $("#txt_numero_sap").val(item.NUMERO_SAP);
+      $("#txt_total").val(formatNum(item.VALOR_TOTAL, '$'));
+      
+      $("#btnPedidos").attr("disabled", false);
+      $("#txt_destinatario").attr('disabled', true);      
+    } else {
+      Swal.fire("Oops!!!", "Pedido no encontrado", "error");
     }
-  });
+  } catch (error) {
+    console.error(error);
+  }
 }
 
+// FUNCIÓN PARA CARGA DE EVENTO AUTOMATICO
 function CargarEvento() {
-  ///carga de evento automatico
-  var DepId = $("#Dpto").val();
+  let DepId = $("#Dpto").val();
   if (parent.parent.$("#AbrirVentas").val() != 0) {
     if (DepId == 10 || $("#txt_codigoSap").val() != '') {
       activaTab("dvProductos");
-      //-------------------------
-      var grupo = parent.parent.$("#AbrirVentas").val();
-      var tipo = parent.parent.$("#AbrirVentasTipo").val();
+      
+      let grupo = parent.parent.$("#AbrirVentas").val();
+      let tipo = parent.parent.$("#AbrirVentasTipo").val();
       switch (tipo) {
         case 'DES':
-          {
             $("#DvChkDctos").addClass('DivCheckBoxTrue');
-          }
-          break;
+            break;
         case 'BON':
-          {
             $("#DvChkBonif").addClass('DivCheckBoxTrue');
-          }
-          break;
+            break;
       }
       $("#txt_bproductos").val($.trim(grupo));
 
@@ -489,44 +432,43 @@ function CargarEvento() {
 
       parent.parent.$("#AbrirVentas").val(0);
     } else {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Oops...',
-        text: 'Para visualizar el evento primero debe seleccionar un cliente!.'
-      });
+      Swal.fire("Oops!!!", "Para visualizar el evento primero debe seleccionar un cliente", "warning");
     }
   }
 }
-//Nuevo para carga de multiples codigos de clientes-----------------------------------------------------------
+// FUNCIÓN PARA DE MULTIPLES CÓDIGOS DE CLIENTES
 function CargarClienteNit(codSAP, sw) {
-  var expresion = new RegExp(codSAP, "i");
-  var bodega = new RegExp($.trim($("#Ofi").val()));
-  filtro = ArrCli.filter(nuevo => expresion.test(nuevo.nit));
+  let expresion = new RegExp(codSAP, "i");
+  let bodega = new RegExp($.trim($("#Ofi").val()));
+
+  let filtro = ArrCli.filter(nuevo => expresion.test(nuevo.nit));
   filtro = filtro.filter(filtro => bodega.test(filtro.bodega));
-  var dataCliente = '';
-  for (var i = 0; i < filtro.length; i++) {
-    d = filtro[i];
-    dataCliente += '<option value="' + d.codigo_sap + '">' + d.codigo_sap + ' | ' + d.nombres + '</option>';
+
+  let dataCliente = '';
+  for (let i = 0; i < filtro.length; i++) {
+    let d = filtro[i];
+    dataCliente += `<option value="${d.codigo_sap}">${d.codigo_sap} | ${d.nombres}</option>`;
   }
   $("#txt_cliente").html(dataCliente);
   CargarClienteSeleccionado();
 }
-
+// FUNCIÓN PARA CARGAR EL CLIENTE SELECCIONADO
 function CargarClienteSeleccionado() {
-  var codSAP = $("#txt_cliente").val();
-  expresion = new RegExp(codSAP, "i");
-  filtro = ArrCli.filter(ArrCli => expresion.test(ArrCli.codigo_sap));
-  for (var i = 0; i < filtro.length; i++) {
-    d = filtro[0];
+  let codSAP = $("#txt_cliente").val();
+  let expresion = new RegExp(codSAP, "i");
+
+  let filtro = ArrCli.filter(ArrCli => expresion.test(ArrCli.codigo_sap));
+  for (let i = 0; i < filtro.length; i++) {
+    const d = filtro[0];
     $("#txt_nit").val(d.nit);
     $("#txt_dir").val(d.direccion);
     $("#txt_tel").val(d.telefonos);
     $("#txt_mail").val(d.email);
     $("#txt_ciudad").val(d.ciudad);
     $("#txt_cupo").val(formatNum(d.cupo_credito, '$'));
-    $("#txt_oficina").html('<option value="' + d.bodega + '">' + d.bodega_desc + '</option>');
-    //$("#txt_oficina").html(OfcN);
-    $("#txt_oficina option[value='" + d.bodega + "']").attr("selected", true);
+    $("#txt_oficina").html(`<option value="${d.bodega}">${d.bodega_desc}</option>`);
+    
+    $(`#txt_oficina option[value="${d.bodega}"]`).attr("selected", true);
     $("#txt_condicion").val(d.condicion_pago);
     $("#txt_lista").val(d.lista);
     $("#txt_vendedor").val(d.vendedor);
@@ -538,31 +480,26 @@ function CargarClienteSeleccionado() {
     $("#txt_plazo").val(d.dias_pago + ' dias');
     $("#txt_destinatario").attr('enable', true);
     $('#txt_cliente').prop('readonly', true);
-    //Grupo cliente-------------------------
+    
     $("#txtGrp1").val(d.grupo1);
     $("#txtGrp2").val(d.grupo2);
-    //Grupo cliente-------------------------
+    // Grupo cliente
     $("#txtGrp1,#txtGrp2").prop('disabled', true);
     Destinatarios(d.codigo_sap, d.ciudad, d.direccion);
-    if (d.institucional == 1) {
-      $("#txt_institucional").val('SI');
-    } else {
-      $("#txt_institucional").val('NO');
-    }
-    if (d.controlados == 1) {
-      $("#txt_controlado").val('SI');
-    } else {
-      $("#txt_controlado").val('NO');
-    }
+    if (d.institucional == 1) $("#txt_institucional").val('SI');
+    else $("#txt_institucional").val('NO');
+    
+    if (d.controlados == 1) $("#txt_controlado").val('SI');
+    else $("#txt_controlado").val('NO');
   }
   BuscarProductos();
 }
-//fin nueva carga de clientes---------------------------------------------------------------------------------------
+// FUNCIÓN PARA CARGAR CLIENTE
 function CargarCliente(codSAP, sw) {
-  expresion = new RegExp(codSAP, "i");
-  filtro = ArrCli.filter(ArrCli => expresion.test(ArrCli.codigo_sap));
+  let expresion = new RegExp(codSAP, "i");
+  let filtro = ArrCli.filter(ArrCli => expresion.test(ArrCli.codigo_sap));
   for (var i = 0; i < filtro.length; i++) {
-    d = filtro[0];
+    const d = filtro[0];
     $('#txt_cliente').val(d.value);
     $("#txt_nit").val(d.nit);
     $("#txt_dir").val(d.direccion);
@@ -570,7 +507,7 @@ function CargarCliente(codSAP, sw) {
     $("#txt_mail").val(d.email);
     $("#txt_ciudad").val(d.ciudad);
     $("#txt_cupo").val(formatNum(d.cupo_credito, '$'));
-    $("#txt_oficina").html('<option value="' + d.bodega + '">' + d.bodega_desc + '</option>');
+    $("#txt_oficina").html(`<option value="${d.bodega}">${d.bodega_desc}</option>`);
     $("#txt_condicion").val(d.condicion_pago);
     $("#txt_lista").val(d.lista);
     $("#txt_vendedor").val(d.vendedor);
@@ -581,85 +518,56 @@ function CargarCliente(codSAP, sw) {
     $("#txt_destinatario").attr('enable', true);
     $('#txt_cliente').prop('readonly', true);
     Destinatarios(d.codigo_sap, d.ciudad, d.direccion);
-    if (d.institucional == 1) {
-      $("#txt_institucional").val('SI');
-    } else {
-      $("#txt_institucional").val('NO');
-    }
-    if (d.controlados == 1) {
-      $("#txt_controlado").val('SI');
-    } else {
-      $("#txt_controlado").val('NO');
-    }
+
+    if (d.institucional == 1) $("#txt_institucional").val('SI');
+    else $("#txt_institucional").val('NO');
+
+    if (d.controlados == 1) $("#txt_controlado").val('SI');
+    else $("#txt_controlado").val('NO');
   }
-  //BuscarProductos();
 }
 // LIMPIEZA Y ACTUALIZACIÓN DE CAMPOS
 function Limpiar() {
   $("#txt_cliente").focus();
-  //Organizacion de ventas traida desde el menu
+  // Organización de ventas traída desde el menú
   $("#Organizacion").val(parent.parent.$("#org").val());
-  //Datos del pedido
-  $("#txt_bproductos").val('');
-  $("#txt_total").val('$0');
-  $("#txt_numero").val('0');
-  $("#txt_numero_sap").val('0');
-  $("#dvResultProductos").html('');
-  //--------------------------------
-  $("#txt_descuento").val('');
-  $("#txt_plazo").val('');
-  $("#txt_nit").val('');
-  $("#txt_dir").val('');
-  $("#txt_tel").val('');
-  $("#txt_mail").val('');
-  $("#txt_ciudad").val('');
-  $("#txt_cupo").val('');
-  $("#txt_oficina").html('');
-  $("#txt_condicion").val('');
-  $("#txt_lista").val('');
-  $("#txt_vendedor").val('');
-  $("#txt_televendedor").val('');
 
-  $("#txt_codigoSap").val('');
-  $("#txt_institucional").val('');
-  $("#txt_controlado").val('');
-  $("#txt_destinatario").html('');
+  const camposVal = [
+    '#txt_bproductos', '#txt_descuento', '#txt_plazo', '#txt_nit', '#txt_dir',
+    '#txt_tel', '#txt_mail', '#txt_ciudad', '#txt_cupo', '#txt_condicion',
+    '#txt_lista', '#txt_vendedor', '#txt_televendedor', '#txt_codigoSap',
+    '#txt_institucional', '#txt_controlado'
+  ];
+  $(camposVal.join(',')).val('');
+
+  $("#txt_total").val('$0');
+  $("#txt_numero, #txt_numero_sap").val('0');
+  $("#dvResultProductos").empty();
+
+  $("#txt_oficina, #txt_destinatario").empty();
   $("#txt_destinatario").attr('disabled', false);
+  $("#btnProductos, #btnPedidos").attr("disabled", true);
   $("#btnDescuentos").hide();
-  //Deshabilitar pestañas---------------------------------
-  // $("#liProductos").addClass("disabled disabledTab");
-  $("#btnProductos").attr("disabled", true);
-  // $("#liPedidos").addClass("disabled disabledTab");
-  $("#btnPedidos").attr("disabled", true);
-  //------------------------------------------------------
+
   $('#txt_cliente').prop('readonly', false);
   $("#txt_oficina").attr('disabled', false);
-  var DepId = $("#Dpto").val();
+
+  // Visualización según Departamento
+  const DepId = $("#Dpto").val();
   if (DepId == 10) {
     CargarClienteNit($.trim($("#Nit").val()), 'c');
+    $('#txt_cliente').val('');
   } else {
     $('#txt_cliente').val('');
   }
-  //Control de visualizacion de cupo de credito 
-  if (DepId != 10 //Clientes 
-    && DepId != 11 //Transferencistas Internas
-    && DepId != 13 //Transferencistas Externas
-    && DepId != 9) { //Proveedores
-    //if($("#Ofi").val()!='2200' && $("#Ofi").val()!='2300'  && $("#Ofi").val()!='2400' ){
-    $("#trTipoPed").show();
-    //}
-    $("#trCondicion").show();
-    $("#trCupo").show();
-    $("#btnEstadisticas").show();
+
+  if (![10, 11, 13, 9].includes(+DepId)) {
+    $("#trTipoPed, #trCondicion, #trCupo, #btnEstadisticas").show();
   } else {
-    $("#trCondicion").hide();
-    $("#trCupo").hide();
-    $("#trTipoPed").hide();
-    $("#btnEstadisticas").hide();
+    $("#trTipoPed, #trCondicion, #trCupo, #btnEstadisticas").hide();
   }
-  // Control de visualizacion de eventos de mercadeo
-  // Transferencistas Internas - Transferencistas Externas - Proveedores 
-  if (DepId != 11 && DepId != 13 && DepId != 9) { 
+
+  if (![11, 13, 9].includes(+DepId)) {
     $('[href="#dvEventos"]').closest('li').show();
     $("#separadorEventos").show();
   } else {
@@ -667,53 +575,33 @@ function Limpiar() {
     $("#separadorEventos").hide();
   }
 
-  if ($.trim($("#Rol").val()) == 9 || $.trim($("#Rol").val()) == 11 || $.trim($("#Rol").val()) == 120) { //Transferencistas y proveedores
-    $("#btnEditar").hide();
-    $("#btnTempTerceros").hide();
-    $("#btnAddEntregas").hide();
-    $("#separadorEntregas").hide();
-    $("#btListaFacts").hide();
-    $("#separadorFacturas").hide();
-    $("#btnMenu5").hide();
-    $("#btnMenu6").hide();
-    $("#btnMenu7").hide();
-    $("#btnMenu8").hide();
-  } else if ($.trim($("#Rol").val()) == 10) { // Clientes
-    $("#btnEditar").hide();
-    $("#btnTempTerceros").hide();
-    $("#btnAddEntregas").hide();
-    $("#separadorEntregas").hide();
-    $("#btnMenu5").hide();
-    $("#btnMenu6").hide();
-    $("#btnMenu7").hide();
-    $("#btnMenu8").hide();
-    $("#btnDescuentos").show();
-    $("#btnDescuentos").show();
+  const Rol = +$.trim($("#Rol").val());
+  const botonesOcultar = "#btnEditar, #btnTempTerceros, #btnAddEntregas, #separadorEntregas, #btListaFacts, #separadorFacturas, #btnMenu5, #btnMenu6, #btnMenu7, #btnMenu8";
+
+  if ([9, 11, 120].includes(Rol)) {
+    $(botonesOcultar).hide();
+  } else if (Rol === 10) {
+    $(botonesOcultar + ', #btnDescuentos').hide();
   }
-  //---eliminar pedidos y eliminar OT
-  if ($.trim($("#Rol").val()) == 1 || $.trim($("#Rol").val()) == 3 || $.trim($("#Rol").val()) == 13) {
-    $("#btnMenu5").show();
-    $("#btnEliminaOT").show();
+
+  // Permiso para eliminar pedidos y OT
+  if ([1, 3, 13].includes(Rol)) {
+    $("#btnMenu5, #btnEliminaOT").show();
   } else {
-    $("#btnMenu5").hide();
-    $("#btnEliminaOT").hide();
+    $("#btnMenu5, #btnEliminaOT").hide();
   }
-  //------------------------------------------------
-  //$(".form-control").attr("disabled",false);
+
   $("#n_resultados").text("");
   $("#OficinaEntregas").html(OfcN);
-  $("#TxtIntegracion").val('N');
+  $("#TxtIntegracion").val('N').attr('disabled', false);
 
-  $("#TxtIntegracion").attr('disabled', false);
-
-
-  if ($("#link_pro").val() != '0') {
-    $("#btnLimpiar").attr("disabled", true)
+  if ($("#link_pro").val() !== '0') {
+    $("#btnLimpiar").attr("disabled", true);
   }
+
   $('#cartera_edades, #Presupuesto_datos').empty();
-
 }
-
+// FUNCIÓN PARA OBTENER INFORMACIÓN DE BONIFICADOS
 function InfoBon(descripcion, desc_bonificado_n, stock, stock_bonificado, condicion, stock_prepack) {
   Swal.fire({
     title: "BONIFICADO",
@@ -742,18 +630,14 @@ function InfoBon(descripcion, desc_bonificado_n, stock, stock_bonificado, condic
     confirmButtonText: 'Cerrar'
   });
 }
-
+// FUNCIÓN PARA LIMPIAR CADENAS DE CARACTERES ESPECIALES
 function getCleanedString(cadena) {
-  // Definimos los caracteres que queremos eliminar
-  var specialChars = "!@#$^&%*()+=-[]\/{}|:<>?,.";
-  // Los eliminamos todos
+  let specialChars = "!@#$^&%*()+=-[]\/{}|:<>?,.";
   for (var i = 0; i < specialChars.length; i++) {
     cadena = cadena.replace(new RegExp("\\" + specialChars[i], 'gi'), '');
   }
-  // Lo queremos devolver limpio en minusculas
   cadena = cadena.toLowerCase();
-  // Quitamos espacios y los sustituimos por _ porque nos gusta mas asi
-  // cadena = cadena.replace(/ /g,"_");
+  // Quitamos espacios y los sustituimos por _ porque nos gusta mas asi  
   // Quitamos acentos y "ñ". Fijate en que va sin comillas el primer parametro
   cadena = cadena.replace(/á/gi, "a");
   cadena = cadena.replace(/é/gi, "e");
@@ -763,60 +647,16 @@ function getCleanedString(cadena) {
   cadena = cadena.replace(/ñ/gi, "n");
   return cadena.toUpperCase();
 }
-
-function ordenarAsc(p_array_json, p_key) {
-  cont = 0;
-  p_array_json.sort(function (a, b) {
-    return a[p_key] > b[p_key];
-  });
-}
-
-function ordenar(op, ob) {
-  obj = $(ob);
-  switch (parseInt(op)) {
-    case 1:
-      key = "descripcion";
-      break;
-    case 2:
-      key = "valor_unitario";
-      break;
-    case 3:
-      key = "descuento";
-      break;
-    case 4:
-      key = "stock";
-      break;
-    default:
-      key = "descripcion";
-      break;
-  }
-  new_ord = "";
-  if (obj.hasClass("glyphicon-triangle-bottom")) {
-    new_ord = "asc";
-    cl = "glyphicon-triangle-top";
-  } else {
-    new_ord = "desc";
-    cl = "glyphicon-triangle-bottom";
-  }
-  sortJSON(Arr, key, new_ord);
-  TableView(Arr);
-}
-
+// FUNCIÓN PARA ORDENAR REGISTROS
 function sortJSON(data, key, orden) {
   return data.sort(function (a, b) {
-    var x = a[key],
-      y = b[key];
+    let x = a[key], y = b[key];
 
-    if (orden === 'asc') {
-      return ((x < y) ? -1 : ((x > y) ? 1 : 0));
-    }
-    if (orden === 'desc') {
-      return ((x > y) ? -1 : ((x < y) ? 1 : 0));
-    }
+    if (orden === 'asc') return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+    if (orden === 'desc') return ((x > y) ? -1 : ((x < y) ? 1 : 0));
   });
-
 }
-
+// FUNCIÓN PARA ARMAR TABLA PRINCIPAL DE RESULTADOS DE PRODUCTOS
 function TableView(filas) {
   const op_inf = $("#DvChkKits").hasClass('DivCheckBoxTrue') ? 1 : 0;
   const org = $.trim($("#Organizacion").val());
@@ -871,7 +711,7 @@ function TableView(filas) {
     tabla += `
       <tr>
         <td class="size-td">${img_new}${d.codigo_material}</td>
-        <td class="size-td">${img_3} ${img} ${img_desc} ${d.descripcion} ${img_1} ${img_2}</td>
+        <td class="size-12">${img_3} ${img} ${img_desc} ${d.descripcion} ${img_1} ${img_2}</td>
         <td class="size-td" style="background-color:#64D4F7">${formatNum(d.valor_unitario, '$')}</td>
         <td class="size-td">${d.iva}</td>
         <td class="size-td">${d.descuento}</td>
@@ -921,18 +761,12 @@ function TableView(filas) {
     InfoMaterial(codigo_material, valor_unitario, iva, descuento, descripcion, stock, op_inf);
   });
 }
-
-function GuardarShoping() {
-  $.ajax({
-    encoding: "UTF-8",
-    url: "../models/PW-SAP.php",
-    global: false,
-    type: "POST",
-    error: function (OBJ, ERROR, JQERROR) {
-      alert(JQERROR);
-    },
-    data: ({
+// FUNCIÓN GUARDAR SHOPING
+const GuardarShoping = async () => {
+  try {
+    const data = await enviarPeticion({
       op: "GUARDA_SHOPING",
+      link: "../models/PW-SAP.php",
       codigo_sap: $("#txt_codigoSap").val(),
       shoping_codmaterial: $("#shoping_codmaterial").val(),
       shoping_preciomaterial: unformatNum($("#shoping_preciomaterial").val()),
@@ -942,53 +776,35 @@ function GuardarShoping() {
       valor_competencia: $("#shoping_valor").val(),
       shoping_observacion: $("#shoping_observacion").val(),
       oficina: $("#txt_oficina").val()
-    }),
-    dataType: "html",
-    async: false,
-    success: function (data) {
-      Swal.fire('Excelente.', 'Informacion almacenada correctamente.', 'success');
-      $("#shoping_observacion").val('');
-      $("#shoping_valor").val('');
-    }
-
-  });
+    });
+  
+    if (data.ok) {
+      Swal.fire("Excelente", "Informacion almacenada correctamente", "success");
+      $("#shoping_observacion").val("");
+      $("#shoping_valor").val("");
+    }    
+  } catch (error) {
+    console.error(error);
+  }
+}
+// FUNCIÓN LISTAR COMPETENCIA
+const ListarCompetencia = async () => {
+  try {
+    let option = "";
+    const organizacion =  $("#Organizacion").val();
+    const data = await enviarPeticion({op: "LISTA_COMPETENCIA", link: "../models/Listar_fidelizados.php", organizacion});
+    data.forEach(item => option += `<option value="${item.ID}">${item.NOMBRE}</option>`);   
+    $("#shoping_competencia").html(option);
+  } catch (error) {
+    console.error(error);
+  } 
 }
 
-function ListarCompetencia() {
-  $.ajax({
-    type: "POST",
-    encoding: "UTF-8",
-    url: "../models/Listar_fidelizados.php",
-    dataType: "json",
-    error: function (OBJ, ERROR, JQERROR) {
-
-    },
-    data: {
-      op: "LISTA_COMPETENCIA",
-      organizacion: $("#Organizacion").val()
-    },
-    async: false,
-    success: function (data) { //alert(data); return false;
-      var option = '';
-      for (var i = 0; i <= data.length - 1; i++) {
-        option += '<option value="' + data[i].ID + '">' + data[i].NOMBRE + '</option>'
-      }
-      $("#shoping_competencia").html(option);
-
-
-    }
-  }).fail(function (data) {
-    console.log(data);
-  });
-}
-
-//FILTROS
+// FUNCIÓN PARA FILTRAR CLIENTES
 function FiltrarCli(expr, ArrayCli, op) {
-  // Convertir 'expr' en una expresión regular para búsqueda insensible a mayúsculas/minúsculas
   const expresion = new RegExp(expr, "i");
   let filtro = [];
 
-  // Filtrar según la opción 'op' usando un solo ciclo de iteración
   switch (parseInt(op)) {
     case 1: // Filtrar por código SAP, NIT o teléfonos
       filtro = ArrayCli.filter(cliente => {
@@ -997,361 +813,237 @@ function FiltrarCli(expr, ArrayCli, op) {
           || expresion.test(cliente.telefonos);
       });
       break;
-
     case 2: // Filtrar por nombres o razón comercial
       filtro = ArrayCli.filter(cliente => {
         return expresion.test(cliente.nombres)
           || expresion.test(cliente.razon_comercial);
       });
       break;
-
     default:
-      // En caso de que 'op' no coincida con ninguna opción válida, retornar array vacío
       filtro = [];
       break;
   }
-
   return filtro;
 }
-
-
+// FUNCIÓN RECURSIVA
 function recursiva(expr, ArrayP, st, des, f_bon, isnum, f_new, f_ofe) {
-  // Crear una expresión regular basada en la entrada 'expr' (ignorar mayúsculas y minúsculas)
   let expresion = new RegExp(expr, "i");
 
-  // Si 'isnum' es 1 (es número), buscar por código de barras
   if (isnum == 1) {
-    // Buscar en el array de códigos de barras el código del material
     for (let c = 0; c < ArrEan.length; c++) {
       let cod = ArrEan[c];
       if (cod.ean == expr) {
         expresion = new RegExp(cod.codigo_material, "i");
-        break; // Detener la búsqueda una vez encontrado
+        break;
       }
     }
   }
 
-  // Filtrar el array 'ArrayP' según la expresión y/o otras condiciones
   let filtro = ArrayP.filter(item => {
-    // Comprobar si la descripción o el código de material coinciden con la expresión
     return expresion.test(item.descripcion) || expresion.test(item.codigo_material);
   });
 
-  // Aplicar filtros adicionales según los parámetros
-  if (st == 1) {
-    filtro = filtro.filter(item => item.stock > 0);
-  }
-  if (des == 1) {
-    filtro = filtro.filter(item => item.descuento > 0);
-  }
-  if (f_bon == 1) {
-    filtro = filtro.filter(item => item.bonificado > 0);
-  }
-  if (f_new == 1) {
-    filtro = filtro.filter(item => item.dias_creacion <= 90);
-  }
-  if (f_ofe == 1) {
-    filtro = filtro.filter(item => item.codigo_material.substring(0, 4) == '4000');
-  }
+  if (st == 1) filtro = filtro.filter(item => item.stock > 0);
+  if (des == 1) filtro = filtro.filter(item => item.descuento > 0);
+  if (f_bon == 1) filtro = filtro.filter(item => item.bonificado > 0);
+  if (f_new == 1) filtro = filtro.filter(item => item.dias_creacion <= 90);
+  if (f_ofe == 1) filtro = filtro.filter(item => item.codigo_material.substring(0, 4) == '4000');
 
   return filtro;
 }
-
-
-function AddProductoPlano(pcodigo, pvalor, piva, pdcto, pcant, pneto, pstock, pvrlped, pidped, pbonifica, pcantbon, pcantreg, pstobon) {
-  var oficina = $("#txt_oficina").val();
-  var codigo = pcodigo;
-  //------------------------------------------------------
-  var vlr_unitario = pvalor;
-  var iva = piva;
-  var descuento = pdcto;
-  var cant = isNaN(pcant) || pcant == '' ? 0 : parseInt(pcant);
-  var precio = pneto;
-  var stock = parseInt(pstock);
-  var totalfila = parseFloat(precio) * parseInt(cant);
-  var totalped = unformatNum($("#txt_total").val());
-  var NumPed = $("#txt_numero").val();
-  var idfila = 'IDF' + pcodigo;
-  //Variables de control de envio de bonificacion-
-  var Bonifica = pbonifica //--
-  var CantBonifica = pcantbon //--
-  var CantRegular = pcantreg //--
-  var StockBonifica = pstobon //--
-  //----------------------------------------------
-  //return false;
-  if (cant > 0) { //validacion de cantidad mayor a cero   
-    //------------Encabezado----------------------------------------------------------------------------
+// FUNCIÓN AGREGAR PRODUCTO PLANO
+async function AddProductoPlano(pcodigo, pvalor, piva, pdcto, pcant, pneto, pstock, pvrlped, pidped, pbonifica, pcantbon, pcantreg, pstobon) {
+  let oficina = $("#txt_oficina").val();
+  let codigo = pcodigo;
+  
+  let vlr_unitario = pvalor;
+  let iva = piva;
+  let descuento = pdcto;
+  let cant = isNaN(pcant) || pcant == '' ? 0 : parseInt(pcant);
+  let precio = pneto;
+  let stock = parseInt(pstock);
+  let totalfila = parseFloat(precio) * parseInt(cant);
+  let totalped = unformatNum($("#txt_total").val());
+  let NumPed = $("#txt_numero").val();
+  let idfila = 'IDF' + pcodigo;
+  // Variables de control de envio de bonificacion
+  let Bonifica = pbonifica;
+  let CantBonifica = pcantbon;
+  let CantRegular = pcantreg;
+  let StockBonifica = pstobon;
+  
+  if (cant > 0) { // validacion de cantidad mayor a cero   
+    // Encabezado
     if (NumPed == 0) {
-      NumPed = InsertarEncabezado(); //Se inserta el encabezado
+      NumPed = await InsertarEncabezado(); // Se inserta el encabezado
       $("#txt_numero").val(NumPed);
     }
+
     if (NumPed > 0) {
       totalped = (totalped + totalfila);
       $("#txt_total").val(formatNum(totalped, '$'));
-      InsertarDetalle(NumPed, codigo, cant, vlr_unitario, descuento, totalfila, iva); //Se inserta el detalle
+      await InsertarDetalle(NumPed, codigo, cant, vlr_unitario, descuento, totalfila, iva); // Se inserta el detalle
     }
   }
 }
-
+// FUNCIÓN BUSCAR PRODUCTO EN EL ARRAY EN MEMORIA
 function BuscarProductoArr(isn) {
-  var desc = $.trim($("#txt_bproductos").val()).toUpperCase(); //descripcion del producto
-  var bodega = $("#txt_oficina").val(); //bodega
-  var lista = $("#txt_lista").val(); //lista de precio del cliente
-  var numero = $("#txt_numero").val(); //numero del pedido temporal
-  var eps = $("#txt_institucional").val(); //eps
-  var ctrl = $("#txt_controlado").val(); //si es controlado
-  var top = $("#txt_reg").val(); //top de busqueda
-  var orden = $("#txt_orden").val(); //ordenar 
-  /*------------Filtros de busqueda-------------------------------------------------*/
-  var f_sto = 0;
-  var f_dto = 0;
-  var f_bon = 0;
-  var f_bar = 0;
-  var f_new = 0;
-  var f_ofe = 0;
-  if ($("#DvChkStock").hasClass('DivCheckBoxTrue')) {
-    f_sto = 1;
-  } //solo con stock
-  if ($("#DvChkDctos").hasClass('DivCheckBoxTrue')) {
-    f_dto = 1;
-  } //con descuentos
-  if ($("#DvChkBonif").hasClass('DivCheckBoxTrue')) {
-    f_bon = 1;
-  } //con bonificados
-  if ($("#DvChkBarras").hasClass('DivCheckBoxTrue')) {
-    f_bar = 1;
-  } //codigo de barras	
-  if ($("#DvChkNuevos").hasClass('DivCheckBoxTrue')) {
-    f_new = 1;
-  } //Productos nuevos	
-  if ($("#DvChkOfertado").hasClass('DivCheckBoxTrue')) {
-    f_ofe = 1;
-  } //Productos ofertados	
+  let desc = $.trim($("#txt_bproductos").val()).toUpperCase(); //descripcion del producto
+  let bodega = $("#txt_oficina").val(); //bodega
+  let lista = $("#txt_lista").val(); //lista de precio del cliente
+  let numero = $("#txt_numero").val(); //numero del pedido temporal
+  let eps = $("#txt_institucional").val(); //eps
+  let ctrl = $("#txt_controlado").val(); //si es controlado
+  let top = $("#txt_reg").val(); //top de busqueda
+  let orden = $("#txt_orden").val(); //ordenar 
+  
+  let f_sto = 0;
+  let f_dto = 0;
+  let f_bon = 0;
+  let f_bar = 0;
+  let f_new = 0;
+  let f_ofe = 0;
 
-  //alert(f_bon);
-  //recorro el array
-  //codigo de material pos=0
-  //descripcion        pos=1
-  var sh_cod = 0;
-  var sh_ean = 0;
-  var sh_des = 0;
-  var desc = escapeRegExp(desc);
+  if ($("#DvChkStock").hasClass('DivCheckBoxTrue')) f_sto = 1;
+  if ($("#DvChkDctos").hasClass('DivCheckBoxTrue')) f_dto = 1;
+  if ($("#DvChkBonif").hasClass('DivCheckBoxTrue')) f_bon = 1;
+  if ($("#DvChkBarras").hasClass('DivCheckBoxTrue')) f_bar = 1;	
+  if ($("#DvChkNuevos").hasClass('DivCheckBoxTrue')) f_new = 1;	
+  if ($("#DvChkOfertado").hasClass('DivCheckBoxTrue')) f_ofe = 1;
+
+  let sh_cod = 0;
+  let sh_ean = 0;
+  let sh_des = 0;
+  desc = escapeRegExp(desc);
+
   if (desc != "") {
-    var div_cadena = desc.split(" ");
-    var new_arr = new Array();
-    var expr = "";
+    let div_cadena = desc.split(" ");
+    let new_arr = new Array();
+    let expr = "";
     Arr = ArrProd;
-    //bloqueo la caja de texto 
-    //coloco cargando en div de busqueda
     $("#txt_bproductos").attr("disabled", true);
-    //****************************************************
-    if (isn == 1) { //es numero
+
+    if (isn == 1) {
       Arr = recursiva(desc, Arr, f_sto, f_dto, f_bon, isn, f_new, f_ofe);
     } else {
-
-      for (var x = 0; x < div_cadena.length; x++) {
-        //limpio la cadena
+      for (let x = 0; x < div_cadena.length; x++) {
         expr = $.trim(div_cadena[x]);
         Arr = recursiva(expr, Arr, f_sto, f_dto, f_bon, isn, f_new, f_ofe);
       }
     }
+
     if (Arr.length > 0) {
       TableView(Arr);
-      $("#n_resultados").text(Arr.length + ' Coincidencias encontradas');
+      $("#n_resultados").text(`${Arr.length} Coincidencias encontradas`);
     } else {
-      $("#dvResultProductos").html('<div class="alert alert-danger" role="alert">'
-        + '<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>'
-        + '<span class="sr-only">Error:</span>  NO EXISTEN RESULTADOS PARA LAS CONDICIONES SELECCIONADAS'
-        + '</div>');
+      let msgHtml = `
+      <div class="alert alert-danger" role="alert">
+        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+        <span class="sr-only">Error:</span>  NO EXISTEN RESULTADOS PARA LAS CONDICIONES SELECCIONADAS
+      </div>`;
+      $("#dvResultProductos").html(msgHtml);
       $("#n_resultados").text('0 resultados');
     }
     $("#txt_bproductos").attr("disabled", false);
   }
 }
-
-function CargarEan() {
-  $.ajax({
-    type: "POST",
-    encoding: "UTF-8",
-    url: "../models/PW-SAP.php",
-    async: true,
-    dataType: "json",
-    error: function (OBJ, ERROR, JQERROR) { },
-    beforeSend: function () { },
-    data: {
-      op: "B_EAN"
-    },
-    success: function (data) {
-
-      for (var i = 0; i < data.length; i++) {
-        d = data[i];
-        e = {
-          'codigo_material': d.codigo_material,
-          'ean': d.ean
-        }
-        ArrEan.push(e);
-      } //for
-    }
-  }).fail(function (data) {
-    console.error(data);
-  });
+// FUNCIÓN CARGAR EAN
+async function CargarEan() {
+  try {
+    const data = await enviarPeticion({op: "B_EAN", link: "../models/PW-SAP.php"});
+    data.forEach(item => {
+      let e = {codigo_material: item.codigo_material, ean: item.ean}
+      ArrEan.push(e);
+    });   
+  } catch (error) {
+    console.error(error);
+  }
 }
-//---------------------------------Funcion para busqueda de productos 
-function BuscarProductos() {
-  var desc = $.trim($("#txt_bproductos").val());
-  var bodega = $("#txt_oficina").val();
-  var lista = $("#txt_lista").val();
-  var numero = $("#txt_numero").val();
-  var eps = $("#txt_institucional").val();
+// FUNCIÓN PARA BUSCAR PRODUCTOS 
+async function BuscarProductos() {
+  let desc = $.trim($("#txt_bproductos").val());
+  let bodega = $("#txt_oficina").val();
+  let lista = $("#txt_lista").val();
+  let numero = $("#txt_numero").val();
+  let eps = $("#txt_institucional").val();
 
-  var ctrl = $("#txt_controlado").val();
-  var top = $("#txt_reg").val();
-  var orden = $("#txt_orden").val();
-  var CodigoSAP = $("#txt_codigoSap").val();
-  //Grupos de terceros ------------------
-  var Grp1 = $("#txtGrp1").val();
-  var Grp2 = $("#txtGrp2").val();
-  //-------------------------------------
-  /*------------Filtros de busqueda-------------------------------------------------*/
-  var f_sto = 0;
-  var f_dto = 0;
-  var f_bon = 0;
-  var f_bar = 0;
-  var f_new = 0;
-  if ($("#DvChkStock").hasClass('DivCheckBoxTrue')) {
-    f_sto = 1;
-  }
-  if ($("#DvChkDctos").hasClass('DivCheckBoxTrue')) {
-    f_dto = 1;
-  }
-  if ($("#DvChkBonif").hasClass('DivCheckBoxTrue')) {
-    f_bon = 1;
-  }
-  if ($("#DvChkBarras").hasClass('DivCheckBoxTrue')) {
-    f_bar = 1;
-  }
-  if ($("#DvChkNuevos").hasClass('DivCheckBoxTrue')) {
-    f_new = 1;
-  } //Productos nuevos	
-  /*
- //valido si se abre desde la ventana de 0102 y selecciono por defecto el valor enviado en $_GET["pedido_integracion"]	
-  if($("#pedido_integracion").val()!=''){
-   if($("#pedido_integracion").val()=='S'){
-    $("#TxtIntegracion").val('S');
-   }else{
-     $("#TxtIntegracion").val('N');
-   }
-  }*/
+  let ctrl = $("#txt_controlado").val();
+  let top = $("#txt_reg").val();
+  let orden = $("#txt_orden").val();
+  let CodigoSAP = $("#txt_codigoSap").val();
+  // Grupos de terceros
+  let Grp1 = $("#txtGrp1").val();
+  let Grp2 = $("#txtGrp2").val();
+  
+  let f_sto = 0;
+  let f_dto = 0;
+  let f_bon = 0;
+  let f_bar = 0;
+  let f_new = 0;
+  
+  if ($("#DvChkStock").hasClass('DivCheckBoxTrue')) f_sto = 1;
+  if ($("#DvChkDctos").hasClass('DivCheckBoxTrue')) f_dto = 1;
+  if ($("#DvChkBonif").hasClass('DivCheckBoxTrue')) f_bon = 1;
+  if ($("#DvChkBarras").hasClass('DivCheckBoxTrue')) f_bar = 1;
+  if ($("#DvChkNuevos").hasClass('DivCheckBoxTrue')) f_new = 1; 
 
-  var TipoPed = $("#TxtIntegracion").val();
-
-  /*-----------Filtro de caso para productos regulares o Kits-----------------------*/
-  var op_sw = 'B_PRODUCTOS';
-  var op_inf = 0;
+  let TipoPed = $("#TxtIntegracion").val();
+ 
+  let op_sw = 'B_PRODUCTOS';
+  let op_inf = 0;
   if ($("#DvChkKits").hasClass('DivCheckBoxTrue')) {
     op_sw = 'B_PRODUCTOS_KIT';
     op_inf = 1;
   }
-  /*--------------------------------------------------------------------------------*/
 
-  //console.log('Bodega : '+bodega);
-  $.ajax({
-    type: "POST",
-    encoding: "UTF-8",
-    url: "../models/PW-SAP.php",
-    async: true,
-    dataType: "json",
-    beforeSend: function () {
-      LoadImg('Cargando portafolio... ⏳⏳⏳');
-    },
-    data: {
-      op: op_sw,
-      desc: desc,
-      bodega: bodega,
-      lista: lista,
-      numero: numero,
-      eps: eps,
-      ctrl: ctrl,
-      f_sto: f_sto,
-      f_dto: f_dto,
-      f_bon: f_bon,
-      f_bar: f_bar,
-      top: top,
-      orden: orden,
-      TipoPed: TipoPed,
-      f_new: f_new,
-      Grp1: Grp1,
-      Grp2: Grp2,
-      CodigoSAP: CodigoSAP
-    },
-    success: function (data) {
-      ArrProd = [];
-      for (var i = 0; i < data.length; i++) {
-        d = data[i];
-        det = {
-          'codigo_material': d.codigo_material,
-          'descripcion': $.trim(d.descripcion),
-          'valor_unitario': d.valor_unitario,
-          'iva': d.iva,
-          'descuento': d.descuento,
-          'stock': d.stock,
-          'valor_neto': d.valor_neto,
-          'valor_bruto': d.valor_bruto,
-          'bonificado': d.bonificado,
-          'desc_bonificado_n': d.desc_bonificado_n,
-          'stock_bonificado': d.stock_bonificado,
-          'cant_bonificado': d.cant_bonificado,
-          'cant_regular': d.cant_regular,
-          'condicion_b': d.condicion_b,
-          'stock_prepack': d.stock_prepack,
-          'cant_pedido': d.cant_pedido,
-          'id_pedido': d.id_pedido,
-          'vlr_pedido': d.vlr_pedido,
-          'grupo_articulo': d.grupo_articulos,
-          'descuento_adg': d.descuento_adg,
-          'dias_creacion': d.dias_creacion,
-          'img1': d.img1,
-          'img2': d.img2,
-          'op_inf': d.op_inf
-          /*,
-                     'codigos_ean'          :d.codigos_ean */
-        } //det={
-        ArrProd.push(det);
-
-
-      } //for
-      // console.log('Registros ARRAY : '+ArrProd.length);
-      sortJSON(ArrProd, 'descripcion', 'asc');
-      // $("#liProductos").removeClass("disabled disabledTab");
-      $("#btnProductos").attr("disabled", false);
-      CargarEan(); //se comenta para ver como funciona el rendimiento
-
-    }
-  }).done(function () {
+  try {
+    LoadImg('Cargando portafolio... ⏳⏳⏳');
+    ArrProd = [];
+    const data = await enviarPeticion({op: op_sw, link: "../models/PW-SAP.php", desc, bodega, lista, numero, eps, ctrl, f_sto, f_dto, f_bon, f_bar, top, orden, TipoPed, f_new, Grp1, Grp2, CodigoSAP});
+    data.forEach(item => {
+      let det = {
+        codigo_material: item.codigo_material,
+        descripcion: $.trim(item.descripcion),
+        valor_unitario: item.valor_unitario,
+        iva: item.iva,
+        descuento: item.descuento,
+        stock: item.stock,
+        valor_neto: item.valor_neto,
+        valor_bruto: item.valor_bruto,
+        bonificado: item.bonificado,
+        desc_bonificado_n: item.desc_bonificado_n,
+        stock_bonificado: item.stock_bonificado,
+        cant_bonificado: item.cant_bonificado,
+        cant_regular: item.cant_regular,
+        condicion_b: item.condicion_b,
+        stock_prepack: item.stock_prepack,
+        cant_pedido: item.cant_pedido,
+        id_pedido: item.id_pedido,
+        vlr_pedido: item.vlr_pedido,
+        grupo_articulo: item.grupo_articulos,
+        descuento_adg: item.descuento_adg,
+        dias_creacion: item.dias_creacion,
+        img1: item.img1,
+        img2: item.img2,
+        op_inf: item.op_inf
+      }
+      ArrProd.push(det);
+    });
+    sortJSON(ArrProd, 'descripcion', 'asc');
+    $("#btnProductos").attr("disabled", false);
+    CargarEan();
+  } catch (error) {
+    console.error(error);
+  } finally {
     UnloadImg();
-  }).fail(function (data) {
-    console.error(data);
-    // UnlockScreen('PRODUCTOS');
-  });
+  }  
 }
-
-function DesbloquearPantalla() {
-  $("#Bloquear").hide();
-  $(".centrado-porcentual").hide();
-}
-
-//---------------------Funcion que permite guardar la huella de faltante
-function GuardarHuella() {
-  $.ajax({
-    encoding: "UTF-8",
-    url: "../models/PW-SAP.php",
-    global: false,
-    type: "POST",
-    error: function (OBJ, ERROR, JQERROR) {
-      alert(JQERROR);
-    },
-    data: ({
-      op: "G_HUELLA",
+// FUNCIÓN QUE PERMITE GUARDAR LA HUELLA FALTANTE
+async function GuardarHuella() {
+  try {
+    const data = await enviarPeticion({
+      op: "G_HUELLA", 
+      link: "../models/PW-SAP.php",
       codigo_sap: $("#txt_codigoSap").val(),
       codigo_material: $("#huella_codmaterial").val(),
       cantidad: $("#huella_cantidad").val(),
@@ -1362,18 +1054,17 @@ function GuardarHuella() {
       valor: unformatNum($("#shoping_preciomaterial").val()),
       dcto: $("#huella_dcto").val(),
       stock: $("#huella_stock").val()
-    }),
-    dataType: "html",
-    async: false,
-    success: function (data) { //alert(data); return false;
-      Swal.fire('Excelente.', 'Informacion almacenada correctamente.', 'success');
-      $("#huella_cantidad").val('');
-      $("#huella_notas").val('');
+    });
+    if (data.ok) {
+      Swal.fire("Excelente.", "Informacion almacenada correctamente.", "success");
+      $("#huella_cantidad").val("");
+      $("#huella_notas").val("");
     }
-  });
+  } catch (error) {
+    console.error(error);
+  } 
 }
-
-
+// FUNCIÓN PARA VALIDAR URL DE IMAGEN
 const validarUrlImg = async (codigo) => {
   try {
     codigo = codigo.substring(0, 1) != "8" ? "1" + codigo.substring(1) : codigo;
@@ -1384,25 +1075,21 @@ const validarUrlImg = async (codigo) => {
     img.onload = function () {
       $(".img-material").attr("src", url);
     };
+
     img.onerror = function () {
       $(".img-material").attr("src", defaultUrl);
     };
+
     img.src = url;
 
-    // Aplicar el tamaño aunque la imagen no haya cargado aún
     $(".img-material").css({ width: 400, height: 345 });
-
   } catch (e) {
     console.error(e);
     $(".img-material").attr("src", "https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Imagen_no_disponible.svg/480px-Imagen_no_disponible.svg.png");
   }
 };
-
-
-
-//---------------------Funcion de informacion adicional del producto (codigo,descripcion,fecha y lotes)
-function InfoMaterial(pcodigo, pvalor, piva, pdcto, pdesc, pstock, op) {
-  // Configuración inicial
+// FUNCIÓN PARA OBTENER INFORMACIÓN DEL PRODUCTO
+async function InfoMaterial(pcodigo, pvalor, piva, pdcto, pdesc, pstock, op) {
   const vunit = parseFloat(pvalor);
   const iva = parseInt(piva);
   const dcto = parseInt(pdcto);
@@ -1422,7 +1109,6 @@ function InfoMaterial(pcodigo, pvalor, piva, pdcto, pdesc, pstock, op) {
     v4 = Math.round((v1 - (v1 * (dtoPP / 100)) + v2));
   }
 
-  // Configurar valores en el modal
   $("#huella_codmaterial").val(pcodigo);
   $("#huella_descripcion").val(pdesc);
   $("#huella_dcto").val(dcto);
@@ -1432,44 +1118,36 @@ function InfoMaterial(pcodigo, pvalor, piva, pdcto, pdesc, pstock, op) {
   $("#shoping_descripcion").val(pdesc);
   $("#shoping_preciomaterial").val(formatNum(vunit, '$'));
 
-  // Mostrar modal
   $('#ModalInfoMaterial').modal('show');
 
-  // Cargar datos
-  $.ajax({
-    encoding: "UTF-8",
-    url: "../models/PW-SAP.php",
-    type: "POST",
-    beforeSend: function () {
-      $('#ContenidoInfoMateriales').html(`
-        <div class="alert alert-info m-2">
-          <i class="fas fa-spinner fa-spin"></i> Cargando...
-        </div>`);
-    },
-    data: { op: opc, cod: pcodigo, org, ofi, lst },
-    dataType: "json",
-    success: function (data) {// console.log(data); return ;
+  try {
+    let msgHtml = `
+    <div class="alert alert-info m-2">
+      <i class="fas fa-spinner fa-spin"></i> Cargando...
+    </div>`;
+    $('#ContenidoInfoMateriales').html(msgHtml);
+    const data = await enviarPeticion({op: opc, link: "../models/PW-SAP.php", cod: pcodigo, org, ofi, lst});
+    if (data.length) {
       if (op === "0") {
         renderMaterialInfo(data, { vunit, v1, v2, v3, v4, iva, dcto });
       } else {
         renderKitInfo(data);
       }
       validarUrlImg(pcodigo);
-    },
-    error: function (xhr, status, error) {
-      console.error("Error en la solicitud AJAX:", status, error);
-      $('#ContenidoInfoMateriales').html(`
-        <div class="alert alert-danger m-2">
-          Error al cargar la información del material
-        </div>`);
     }
-  });
+  } catch (error) {
+    console.error(error);
+    let msgHtml = `
+    <div class="alert alert-danger m-2">
+      Error al cargar la información del material
+    </div>`;
+    $('#ContenidoInfoMateriales').html(msgHtml);
+  } 
 }
-
-// Función para renderizar información de material
+// FUNCIÓN PARA RENDERIZAR INFORMACIÓN DEL MATERIAL
 function renderMaterialInfo(data, { vunit, v1, v2, v3, v4, iva, dcto }) {
-  const ins = data[0].INSTITUCIONAL == 1 ? 'SI' : 'NO';
-  const ctrl = data[0].CONTROLADO == 1 ? 'SI' : 'NO';
+  const ins = data[0].INSTITUCIONAL == 1 ? "SI" : "NO";
+  const ctrl = data[0].CONTROLADO == 1 ? "SI" : "NO";
 
   const stockRows = data[0]['INVENTARIO_LOTES'].map(item => `
     <tr>
@@ -1497,48 +1175,48 @@ function renderMaterialInfo(data, { vunit, v1, v2, v3, v4, iva, dcto }) {
                   </td>
                 </tr>
                 <tr>
-                  <td><b>CÓDIGO</b></td>
+                  <td class="size-10"><strong>CÓDIGO</strong></td>
                   <td class="text-green">${data[0].CODIGO_MATERIAL}</td>
                 </tr>
                 <tr>
-                  <td><b>TEXTO CORTO</b></td>
-                  <td class="size-td text-green">${data[0].DESCRIPCION}</td>
+                  <td class="size-10"><strong>TEXTO CORTO</strong></td>
+                  <td class="size-10 size-td text-green">${data[0].DESCRIPCION}</td>
                 </tr>
                 <tr>
-                  <td><b>REGISTRO INFO</b></td>
+                  <td class="size-10"><strong>REGISTRO INFO</strong></td>
                   <td class="text-green">${data[0].CODIGO_SAP}</td>
                 </tr>
                 <tr>
-                  <td><b>TEXTO LARGO</b></td>
-                  <td class="size-td text-green">${data[0].DESCRIPCION2}</td>
+                  <td class="size-10"><strong>TEXTO LARGO</strong></td>
+                  <td class="size-10 size-td text-green">${data[0].DESCRIPCION2}</td>
                 </tr>
                 <tr>
-                  <td><b>LABORATORIO</b></td>
+                  <td class="size-10"><strong>LABORATORIO</strong></td>
                   <td class="text-green">${data[0].LAB}</td>
                 </tr>
                 <tr>
-                  <td><b>INVIMA</b></td>
+                  <td class="size-10"><strong>INVIMA</strong></td>
                   <td class="text-green">${data[0].INVIMA}</td>
                 </tr>
                 <tr>
-                  <td><b>EAN</b></td>
+                  <td class="size-10"><strong>EAN</strong></td>
                   <td class="text-green">${data[0].EAN}</td>
                 </tr>
                 <tr>
-                  <td><b>EMBALAJE</b></td>
+                  <td class="size-10"><strong>EMBALAJE</strong></td>
                   <td class="text-green">${data[0].EMBALAJE}</td>
                 </tr>
                 <tr>
-                  <td><b>FECHA CREACIÓN</b></td>
+                  <td class="size-10"><strong>FECHA CREACIÓN</strong></td>
                   <td class="text-green">${data[0].FECHA_CREACION}</td>
                 </tr>
                 <tr>
-                  <td><b>DIAS CREACIÓN</b></td>
+                  <td class="size-10"><strong>DIAS CREACIÓN</strong></td>
                   <td class="text-green">${data[0].DIAS_CREACION}</td>
                 </tr>
                 <tr>
-                  <td><b>CONTROLADO</b>: ${ctrl}</td>
-                  <td><b>INSTITUCIONAL</b>: ${ins}</td>
+                  <td class="size-10"><strong>CONTROLADO</strong>: ${ctrl}</td>
+                  <td class="size-10"><strong>INSTITUCIONAL</strong>: ${ins}</td>
                 </tr>
               </tbody>
             </table>
@@ -1552,31 +1230,31 @@ function renderMaterialInfo(data, { vunit, v1, v2, v3, v4, iva, dcto }) {
             <table class="form" width="100%" align="center">
               <tbody>
                 <tr>
-                  <td><b>VLR BRUTO</b></td>
+                  <td class="size-10"><strong>VLR BRUTO</strong></td>
                   <td class="text-green">${formatNum(vunit, '$')}</td>
                 </tr>
                 <tr>
-                  <td><b>VLR NETO SIN IVA</b></td>
+                  <td class="size-10"><strong>VLR NETO SIN IVA</strong></td>
                   <td class="text-green">${formatNum(v1, '$')}</td>
                 </tr>
                 <tr>
-                  <td><b>VLR NETO FINANCIERO</b></td>
+                  <td class="size-10"><strong>VLR NETO FINANCIERO</strong></td>
                   <td class="text-green">${formatNum(v4, '$')}</td>
                 </tr>
                 <tr>
-                  <td><b>VLR DESCUENTO</b></td>
+                  <td class="size-10"><strong>VLR DESCUENTO</strong></td>
                   <td class="text-green">${formatNum(v3, '$')}</td>
                 </tr>
                 <tr>
-                  <td><b>VLR IVA</b></td>
+                  <td class="size-10"><strong>VLR IVA</strong></td>
                   <td class="text-green">${formatNum(v2, '$')}</td>
                 </tr>
                 <tr>
-                  <td><b>PORCENTAJE DCTO</b></td>
+                  <td class="size-10"><strong>PORCENTAJE DCTO</strong></td>
                   <td class="text-green">${dcto}%</td>
                 </tr>
                 <tr>
-                  <td><b>PORCENTAJE IVA</b></td>
+                  <td class="size-10"><strong>PORCENTAJE IVA</strong></td>
                   <td class="text-green">${iva}%</td>
                 </tr>
               </tbody>
@@ -1586,7 +1264,7 @@ function renderMaterialInfo(data, { vunit, v1, v2, v3, v4, iva, dcto }) {
       </div>
         
       <!-- Columna de datos de ingreso -->
-      <div class="row mt-2">
+      <div class="row mt-3">
         <div class="col-md-12">
           <div class="panel panel-info">
             <div class="panel-heading">INVENTARIO FÍSICO POR LOTES</div>
@@ -1616,7 +1294,7 @@ function renderMaterialInfo(data, { vunit, v1, v2, v3, v4, iva, dcto }) {
   $('#ContenidoInfoMateriales').html(html);
 }
 
-// Función para renderizar información de kit
+// FUNCIÓN PARA RENDERIZAR INFORMACIÓN DE KIT
 function renderKitInfo(data) {
   const rows = data.map(item => `
     <tr>
@@ -1648,44 +1326,31 @@ function renderKitInfo(data) {
       <tbody>
         ${rows}
       </tbody>
-    </table>
-  `;
+    </table>`;
 
   $('#ContenidoInfoMateriales').html(html);
 }
-//---------------------WS que valida en tiempo real el inventario en SAP
-function WSInvent(codigo, oficina) {
-  var cantidad = 0;
-  $.ajax({
-    encoding: "UTF-8",
-    url: "../models/WS-INVENT.php",
-    global: false,
-    type: "POST",
-    error: function (OBJ, ERROR, JQERROR) {
-      alert(JQERROR);
-    },
-    data: ({
-      codigo: codigo,
-      oficina: oficina
-    }),
-    dataType: "html",
-    async: false,
-    success: function (data) {
-      cantidad = data;
-    }
-  });
+// FUNCIÓN QUE VALIDA EN TIEMPO REAL EL INVENTARIO EN SAP
+async function WSInvent(codigo, oficina) {
+  let cantidad = 0;
+  try {
+    const data = await enviarPeticion({link: "../models/WS-INVENT.php", codigo, oficina});
+    cantidad = data;
+  } catch (error) {
+    console.error(error);
+  } 
   return cantidad;
 }
 // FUNCIÓN PARA AGERAGAR O ELIMINAR UN PRODUCTO SELECCIONADO
 async function AddProducto(pcodigo, pvalor, piva, pdcto, pcant, pneto, pstock, pvrlped, pidped, pbonifica, pcantbon, pcantreg, pstobon) {
-  var oficina = $("#txt_oficina").val();
-  var codigo = pcodigo;
-  var cant = isNaN(pcant) || pcant == '' ? 0 : parseInt(pcant);
+  let oficina = $("#txt_oficina").val();
+  let codigo = pcodigo;
+  let cant = isNaN(pcant) || pcant == '' ? 0 : parseInt(pcant);
   // Variables de control de envio de bonificacion-
-  var Bonifica = pbonifica;
-  var CantBonifica = pcantbon;
-  var CantRegular = parseInt(pcantreg);
-  var StockBonifica = pstobon;
+  let Bonifica = pbonifica;
+  let CantBonifica = pcantbon;
+  let CantRegular = parseInt(pcantreg);
+  let StockBonifica = pstobon;
   // Verificacion de aumento de cantidad segun bonificacion
   if ((cant > 0) && (cant < CantRegular)) {
     const result = await confirmAlert("Oferta Producto", `Este producto tiene una oferta ${CantRegular} + ${CantBonifica} ¿desea aumentar su cantidad para que no deje perder esta promoción?`);
@@ -1694,38 +1359,38 @@ async function AddProducto(pcodigo, pvalor, piva, pdcto, pcant, pneto, pstock, p
       $("#CAF" + pcodigo).val(cant);
     }
   }
-  var vlr_unitario = pvalor;
-  var iva = piva;
-  var descuento = pdcto;
-  var precio = pneto;
-  var stock = parseInt(pstock);
-  var totalfila = parseFloat(precio) * parseInt(cant);
-  var totalped = unformatNum($("#txt_total").val());
-  var totalfila_antes = isNaN(unformatNum($('#TOF' + pcodigo).val())) || unformatNum($('#TOF' + pcodigo).val()) == '' ? 0 : unformatNum($('#TOF' + pcodigo).val());
-  var NumPed = $("#txt_numero").val();
-  var idfila = 'IDF' + pcodigo;
-  //----------------------------------------------
-  //return false;
-  if (cant > 0) { //validacion de cantidad mayor a cero
-    var CantRegalar = parseInt(parseInt(parseInt(cant) / parseInt(CantRegular)) * parseInt(CantBonifica));
-    var swb = 0;
+
+  let vlr_unitario = pvalor;
+  let iva = piva;
+  let descuento = pdcto;
+  let precio = pneto;
+  let stock = parseInt(pstock);
+  let totalfila = parseFloat(precio) * parseInt(cant);
+  let totalped = unformatNum($("#txt_total").val());
+  let totalfila_antes = isNaN(unformatNum($('#TOF' + pcodigo).val())) || unformatNum($('#TOF' + pcodigo).val()) == '' ? 0 : unformatNum($('#TOF' + pcodigo).val());
+  let NumPed = $("#txt_numero").val();
+  let idfila = 'IDF' + pcodigo;
+  
+  if (cant > 0) {
+    let CantRegalar = parseInt(parseInt(parseInt(cant) / parseInt(CantRegular)) * parseInt(CantBonifica));
+    let swb = 0;
     if (parseInt(Bonifica) == 1) {
       if (CantRegalar <= parseInt(StockBonifica)) {
         swb = 0;
       } else {
         Swal.fire({
-          title: 'INFORMACIÓN',
-          type: 'info',
-          html: '<table border="0"  width="100%">'
-            + '<tr>'
-            + '<td colspan="4" align="justify">'
-            + 'Señor usuario, tenga en cuenta que la cantidad disponible de bonificado'
-            + ' es inferior a la ingresada, lo que significa que solo llegarán <b>' + StockBonifica + '</b> '
-            + 'unidades de bonificación, si no esta de acuerdo con esto por favor modificar '
-            + 'la cantidad de producto valorado.'
-            + '</td>'
-            + '</tr>'
-            + '</table>',
+          title: "INFORMACIÓN",
+          type: "info",
+          html: `<table border="0"  width="100%">
+                  <tr>
+                    <td colspan="4" align="justify">
+                      Señor usuario, tenga en cuenta que la cantidad disponible de bonificado
+                      es inferior a la ingresada, lo que significa que solo llegarán <strong>${StockBonifica}</strong> 
+                      unidades de bonificación, si no esta de acuerdo con esto por favor modificar 
+                      la cantidad de producto valorado.
+                    </td>
+                  </tr>
+                </table>`,
           showCloseButton: true,
           confirmButtonText: 'Ok'
         });
@@ -1734,85 +1399,58 @@ async function AddProducto(pcodigo, pvalor, piva, pdcto, pcant, pneto, pstock, p
       swb = 0;
     }
     totalped = (totalped - totalfila_antes) + totalfila;
-    $("#TOF" + pcodigo).val(formatNum(totalfila, '$'));
-    $("#txt_total").val(formatNum(totalped, '$'));
-    //------------Encabezado----------------------------------------------------------------------------
+    $(`#TOF${pcodigo}`).val(formatNum(totalfila, "$"));
+    $("#txt_total").val(formatNum(totalped, "$"));
+
+    // Se inserta el encabezado
     if (NumPed == 0) {
-      //Se inserta el encabezado
-      NumPed = InsertarEncabezado();
+      NumPed = await InsertarEncabezado();
       $("#txt_numero").val(NumPed);
     }
-    //-----------Detalle--------------------------------------------------------------------------------
-    if ($("#" + idfila).val() == 0) {
-      //Se inserta la fila 
-      idfila = InsertarDetalle(NumPed, codigo, cant, vlr_unitario, descuento, totalfila, iva);
-      $("#IDF" + pcodigo).val(idfila); //
-    } else {
 
-      //Se actualiza la fila
-      var id = $("#IDF" + pcodigo).val();
+    // Se inserta la fila 
+    if ($(`#${idfila}`).val() == 0) {
+      idfila = await InsertarDetalle(NumPed, codigo, cant, vlr_unitario, descuento, totalfila, iva);
+      $(`#IDF${pcodigo}`).val(idfila);
+    } else {
+      // Se actualiza la fila
+      let id = $(`#IDF${pcodigo}`).val();
       ActualizarDetalle(id, cant, totalfila, codigo);
     }
 
   } else {
-    //Elimina
     totalped = totalped - totalfila_antes;
     $("#txt_total").val(formatNum(totalped, '$'));
-    $("#CAF" + pcodigo).val(''); // input catidad
-    $("#TOF" + pcodigo).val(''); // input total
-    //Se elimina la fila 	
-    EliminarDetalle($('#IDF' + pcodigo).val(), pcodigo);
-    $("#IDF" + pcodigo).val(0); // input id fila
+    $(`#CAF${pcodigo}`).val(''); // input catidad
+    $(`#TOF${pcodigo}`).val(''); // input total
+    // Se elimina la fila 	
+    EliminarDetalle($(`#IDF${pcodigo}`).val(), pcodigo);
+    $(`#IDF${pcodigo}`).val(0); // input id fila
   }
 }
-
-//--------------------------Funcion que construye el listado de destinatarios de mercancia 
-function Destinatarios(codSap, ciudad, direccion) {
-  $.ajax({
-    encoding: "UTF-8",
-
-    url: "../models/PW-SAP.php",
-    global: false,
-    type: "POST",
-    error: function (OBJ, ERROR, JQERROR) {
-      alert(JQERROR);
-    },
-    data: ({
-      op: "B_DESTINATARIO",
-      codSap: $.trim(codSap)
-    }),
-    dataType: "json",
-    async: false,
-    success: function (data) { // alert(JSON.stringify(data));
-      var destino = '<option value="0" selected>Principal - ' + ciudad + ' - ' + direccion + '</option>';
-      if (data != '') {
-        for (var i = 0; i <= data.length - 1; i++) {
-          destino += '<option value="' + data[i].id + '">alterna ' + i + ' - ' + data[i].direccion + '</option>';
-        }
-      }
-      $("#txt_destinatario").html(destino);
-      //$("#txt_destinatario select").val(0);
+// FUNCIÓN QUE CONSTRUYE EL LISTADO DE DESTINATARIOS DE MERCANCIA 
+async function Destinatarios(codSap, ciudad, direccion) {
+  try {
+    const data = await enviarPeticion({ op: "B_DESTINATARIO", link: "../models/PW-SAP.php", codSap: $.trim(codSap) });
+    let destino = `<option value="0" selected>Principal - ${ciudad} - ${direccion}</option>`;
+    if (data != '') {
+      data.forEach((item, i) => destino += `<option value="${item.id}">alterna ${i} - ${item.direccion}</option>`);      
     }
-  }).fail(function (data) {
-    console.log(data);
-  });
+    $("#txt_destinatario").html(destino);
+  } catch (error) {
+    console.error(error);
+  }  
 }
-//---------------------------Funcion para insercion del encabezado del pedido
-function InsertarEncabezado() {
-  var numero = 0;
-  var usuario = $("#UsrLogin").val();
-  var tipoPed = $("#TxtIntegracion").val();
+// FUNCIÓN PARA INSERTAR EL ENCABEZADO DEL PEDIDO
+async function InsertarEncabezado() {
+  let numero = 0;
+  let usuario = $("#UsrLogin").val();
+  let tipoPed = $("#TxtIntegracion").val();
   if (usuario != '') {
-    $.ajax({
-      encoding: "UTF-8",
-      url: "../models/PW-SAP.php",
-      global: false,
-      type: "POST",
-      error: function (OBJ, ERROR, JQERROR) {
-        alert(JQERROR);
-      },
-      data: ({
-        op: "I_PEDIDO_ENCABEZADO",
+    try {
+      const data = await enviarPeticion({
+        op: "I_PEDIDO_ENCABEZADO", 
+        link: "../models/PW-SAP.php",
         organizacion_ventas: $("#Organizacion").val(),
         oficina_ventas: $("#txt_oficina").val(),
         canal_distribucion: 10,
@@ -1820,26 +1458,23 @@ function InsertarEncabezado() {
         destinatario: $("#txt_destinatario").val(),
         tipoPed: tipoPed,
         cotizacion: $("#tipo_documento").val()
-      }),
-      dataType: "html",
-      async: false,
-      success: function (data) { //alert(data);
-        if (!isNaN(data) > 0) {
-          numero = data;
-          // $("#liPedidos").removeClass("disabled disabledTab");
-          $("#btnPedidos").attr("disabled", false);
-        } else {
-          alert('ERROR: Al insertar el encabezado del pedido');
-        }
+      });
+      if (!isNaN(data) > 0) {
+        numero = data;
+        $("#btnPedidos").attr("disabled", false);
+      } else {
+        alert('ERROR: Al insertar el encabezado del pedido');
       }
-    });
+    } catch (error) {
+      console.error(error);
+    }    
   }
   return numero;
 }
-
+// FUNCIÓN MODIFICAR ARRAY
 function ModificarArray(cant, total, id, cod) {
-  for (var i = 0; i < ArrProd.length; i++) {
-    d = ArrProd[i];
+  for (let i = 0; i < ArrProd.length; i++) {
+    let d = ArrProd[i];
     if (d.codigo_material == cod) {
       d.cant_pedido = cant;
       d.vlr_pedido = total;
@@ -1847,20 +1482,14 @@ function ModificarArray(cant, total, id, cod) {
     }
   }
 }
-//---------------------------Funcion que inserta el detalle 
-function InsertarDetalle(NumPed, codigo, cant, vlr_unitario, descuento, totalfila, iva) {
-  var numero = 0;
-  var NumPedSAP = $.trim($("#txt_numero_sap").val());
-  $.ajax({
-    encoding: "UTF-8",
-    url: "../models/PW-SAP.php",
-    global: false,
-    type: "POST",
-    error: function (OBJ, ERROR, JQERROR) {
-      alert(JQERROR);
-    },
-    data: ({
+// FUNCIÓN QUE INSERTA EL DETALLE 
+async function InsertarDetalle(NumPed, codigo, cant, vlr_unitario, descuento, totalfila, iva) {
+  let numero = 0;
+  let NumPedSAP = $.trim($("#txt_numero_sap").val());
+  try {
+    const data = await enviarPeticion({
       op: "I_PEDIDO_DETALLE",
+      link: "../models/PW-SAP.php",
       NumPed: NumPed,
       codigo: codigo,
       cant: cant,
@@ -1870,40 +1499,25 @@ function InsertarDetalle(NumPed, codigo, cant, vlr_unitario, descuento, totalfil
       iva: iva,
       lista: $("#txt_lista").val(),
       oficina: $("#txt_oficina").val(),
-      canal: '10'
-    }),
-    dataType: "html",
-    async: false,
-    success: function (data) { //alert(data); return false;
-      if (!isNaN(data) > 0) {
-        numero = data;
-        if (NumPedSAP != 0) {
-          InserUpdateSAP('MODIFICAR', NumPed, NumPedSAP);
-        }
-        ModificarArray(cant, totalfila, numero, codigo);
-      } else {
-        /* alert('ERROR: Al insertar el producto - '+codigo);
-       alert(data);*/
-        Swal.fire({
-          toast: true,
-          icon: 'success',
-          title: 'ERROR: Al insertar el producto - ' + codigo + ' ' + data,
-          animation: false,
-          position: 'top-right',
-          showConfirmButton: false,
-          timer: 4000,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.addEventListener('mouseenter', Swal.stopTimer)
-            toast.addEventListener('mouseleave', Swal.resumeTimer)
-          }
-        })
+      canal: '10' 
+    });
+  
+    if (!isNaN(data) > 0) {
+      numero = data;
+      if (NumPedSAP != 0) {
+        InserUpdateSAP('MODIFICAR', NumPed, NumPedSAP);
       }
-    }
-  });
+      ModificarArray(cant, totalfila, numero, codigo);
+    } else {
+      showToastr("error", `ERROR: Al insertar el producto - ${codigo} ${data}`);      
+    }    
+  } catch (error) {
+    console.error(error);
+  }   
   return numero;
 }
-//--------------Funcion que actualiza el detalle del pedido
+// TODO: SEGUIR REFACTORIZANDO DESDE AQUÍ
+// FUNCIÓN QUE ACTUALIZA EL DETALLE DEL PEDIDO
 function ActualizarDetalle(idfila, cant, totalfila, codigo) {
   var numero = $.trim($("#txt_numero").val());
   var numeroSAP = $.trim($("#txt_numero_sap").val());
@@ -2502,10 +2116,11 @@ const Temporales = async () => {
   });
     } else {
       let msgHtml = `
-      <div class="alert alert-danger" role="alert">
-        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-        <span class="sr-only">Error:</span>NO EXISTEN RESULTADOS PARA LAS CONDICIONES SELECCIONADAS'
+      <div class="alert alert-danger mt-3" role="alert">
+      <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+      <span class="sr-only">Error:</span>NO EXISTEN RESULTADOS PARA LAS CONDICIONES SELECCIONADAS
       </div>`;
+      $("#contenedorLeyendas").html(``);
       $("#DvRecuperables").html(msgHtml);
     }    
   } catch (error) {
@@ -2695,11 +2310,11 @@ function WSInvenTotal() {
     });
   }
 }
-//Funcion para guardar pedido en SAP------------------------------------
-function Guardar() {
-  var numero = $.trim($("#txt_numero").val());
-  var op = '';
-  var numeroSAP = 0;
+// FUNCIÓN PARA GUARDAR PEDIDO EN SAP
+const Guardar = async () => {
+  let numero = $.trim($("#txt_numero").val());
+  let op = '';
+  let numeroSAP = 0;
 
   if (VerficarPedido(numero) == 0) {
     op = 'NUEVO';
@@ -2707,66 +2322,51 @@ function Guardar() {
     op = 'MODIFICAR';
     numeroSAP = NumeroSAP(numero);
   }
-  var BoniDatos = ValidarBonificados(numero);
+
+  let BoniDatos = ValidarBonificados(numero);
   if (parseInt(BoniDatos.Id) == 0) {
     if (numero != '' && numero > 0) {
-      Swal.fire({
-        title: "Esta seguro de enviar el pedido numero " + numero + "?",
-        text: "Despues de aceptar no podra reversar la operacion!",
-        icon: "warning",
-        confirmButtonColor: "#82ED81",
-        cancelButtonColor: "#FFA3A4",
-        confirmButtonText: "Enviar!",
-        cancelButtonText: "No Enviar",
-        showLoaderOnConfirm: true,
-        showCancelButton: true,
-      }).then((result) => {
-        if (result.value) {
-          $.ajax({
-            type: "POST",
-            encoding: "UTF-8",
-            url: "../models/WS-PW.php",
-            global: false,
-            beforeSend: function () {
-              LoadImg('Guardando... ⏳⏳⏳');
-            },
-            data: ({
-              op: op,
-              numero: numero,
-              numeroSAP: numeroSAP
-            }),
-            dataType: "json",
-            async: true,
-            success: function (data) { //alert(data);return false;
-              if (data.Tipo == 'S') {
-                Swal.fire("Excelente!", data.Msj, "success");
-                activaTab("dvClientes");
-                Limpiar();
-                //Envio de email para usuarios---
-                if (numeroSAP == 0) {
-                  EnviarMail('P', numero);
-                } else {
-                  EnviarMail('M', numero);
-                }
-
-                //valido si se abrio el modulo desde el 0102 
-                if ($("#link_pro").val() != '0' || $("#link_pro").val() != '') {
-                  preLoadCliente($("#link_pro").val());
-                }
-                //-------------------------------
-                return false;
-              } else {
-                Swal.fire("Oops..!", data.Msj, "error");
-                return false;
-              }
-            }
-          }).always(function (data) {
-            UnloadImg();
+      const result = await confirmAlert(`¿Está seguro(a) de enviar el pedido número ${numero}?`, "Después de aceptar no podrá reversar la operación!!!");
+      if (result.isConfirmed) {
+        try {
+          LoadImg('Guardando... ⏳⏳⏳');
+          const data = await enviarPeticion({
+            op: op,
+            link: "../models/WS-PW.php",
+            numero: numero,
+            numeroSAP: numeroSAP
           });
-        } else {
-          Swal.fire("Cancelado", "La operacion de guardado de pedido ha sido cancelada!", "error");
+
+          if (data.Tipo == 'S') {
+            Swal.fire("Excelente!", data.Msj, "success");
+            activaTab("dvClientes");
+            Limpiar();
+            // Envio de email para usuarios---
+            if (numeroSAP == 0) {
+              EnviarMail('P', numero);
+            } else {
+              EnviarMail('M', numero);
+            }
+
+            // valido si se abrio el modulo desde el 0102 
+            if ($("#link_pro").val() != '0' || $("#link_pro").val() != '') {
+              preLoadCliente($("#link_pro").val());
+            }
+            
+            return false;
+          } else {
+            Swal.fire("Oops!!!", data.Msj, "error");
+            return false;
+          }
+
+        } catch (error) {
+          console.error(error);
+        } finally {
+          UnloadImg();
         }
-      })
+      } else {
+        Swal.fire("Cancelado", "La operación de guardado de pedido ha sido cancelada!", "error");
+      }     
     }
   } else {
     Swal.fire('Bonificados errados, imposible guardar', BoniDatos.Msj, 'error');
@@ -2875,7 +2475,7 @@ const EliminarPedido = async () => {
 
   if (sw_user == 0) {
     $("#ModalOpciones").modal("hide");
-    const result = await confirmAlert(`Desea eliminar el pedido #${numero}`, "Despues de aceptar no podra reversar la operación!");
+    const result = await confirmAlert(`Desea eliminar el pedido #${numero}`, "Después de aceptar no podrá reversar la operación!");
     if (result.isConfirmed) {
       if (opc == 0) EliminarPW(numero);
       else EliminarSAP(numero_sap, numero);
@@ -2915,7 +2515,7 @@ const EliminarSAP = async (numero_sap, numero) => {
     const result = await confirmAlert("Oops!!", "¿Está seguro(a) de eliminar el pedido?");
     if (!result.isConfirmed) return;
 
-    const data = await enviarPeticion({op: "ELIMINAR", link: "../models/PW-SAP.php", numero_sap});
+    const data = await enviarPeticion({op: "ELIMINAR", link: "../models/WS-PW.php", numero: numero_sap});
 
      if (data.Tipo != 'S') {
         Swal.fire("Error", data.Msj, "error");
@@ -3079,7 +2679,7 @@ function Entregas() {
             + '<td>' + data[i].POSICION + '</td>'
             + '<td>' + data[i].CODIGO_MATERIAL + '</td>'
             + '<td>' + icon + ' ' + data[i].DESCRIPCION + '</td>'
-            + '<td><input type="text" value="' + data[i].CANTIDAD + '" class="form-control" size="2%"></td>'
+            + '<td><input type="text" value="' + data[i].CANTIDAD + '" class="form-control form-control-sm" size="2%"></td>'
             + '<td>' + data[i].CANT_PED + '</td>'
             + '<td>' + data[i].DESCUENTO + '%</td>'
             + '<td>' + data[i].ENTREGA + '</td>'
@@ -3090,9 +2690,10 @@ function Entregas() {
           PnetoIva = PnetoIva + parseFloat((data[i].PNETO_IVA));
         }
         $("#tdDetalleEntregas").html(detalle);
+        $("#ModalOpciones").modal("hide");
         $("#ModalEntregas").modal("show");
-        $("#valor_entrega").html('<b>VALOR ENTREGADO SIN IVA : ' + formatNum(Pneto, '$') + '</b>');
-        $("#valor_entrega_iva").html('<b>VALOR ENTREGADO : ' + formatNum(PnetoIva, '$') + '</b>');
+        $("#valor_entrega").html(`VALOR ENTREGADO SIN IVA: <span><strong>${formatNum(Pneto, '$')}</strong></span>`);
+        $("#valor_entrega_iva").html(`VALOR ENTREGADO: <span><strong>${formatNum(PnetoIva, '$')}</strong></span>`);
 
       }
     }).done(function (data) {
@@ -3270,61 +2871,7 @@ function Ordenes() {
   }
   if (entrega != 0 && entrega != '') {
     var Num = $.trim($("#ped_ot").val());
-    /*if (Num == '0') {
-      Swal.fire({
-        title: "El pedido no posee Orden de transporte, desea crearla?",
-        text: "Despues de aceptar no podra reversar la operacion!",
-        icon: "question",
-        showCancelButton: true,
-        confirmButtonColor: "#82ED81",
-        cancelButtonColor: "#FFA3A4",
-        confirmButtonText: "Aceptar",
-        cancelButtonText: "Cancelar",
-        closeOnConfirm: true,
-        closeOnCancel: false
-      }).then((result) => {
-        if (result.value) {
-          $.ajax({
-            type: "POST",
-            encoding: "UTF-8",
-            url: "../models/WS-PW.php",
-            global: false,
-            error: function (OBJ, ERROR, JQERROR) {
-              alert(JQERROR + " ");
-            },
-            data: ({
-              op: 'CREA_ORDENES',
-              almacen: almacen,
-              entrega: entrega
-            }),
-            dataType: "json",
-            async: false,
-            success: function (data) { //alert(data);
-              if (data.Tipo != 'S') {
-                Swal.fire("Error", data.Msj, "error");
-              } else {
-                Swal.fire("Excelente", data.Msj, "success");
-              }
-              var delayInMilliseconds = 2000; //1 segundo
-              setTimeout(function () {
-                //Temporales propios
-                Temporales();
-                //Temporales de terceros
-                GestionPedidos();
-                //Actualizacion de datos en modal
-                consultaOpciones(NumTmp);
-                //------------------------------
-              }, delayInMilliseconds);
-            }
-          }).fail(function (data) {
-            console.log(data);
-          });
-        } else {
-          Swal.fire("Cancelado", "La operacion ha sido cancelada!", "error");
-        }
-      });
-
-    } */
+  
     if (Num == '0') {
       // Configuración inicial del Swal con checkboxes dinámicos
       let swalOptions = {
@@ -3441,7 +2988,7 @@ function Ordenes() {
               + '<td>' + data[i].posicion_ot + '</td>'
               + '<td>' + data[i].codigo_material + '</td>'
               + '<td>' + data[i].descripcion + '</td>'
-              + '<td><input type="text" value="' + data[i].cantidad + '" class="form-control" size="2%"></td>'
+              + '<td><input type="text" value="' + data[i].cantidad + '" class="form-control form-control-sm" size="2%"></td>'
               + '<td>' + data[i].lote + '</td>'
               + '<td>' + data[i].numero_ot + '</td>'
               + '<td align="center"><input type="checkbox"/></td>'
@@ -3449,8 +2996,9 @@ function Ordenes() {
             Pneto = Pneto + parseFloat((data[i].pneto));
           }
           $("#tdDetalleOrdenes").html(detalle);
+          $("#ModalOpciones").modal("hide");
           $("#ModalOrdenes").modal("show");
-          $("#valor_orden").html('<b>VALOR ORDEN : ' + formatNum(Pneto, '$') + '</b>');
+          $("#valor_orden").html(`VALOR ORDEN: <span><strong>${formatNum(Pneto, '$')}</strong></span>`);
 
         }
       }).done(function (data) {
@@ -4750,6 +4298,7 @@ function LogDatos() {
     }
   });
 
+  $("#ModalOpciones").modal('hide');
   $("#ModalLog").modal('show');
 
 }
@@ -4856,18 +4405,16 @@ function Permisos() {
   });
 }
 
-
 const consultarPuntos = async (codigo_sap) => {
-  const data = {
-    link: "../models/PW-SAP.php",
-    op: "S_PUNTOS_CLIENTE",
-    codigo_sap
-  }
   try {
-    const resp = await enviarPeticion(data);
+    const resp = await enviarPeticion({
+      link: "../models/PW-SAP.php",
+      op: "S_PUNTOS_CLIENTE",
+      codigo_sap
+    });
     resp.forEach(function (d, i) {
-      $("#tdAcumuladoPuntos").html(`<b>Tus puntos ${d.puntos}</b>`);
-      $("#tdCodigoSapPuntos").html(`<b>¡ Hola ${d.nombres}!</b>`);
+      $("#tdAcumuladoPuntos").html(`<strong>Tus Puntos: ${d.puntos}</strong>`);
+      $("#tdCodigoSapPuntos").html(`<strong>Hola... ${d.nombres}</strong>`);
     });
     consultarObsequios();
   } catch (error) {
@@ -4878,47 +4425,45 @@ const consultarPuntos = async (codigo_sap) => {
 const consultarObsequios = async () => {
   const organizacion = $.trim($("#Organizacion").val());
   const oficina = $.trim($("#txt_oficina").val());
-  const data = {
-    link: "../models/PW-SAP.php",
-    op: "S_OBSEQUIOS_PUNTOS",
-    organizacion,
-    oficina
-  }
   try {
-    const resp = await enviarPeticion(data);
-    var html = '';
+    const resp = await enviarPeticion({
+      link: "../models/PW-SAP.php",
+      op: "S_OBSEQUIOS_PUNTOS",
+      organizacion,
+      oficina
+    });
+    let html = '';
     if (resp.length > 0) {
       for (let i = 0; i < resp.length; i++) {
         if (i % 4 === 0) {
-          html += '<div class="row">';
+          html += '<div class="row mb-4">';
         }
+
         html += `
-        <div class="col-sm-6 col-md-3">
-          <div class="thumbnail">
-            <img src="https://app.pwmultiroma.com/web/imagenesMateriales/${resp[i].codigo_material}.png" alt="${resp[i].descripcion}">
-            <div class="caption">
-              <h5>${resp[i].puntos} - Puntos</h5>
-			  <p>
- 					<button class="btn btn-danger btn-sm" onclick="redimirProducto('${resp[i].codigo_material}','https://app.pwmultiroma.com/web/imagenesMateriales/${resp[i].codigo_material}.png')">
-						<i class="fa-solid fa-heart-circle-plus"></i> ¡Lo quiero!
-					</button>
-			 </p>
-              <h5>${resp[i].descripcion}</h5>              
+        <div class="col-sm-6 col-md-3 mb-3">
+          <div class="card h-100 shadow-sm">
+            <img src="https://app.pwmultiroma.com/web/imagenesMateriales/${resp[i].codigo_material}.png" class="card-img-top" alt="${resp[i].descripcion}">            
+            <div class="card-body d-flex flex-column">
+              <h6 class="card-title">${resp[i].puntos} Puntos</h6>
+              <p class="mt-auto">
+                <button class="btn btn-danger btn-sm w-100" onclick="redimirProducto('${resp[i].codigo_material}','https://app.pwmultiroma.com/web/imagenesMateriales/${resp[i].codigo_material}.png')">
+                  <i class="fa-solid fa-heart-circle-plus"></i> ¡Lo quiero!
+                </button>
+              </p>
+              <p class="card-text mt-2 small text-muted">${resp[i].descripcion}</p>
             </div>
           </div>
-        </div>
-      `;
-        if ((i + 1) % 4 === 0 || (i + 1) === resp.length) { // Cada cuatro elementos, o si es el último elemento, cerrar la fila
-          html += '</div>';
+        </div>`;
+
+        if ((i + 1) % 4 === 0 || (i + 1) === resp.length) {
+          html += '</div>'; // cerrar fila
         }
       }
-
     } else {
       html = '<div class="alert alert-danger"><i class="fa-solid fa-circle-info"></i> Sin resultados para mostrar.</div>';
     }
 
     $("#dvMaterialespuntos").html(html);
-
     $("#ModalPP").modal('show');
   } catch (error) {
     console.log(error);
@@ -5361,12 +4906,12 @@ const validarCargaClientes = () => {
 // EJECUCIÓN DE LAS FUNCIONALIDADES AL CARGAR EL DOM
 $(function () { 
   Permisos(); // Validacion de permisos
-  Notificaciones(); // Nuevas notificaciones emergentes - se quita porque se acabo la convencion
+  Notificaciones(); // Nuevas notificaciones emergentes - se quita porque se acabo la convención
   setInterval(function () {
     Notificaciones();
   }, 300000);
   
-  CargaGruposClientes(1); // Nueva distribucion de grupos 
+  CargaGruposClientes(1); // Nueva distribución de grupos 
   CargaGruposClientes(2);
 
   OfcS = OficinasVentas('S');
@@ -5399,31 +4944,15 @@ $(function () {
     }
   });
 
-  // Eventos click 
   $("#ContenidoPhone").html('<embed src="../../adg-phone/index.html?" frameborder="0" width="100%" height="500px">');
   $("#btnPhone").click(function () {
     $("#ModalPhone").modal('show');
   });
-
-  // Refresh pedidos 
+  // REFRESH PEDIDOS 
   $("#btnMenu9").click(function () {
     let num = $.trim($("#ped_numero").val());
     consultaOpciones(num);
-    showToastr("success", "Ejecutado correctamente", `<strong>ACTUALIZAR INFO PEDIDO ${num}</strong></br>`);
-    // $.notify({
-    //   icon: 'glyphicon glyphicon-warning-sign',
-    //   title: '<strong>ACTUALIZAR INFO PEDIDO ' + num + '</strong></br>',
-    //   message: 'Ejecutado correctamente',
-    //   url: '',
-    //   target: '_blank'
-    // }, {
-    //   delay: 2000,
-    //   type: 'success',
-    //   animate: {
-    //     enter: 'animated fadeInDown',
-    //     exit: 'animated fadeOutUp'
-    //   },
-    // });
+    showToastr("success", "Ejecutado correctamente", `<strong>ACTUALIZAR INFO PEDIDO ${num}</strong></br>`);   
   });
 
   $("#exportar_gestion").click(function () {
@@ -5620,13 +5149,14 @@ $(function () {
     GestionEntregas();
   });
   
-  // Busqueda o carga de cliente segun departamento
+  // Búsqueda o carga de cliente según departamento
   let DepId = $("#Dpto").val();
   if (DepId == 10) {
     $("#colCliente").html('<select id="txt_cliente" class="form-select size-text"></select>');
 
     $("#txt_cliente").on('change', function () {
       CargarClienteSeleccionado();
+      console.log("onChage...");
     });
 
     $("#tr_cliente_fact").hide();
@@ -5636,109 +5166,34 @@ $(function () {
     $("#tr_cliente_faltante").show();
     let inputCliente = `
     <div class="input-group">
-      <input type="text" id="txt_cliente" class="form-control size-text" placeholder="Búsqueda de clientes" tabindex="1">
+      <input type="text" id="txt_cliente" class="form-control size-td" placeholder="Búsqueda de clientes" tabindex="1">
       <span class="input-group-btn">
       <button class="btn btn-light btn-micro" type="button" title="Búsqueda de cliente por voz" onclick="iniciarVozATexto('txt_cliente',this)">
         <i class="fa-solid fa-microphone"></i>&nbsp;
       </button>
       </span>
     </div>`;
-    $("#colCliente").html(inputCliente);
-
-    // $('#txt_cliente').autocomplete({
-    //   source: function (request, response) {
-    //     Arr_cli = ArrCli;
-    //     valor = $.trim($("#txt_cliente").val());
-    //     //
-    //     if (validarSiNumero(valor) == 1) {
-    //       Arr_cli = FiltrarCli(valor, Arr_cli, 1);
-    //     } else {
-    //       div_cadena = valor;
-    //       div_cadena = div_cadena.split(" ");
-    //       for (var x = 0; x < div_cadena.length; x++) {
-    //         expr = $.trim(div_cadena[x]);
-    //         Arr_cli = FiltrarCli(expr, Arr_cli, 2);
-    //       }
-    //     }
-    //     response(Arr_cli.slice(0, 10));
-    //   },
-    //   maxResults: 10,
-    //   minLength: 3,
-    //   search: function () { },
-    //   open: function (event, ui) { },
-    //   select: function (event, ui) {
-    //     $("#TxtIntegracion").attr('disabled', true);
-    //     $("#txt_nit").val(ui.item.nit);
-    //     $("#txt_dir").val(ui.item.direccion);
-    //     $("#txt_tel").val(ui.item.telefonos);
-    //     $("#txt_mail").val(ui.item.email);
-    //     $("#txt_ciudad").val(ui.item.ciudad);
-    //     $("#txt_cupo").val(formatNum(ui.item.cupo_credito, '$'));
-        
-    //     $("#txt_oficina").html(OfcN);
-    //     $("#txt_oficina option[value='" + ui.item.bodega + "']").attr("selected", true);
-    //     //Validamos los permisos para cambio de bodega y activamos o desactivamos esta opcion.
-    //     if (Perm_Cambiar_Bodega != 'S') {
-    //       $("#txt_oficina").attr("disabled", true);
-    //     } else {
-    //       $("#txt_oficina").attr("disabled", false);
-    //     }
-        
-    //     $("#txt_condicion").val(ui.item.condicion_pago);
-    //     $("#txt_lista").val(ui.item.lista);
-    //     $("#txt_vendedor").val(ui.item.vendedor);
-    //     $("#txt_televendedor").val(ui.item.televendedor);
-    //     $("#txt_vendedor_tel").val(ui.item.telefono_vendedor);
-    //     $("#txt_televendedor_tel").val(ui.item.telefono_televendedor);
-    //     $("#txt_codigoSap").val(ui.item.codigo_sap);
-    //     $("#txt_descuento").val(ui.item.descuento_financiero);
-    //     $("#txt_plazo").val(ui.item.dias_pago + ' dias');
-    //     Destinatarios(ui.item.codigo_sap, ui.item.ciudad, ui.item.direccion);
-    //     Presupuesto_datos();
-    //     Cartera_edades();
-    //     if (ui.item.institucional == 1) {
-    //       $("#txt_institucional").val('SI');
-    //     } else {
-    //       $("#txt_institucional").val('NO');
-    //     }
-    //     if (ui.item.controlados == 1) {
-    //       $("#txt_controlado").val('SI');
-    //     } else {
-    //       $("#txt_controlado").val('NO');
-    //     }
-    //     $("#btnProductos").attr("disabled", false);
-    //     // Grupos de clientes
-    //     $("#txtGrp1").val(ui.item.grupo1);
-    //     $("#txtGrp2").val(ui.item.grupo2);
-    //     $("#txtGrp1,#txtGrp2").prop('disabled', true);
-        
-    //     CargarEvento();
-    //     BuscarProductos();
-    //   }
-    // });
+    $("#colCliente").html(inputCliente);   
     
     let timer;
-
     $('#txt_cliente').autocomplete({
       source: function (request, response) {
         clearTimeout(timer);
         timer = setTimeout(() => {
           const termino = $.trim(request.term).toLowerCase();
-
           if (termino.length < 3) {
             response([]);
             return;
           }
 
-          // Filtrado más limpio y eficiente
           const resultados = ArrCli.filter(cli =>
             cli.nombres.toLowerCase().includes(termino) ||
             cli.razon_comercial.toLowerCase().includes(termino) ||
             cli.nit.includes(termino)
           );
 
-          response(resultados.slice(0, 10)); // devolver máximo 10
-        }, 150); // Delay para evitar saturar la UI
+          response(resultados.slice(0, 10));
+        }, 150);
       },
       minLength: 3,
       select: function (event, ui) {
@@ -6144,9 +5599,9 @@ $(function () {
       $("#dvResultProductos").html("");
       $("#n_resultados").text("");
     }
-
   });
-  //--Fin se coloca para mitigar el problema mobil
+
+  // Fin se coloca para mitigar el problema mobil
   $("#txt_bproductos").focusout(function (e) {
     valor = $.trim($(this).val());
     if (valor != "") {
@@ -6165,8 +5620,8 @@ $(function () {
       $("#n_resultados").text("");
     }
   });
-  //--Fin se coloca para mitigar el problema mobil
-  //------nuevo para carga de archivo plano 
+  
+  // Nuevo para carga de archivo plano 
   $("#filename").val('');
   $("#filename").change(function (e) {
     var ext = $("input#filename").val().split(".").pop().toLowerCase();
@@ -6252,62 +5707,42 @@ $(function () {
     }
     return false;
   });
+
   if ($("#Rol").val() == '10' || $("#Dpto").val() == '11') {
     console.log('cliente o transferencista no carga competencia')
   } else {
     ListarCompetencia();
   }
-
-  //Ferias virtuales
-  $("#btnFeriaVirtual").click(function () {
-    var cod = $("#txt_codigoSap").val();
+  
+  $("#btnFeriaVirtual").click(function () { //Ferias virtuales
+    let cod = $("#txt_codigoSap").val();
     if (cod != '') {
       $("#ModalFeriaVirtual").modal('show');
       QueryFeria(4);
-
-    } else {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Oops...',
-        text: 'Debe seleccionar un cliente!.'
-      });
-    }
+    } else Swal.fire("Oops!!", "Debe seleccionar un cliente", "Warning");
   });
-  //Ferias Virtuales
-
-
-  //Grupos Articulos
-  GruposArticulos();
+  
+  GruposArticulos(); // Grupos Articulos
   $("#txtGrupoArticulo").change(function () {
     $("#txt_bproductos").val($.trim($(this).val()));
     BuscarProductoArr(0);
-  });
-  //Grupos Articulos	
-  //Descuentos ir------------------------------------------------------------
-  $("#btnDescuentos").on('click', function () {
+  });  
+ 
+  $("#btnDescuentos").on('click', function () {  // Descuentos ir
     activaTab('dvProductos');
-    if ($("#txtGrp1").val() == '100') {
-      $("#txt_bproductos").val('OFERTA EXCLUSIVA CLIENTE WEB');
-    } else {
-      $("#txt_bproductos").val('*');
-    }
-
+    if ($("#txtGrp1").val() == '100') $("#txt_bproductos").val('OFERTA EXCLUSIVA CLIENTE WEB');
+    else $("#txt_bproductos").val('*');
     $("#DvChkDctos").addClass("DivCheckBoxTrue");
     BuscarProductoArr(0);
   });
-  //Descuentos ir------------------------------------------------------------
 
-  //carga por defecto el usuario que se le esta haciendo la gestion en el 0102 
-  //
+  // carga por defecto el usuario que se le esta haciendo la gestion en el 0102 
   if ($("#link_pro").val() != '') {
     preLoadCliente($("#link_pro").val());
   }
 
   $("#TxtIntegracion").change(function () {
-    if ($("#link_pro").val() != '') {
-      BuscarProductos();
-    }
-
+    if ($("#link_pro").val() != '') BuscarProductos();
   });
 
   $("#txtFilter").val('');
@@ -6315,36 +5750,23 @@ $(function () {
     let filtro = $(this).val().toLowerCase();
     $('.card-evento').each(function () {
       let textoGrupo = $(this).find('.col-md-4:eq(1)').text().toLowerCase();
-      if (textoGrupo.includes(filtro)) {
-        $(this).show();
-      } else {
-        $(this).hide();
-      }
+      if (textoGrupo.includes(filtro)) $(this).show();
+      else $(this).hide();
     });
   });
 
-  //Plan de puntos para clientes.
+  // Plan de puntos para clientes
   $("#btnPuntos").click(function () {
-
-    if ($("#txt_codigoSap").val() != '') {
-      consultarPuntos($("#txt_codigoSap").val());
-    } else {
-      Swal.fire({
-        icon: 'error',
-        title: 'Oops...',
-        text: 'Debe seleccionar un cliente.!.'
-      });
-    }
+    if ($("#txt_codigoSap").val() != '') consultarPuntos($("#txt_codigoSap").val());
+    else Swal.fire("Oops!!", "Dede seleccionar un cliente", "error");
   });
 
   $("#buy-now").click(function () {
     crearPedidoRedencion();
-  })
+  });
 
   let valor_rol = $("#Rol").val();
   let valoresPermitidosrol = ["12", "1", "44", "72", "13", "14"];
-
-  // Mostrar u ocultar los divs según el valor de Rol
   $("#cartera_edades, #Presupuesto_datos").toggle(valoresPermitidosrol.includes(valor_rol));
 
   $('#btnMas').click(function () {
