@@ -148,7 +148,7 @@ Redireccionar();
         width: 112px;
       }
     }
-    
+
     #loaderOverlay {
       position: fixed;
       inset: 0;
@@ -391,25 +391,25 @@ Redireccionar();
             </tbody>
           </table>
           <div class="container-btn">
-            <button type="button" class="btn btn-outline-secondary w-btn btn-sm" id="btnLimpiar" onClick="Limpiar();">
+            <button type="button" class="btn btn-outline-secondary w-btn btn-sm shadow" id="btnLimpiar" onClick="Limpiar();">
               <i class="fa-solid fa-file"></i>
               Nuevo
             </button>
-            <button type="button" class="btn btn-outline-primary w-btn btn-sm" id="btnMas">
+            <button type="button" class="btn btn-outline-primary w-btn btn-sm shadow" id="btnMas">
               <i class="fa-solid fa-list"></i>
-              Mas
+              Más
             </button>
-            <button type="button" class="btn btn-outline-success w-btn btn-sm" id="btnPuntos">
+            <button type="button" class="btn btn-outline-success w-btn btn-sm shadow" id="btnPuntos">
               <i class="fa-solid fa-heart"></i>
               Puntos
             </button>
-            <button type="button" class="btn btn-outline-danger w-btn btn-sm" id="btnDescuentos" style="display: none">
+            <button type="button" class="btn btn-outline-danger w-btn btn-sm shadow" id="btnDescuentos" style="display: none">
               <i class="fa-solid fa-bullhorn"></i>
               Descuentos para ti!
             </button>
-            <button type="button" class="btn btn-outline-warning w-btn btn-sm" id="btnEstadisticas" style="display: none">
+            <button type="button" class="btn btn-outline-warning w-btn btn-sm shadow" id="btnEstadisticas" style="display: none">
               <i class="fa-solid fa-chart-pie"></i>
-              Estadisticas
+              Estadísticas
             </button>
           </div>
           <hr>
@@ -451,7 +451,7 @@ Redireccionar();
             </div>
           </div>
           <div class="input-group mb-2 shadow-sm">
-            <input type="text" id="txt_bproductos" class="form-control" tabindex="1" placeholder="F2 - Descripción de producto: Nombre - Codigo - Grupo">
+            <input type="text" id="txt_bproductos" class="form-control" tabindex="1" placeholder="F2 - Descripción de producto: Nombre - Código - Grupo">
             <div class="input-group-btn">
               <button class="btn btn-light btn-micro" type="button" title="Búsqueda de productos por voz" onclick="iniciarVozATexto('txt_bproductos',this)">
                 <i class="fa-solid fa-microphone"></i>&nbsp;
@@ -536,9 +536,9 @@ Redireccionar();
             </tbody>
           </table>
           <div>
-            <button class="btn btn-outline-primary btn-sm w-btn" onClick="GestionPedidos();">Buscar</button>
-            <button class="btn btn-outline-success btn-sm w-btn" id="exportar_gestion">Exportar</button>
-            <button class="btn btn-light btn-sm w-btn btn-micro" onClick="LimpiarGestionPedido();">Limpiar</button>
+            <button class="btn btn-outline-primary btn-sm w-btn shadow" onClick="GestionPedidos();">Buscar</button>
+            <button class="btn btn-outline-success btn-sm w-btn shadow" id="exportar_gestion">Exportar</button>
+            <button class="btn btn-light btn-sm w-btn btn-micro shadow" onClick="LimpiarGestionPedido();">Limpiar</button>
           </div>
           <hr>
         </div>
@@ -575,9 +575,9 @@ Redireccionar();
             </tbody>
           </table>
           <div class="mt-2">
-            <button class="btn btn-outline-primary btn-sm w-btn" onClick="GestionEntregas();">Buscar</button>
-            <button class="btn btn-outline-success btn-sm w-btn" onClick="UnificarEntrega();">Crear Entrega</button>
-            <button class="btn btn-light btn-sm w-btn btn-micro" onClick="LimpiarEntregas();">Limpiar</button>
+            <button class="btn btn-outline-primary btn-sm w-btn shadow" onClick="GestionEntregas();">Buscar</button>
+            <button class="btn btn-outline-success btn-sm w-btn shadow" onClick="UnificarEntrega();">Crear Entrega</button>
+            <button class="btn btn-light btn-sm w-btn btn-micro shadow" onClick="LimpiarEntregas();">Limpiar</button>
           </div>
         </div>
         <hr>
@@ -608,9 +608,9 @@ Redireccionar();
             </tbody>
           </table>
           <div class="mt-2">
-            <button class="btn btn-outline-primary btn-sm w-btn" onClick="Faltante();">Buscar</button>
-            <button class="btn btn-outline-success btn-sm w-btn" onClick="fnExcelReport('tdFaltantes');">Exportar</button>
-            <button class="btn btn-light btn-sm w-btn btn-micro" onClick="LimpiarFaltantes();">Limpiar</button>
+            <button class="btn btn-outline-primary btn-sm w-btn shadow" onClick="Faltante();">Buscar</button>
+            <button class="btn btn-outline-success btn-sm w-btn shadow" onClick="fnExcelReport('tdFaltantes');">Exportar</button>
+            <button class="btn btn-light btn-sm w-btn btn-micro shadow" onClick="LimpiarFaltantes();">Limpiar</button>
           </div>
         </div>
         <hr>
@@ -632,8 +632,8 @@ Redireccionar();
                 <td><input type="text" id="txtFactCliente" placeholder="Ingrese el cliente" class="form-control size-text shadow-sm"></td>
               </tr>
               <tr class="custom-tr">
-                <td class="size-text">Numero factura</td>
-                <td><input type="text" id="txtNumFact" placeholder="Numero de factura" class="form-control size-text shadow-sm"></td>
+                <td class="size-text">Número factura</td>
+                <td><input type="text" id="txtNumFact" placeholder="Número de factura" class="form-control size-text shadow-sm"></td>
               </tr>
               <tr class="custom-tr">
                 <td class="size-text">Fecha Inicial</td>
@@ -646,8 +646,8 @@ Redireccionar();
             </tbody>
           </table>
           <div class="mt-2">
-            <button class="btn btn-outline-primary btn-sm w-btn" onClick="ListarFacturas();">Buscar</button>
-            <button class="btn btn-light btn-sm w-btn btn-micro" onClick="LimpiarFacturas();">Limpiar</button>
+            <button class="btn btn-outline-primary btn-sm w-btn shadow" onClick="ListarFacturas();">Buscar</button>
+            <button class="btn btn-light btn-sm w-btn btn-micro shadow" onClick="LimpiarFacturas();">Limpiar</button>
           </div>
           <hr>
           <div id="VtotalFacturas"></div>

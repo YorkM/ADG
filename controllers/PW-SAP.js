@@ -665,8 +665,8 @@ function TableView(filas) {
     <table class="display" width="100%" id="tableProd">
       <thead>
         <tr style="background-color: #cff4fc;">
-          <th class="size-th">CODIGO</th>
-          <th class="size-th">DESCRIPCION</th>
+          <th class="size-th">CÓDIGO</th>
+          <th class="size-th">DESCRIPCIÓN</th>
           <th class="size-th">VALOR</th>
           <th class="size-th">IVA</th>
           <th class="size-th">DCTO</th>
@@ -1415,7 +1415,7 @@ async function AddProducto(pcodigo, pvalor, piva, pdcto, pcant, pneto, pstock, p
     } else {
       // Se actualiza la fila
       let id = $(`#IDF${pcodigo}`).val();
-      ActualizarDetalle(id, cant, totalfila, codigo);
+      await ActualizarDetalle(id, cant, totalfila, codigo);
     }
 
   } else {
@@ -1424,7 +1424,7 @@ async function AddProducto(pcodigo, pvalor, piva, pdcto, pcant, pneto, pstock, p
     $(`#CAF${pcodigo}`).val(''); // input catidad
     $(`#TOF${pcodigo}`).val(''); // input total
     // Se elimina la fila 	
-    EliminarDetalle($(`#IDF${pcodigo}`).val(), pcodigo);
+    await EliminarDetalle($(`#IDF${pcodigo}`).val(), pcodigo);
     $(`#IDF${pcodigo}`).val(0); // input id fila
   }
 }
@@ -1505,7 +1505,7 @@ async function InsertarDetalle(NumPed, codigo, cant, vlr_unitario, descuento, to
     if (!isNaN(data) > 0) {
       numero = data;
       if (NumPedSAP != 0) {
-        InserUpdateSAP('MODIFICAR', NumPed, NumPedSAP);
+        await InserUpdateSAP('MODIFICAR', NumPed, NumPedSAP);
       }
       ModificarArray(cant, totalfila, numero, codigo);
     } else {
@@ -1516,19 +1516,15 @@ async function InsertarDetalle(NumPed, codigo, cant, vlr_unitario, descuento, to
   }   
   return numero;
 }
-// TODO: SEGUIR REFACTORIZANDO DESDE AQUÍ
 // FUNCIÓN QUE ACTUALIZA EL DETALLE DEL PEDIDO
-function ActualizarDetalle(idfila, cant, totalfila, codigo) {
-  var numero = $.trim($("#txt_numero").val());
-  var numeroSAP = $.trim($("#txt_numero_sap").val());
-  $.ajax({
-    encoding: "UTF-8",
-    url: "../models/PW-SAP.php",
-    global: false,
-    type: "POST",
-    error: function (OBJ, ERROR, JQERROR) { },
-    data: ({
+async function ActualizarDetalle(idfila, cant, totalfila, codigo) {
+  try {
+    let numero = $.trim($("#txt_numero").val());
+    let numeroSAP = $.trim($("#txt_numero_sap").val());
+
+    const data = await enviarPeticion({
       op: "U_PEDIDO_DETALLE",
+      link: "../models/PW-SAP.php",
       idfila: idfila,
       cant: cant,
       vlr_total: totalfila,
@@ -1537,201 +1533,116 @@ function ActualizarDetalle(idfila, cant, totalfila, codigo) {
       numero: numero,
       lista: $("#txt_lista").val(),
       canal: '10'
-    }),
-    dataType: "html",
-    async: false,
-    success: function (data) {
-      if (numeroSAP != 0) {
-        InserUpdateSAP('MODIFICAR', numero, numeroSAP);
-      }
-      ModificarArray(cant, totalfila, idfila, codigo);
+    });
+    console.log(data);
+    if (numeroSAP != 0) {
+      await InserUpdateSAP('MODIFICAR', numero, numeroSAP);
     }
-  });
+    ModificarArray(cant, totalfila, idfila, codigo);
+  } catch (error) {
+    console.error(error);
+  }  
 }
-//Funcion que elimina el detalle del pedido 
-function EliminarDetalle(idfila, codigo) {
-  //alert(idfila+' - '+codigo);
-  var numero = $.trim($("#txt_numero").val());
-  var numeroSAP = $.trim($("#txt_numero_sap").val());
-  $.ajax({
-    encoding: "UTF-8",
-    url: "../models/PW-SAP.php",
-    global: false,
-    type: "POST",
-    error: function (OBJ, ERROR, JQERROR) {
-      alert(JQERROR);
-    },
-    data: ({
+// FUNCIÓN QUE ELIMINA EL DETALLE DEL PEDIDO 
+async function EliminarDetalle(idfila, codigo) {
+  try {
+    let numero = $.trim($("#txt_numero").val());
+    let numeroSAP = $.trim($("#txt_numero_sap").val());
+
+    const data = await enviarPeticion({
       op: "D_PEDIDO_DETALLE",
+      link: "../models/PW-SAP.php",
       idfila: idfila,
       numero: numero,
       oficina: $("#txt_oficina").val(),
       codigo: $.trim(codigo),
       lista: $("#txt_lista").val(),
       canal: '10'
-    }),
-    dataType: "html",
-    async: false,
-    success: function (data) { //alert(data);
-      if (data > 0) {
-        //modifico
-        if (numeroSAP != 0) {
-          InserUpdateSAP('MODIFICAR', numero, numeroSAP);
-        }
-        ModificarArray(0, 0, 0, codigo);
-      } else { }
-      VerificaPedido();
-    }
-  });
-}
-//----------------------Function Que actualiza o guarda el pedido en el WS - 30-04-2021
-function InserUpdateSAP(op, numero, numeroSAP) {
-  $.ajax({
-    type: "POST",
-    encoding: "UTF-8",
-    url: "../models/WS-PW.php",
-    global: false,
-    beforeSend: function () {
-      LoadImg('Guardando... ⏳⏳⏳');
-    },
-    data: ({
-      op: op,
-      numero: numero,
-      numeroSAP: numeroSAP
-    }),
-    dataType: "json",
-    async: true,
-    success: function (data) {
-      //alert(data);return false;
-      if (data.Tipo == 'S') {
-        Swal.fire({
-          toast: true,
-          icon: 'success',
-          title: data.Msj,
-          animation: false,
-          position: 'top-right',
-          showConfirmButton: false,
-          timer: 3000,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.addEventListener('mouseenter', Swal.stopTimer)
-            toast.addEventListener('mouseleave', Swal.resumeTimer)
-          }
-        })
-      } else {
-        Swal.fire({
-          toast: true,
-          icon: 'error',
-          title: data.Msj,
-          animation: false,
-          position: 'top-right',
-          showConfirmButton: false,
-          timer: 3000,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.addEventListener('mouseenter', Swal.stopTimer)
-            toast.addEventListener('mouseleave', Swal.resumeTimer)
-          }
-        })
-      }
-    }
-  }).always(function (data) {
-    UnloadImg();
-    //console.log(data);	
-  });
-
-}
-
-//----------------------Funcion que verifica si el pedido existe o no existe en la base de datos
-function VerificaPedido() {
-  var num = $("#txt_numero").val();
-  if (num > 0) {
-    $.ajax({
-      encoding: "UTF-8",
-      url: "../models/PW-SAP.php",
-      type: "POST",
-      async: true,
-      dataType: "json",
-      error: function (OBJ, ERROR, JQERROR) {
-        alert(JQERROR);
-      },
-      data: {
-        op: "S_VERIFICA_PEDIDO",
-        num: num
-      },
-      success: function (data) {
-        if (data == '') {
-          var numsap = $.trim($("#txt_numero_sap").val());
-          if (numsap != 0) {
-            EliminarSAP(numsap, 0);
-          }
-          $("#txt_total").val('$0');
-          $("#txt_numero").val('0');
-          $("#txt_numero_sap").val('0')
-        }
-      }
     });
+
+    if (data > 0) {
+      if (numeroSAP != 0) {
+        await InserUpdateSAP('MODIFICAR', numero, numeroSAP);
+      }
+      ModificarArray(0, 0, 0, codigo);
+    }
+    VerificaPedido();
+  } catch (error) {
+    console.error(error);
   }
 }
-
-
-async function enviarCotizacionEmail(numero) {
-
+// FUNCIÓN QUE ACTUALIZA O GUARDA EL PEDIDO EN EL WS
+async function InserUpdateSAP(op, numero, numeroSAP) {
   try {
-    data = {
-      op: 'EnviarPedidoEmail',
+    LoadImg('Guardando... ⏳⏳⏳');
+    const data = await enviarPeticion({ op, link: "../models/WS-PW.php", numero, numeroSAP });
+
+    if (data.Tipo == 'S') {
+      showToastr("success", data.Msj);      
+    } else {
+      showToastr("error", data.Msj);    
+    }
+  } catch (error) {
+    console.log(error);
+  } finally {
+    UnloadImg();
+  }
+}
+// FUNCIÓN QUE VERIFICA SI EL PEDIDO EXISTE O NO EN LA BASE DE DATOS
+async function VerificaPedido() {
+  try {
+    let num = $("#txt_numero").val();
+    if (num > 0) {
+      const data = await enviarPeticion({ op: "S_VERIFICA_PEDIDO", link: "../models/PW-SAP.php", num});
+      if (data == '') {
+        var numsap = $.trim($("#txt_numero_sap").val());
+        if (numsap != 0) {
+          EliminarSAP(numsap, 0);
+        }
+        $("#txt_total").val('$0');
+        $("#txt_numero").val('0');
+        $("#txt_numero_sap").val('0')
+      }
+    }
+  } catch (error) {
+    console.error(error);
+  }  
+}
+// FUNCIÓN PARA ENVIAR COTIZACIÓN VÍA EMAIL
+async function enviarCotizacionEmail(numero) {
+  try {
+    showLoadingSwalAlert2();
+    const resp = await enviarPeticion({
+      op: "EnviarPedidoEmail",
       link: "../models/ProgramacionCliente.php",
       ped: numero,
-      tipo: 'C'
-    }
-    showLoadingSwalAlert2();
-    const resp = await enviarPeticion(data);
+      tipo: "C"
+    });
     dissminSwal();
 
-    if (resp.Tipo && resp.Tipo == 'success') {
-      Swal.fire({
-        position: 'top-end',
-        icon: 'success',
-        title: 'Documento enviado',
-        showConfirmButton: false,
-        timer: 1500
-      });
-
+    if (resp.Tipo && resp.Tipo == "success") {
+      showToastr("success", "Documento enviado");
       activaTab("dvClientes");
       Limpiar();
-      //valido si se abrio el modulo desde el 0102 
-      if ($("#link_pro").val() != '0' || $("#link_pro").val() != '') {
+      // valido si se abrio el modulo desde el 0102 
+      if ($("#link_pro").val() != "0" || $("#link_pro").val() != "") {
         preLoadCliente($("#link_pro").val());
       }
-
     } else {
-      Swal.fire('Error', 'Ocurrio un error al enviar la cotización', 'error');
+      Swal.fire("Error", "Ocurrio un error al enviar la cotización", "error");
     }
   } catch (e) {
-    Swal.fire('Error', 'Ocurrio un error al enviar la cotización', 'error');
+    Swal.fire("Error", "Ocurrio un error al enviar la cotización", "error");
     dissminSwal();
     console.error(e)
   }
-
 }
-
-
-function ConfirmarenviarPedidoEmail(numero) {
-
-  Swal.fire({
-    title: "Desea enviar la cotización al coerreo?",
-    text: "La coizacion de enviara al correo " + $("#emailCliente").val(),
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#3085d6',
-    cancelButtonColor: '#d33',
-    confirmButtonText: 'Si'
-  }).then((result) => {
-    if (result.isConfirmed) {
-      enviarCotizacionEmail(numero);
-    }
-  })
-
+// FUNCIÓN PARA CONFIRMAR ENVÍO DE PEDIDO VÍA EMAIL
+async function ConfirmarenviarPedidoEmail(numero) {
+  const result = await confirmAlert("¿Desea enviar la cotización al correo?", "La cotizacion se enviará al correo " + $("#emailCliente").val());
+  if (result.isConfirmed) {
+    enviarCotizacionEmail(numero);
+  }
 }
 // LISTAR PEDIDO TEMPORAL
 const ListarPedido = async () => {
@@ -1869,10 +1780,10 @@ const ListarPedido = async () => {
       let itemsList = ``;
       infoPedidoArray.forEach(item => {
         itemsList += `
-          <li class="list-group-item d-flex justify-content-between">
-              <p class="m-0">${item.title}:</p>
-              <p class="m-0 text-green">${item.value}</p>
-          </li>`;
+        <li class="list-group-item d-flex justify-content-between">
+            <p class="m-0">${item.title}:</p>
+            <p class="m-0 text-green">${item.value}</p>
+        </li>`;
       });
 
       let infoPedido = `
@@ -1892,17 +1803,17 @@ const ListarPedido = async () => {
         </div>`;
       
       let columns = ``;
-      ['CODIGO', 'DESCRIPCION', 'VALOR', 'IVA', 'DCTO', 'VNETO', 'STOCK', 'CANTIDAD', 'TOTAL', 'ID'].forEach(item => columns += `<th class="size-th">${item}</th>`);
+      ['CÓDIGO', 'DESCRIPCIÓN', 'VALOR', 'IVA', 'DCTO', 'VNETO', 'STOCK', 'CANTIDAD', 'TOTAL', 'ID'].forEach(item => columns += `<th class="size-th">${item}</th>`);
 
       tabla += `
-        <table class="display" style="width: 100%" id="tablaConfirmar">
-          <thead> 
-            <tr class="bag-info">
-              ${columns}
-            </tr>
-          </thead>
-        <tbody>${detalle}</tbody>
-        </table>`
+      <table class="display" style="width: 100%" id="tablaConfirmar">
+        <thead> 
+          <tr class="bag-info">
+            ${columns}
+          </tr>
+        </thead>
+      <tbody>${detalle}</tbody>
+      </table>`
       $("#listInfoPedido").html(infoPedido);
       $("#dvResultPedidos").html(tabla);
 
@@ -1924,12 +1835,12 @@ const ListarPedido = async () => {
 
     } else {
       let alertMsg = `
-          <div class="alert alert-danger d-flex align-items-center" role="alert">
-            <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
-            <div>
-              NO EXISTEN RESULTADOS PARA LAS CONDICIONES SELECCIONADAS
-            </div>
-          </div>`;
+      <div class="alert alert-danger d-flex align-items-center" role="alert">
+        <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+        <div>
+          NO EXISTEN RESULTADOS PARA LAS CONDICIONES SELECCIONADAS
+        </div>
+      </div>`;
       $("#dvResultPedidos").html(alertMsg);
     }    
   } catch (error) {
@@ -1939,30 +1850,17 @@ const ListarPedido = async () => {
   }
 }
 // ACTUALIZACIÓN DE NOTAS DE PEDIDO 
-function UpdNotas(ob) {
-  var nota = $.trim($(ob).val());
-  var nump = $.trim($("#txt_numero").val());
-  if (nump != '') {
-    $.ajax({
-      type: "POST",
-      encoding: "UTF-8",
-      url: "../models/PW-SAP.php",
-      global: false,
-      error: function (OBJ, ERROR, JQERROR) {
-        alert(JQERROR);
-      },
-      data: ({
-        op: "U_NOTAS",
-        nota: nota,
-        nump: nump
-      }),
-      dataType: "html",
-      async: false,
-      success: function (data) { //alert(data);
-      }
-    });
-
-  }
+async function UpdNotas(ob) {
+  try {
+    let nota = $.trim($(ob).val());
+    let nump = $.trim($("#txt_numero").val()); 
+    if (nump != '') {
+      const data = await enviarPeticion({op: "U_NOTAS", link: "../models/PW-SAP.php", nota, nump});
+      console.log(data);
+    }
+  } catch (error) {
+    console.log(error);
+  }  
 }
 // PEDIDOS TEMPORALES PENDIENTES POR RECUPERAR
 const Temporales = async () => {
@@ -2166,56 +2064,51 @@ function AbrirOpciones(numero, valor_total, destinatario, direccion, bodega, cod
     $("#btnNotaRapida").attr('disabled', true);
   }
 }
-
+// FUNCIÓN PARA VISUALIZAR PEDIDO
 function VisualizarPedido() {
   var num = $.trim($("#ped_numero").val());
   $("#ContenidoPDF").html('<embed src="../resources/tcpdf/pedidos.php?ped=' + num + '&tipo=V" frameborder="0" width="100%" height="400px">');
   $("#ModalPDF").modal("show");
 }
-
+// FUNCIÓN PARA VISUALIZAR FACTURA
 function VisualizarFactura(num) {
   if (num != 0) {
-    //$("#ModalOpciones").modal("hide");
     $("#ContenidoPDFfactura").html('<embed src="../resources/tcpdf/Factura.php?num=' + num + '&tipo=V" frameborder="0" width="100%" height="400px">');
     $("#ModalPDFfactura").modal("show");
   } else {
     Swal.fire('error', 'El pedido seleccionado no posee factura', 'error');
   }
 }
-
+// FUNCIÓN PARA RECUPERAR PEDIDOS
 function RecuperarPedido() {
-  //---------------------------------------------------------
-  var numero = $.trim($("#ped_numero").val());
-  var valor = $.trim($("#ped_valor_total").val());
-  var destinatario = $.trim($("#ped_destinatario").val());
-  var bodega = $.trim($("#ped_bodega").val());
-  var codigo_sap = $.trim($("#ped_codigo_sap").val());
-  var transferido = $.trim($("#ped_transferido").val());
-  var numero_sap = $.trim($("#ped_numero_sap").val());
-  var entrega = $.trim($("#ped_entrega").val());
-  var DepId = $.trim($("#Dpto").val());
-  //---Control de modificacion de pedidos usuarios diferentes
-  var ped_usuario = $.trim($("#ped_usuario").val());
-  var usuario_log = $.trim($("#UsrLogin").val());
-  var sw_user = 0;
-  var IdRol = $.trim($("#Rol").val());
+  let numero = $.trim($("#ped_numero").val());
+  let valor = $.trim($("#ped_valor_total").val());
+  let destinatario = $.trim($("#ped_destinatario").val());
+  let bodega = $.trim($("#ped_bodega").val());
+  let codigo_sap = $.trim($("#ped_codigo_sap").val());
+  let transferido = $.trim($("#ped_transferido").val());
+  let numero_sap = $.trim($("#ped_numero_sap").val());
+  let entrega = $.trim($("#ped_entrega").val());
+  let DepId = $.trim($("#Dpto").val());
+  // Control de modificacion de pedidos usuarios diferentes
+  let ped_usuario = $.trim($("#ped_usuario").val());
+  let usuario_log = $.trim($("#UsrLogin").val());
+  let sw_user = 0;
+  let IdRol = $.trim($("#Rol").val());
+
   if (ped_usuario != usuario_log && ped_usuario != 'INTEGRACION' && IdRol != 1) {
     sw_user = 1;
   }
 
   if (sw_user == 0) {
-    //---Control de modificacion de pedidos usuarios diferentes
     if (entrega == 0) {
-      //--------------------------------------------------------------		
       $("#txt_numero").val(numero);
       $("#txt_numero_sap").val(numero_sap);
       $("#txt_total").val(formatNum(valor, '$'));
-      //---------------------------------------------------------
-      // $("#liPedidos").removeClass("disabled disabledTab");
       $("#btnPedidos").attr("disabled", false);
       $("#ModalOpciones").modal("hide");
       activaTab('dvPedidos');
-      //---------------------------------------------------------
+
       if (DepId == 10) {
         $("#txt_cliente").val(codigo_sap);
         BuscarProductos();
@@ -2226,66 +2119,36 @@ function RecuperarPedido() {
         $("#txt_oficina").attr('disabled', true);
         $("#txt_oficina").attr('readonly', true);
         BuscarProductos();
-
       }
-      //--------------------------------------------------------------		
+
       ListarPedido();
       $("#txt_destinatario").val(destinatario);
       $("#txt_destinatario").attr('disabled', true);
       $("#txt_destinatario").attr('readonly', true);
-      //BuscarProductos();	 se cancela por hacer el proceso dos veces
-      //---------------------------------------------------------
     } else {
       Swal.fire('Cancelado', 'No es posible recuperar un pedido con procesos posteriores.', 'error');
     }
-
   } else {
     Swal.fire('Cancelado', 'No es posible recuperar un pedido realizado por otro usuario!.', 'error');
   }
 }
-//Envio de Email de pedidos--------------------------------------------
-function EnviarMail(tipo, numero) {
-  $.ajax({
-    type: "GET",
-    encoding: "UTF-8",
-    url: "../resources/tcpdf/pedidos.php",
-    global: false,
-    error: function (OBJ, ERROR, JQERROR) {
-      alert(JQERROR + " ");
-    },
-    data: ({
-      ped: numero,
-      tipo: tipo
-    }),
-    dataType: "html",
-    async: true,
-    success: function (data) { }
-  }).fail(function (data) {
+// ENVÍO DE EMAIL DE PEDIDOS
+async function EnviarMail(tipo, numero) {
+  try {
+    const data = await enviarPeticion({metodo: "GET", link: "../resources/tcpdf/pedidos.php", ped: numero, tipo: tipo});
     console.log(data);
-  });
+  } catch (error) {
+    console.error(error);
+  }  
 }
-//Envio de Email de anulacion de pedidos
-function EnviarMailAnulacion(tipo, numero, texto) {
-  $.ajax({
-    type: "POST",
-    encoding: "UTF-8",
-    url: "../models/PW-SAP.php",
-    global: false,
-    error: function (OBJ, ERROR, JQERROR) {
-      alert(JQERROR + " ");
-    },
-    data: ({
-      op: "EMAIL",
-      tipo: tipo,
-      numero: numero,
-      texto: texto
-    }),
-    dataType: "html",
-    async: true,
-    success: function (data) { }
-  }).fail(function (data) {
+// ENVÍO DE EMAIL DE ANULACIÓN DE PEDIDOS
+async function EnviarMailAnulacion(tipo, numero, texto) {
+  try {
+    const data = await enviarPeticion({op: "EMAIL", link: "../models/PW-SAP.php", tipo, numero, texto});
     console.log(data);
-  });
+  } catch (error) {
+    console.error(error);
+  }  
 }
 //Funcion validar inventario antes de guardar
 function WSInvenTotal() {
