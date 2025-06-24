@@ -120,7 +120,7 @@ const MostrarEstadoSolDesbloqueo = async (pedido) => {
 
 const guardSolicitudesDesbloqueoPedidos = async () => {
   try {
-    const resp = await enviarPeticion({link: '../models/PW-SAP.php', op: 'SOL_PENDIENTE'});
+    const resp = await enviarPeticion({ link: '../models/PW-SAP.php', op: 'SOL_PENDIENTE' });
   } catch (e) {
     console.error(e)
   }
@@ -148,10 +148,10 @@ const preLoadCliente = (codigo_sap) => {
     $("#txt_ciudad").val(DataCliente.ciudad);
 
     $("#txt_cupo").val(formatNum(DataCliente.cupo_credito, '$'));
-    
+
     $("#txt_oficina").html(OfcN);
     $("#txt_oficina option[value='" + DataCliente.bodega + "']").attr("selected", true);
-    
+
     $("#txt_condicion").val(DataCliente.condicion_pago);
     $("#txt_lista").val(DataCliente.lista);
     $("#txt_vendedor").val(DataCliente.vendedor);
@@ -175,7 +175,7 @@ const preLoadCliente = (codigo_sap) => {
     $("#txtGrp1").val(DataCliente.grupo1);
     $("#txtGrp2").val(DataCliente.grupo2);
     $("#txtGrp1,#txtGrp2").prop('disabled', true)
-    
+
     $("#txt_cliente").val(DataCliente.value);
     $("#txtFaltanteCodigoCliente").val(DataCliente.codigo_sap);
     $("#txtFaltanteCliente").val(DataCliente.value).attr("disabled", true);
@@ -191,17 +191,17 @@ async function GruposArticulos() {
       let option = `<option value="">TODOS</option>`;
       data.forEach(item => {
         option += `<option value="${item.GRUPO_ARTICULO}">${item.DESCRIPCION1}</option>`;
-      });     
+      });
       $("#txtGrupoArticulo").html(option);
     }
   } catch (error) {
     console.error(error);
-  }  
+  }
 }
 // FUNCIÓN CONSULTA DE OPCIONES
 async function consultaOpciones(pedido, alm = undefined, rdespacho = undefined, rpuntoventa = undefined) {
   try {
-    const data = await enviarPeticion({op: "S_GESTION_PEDIDOS_UNICO", link: "../models/PW-SAP.php", pedido});
+    const data = await enviarPeticion({ op: "S_GESTION_PEDIDOS_UNICO", link: "../models/PW-SAP.php", pedido });
     if (data.length) {
       let item = data[0];
       $("#ped_gestion").val(item.factura);
@@ -229,7 +229,7 @@ async function consultaOpciones(pedido, alm = undefined, rdespacho = undefined, 
     }
   } catch (error) {
     console.error(error);
-  } 
+  }
 }
 // FUNCIÓN NOTIFICACIONES
 function Notificaciones() {
@@ -238,7 +238,7 @@ function Notificaciones() {
   // Descuentos especiales página web
   if (rol == 10) {
     if (ofi == 2100 || ofi == 2200 || ofi == 2300 || ofi == 2400) {
-      showToastr("success", "¡Tenemos descuentos exclusivos para clientes WEB compra ya!", `<strong>PROMOCIONES!</strong></br>`);     
+      showToastr("success", "¡Tenemos descuentos exclusivos para clientes WEB compra ya!", `<strong>PROMOCIONES!</strong></br>`);
     }
   }
 }
@@ -247,8 +247,8 @@ const PermisosZonas = async () => {
   let sw = 0;
   try {
     let rol = $("#Rol").val();
-    
-    const data = await enviarPeticion({op: "S_PERMISO_ZONA", link: "../models/PW-SAP.php", rol});
+
+    const data = await enviarPeticion({ op: "S_PERMISO_ZONA", link: "../models/PW-SAP.php", rol });
     if (data.length > 0) sw = 1;
   } catch (error) {
     console.error(error);
@@ -261,8 +261,8 @@ const ZonasVentas = async () => {
     let zonas = "";
     let sw = await PermisosZonas();
     let idUsr = $("#UsrId").val();
-  
-    const data = await enviarPeticion({op: "S_ZONAS_VENTA", link: "../models/PW-SAP.php", sw, idUsr});
+
+    const data = await enviarPeticion({ op: "S_ZONAS_VENTA", link: "../models/PW-SAP.php", sw, idUsr });
     if (data.length > 0) {
       if (sw == 1) {
         zonas = `<option value="0">000000 - TODAS</option>`;
@@ -273,10 +273,10 @@ const ZonasVentas = async () => {
     } else {
       zonas = `<option value="999999">NO TIENE ZONA ASIGNADA SOLICITAR AL ADMINISTRADOR</option>`;
     }
-    $("#txtZonas").html(zonas);    
+    $("#txtZonas").html(zonas);
   } catch (error) {
     console.error(error);
-  }  
+  }
 }
 // FUNCIÓN DE ACTIVACIÓN DE TABS
 function activaTab(tab) { $(`.nav-tabs a[href="#${tab}"]`).tab("show"); };
@@ -322,11 +322,11 @@ function UnlockScreen(cadena) {
 // FUNCION QUE CARGA EL ARRAY DE LOS TERCEROS DE LA ORGANIZACION X
 const LoadArrayCli = async () => {
   try {
-    LoadImg('Cargando información... Espere un momento ⏳⏳⏳');
+    LoadImg('Cargando información... Espere un momento');
     await new Promise(requestAnimationFrame);
 
     const data = await enviarPeticion({
-      op: "B_CLIENTE", 
+      op: "B_CLIENTE",
       link: "../models/PW-SAP.php",
       org: $("#Organizacion").val(),
       sw: 'a'
@@ -389,15 +389,15 @@ const EditarPedido = async (Numero, Tipo) => {
       $("#ped_codigo_sap").val(item.CODIGO_SAP);
       $("#ped_transferido").val(item.TRANSFERIDO);
       $("#ped_numero_sap").val(item.NUMERO_SAP);
-      
+
       CargarCliente(item.CODIGO_SAP, 'c');
       BuscarProductos();
       $("#txt_numero").val(item.NUMERO);
       $("#txt_numero_sap").val(item.NUMERO_SAP);
       $("#txt_total").val(formatNum(item.VALOR_TOTAL, '$'));
-      
+
       $("#btnPedidos").attr("disabled", false);
-      $("#txt_destinatario").attr('disabled', true);      
+      $("#txt_destinatario").attr('disabled', true);
     } else {
       Swal.fire("Oops!!!", "Pedido no encontrado", "error");
     }
@@ -412,16 +412,16 @@ function CargarEvento() {
   if (parent.parent.$("#AbrirVentas").val() != 0) {
     if (DepId == 10 || $("#txt_codigoSap").val() != '') {
       activaTab("dvProductos");
-      
+
       let grupo = parent.parent.$("#AbrirVentas").val();
       let tipo = parent.parent.$("#AbrirVentasTipo").val();
       switch (tipo) {
         case 'DES':
-            $("#DvChkDctos").addClass('DivCheckBoxTrue');
-            break;
+          $("#DvChkDctos").addClass('DivCheckBoxTrue');
+          break;
         case 'BON':
-            $("#DvChkBonif").addClass('DivCheckBoxTrue');
-            break;
+          $("#DvChkBonif").addClass('DivCheckBoxTrue');
+          break;
       }
       $("#txt_bproductos").val($.trim(grupo));
 
@@ -467,7 +467,7 @@ function CargarClienteSeleccionado() {
     $("#txt_ciudad").val(d.ciudad);
     $("#txt_cupo").val(formatNum(d.cupo_credito, '$'));
     $("#txt_oficina").html(`<option value="${d.bodega}">${d.bodega_desc}</option>`);
-    
+
     $(`#txt_oficina option[value="${d.bodega}"]`).attr("selected", true);
     $("#txt_condicion").val(d.condicion_pago);
     $("#txt_lista").val(d.lista);
@@ -480,7 +480,7 @@ function CargarClienteSeleccionado() {
     $("#txt_plazo").val(d.dias_pago + ' dias');
     $("#txt_destinatario").attr('enable', true);
     $('#txt_cliente').prop('readonly', true);
-    
+
     $("#txtGrp1").val(d.grupo1);
     $("#txtGrp2").val(d.grupo2);
     // Grupo cliente
@@ -488,7 +488,7 @@ function CargarClienteSeleccionado() {
     Destinatarios(d.codigo_sap, d.ciudad, d.direccion);
     if (d.institucional == 1) $("#txt_institucional").val('SI');
     else $("#txt_institucional").val('NO');
-    
+
     if (d.controlados == 1) $("#txt_controlado").val('SI');
     else $("#txt_controlado").val('NO');
   }
@@ -777,12 +777,12 @@ const GuardarShoping = async () => {
       shoping_observacion: $("#shoping_observacion").val(),
       oficina: $("#txt_oficina").val()
     });
-  
+
     if (data.ok) {
       Swal.fire("Excelente", "Informacion almacenada correctamente", "success");
       $("#shoping_observacion").val("");
       $("#shoping_valor").val("");
-    }    
+    }
   } catch (error) {
     console.error(error);
   }
@@ -791,13 +791,13 @@ const GuardarShoping = async () => {
 const ListarCompetencia = async () => {
   try {
     let option = "";
-    const organizacion =  $("#Organizacion").val();
-    const data = await enviarPeticion({op: "LISTA_COMPETENCIA", link: "../models/Listar_fidelizados.php", organizacion});
-    data.forEach(item => option += `<option value="${item.ID}">${item.NOMBRE}</option>`);   
+    const organizacion = $("#Organizacion").val();
+    const data = await enviarPeticion({ op: "LISTA_COMPETENCIA", link: "../models/Listar_fidelizados.php", organizacion });
+    data.forEach(item => option += `<option value="${item.ID}">${item.NOMBRE}</option>`);
     $("#shoping_competencia").html(option);
   } catch (error) {
     console.error(error);
-  } 
+  }
 }
 
 // FUNCIÓN PARA FILTRAR CLIENTES
@@ -855,7 +855,7 @@ function recursiva(expr, ArrayP, st, des, f_bon, isnum, f_new, f_ofe) {
 async function AddProductoPlano(pcodigo, pvalor, piva, pdcto, pcant, pneto, pstock, pvrlped, pidped, pbonifica, pcantbon, pcantreg, pstobon) {
   let oficina = $("#txt_oficina").val();
   let codigo = pcodigo;
-  
+
   let vlr_unitario = pvalor;
   let iva = piva;
   let descuento = pdcto;
@@ -871,7 +871,7 @@ async function AddProductoPlano(pcodigo, pvalor, piva, pdcto, pcant, pneto, psto
   let CantBonifica = pcantbon;
   let CantRegular = pcantreg;
   let StockBonifica = pstobon;
-  
+
   if (cant > 0) { // validacion de cantidad mayor a cero   
     // Encabezado
     if (NumPed == 0) {
@@ -896,7 +896,7 @@ function BuscarProductoArr(isn) {
   let ctrl = $("#txt_controlado").val(); //si es controlado
   let top = $("#txt_reg").val(); //top de busqueda
   let orden = $("#txt_orden").val(); //ordenar 
-  
+
   let f_sto = 0;
   let f_dto = 0;
   let f_bon = 0;
@@ -907,8 +907,8 @@ function BuscarProductoArr(isn) {
   if ($("#DvChkStock").hasClass('DivCheckBoxTrue')) f_sto = 1;
   if ($("#DvChkDctos").hasClass('DivCheckBoxTrue')) f_dto = 1;
   if ($("#DvChkBonif").hasClass('DivCheckBoxTrue')) f_bon = 1;
-  if ($("#DvChkBarras").hasClass('DivCheckBoxTrue')) f_bar = 1;	
-  if ($("#DvChkNuevos").hasClass('DivCheckBoxTrue')) f_new = 1;	
+  if ($("#DvChkBarras").hasClass('DivCheckBoxTrue')) f_bar = 1;
+  if ($("#DvChkNuevos").hasClass('DivCheckBoxTrue')) f_new = 1;
   if ($("#DvChkOfertado").hasClass('DivCheckBoxTrue')) f_ofe = 1;
 
   let sh_cod = 0;
@@ -938,8 +938,8 @@ function BuscarProductoArr(isn) {
     } else {
       let msgHtml = `
       <div class="alert alert-danger" role="alert">
-        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-        <span class="sr-only">Error:</span>  NO EXISTEN RESULTADOS PARA LAS CONDICIONES SELECCIONADAS
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span class="sr-only">Error:</span>NO EXISTEN RESULTADOS PARA LAS CONDICIONES SELECCIONADAS
       </div>`;
       $("#dvResultProductos").html(msgHtml);
       $("#n_resultados").text('0 resultados');
@@ -950,11 +950,11 @@ function BuscarProductoArr(isn) {
 // FUNCIÓN CARGAR EAN
 async function CargarEan() {
   try {
-    const data = await enviarPeticion({op: "B_EAN", link: "../models/PW-SAP.php"});
+    const data = await enviarPeticion({ op: "B_EAN", link: "../models/PW-SAP.php" });
     data.forEach(item => {
-      let e = {codigo_material: item.codigo_material, ean: item.ean}
+      let e = { codigo_material: item.codigo_material, ean: item.ean }
       ArrEan.push(e);
-    });   
+    });
   } catch (error) {
     console.error(error);
   }
@@ -974,21 +974,21 @@ async function BuscarProductos() {
   // Grupos de terceros
   let Grp1 = $("#txtGrp1").val();
   let Grp2 = $("#txtGrp2").val();
-  
+
   let f_sto = 0;
   let f_dto = 0;
   let f_bon = 0;
   let f_bar = 0;
   let f_new = 0;
-  
+
   if ($("#DvChkStock").hasClass('DivCheckBoxTrue')) f_sto = 1;
   if ($("#DvChkDctos").hasClass('DivCheckBoxTrue')) f_dto = 1;
   if ($("#DvChkBonif").hasClass('DivCheckBoxTrue')) f_bon = 1;
   if ($("#DvChkBarras").hasClass('DivCheckBoxTrue')) f_bar = 1;
-  if ($("#DvChkNuevos").hasClass('DivCheckBoxTrue')) f_new = 1; 
+  if ($("#DvChkNuevos").hasClass('DivCheckBoxTrue')) f_new = 1;
 
   let TipoPed = $("#TxtIntegracion").val();
- 
+
   let op_sw = 'B_PRODUCTOS';
   let op_inf = 0;
   if ($("#DvChkKits").hasClass('DivCheckBoxTrue')) {
@@ -997,9 +997,9 @@ async function BuscarProductos() {
   }
 
   try {
-    LoadImg('Cargando portafolio... ⏳⏳⏳');
+    LoadImg('Cargando portafolio...');
     ArrProd = [];
-    const data = await enviarPeticion({op: op_sw, link: "../models/PW-SAP.php", desc, bodega, lista, numero, eps, ctrl, f_sto, f_dto, f_bon, f_bar, top, orden, TipoPed, f_new, Grp1, Grp2, CodigoSAP});
+    const data = await enviarPeticion({ op: op_sw, link: "../models/PW-SAP.php", desc, bodega, lista, numero, eps, ctrl, f_sto, f_dto, f_bon, f_bar, top, orden, TipoPed, f_new, Grp1, Grp2, CodigoSAP });
     data.forEach(item => {
       let det = {
         codigo_material: item.codigo_material,
@@ -1036,13 +1036,13 @@ async function BuscarProductos() {
     console.error(error);
   } finally {
     UnloadImg();
-  }  
+  }
 }
 // FUNCIÓN QUE PERMITE GUARDAR LA HUELLA FALTANTE
 async function GuardarHuella() {
   try {
     const data = await enviarPeticion({
-      op: "G_HUELLA", 
+      op: "G_HUELLA",
       link: "../models/PW-SAP.php",
       codigo_sap: $("#txt_codigoSap").val(),
       codigo_material: $("#huella_codmaterial").val(),
@@ -1062,7 +1062,7 @@ async function GuardarHuella() {
     }
   } catch (error) {
     console.error(error);
-  } 
+  }
 }
 // FUNCIÓN PARA VALIDAR URL DE IMAGEN
 const validarUrlImg = async (codigo) => {
@@ -1126,7 +1126,7 @@ async function InfoMaterial(pcodigo, pvalor, piva, pdcto, pdesc, pstock, op) {
       <i class="fas fa-spinner fa-spin"></i> Cargando...
     </div>`;
     $('#ContenidoInfoMateriales').html(msgHtml);
-    const data = await enviarPeticion({op: opc, link: "../models/PW-SAP.php", cod: pcodigo, org, ofi, lst});
+    const data = await enviarPeticion({ op: opc, link: "../models/PW-SAP.php", cod: pcodigo, org, ofi, lst });
     if (data.length) {
       if (op === "0") {
         renderMaterialInfo(data, { vunit, v1, v2, v3, v4, iva, dcto });
@@ -1142,7 +1142,7 @@ async function InfoMaterial(pcodigo, pvalor, piva, pdcto, pdesc, pstock, op) {
       Error al cargar la información del material
     </div>`;
     $('#ContenidoInfoMateriales').html(msgHtml);
-  } 
+  }
 }
 // FUNCIÓN PARA RENDERIZAR INFORMACIÓN DEL MATERIAL
 function renderMaterialInfo(data, { vunit, v1, v2, v3, v4, iva, dcto }) {
@@ -1334,11 +1334,11 @@ function renderKitInfo(data) {
 async function WSInvent(codigo, oficina) {
   let cantidad = 0;
   try {
-    const data = await enviarPeticion({link: "../models/WS-INVENT.php", codigo, oficina});
+    const data = await enviarPeticion({ link: "../models/WS-INVENT.php", codigo, oficina });
     cantidad = data;
   } catch (error) {
     console.error(error);
-  } 
+  }
   return cantidad;
 }
 // FUNCIÓN PARA AGERAGAR O ELIMINAR UN PRODUCTO SELECCIONADO
@@ -1370,7 +1370,7 @@ async function AddProducto(pcodigo, pvalor, piva, pdcto, pcant, pneto, pstock, p
   let totalfila_antes = isNaN(unformatNum($('#TOF' + pcodigo).val())) || unformatNum($('#TOF' + pcodigo).val()) == '' ? 0 : unformatNum($('#TOF' + pcodigo).val());
   let NumPed = $("#txt_numero").val();
   let idfila = 'IDF' + pcodigo;
-  
+
   if (cant > 0) {
     let CantRegalar = parseInt(parseInt(parseInt(cant) / parseInt(CantRegular)) * parseInt(CantBonifica));
     let swb = 0;
@@ -1434,12 +1434,12 @@ async function Destinatarios(codSap, ciudad, direccion) {
     const data = await enviarPeticion({ op: "B_DESTINATARIO", link: "../models/PW-SAP.php", codSap: $.trim(codSap) });
     let destino = `<option value="0" selected>Principal - ${ciudad} - ${direccion}</option>`;
     if (data != '') {
-      data.forEach((item, i) => destino += `<option value="${item.id}">alterna ${i} - ${item.direccion}</option>`);      
+      data.forEach((item, i) => destino += `<option value="${item.id}">alterna ${i} - ${item.direccion}</option>`);
     }
     $("#txt_destinatario").html(destino);
   } catch (error) {
     console.error(error);
-  }  
+  }
 }
 // FUNCIÓN PARA INSERTAR EL ENCABEZADO DEL PEDIDO
 async function InsertarEncabezado() {
@@ -1449,7 +1449,7 @@ async function InsertarEncabezado() {
   if (usuario != '') {
     try {
       const data = await enviarPeticion({
-        op: "I_PEDIDO_ENCABEZADO", 
+        op: "I_PEDIDO_ENCABEZADO",
         link: "../models/PW-SAP.php",
         organizacion_ventas: $("#Organizacion").val(),
         oficina_ventas: $("#txt_oficina").val(),
@@ -1467,7 +1467,7 @@ async function InsertarEncabezado() {
       }
     } catch (error) {
       console.error(error);
-    }    
+    }
   }
   return numero;
 }
@@ -1499,9 +1499,9 @@ async function InsertarDetalle(NumPed, codigo, cant, vlr_unitario, descuento, to
       iva: iva,
       lista: $("#txt_lista").val(),
       oficina: $("#txt_oficina").val(),
-      canal: '10' 
+      canal: '10'
     });
-  
+
     if (!isNaN(data) > 0) {
       numero = data;
       if (NumPedSAP != 0) {
@@ -1509,11 +1509,11 @@ async function InsertarDetalle(NumPed, codigo, cant, vlr_unitario, descuento, to
       }
       ModificarArray(cant, totalfila, numero, codigo);
     } else {
-      showToastr("error", `ERROR: Al insertar el producto - ${codigo} ${data}`);      
-    }    
+      showToastr("error", `ERROR: Al insertar el producto - ${codigo} ${data}`);
+    }
   } catch (error) {
     console.error(error);
-  }   
+  }
   return numero;
 }
 // FUNCIÓN QUE ACTUALIZA EL DETALLE DEL PEDIDO
@@ -1541,7 +1541,7 @@ async function ActualizarDetalle(idfila, cant, totalfila, codigo) {
     ModificarArray(cant, totalfila, idfila, codigo);
   } catch (error) {
     console.error(error);
-  }  
+  }
 }
 // FUNCIÓN QUE ELIMINA EL DETALLE DEL PEDIDO 
 async function EliminarDetalle(idfila, codigo) {
@@ -1574,13 +1574,13 @@ async function EliminarDetalle(idfila, codigo) {
 // FUNCIÓN QUE ACTUALIZA O GUARDA EL PEDIDO EN EL WS
 async function InserUpdateSAP(op, numero, numeroSAP) {
   try {
-    LoadImg('Guardando... ⏳⏳⏳');
+    LoadImg('Guardando...');
     const data = await enviarPeticion({ op, link: "../models/WS-PW.php", numero, numeroSAP });
 
     if (data.Tipo == 'S') {
-      showToastr("success", data.Msj);      
+      showToastr("success", data.Msj);
     } else {
-      showToastr("error", data.Msj);    
+      showToastr("error", data.Msj);
     }
   } catch (error) {
     console.log(error);
@@ -1593,7 +1593,7 @@ async function VerificaPedido() {
   try {
     let num = $("#txt_numero").val();
     if (num > 0) {
-      const data = await enviarPeticion({ op: "S_VERIFICA_PEDIDO", link: "../models/PW-SAP.php", num});
+      const data = await enviarPeticion({ op: "S_VERIFICA_PEDIDO", link: "../models/PW-SAP.php", num });
       if (data == '') {
         var numsap = $.trim($("#txt_numero_sap").val());
         if (numsap != 0) {
@@ -1606,7 +1606,7 @@ async function VerificaPedido() {
     }
   } catch (error) {
     console.error(error);
-  }  
+  }
 }
 // FUNCIÓN PARA ENVIAR COTIZACIÓN VÍA EMAIL
 async function enviarCotizacionEmail(numero) {
@@ -1650,9 +1650,9 @@ const ListarPedido = async () => {
     $("#dvResultProductos").html("");
     let numero = $("#txt_numero").val();
 
-    LoadImg('Cargando pedido... ⏳⏳⏳');
+    LoadImg('Cargando pedido...');
 
-    const data = await enviarPeticion({op: "S_PEDIDO_DETALLE", link: "../models/PW-SAP.php", numero});
+    const data = await enviarPeticion({ op: "S_PEDIDO_DETALLE", link: "../models/PW-SAP.php", numero });
     if (data.length) {
       let cont = 0;
       let vtotal = 0;
@@ -1770,11 +1770,11 @@ const ListarPedido = async () => {
       }
 
       const infoPedidoArray = [
-        {title: "Subtotal", value: formatNum(vbruto, '$')},
-        {title: "Valor Iva", value: formatNum(vtotal - vbruto, '$')},
-        {title: "Valor Total", value: formatNum(vtotal, '$')},
-        {title: "Items", value: cont},
-        {title: "Productos", value: ctotal},
+        { title: "Subtotal", value: formatNum(vbruto, '$') },
+        { title: "Valor Iva", value: formatNum(vtotal - vbruto, '$') },
+        { title: "Valor Total", value: formatNum(vtotal, '$') },
+        { title: "Items", value: cont },
+        { title: "Productos", value: ctotal },
       ];
 
       let itemsList = ``;
@@ -1801,7 +1801,7 @@ const ListarPedido = async () => {
             ${itemsList}
           </ul>
         </div>`;
-      
+
       let columns = ``;
       ['CÓDIGO', 'DESCRIPCIÓN', 'VALOR', 'IVA', 'DCTO', 'VNETO', 'STOCK', 'CANTIDAD', 'TOTAL', 'ID'].forEach(item => columns += `<th class="size-th">${item}</th>`);
 
@@ -1835,14 +1835,12 @@ const ListarPedido = async () => {
 
     } else {
       let alertMsg = `
-      <div class="alert alert-danger d-flex align-items-center" role="alert">
-        <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
-        <div>
-          NO EXISTEN RESULTADOS PARA LAS CONDICIONES SELECCIONADAS
-        </div>
+      <div class="alert alert-danger" role="alert">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span class="sr-only">Error:</span>NO EXISTEN RESULTADOS PARA LAS CONDICIONES SELECCIONADAS
       </div>`;
       $("#dvResultPedidos").html(alertMsg);
-    }    
+    }
   } catch (error) {
     console.log(error);
   } finally {
@@ -1853,20 +1851,20 @@ const ListarPedido = async () => {
 async function UpdNotas(ob) {
   try {
     let nota = $.trim($(ob).val());
-    let nump = $.trim($("#txt_numero").val()); 
+    let nump = $.trim($("#txt_numero").val());
     if (nump != '') {
-      const data = await enviarPeticion({op: "U_NOTAS", link: "../models/PW-SAP.php", nota, nump});
+      const data = await enviarPeticion({ op: "U_NOTAS", link: "../models/PW-SAP.php", nota, nump });
       console.log(data);
     }
   } catch (error) {
     console.log(error);
-  }  
+  }
 }
 // PEDIDOS TEMPORALES PENDIENTES POR RECUPERAR
 const Temporales = async () => {
   try {
-    LoadImg('Cargando... ⏳⏳⌛');
-    const data = await enviarPeticion({op: "S_TEMPORALES", link: "../models/PW-SAP.php"});
+    LoadImg('Cargando...');
+    const data = await enviarPeticion({ op: "S_TEMPORALES", link: "../models/PW-SAP.php" });
     if (data.length) {
       let header = `    
       <div class="alert alert-warning alert-dismissible mt-2 mb-5" role="alert">
@@ -2011,16 +2009,16 @@ const Temporales = async () => {
           zeroRecords: "No se encontraron registros",
           infoEmpty: "No hay registros disponibles"
         }
-  });
+      });
     } else {
       let msgHtml = `
-      <div class="alert alert-danger mt-3" role="alert">
-      <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-      <span class="sr-only">Error:</span>NO EXISTEN RESULTADOS PARA LAS CONDICIONES SELECCIONADAS
+      <div class="alert alert-danger" role="alert">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span class="sr-only">Error:</span>NO EXISTEN RESULTADOS PARA LAS CONDICIONES SELECCIONADAS
       </div>`;
       $("#contenedorLeyendas").html(``);
       $("#DvRecuperables").html(msgHtml);
-    }    
+    }
   } catch (error) {
     console.log(error);
   } finally {
@@ -2135,22 +2133,22 @@ function RecuperarPedido() {
 // ENVÍO DE EMAIL DE PEDIDOS
 async function EnviarMail(tipo, numero) {
   try {
-    const data = await enviarPeticion({metodo: "GET", link: "../resources/tcpdf/pedidos.php", ped: numero, tipo: tipo});
+    const data = await enviarPeticion({ metodo: "GET", link: "../resources/tcpdf/pedidos.php", ped: numero, tipo: tipo });
     console.log(data);
   } catch (error) {
     console.error(error);
-  }  
+  }
 }
 // ENVÍO DE EMAIL DE ANULACIÓN DE PEDIDOS
 async function EnviarMailAnulacion(tipo, numero, texto) {
   try {
-    const data = await enviarPeticion({op: "EMAIL", link: "../models/PW-SAP.php", tipo, numero, texto});
+    const data = await enviarPeticion({ op: "EMAIL", link: "../models/PW-SAP.php", tipo, numero, texto });
     console.log(data);
   } catch (error) {
     console.error(error);
-  }  
+  }
 }
-//Funcion validar inventario antes de guardar
+// FUNCIÓN PARA VALIDAR INVENTARIO ANTES DE GUARDAR
 function WSInvenTotal() {
   var numero = $("#txt_numero").val();
   if (numero > 0) {
@@ -2192,7 +2190,7 @@ const Guardar = async () => {
       const result = await confirmAlert(`¿Está seguro(a) de enviar el pedido número ${numero}?`, "Después de aceptar no podrá reversar la operación!!!");
       if (result.isConfirmed) {
         try {
-          LoadImg('Guardando... ⏳⏳⏳');
+          LoadImg('Guardando...');
           const data = await enviarPeticion({
             op: op,
             link: "../models/WS-PW.php",
@@ -2204,24 +2202,22 @@ const Guardar = async () => {
             Swal.fire("Excelente!", data.Msj, "success");
             activaTab("dvClientes");
             Limpiar();
-            // Envio de email para usuarios---
+            // Envio de email para usuarios
             if (numeroSAP == 0) {
               EnviarMail('P', numero);
             } else {
               EnviarMail('M', numero);
             }
-
             // valido si se abrio el modulo desde el 0102 
             if ($("#link_pro").val() != '0' || $("#link_pro").val() != '') {
               preLoadCliente($("#link_pro").val());
             }
-            
+
             return false;
           } else {
             Swal.fire("Oops!!!", data.Msj, "error");
             return false;
           }
-
         } catch (error) {
           console.error(error);
         } finally {
@@ -2229,7 +2225,7 @@ const Guardar = async () => {
         }
       } else {
         Swal.fire("Cancelado", "La operación de guardado de pedido ha sido cancelada!", "error");
-      }     
+      }
     }
   } else {
     Swal.fire('Bonificados errados, imposible guardar', BoniDatos.Msj, 'error');
@@ -2360,42 +2356,42 @@ const EliminarPW = async (numero) => {
     const result = await confirmAlert("Eliminar Pedido", "¿Está seguro(a) de eliminar el pedido?");
     if (!result.isConfirmed) return;
 
-    const data = await enviarPeticion({op: "D_PEDIDO", link: "../models/PW-SAP.php", numero});
+    const data = await enviarPeticion({ op: "D_PEDIDO", link: "../models/PW-SAP.php", numero });
 
     if (data == 0) {
       Swal.fire("Excelente", "Pedido eliminado correctamente!", "success");
       Temporales();
     } else {
       Swal.fire("Error", "Error al intentar eliminar pedido!", "error");
-    }    
+    }
   } catch (error) {
     console.log(error);
   }
 }
 // FUNCIÓN PARA ELIMINAR PEDIDO SAP
 const EliminarSAP = async (numero_sap, numero) => {
-   try {
+  try {
     const result = await confirmAlert("Oops!!", "¿Está seguro(a) de eliminar el pedido?");
     if (!result.isConfirmed) return;
 
-    const data = await enviarPeticion({op: "ELIMINAR", link: "../models/WS-PW.php", numero: numero_sap});
+    const data = await enviarPeticion({ op: "ELIMINAR", link: "../models/WS-PW.php", numero: numero_sap });
 
-     if (data.Tipo != 'S') {
-        Swal.fire("Error", data.Msj, "error");
-      } else {
-        EnviarMailAnulacion('E', numero, 'Pedido eliminado');
-        EliminarPW(numero);
-      }
+    if (data.Tipo != 'S') {
+      Swal.fire("Error", data.Msj, "error");
+    } else {
+      EnviarMailAnulacion('E', numero, 'Pedido eliminado');
+      EliminarPW(numero);
+    }
   } catch (error) {
     console.log(error);
-  } 
+  }
 }
-
+// FUNCIÓN DE RASTREO DE PEDIDOS
 const Rastreo = async () => {
   if ($("#ped_numero_sap").val() != '' && $("#ped_numero_sap").val() > 0) {
     try {
       const numero = $("#ped_numero_sap").val();
-      const data = await enviarPeticion({op: "TRAZABILIDAD", link: "../models/RastreoPedido.php", numero});
+      const data = await enviarPeticion({ op: "TRAZABILIDAD", link: "../models/RastreoPedido.php", numero });
       const item = data[0];
       if (data.length) {
         $("#txt_org").html(item.ORG);
@@ -2438,303 +2434,211 @@ const Rastreo = async () => {
         $("#txt_nota").html(item.NOTA_ENTREGA);
 
         $("#ModalRastreo").modal("show");
-      }       
+      }
     } catch (error) {
       console.log(error);
-    }   
+    }
   } else {
     Swal.fire('Oops', 'No es posible rastrear un pedido temporal', 'warning');
   }
 }
 // FUNCIÓN ENTREGAS
-function Entregas() {
-  var Num = $.trim($("#ped_entrega").val());
-  var NumTmp = $.trim($("#ped_numero").val());
-  if (Num == '0') {
-    Swal.fire({
-      title: "El pedido no posee entrega, desea crearla?",
-      text: "Despues de aceptar no podra reversar la operacion!",
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonColor: "#82ED81",
-      cancelButtonColor: "#FFA3A4",
-      confirmButtonText: "Aceptar",
-      cancelButtonText: "Cancelar",
-      closeOnConfirm: true,
-      closeOnCancel: false
-    }).then((result) => {
-      if (result.value) {
-        $.ajax({
-          type: "POST",
-          encoding: "UTF-8",
-          url: "../models/WS-PW.php",
-          global: false,
-          error: function (OBJ, ERROR, JQERROR) {
-            alert(JQERROR + " ");
-          },
-          data: ({
-            op: 'CREA_ENTREGAS',
-            numero: $.trim($("#ped_numero_sap").val())
-          }),
-          dataType: "json",
-          async: false,
-          success: function (data) {
-            if (data.Tipo != 'S') {
-              Swal.fire("Error", data.Msj, "error");
-            } else {
-              Swal.fire("Excelente", data.Msj, "success");
-            }
-            var delayInMilliseconds = 2000; //1 segundo
-            setTimeout(function () {
-              //Temporales propios
-              Temporales();
-              //Temporales de terceros
-              GestionPedidos();
-              //Actualizacion de datos en modal
-              consultaOpciones(NumTmp);
-              //-------------------------------
-            }, delayInMilliseconds);
+async function Entregas() {
+  const Num = $.trim($("#ped_entrega").val());
+  const NumTmp = $.trim($("#ped_numero").val());
+  const numero = $.trim($("#ped_numero_sap").val());
+  try {
+    if (Num == '0') {
+      const result = await confirmAlert("El pedido no posee entrega... ¿Desea crearla?", "Después de aceptar no podrá reversar la operación");
+      if (result.isConfirmed) {
+        const data = await enviarPeticion({op: 'CREA_ENTREGAS', link: "../models/WS-PW.php", numero});
+        if (data.Tipo != 'S') {
+          Swal.fire("Error", data.Msj, "error");
+        } else {
+          Swal.fire("Excelente", data.Msj, "success");
+        }
 
-          }
-        }).done(function (data) {
-          //console.log(data);	
-        });
+        setTimeout(function () {
+          Temporales(); // Temporales propios
+          GestionPedidos(); // Temporales de terceros 
+          consultaOpciones(NumTmp); // Actualizacion de datos en modal
+        }, 2000);
       } else {
-        Swal.fire("Cancelado", "La operacion ha sido cancelada!", "error");
+        Swal.fire("Cancelado", "La operación ha sido cancelada", "error");
       }
-    });
+    } else {
+      const data = await enviarPeticion({ op: 'S_ENTREGA', link: "../models/PW-SAP.php", numero});
+      if (data.length) {
+        let detalle = '';
+        let clas = '';
+        let icon = '';
+        let Pneto = 0;
+        let PnetoIva = 0;
 
-  } else {
-    $.ajax({
-      type: "POST",
-      encoding: "UTF-8",
-      url: "../models/PW-SAP.php",
-      global: false,
-      error: function (OBJ, ERROR, JQERROR) {
-        alert(JQERROR + " ");
-      },
-      data: ({
-        op: 'S_ENTREGA',
-        numero: $.trim($("#ped_numero_sap").val())
-      }),
-      dataType: "json",
-      async: false,
-      success: function (data) {
-        //$("#ModalOpciones").modal("hide");
-        var detalle = '';
-        var clas = '';
-        var icon = '';
-        var Pneto = 0;
-        var PnetoIva = 0;
-        for (var i = 0; i <= data.length - 1; i++) {
-
-          if (parseInt(data[i].ENTREGA) == 0) {
-            clas = 'class="alert-danger"';
-            icon = '<span class="glyphicon glyphicon-remove-sign" aria-hidden="true"></span>'
-          } else if (parseInt(data[i].CANTIDAD) < parseInt(data[i].CANT_PED)) {
-            clas = 'class="alert-warning"';
-            icon = '<span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>'
+        data.forEach(item => {
+          if (parseInt(item.ENTREGA) == 0) {
+            clas = 'class="text-danger"';
+            icon = '<i class="fa-solid fa-circle-xmark"></i>'
+          } else if (parseInt(item.CANTIDAD) < parseInt(item.CANT_PED)) {
+            clas = 'class="text-warning"';
+            icon = '<i class="fa-solid fa-triangle-exclamation"></i>'
           } else {
             clas = '';
             icon = '';
           }
-          detalle += '<tr ' + clas + '>'
-            + '<td>' + data[i].POSICION + '</td>'
-            + '<td>' + data[i].CODIGO_MATERIAL + '</td>'
-            + '<td>' + icon + ' ' + data[i].DESCRIPCION + '</td>'
-            + '<td><input type="text" value="' + data[i].CANTIDAD + '" class="form-control form-control-sm" size="2%"></td>'
-            + '<td>' + data[i].CANT_PED + '</td>'
-            + '<td>' + data[i].DESCUENTO + '%</td>'
-            + '<td>' + data[i].ENTREGA + '</td>'
-            + '<td align="center"><input type="checkbox"/></td>'
-            + '<td>' + data[i].STOCK + '</td>'
-            + '</tr>';
-          Pneto = Pneto + parseFloat((data[i].PNETO));
-          PnetoIva = PnetoIva + parseFloat((data[i].PNETO_IVA));
-        }
+
+          detalle += `
+          <tr ${clas}>
+            <td>${item.POSICION}</td>
+            <td>${item.CODIGO_MATERIAL}</td>
+            <td>${icon} ${item.DESCRIPCION}</td>
+            <td>
+              <input type="text" value="${item.CANTIDAD}" class="form-control form-control-sm" size="2%">
+            </td>
+            <td>${item.CANT_PED}</td>
+            <td>${item.DESCUENTO}%</td>
+            <td>${item.ENTREGA}</td>
+            <td align="center">
+              <input type="checkbox"/>
+            </td>
+            <td>${item.STOCK}</td>
+          </tr>`;
+          Pneto = Pneto + parseFloat((item.PNETO));
+          PnetoIva = PnetoIva + parseFloat((item.PNETO_IVA));
+        });
         $("#tdDetalleEntregas").html(detalle);
         $("#ModalOpciones").modal("hide");
         $("#ModalEntregas").modal("show");
         $("#valor_entrega").html(`VALOR ENTREGADO SIN IVA: <span><strong>${formatNum(Pneto, '$')}</strong></span>`);
         $("#valor_entrega_iva").html(`VALOR ENTREGADO: <span><strong>${formatNum(PnetoIva, '$')}</strong></span>`);
-
-      }
-    }).done(function (data) {
-      //console.log(data);	
-    });
+      }      
+    }
+  } catch (error) {
+    console.error(error);
   }
 }
-
-function EliminarEntrega() {
-  $.ajax({
-    type: "POST",
-    encoding: "UTF-8",
-    url: "../models/WS-PW.php",
-    global: false,
-    error: function (OBJ, ERROR, JQERROR) {
-      alert(JQERROR + " ");
-    },
-    data: ({
-      op: 'ELIMINA_ENTREGAS',
-      numero: $.trim($("#ped_entrega").val())
-    }),
-    dataType: "json",
-    async: false,
-    success: function (data) { //alert(data);
-
-      if (data.Tipo != 'S') {
-        Swal.fire("Error", data.Msj, "error");
-      } else {
-        Swal.fire("Excelente", data.Msj, "success");
-        //Temporales propios
-        Temporales();
-        //Temporales de terceros
-        GestionPedidos();
-        $("#ModalEntregas").modal("hide");
-      }
-
-    }
-  }).done(function (data) {
-    //console.log(data);	
-  });
+// FUNCIÓN ELIMNAR ENTREGA
+async function EliminarEntrega() {
+  const numero = $.trim($("#ped_entrega").val());
+  try {
+    const result = await confirmAlert("Eliminar Entrega", "¿Está seguro(a) de eliminar la entrega?");
+    if (!result.isConfirmed) return;
+    const data = await enviarPeticion({op: "ELIMINA_ENTREGAS", link: "../models/WS-PW.php", numero});
+    if (data.Tipo != 'S') {
+      Swal.fire("Error", data.Msj, "error");
+    } else {
+      Swal.fire("Excelente", data.Msj, "success");     
+      Temporales();  // Temporales propios      
+      GestionPedidos(); // Temporales de terceros
+      $("#ModalEntregas").modal("hide");
+    }   
+  } catch (error) {
+    console.error(error);
+  }
 }
+// FUNCIÓN MODIFICAR ENTREGA
+async function ModificarEntrega() {
+  let entrega = $.trim($("#ped_entrega").val());
+  let detalle = new Array();
+  let d1 = "", d2 = "", d3 = "", d4 = "", d5 = "", d6 = "";
 
-function ModificarEntrega() {
-  var entrega = $.trim($("#ped_entrega").val());
-  //Posiciones 
-  var detalle = new Array();
   $("#tdDetalleEntregas tr").each(function (index, element) {
     d1 = $.trim($(this).find("td").eq(0).html());
     d2 = $.trim($(this).find("td").eq(1).html());
     d3 = $.trim($(this).find("td").eq(3).find("input").val());
     d5 = $.trim($(this).find("td").eq(4).html());
     d6 = $.trim($(this).find("td").eq(8).html());
-    if ($(this).find("td").eq(7).find("input").prop('checked')) {
-      d4 = 'X'
-    } else {
-      d4 = ''
-    };
+
+    if ($(this).find("td").eq(7).find("input").prop('checked')) d4 = 'X';
+    else d4 = '';
+
     if (d1 != 0) {
       det = {
-        'Posicion': d1,
-        'Material': d2,
-        'Cantidad': d3,
-        'Eliminar': d4,
-        'Pedido': d5,
-        'Stock': d6
-      } //det={
+        Posicion: d1,
+        Material: d2,
+        Cantidad: d3,
+        Eliminar: d4,
+        Pedido: d5,
+        Stock: d6
+      }
       detalle.push(det);
     }
   });
-  var proceder = 0;
-  for (i = 0; i <= detalle.length - 1; i++) {
 
-    if (parseInt(detalle[i].Cantidad) > parseInt(detalle[i].Stock)) {
-      proceder = 1;
-    }
-
-    if (parseInt(detalle[i].Cantidad) > parseInt(detalle[i].Pedido)) {
-      proceder = 2;
-    }
-  }
+  let  proceder = 0;
+  detalle.forEach(item => {
+    if (parseInt(item.Cantidad) > parseInt(item.Stock)) proceder = 1;
+    if (parseInt(item.Cantidad) > parseInt(item.Pedido)) proceder = 2;
+  });
+  
   if (proceder == 0) {
-    $.ajax({
-      type: "POST",
-      encoding: "UTF-8",
-      url: "../models/WS-PW.php",
-      global: false,
-      error: function (OBJ, ERROR, JQERROR) {
-        alert(JQERROR + " ");
-      },
-      data: ({
+    try {
+      const data = await enviarPeticion({
         op: 'MODIFICA_ENTREGAS',
+        link: "../models/WS-PW.php",
         entrega: entrega,
         detalle: JSON.stringify(detalle)
-      }),
-      dataType: "json",
-      async: false,
-      success: function (data) { //alert(data); return false;
-        if (data.Tipo != 'S') {
-          Swal.fire("Error", data.Msj, "error");
-        } else {
-          Swal.fire("Excelente", data.Msj, "success");
-        }
-      }
-    }).fail(function (data) {
-      console.log(data);
-    });
+      });
+
+      if (data.Tipo != 'S') Swal.fire("Error", data.Msj, "error");
+      else Swal.fire("Excelente", data.Msj, "success");
+    } catch (error) {
+      console.error(error);
+    }
   } else {
     $("#ModalEntregas").modal("hide");
-    if (proceder == 1) {
-      Swal.fire("Operación Cancelada", "No es posible actualizar un producto en donde la cantidad es mayor al stock ", "error");
-    }
-
-    if (proceder == 2) {
-      Swal.fire("Operación Cancelada", "No es posible que la cantidad entregada sea superior a la cantidad pedida ", "error");
-    }
-
+    if (proceder == 1) Swal.fire("Operación Cancelada", "No es posible actualizar un producto en donde la cantidad es mayor al stock ", "error");
+    if (proceder == 2) Swal.fire("Operación Cancelada", "No es posible que la cantidad entregada sea superior a la cantidad pedida ", "error");
   }
-  //alert(JSON.stringify(detalle));
 }
-
-function Prioridad_ot(ot, almacen, despacho, punto) {
-  $.ajax({
-    type: "POST",
-    encoding: "UTF-8",
-    url: "../models/PW-SAP.php",
-    global: false,
-    error: function (OBJ, ERROR, JQERROR) {
-      //alert(JQERROR + " ");
-    },
-    data: {
+// FUNCIÓN PRIORIDAD OT
+async function Prioridad_ot(ot, almacen, despacho, punto) {
+  try {
+    const data = await enviarPeticion({
       op: 'Prioridad_ot',
+      link: "../models/PW-SAP.php",
       ot: ot,
       almacen: almacen,
       recojeDespachos: despacho, // Cambiado de 'despacho' a 'recojeDespachos'
       recojePuntoVenta: punto // Cambiado de 'punto' a 'recojePuntoVenta'
-    },
-    dataType: "json",
-    async: false,
-    success: function (data) {
-      if (data.Tipo != 'S') {
-        console.log("Error" + data.Msj);
-      } else {
-        console.log("Exito" + data.Msj);
-      }
-    }
-  }).fail(function (data) {
-    console.log(data);
-    // Swal.fire("Error", "Ocurrió un error al actualizar la prioridad", "error");
-  });
-}
+    });
 
+    if (data.Tipo != 'S') console.log("Error" + data.Msj);
+    else console.log("Exito" + data.Msj);
+  } catch (error) {
+    console.error(error);
+  }
+}
+// FUNCIÓN ORDENES
+// todo: código pendiente por refactorizar y modernizar
 function Ordenes() {
-  var entrega = $.trim($("#ped_entrega").val());
-  var NumTmp = $.trim($("#ped_numero").val());
-  var almacen = '';
-  switch ($.trim($("#ped_bodega").val())) {
+  let entrega = $.trim($("#ped_entrega").val());
+  let NumTmp = $.trim($("#ped_numero").val());
+  let pedidoBodega = $.trim($("#ped_bodega").val());
+  let almacen = '';
+  switch (pedidoBodega) {
     case '1100':
       almacen = 'D01';
-      break; //Monteria
+      break; // Monteria
     case '1200':
       almacen = 'C01';
-      break; //Cartagena 
+      break; // Cartagena 
     case '2100':
       almacen = 'M01';
-      break; //Medellin
+      break; // Medellin
     case '2200':
       almacen = 'B01';
-      break; //Bogota
+      break; // Bogota
     case '2300':
       almacen = 'L01';
-      break; //Cali
+      break; // Cali
     case '2400':
       almacen = 'R01';
-      break; //Barranquilla
+      break; // Barranquilla
   }
+
   if (entrega != 0 && entrega != '') {
-    var Num = $.trim($("#ped_ot").val());
-  
+    let Num = $.trim($("#ped_ot").val());
     if (Num == '0') {
       // Configuración inicial del Swal con checkboxes dinámicos
       let swalOptions = {
@@ -2748,23 +2652,21 @@ function Ordenes() {
         cancelButtonText: "Cancelar",
         closeOnConfirm: false,
         closeOnCancel: false,
-        html: `
-                <div style="text-align: left; margin-top: 20px;">
+        html: `<div style="text-align: left; margin-top: 20px;">
                     <label style="display: block; margin-bottom: 10px;">
                         <input type="checkbox" id="recojeDespachos" name="recojeDespachos"> 
                         Recoge en Despachos
                     </label>
-                    ${$.trim($("#ped_bodega").val()) == '1100' ?
-            `<label style="display: block;">
+                    ${pedidoBodega == '1100' ?
+                   `<label style="display: block;">
                         <input type="checkbox" id="recojePuntoVenta" name="recojePuntoVenta"> 
                         Recoge en Punto de venta
                     </label>` : ''}
-                </div>
-            `,
+              </div>`,
         preConfirm: () => {
           return {
             recojeDespachos: document.getElementById('recojeDespachos').checked,
-            recojePuntoVenta: $.trim($("#ped_bodega").val()) == '1100'
+            recojePuntoVenta: pedidoBodega == '1100'
               ? document.getElementById('recojePuntoVenta').checked : false
           }
         }
@@ -2872,60 +2774,50 @@ function Ordenes() {
     Swal.fire('Error', 'El pedido no tiene entrega, no se puede generar OT', 'error');
   }
 }
-
-function EliminarOT() {
-  var almacen = '';
-  switch ($.trim($("#ped_bodega").val())) {
+// FUNCIÓN ELIMINAR OT
+async function EliminarOT() {
+  let almacen = '';
+  let pedidoBodega = $.trim($("#ped_bodega").val());
+  switch (pedidoBodega) {
     case '1100':
       almacen = 'D01';
-      break; //Monteria
+      break; // Monteria
     case '1200':
       almacen = 'C01';
-      break; //Cartagena 
+      break; // Cartagena 
     case '2100':
       almacen = 'M01';
-      break; //Medellin
+      break; // Medellin
     case '2200':
       almacen = 'B01';
-      break; //Bogota
+      break; // Bogota
     case '2300':
       almacen = 'L01';
-      break; //Cali
+      break; // Cali
   }
-  $.ajax({
-    type: "POST",
-    encoding: "UTF-8",
-    url: "../models/WS-PW.php",
-    global: false,
-    error: function (OBJ, ERROR, JQERROR) {
-      alert(JQERROR + " ");
-    },
-    data: ({
+  try {
+    const result = await confirmAlert("Eliminar OT", "¿Está seguro(a) de eliminar la OT?");
+    if (!result.isConfirmed) return;
+  
+    const data = await enviarPeticion({
       op: 'ELIMINA_OT',
       ot: $.trim($("#ped_ot").val()),
       alm: almacen
-    }),
-    dataType: "json",
-    async: false,
-    success: function (data) { //alert(data);
-
-      if (data.Tipo != 'S') {
-        Swal.fire("Error", data.Msj, "error");
-      } else {
-        Swal.fire("Excelente", data.Msj, "success");
-        //Temporales propios
-        Temporales();
-        //Temporales de terceros
-        GestionPedidos();
-        $("#ModalOrdenes").modal("hide");
-      }
-
-    }
-  }).done(function (data) {
-    //console.log(data);	
-  });
+    });
+  
+    if (data.Tipo != 'S') {
+      Swal.fire("Error", data.Msj, "error");
+    } else {
+      Swal.fire("Excelente", data.Msj, "success");      
+      Temporales(); // Temporales propios      
+      GestionPedidos(); // Temporales de terceros
+      $("#ModalOrdenes").modal("hide");
+    }    
+  } catch (error) {
+    console.error(error);
+  }  
 }
-//Gestion de pedidos de terceros
+// GESTIÓN DE PEDIDOS DE TERCEROS
 function LimpiarGestionPedido() {
   ZonasVentas();
   $("#txtCodigoSAP").val('');
@@ -2937,7 +2829,7 @@ function LimpiarGestionPedido() {
 // FUNCIÓN GESTIÓN DE PEDIDOS
 const GestionPedidos = async () => {
   try {
-    LoadImg('Cargando... ⏳⏳⏳');
+    LoadImg('Cargando...');
     let TemporalesHistoria = $("#txtTemporalesHistoria").val();
 
     const dataPeticion = {
@@ -2981,7 +2873,7 @@ const GestionPedidos = async () => {
       <body>`;
 
     if (TemporalesHistoria == 'N') {
-      const data = await enviarPeticion({op: "S_GESTION_PEDIDOS", ...dataPeticion});
+      const data = await enviarPeticion({ op: "S_GESTION_PEDIDOS", ...dataPeticion });
       if (data.length) {
         data.forEach(item => {
           let transfer = '';
@@ -3056,10 +2948,10 @@ const GestionPedidos = async () => {
             <td style="font-size: 12px">${item.bodega}</td>
             <td class="size-td">${item.clase} - ${item.numero_sap}</td>
             <td class="size-td">
-                <p style="margin: 0; font-size: 12px">${item.cliente}</p>
-                <small style="font-weight: bold;">Zona ventas: 
-                  <span class="text-primary" style="font-size: 8px;">${item.zona_ventas} - ${item.zona_descripcion}</span>
-                </small>
+              <p style="margin: 0; font-size: 12px">${item.cliente}</p>
+              <small style="font-weight: bold;">Zona ventas: 
+                <span class="text-primary" style="font-size: 8px;">${item.zona_ventas} - ${item.zona_descripcion}</span>
+              </small>
             </td>
             <td class="size-td">${formatNum(item.valor_total, '$')}</td>
             <td class="size-td">${item.destinatario}</td>
@@ -3082,13 +2974,13 @@ const GestionPedidos = async () => {
         $("#VtotalTerceros").html('');
         let msgHtml = `
         <div class="alert alert-danger" role="alert">
-          <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+          <i class="fa-solid fa-triangle-exclamation"></i>
           <span class="sr-only">Error:</span>NO EXISTEN RESULTADOS PARA LAS CONDICIONES SELECCIONADAS
         </div>`;
         $("#DvRecuperablesTerceros").html(msgHtml);
       }
     } else {
-      const data = await enviarPeticion({op: "S_GESTION_PEDIDOS_HISTORIA", ...dataPeticion});
+      const data = await enviarPeticion({ op: "S_GESTION_PEDIDOS_HISTORIA", ...dataPeticion });
       if (data.length) {
         data.forEach(item => {
           headerTabla += `
@@ -3119,12 +3011,12 @@ const GestionPedidos = async () => {
         $("#VtotalTerceros").html(`<div class="alert alert-info" role="info"><b>VALOR TOTAL: ${formatNum(total, '$')}</b></div>`);
         $("#DvRecuperablesTerceros").html(headerTabla);
       } else {
-         $("#VtotalTerceros").html('');
-         let msgHtml = `
-         <div class="alert alert-danger" role="alert">
-          <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+        $("#VtotalTerceros").html('');
+        let msgHtml = `
+        <div class="alert alert-danger" role="alert">
+          <i class="fa-solid fa-triangle-exclamation"></i>
           <span class="sr-only">Error:</span>NO EXISTEN RESULTADOS PARA LAS CONDICIONES SELECCIONADAS
-         </div>`
+        </div>`;
         $("#DvRecuperablesTerceros").html(msgHtml);
       }
     }
@@ -3151,138 +3043,75 @@ const GestionPedidos = async () => {
     UnloadImg();
   }
 }
-
-function RecuperarHistorico(numero) {
-  Swal.fire({
-    title: "Esta seguro de restablecer el pedido temporal numero " + numero + "?",
-    text: "Tenga presente que las condiciones (Precios, Descuentos, Bonificaciones) serán recalculadas a la fecha actual",
-    icon: "question",
-    confirmButtonColor: "#82ED81",
-    cancelButtonColor: "#FFA3A4",
-    confirmButtonText: "Enviar!",
-    cancelButtonText: "No Enviar",
-    showLoaderOnConfirm: true,
-    showCancelButton: true,
-  }).then((result) => {
-    if (result.value) {
-      $.ajax({
-        type: "POST",
-        encoding: "UTF-8",
-        url: "../models/PW-SAP.php",
-        global: false,
-        error: function (OBJ, ERROR, JQERROR) {
-          alert(JQERROR);
-        },
-        beforeSend: function () {
-          LoadImg('Restaurando... ⏳⏳⏳');
-        },
-        data: ({
-          op: "G_PEDIDOS_HISTORIA_TMP",
-          numero: numero
-        }),
-        dataType: "json",
-        async: true,
-        success: function (data) {
-          if (!data.error) {
-            Swal.fire("Excelente", data.mensaje, "success");
-          } else {
-            Swal.fire("Oops", data.mensaje, "error");
-          }
-          GestionPedidos();
-        }
-      });
-
+// FUNCIÓN RECUPERAR HISTÓRICOS
+async function RecuperarHistorico(numero) {
+  try {
+    const result = await confirmAlert(`¿Está seguro(a) de restablecer el pedido temporal número ${numero}?`, "Tenga presente que las condiciones (Precios, Descuentos, Bonificaciones) serán recalculadas a la fecha actual");
+    if (result.isConfirmed) {
+      LoadImg('Restaurando...');
+      const data = await enviarPeticion({op: "G_PEDIDOS_HISTORIA_TMP", link: "../models/PW-SAP.php", numero});
+      if (!data.error) {
+        Swal.fire("Excelente", data.mensaje, "success");
+      } else {
+        Swal.fire("Oops", data.mensaje, "error");
+      }
+      GestionPedidos();
     } else {
-      Swal.fire("Cancelado", "Operacion cancelada por el usuario", "error");
-    }
-  }).done(function () {
+      Swal.fire("Cancelado", "Operación cancelada por el usuario", "warning");
+    }    
+  } catch (error) {
+    console.error(error);
+  } finally {
     UnloadImg();
-  });
+  } 
 }
-
-function GuardarDirecto() {
-  var numero = $("#ped_numero").val();
-  var op = '';
-  var numeroSAP = 0;
+// FUNCIÓN GUARDAR DIRECTO
+async function GuardarDirecto() {
+  let numero = $("#ped_numero").val();
+  let numeroSAP = 0;
+  let op = '';
+  
   if (VerficarPedido(numero) == 0) {
     op = 'NUEVO';
   } else {
     op = 'MODIFICAR';
     numeroSAP = NumeroSAP(numero);
   }
-  var BoniDatos = ValidarBonificados(numero);
+
+  let BoniDatos = ValidarBonificados(numero);
   if (parseInt(BoniDatos.Id) == 0) {
-    Swal.fire({
-      title: "Esta seguro de enviar el pedido numero " + numero + "?",
-      text: "Despues de aceptar no podra reversar la operacion!",
-      icon: "question",
-      confirmButtonColor: "#82ED81",
-      cancelButtonColor: "#FFA3A4",
-      confirmButtonText: "Enviar!",
-      cancelButtonText: "No Enviar",
-      showLoaderOnConfirm: true,
-      showCancelButton: true,
-    }).then((result) => {
-      if (result.value) {
-        let timerInterval
-        Swal.fire({
-          title: 'Guardando..',
-          html: '<img src="../resources/icons/preloader.gif" width="300px" heigth="300px">',
-          showConfirmButton: false
-        });
-        $.ajax({
-          type: "POST",
-          encoding: "UTF-8",
-          url: "../models/WS-PW.php",
-          global: false,
-          error: function (OBJ, ERROR, JQERROR) {
-            alert(JQERROR + " ");
-          },
-          data: ({
-            op: op,
-            numero: numero,
-            numeroSAP: numeroSAP
-          }),
-          dataType: "json",
-          async: true,
-          success: function (data) { //alert(data);return false;
-            if (data.Tipo == 'S') {
-              Swal.fire("Excelente!", data.Msj, "success");
-              var delayInMilliseconds = 2000; //1 segundo
-              setTimeout(function () {
-                //Temporales propios
-                Temporales();
-                //Temporales de terceros
-                GestionPedidos();
-                //Actualizacion de datos en modal
-                consultaOpciones(numero);
-                //-------------------------------
-              }, delayInMilliseconds);
-              return false;
-            } else {
-              Swal.fire("Oops..!", data.Msj, "error");
-              return false;
-            }
-
-
-          }
-        }).always(function (data) {
-          //console.log(data);	
-        });
+    const result = await confirmAlert(`¿Está seguro de enviar el pedido número ${numero}?`, "Después de aceptar no podrá reversar la operación");
+    if (result.isConfirmed) {
+      Swal.fire({
+        title: 'Guardando...',
+        html: '<img src="../resources/icons/preloader.gif" width="300px" heigth="300px">',
+        showConfirmButton: false
+      });
+      const data = await enviarPeticion({op: op, link: "../models/WS-PW.php", numero, numeroSAP});
+      if (data.Tipo == 'S') {
+        Swal.fire("Excelente!", data.Msj, "success");
+        setTimeout(function () {          
+          Temporales(); // Temporales propios          
+          GestionPedidos(); // Temporales de terceros          
+          consultaOpciones(numero); // Actualizacion de datos en modal
+        }, 2000);
+        return false;
       } else {
-        Swal.fire("Cancelado", "La operacion de guardado de pedido ha sido cancelada!", "error");
+        Swal.fire("Oops!!!", data.Msj, "error");
+        return false;
       }
-    })
+    } else {
+      Swal.fire("Cancelado", "La operación de guardado de pedido ha sido cancelada!", "warning");
+    }   
   } else {
     Swal.fire('Bonificados errados, imposible guardar', BoniDatos.Msj, 'error');
   }
-
 }
 // FUNCIÓN PARA GESTIONAR ENTREGAS
 const GestionEntregas = async () => {
   if ($.trim($("#CodigoSAPEntregas").val()) != '') {
     try {
-      LoadImg('Cargando... ⏳⏳⏳');
+      LoadImg('Cargando...');
       const data = await enviarPeticion({
         op: "S_ENTREGAS",
         link: "../models/PW-SAP.php",
@@ -3306,11 +3135,11 @@ const GestionEntregas = async () => {
               <th>CodDir</th>
             </tr>
           </thead>
-          <body>`; 
+          <body>`;
 
         data.forEach(item => {
-          tabla += 
-          `<tr>
+          tabla +=
+            `<tr>
             <td>${item.numero}</td>
             <td>${item.fecha_pedido}</td>
             <td>${item.clase}</td>
@@ -3343,11 +3172,11 @@ const GestionEntregas = async () => {
       } else {
         let msgHtml = `
         <div class="alert alert-danger" role="alert">
-          <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+          <i class="fa-solid fa-triangle-exclamation"></i>
           <span class="sr-only">Error:</span>NO EXISTEN RESULTADOS PARA LAS CONDICIONES SELECCIONADAS
         </div>`;
         $("#DvListaEntregas").html(msgHtml);
-      }      
+      }
     } catch (error) {
       console.log(error);
     } finally {
@@ -3355,7 +3184,7 @@ const GestionEntregas = async () => {
     }
   } else Swal.fire('Error', 'Debe seleccionar un cliente', 'error');
 }
-
+// FUNCIÓN LIMPIAR ENTREGAS
 function LimpiarEntregas() {
   $("#ClienteEntregas").val('');
   $("#CodigoSAPEntregas").val('');
@@ -3383,8 +3212,8 @@ const UnificarEntrega = async () => {
   } else {
     if (numeros != '') {
       try {
-        LoadImg('Cargando... ⏳⏳⏳');
-        const data = await enviarPeticion({op: "UNIFICA_ENTREGAS", link: "../models/WS-PW.php", numeros});
+        LoadImg('Cargando...');
+        const data = await enviarPeticion({ op: "UNIFICA_ENTREGAS", link: "../models/WS-PW.php", numeros });
         if (data.Tipo == 'S') {
           const result = await confirmAlert(`${data.Msj}, desea generar la OT?`, "Despues de aceptar no podra reversar la operación!");
           if (result.isConfirmed) {
@@ -3410,7 +3239,7 @@ const UnificarEntrega = async () => {
                 almacen = 'R01';
                 break; // Barranquilla
             }
-            const data = await enviarPeticion({op: "", link: "", almacen, entrega});
+            const data = await enviarPeticion({ op: "", link: "", almacen, entrega });
             if (data.Tipo != 'S') {
               Swal.fire("Error", data.Msj, "error");
             } else {
@@ -3428,13 +3257,13 @@ const UnificarEntrega = async () => {
         console.log(error);
       } finally {
         UnloadImg();
-      }     
+      }
     } else {
       Swal.fire('Error', 'Debe seleccionar por lo menos una entrega', 'error');
     }
   }
 }
-
+// FUNCIONES CORTAS PARA MOSTRAR ARCHIVOS
 function ExcelFactura(num) {
   if (num != 0 && num != '') window.open("../resources/Excel/ExcelFactura.php?num=" + num);
   else Swal.fire('Error', 'El pedido no posee factura.', 'error');
@@ -3459,7 +3288,6 @@ function TxtFactura(num) {
   if (num != 0 && num != '') window.open("../resources/TXT/TxtFactura.php?num=" + num);
   else Swal.fire('Error', 'El pedido no posee factura.', 'error');
 }
-
 // FUNCIÓN LISTAR FACTURAS
 const ListarFacturas = async () => {
   let DepId = $.trim($("#Dpto").val());
@@ -3477,9 +3305,9 @@ const ListarFacturas = async () => {
 
   if ((codigo != '') || (fact != '')) {
     try {
-      const data = await enviarPeticion({op: "S_FACTURAS", link: "../models/PW-SAP.php", codigo, fh1, fh2, fact});
+      const data = await enviarPeticion({ op: "S_FACTURAS", link: "../models/PW-SAP.php", codigo, fh1, fh2, fact });
       if (data.length) {
-          let tabla = `
+        let tabla = `
           <table class="display" width="100%" id="tableEntregas">
             <thead>
               <tr>
@@ -3496,12 +3324,12 @@ const ListarFacturas = async () => {
               </tr>
             </thead>
             <body>`;
-          let total = 0;
-          let iva = 0;
-          let subtotal = 0;
+        let total = 0;
+        let iva = 0;
+        let subtotal = 0;
 
-          data.forEach(item => {
-            tabla += `
+        data.forEach(item => {
+          tabla += `
                 <tr>
                   <td>${item.NUMERO_FACTURA}</td>
                   <td>${item.OFICINA_VENTAS}</td>
@@ -3520,14 +3348,14 @@ const ListarFacturas = async () => {
                     </div>
                   </td>
                 </tr>`;
-              subtotal += parseFloat(item.VALOR);
-              iva += parseFloat(item.IVA);
-              total += parseFloat(item.TOTAL);
-          });
+          subtotal += parseFloat(item.VALOR);
+          iva += parseFloat(item.IVA);
+          total += parseFloat(item.TOTAL);
+        });
 
-          tabla += `</body></table>`;
-          $("#DvListaFacturas").html(tabla);
-          let totalHTML = `
+        tabla += `</body></table>`;
+        $("#DvListaFacturas").html(tabla);
+        let totalHTML = `
             <div class="alert alert-info" role="info">
               <div class="container">
                 <div class="row">
@@ -3537,24 +3365,24 @@ const ListarFacturas = async () => {
                 </div>
               </div>
             </div>`;
-          $("#VtotalFacturas").html(totalHTML);
+        $("#VtotalFacturas").html(totalHTML);
       } else {
         let msgHtml = `
-          <div class="alert alert-danger" role="alert">
-            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-            <span class="sr-only">Error:</span>NO EXISTEN RESULTADOS PARA LAS CONDICIONES SELECCIONADAS
-          </div>`;
+        <div class="alert alert-danger" role="alert">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          <span class="sr-only">Error:</span>NO EXISTEN RESULTADOS PARA LAS CONDICIONES SELECCIONADAS
+        </div>`;
         $("#VtotalFacturas").html('');
         $("#DvListaFacturas").html(msgHtml);
       }
     } catch (error) {
       console.log(error);
-    }   
+    }
   } else {
     Swal.fire('Error', 'Debe seleccionar un cliente', 'error');
   }
 }
-
+// FUNCIONES DE LIMPIEZA
 function LimpiarFacturas() {
   $("#DvListaFacturas").html('');
   $("#txtFactCodigoCliente").val('');
@@ -3588,10 +3416,10 @@ const Faltante = async () => {
 
   if (codigo != '' || fact != undefined) {
     try {
-      LoadImg('Cargando... ⏳⏳⏳');
-      const data = await enviarPeticion({op: "S_FALTANTES", link: "../models/PW-SAP.php", codigo, fh1, fh2, fact});
+      LoadImg('Cargando...');
+      const data = await enviarPeticion({ op: "S_FALTANTES", link: "../models/PW-SAP.php", codigo, fh1, fh2, fact });
       if (data != '' && data != null) {
-         let tabla = `
+        let tabla = `
          <table class="table" align="center" id="tdFaltantes">
           <thead>
             <tr>
@@ -3652,8 +3480,7 @@ const Faltante = async () => {
     Swal.fire('Error', 'Debe seleccionar un cliente', 'error');
   }
 }
-
-//-----nuevas funciones para verificacion de pedidos
+// NUEVAS FUNCIONES PARA VERIFICACIÓN DE PEDIDOS
 function VerficarPedido(numTMP) {
   var result = 0;
   $.ajax({
@@ -3679,7 +3506,7 @@ function VerficarPedido(numTMP) {
   });
   return result;
 }
-
+// FUNCIÓN QUE RETORNA NÚMERO SAP
 function NumeroSAP(numTMP) {
   var result = 0;
   $.ajax({
@@ -3701,9 +3528,8 @@ function NumeroSAP(numTMP) {
   });
   return result;
 }
-
+// FUNCIÓN DATOS CUPO
 function datos_cupo() {
-
   return new Promise((resolve, reject) => {
     $.ajax({
       type: "POST",
@@ -3723,15 +3549,12 @@ function datos_cupo() {
     });
   });
 }
-
+// FUNCIÓN TOP 10 MATERIALES
 function top10_materiales() {
-
-
   var ano = new Date().getFullYear();
   var mes = new Date().getMonth() + 1;
 
   return new Promise((resolve, reject) => {
-
     $.ajax({
       type: "POST",
       url: "../models/PW-SAP.php",
@@ -3753,23 +3576,17 @@ function top10_materiales() {
       reject(error);
     });
   });
-
 }
-
+// FUNCIÓN PASAR MESES
 function pasarMeses(claves) {
-
   resultado = [];
-
   claves.forEach(clave => {
     resultado.push(clave.substr(2, clave.length));
   });
-
   return resultado;
 }
-
-
+// FUNCIÓN DATA COMPORTAMIENTO
 function dataComportamiento() {
-
   let datos = new Array();
   let datos_ant = new Array();
   let ano = new Date().getFullYear();
@@ -3777,7 +3594,6 @@ function dataComportamiento() {
   let ano_ant = new Date().getFullYear() - 1;
 
   return new Promise((resolve, reject) => {
-
     $.ajax({
       type: "POST",
       url: "../models/PW-SAP.php",
@@ -3799,10 +3615,8 @@ function dataComportamiento() {
     });
   })
 }
-
-
+// FUNCIÓN NOTA RÁPIDA
 function NotaRapida() {
-
   var nota = $.trim($("#NotasRapidas").val());
   var nump = $.trim($("#ped_numero").val());
   var nums = $.trim($("#ped_numero_sap").val());
@@ -3835,9 +3649,8 @@ function NotaRapida() {
     Swal.fire('Opps', 'El pedido ya posee entrega, no puede modificarse la nota!', 'error');
   }
 }
-
+// FUNCIÓN FILTROS TIPO PEDIDOS
 function FiltrosTipoPedidos(tipo) {
-  //8
   var valor = 0;
   var valor_total = 0;
   if (tipo == 'A') {
@@ -3865,8 +3678,7 @@ function FiltrosTipoPedidos(tipo) {
     $("#VtotalTerceros").html('<div class="alert alert-info" role="info"><b>VALOR TOTAL: ' + formatNum(valor_total, '$') + '</b></div>');
   }
 }
-
-////funcion para la consulta de datos de la feria
+// FUNCIÓN QUERY FERIA
 function QueryFeria(grupo) {
   var codigo = $("#txt_codigoSap").val();
   $.ajax({
@@ -4189,58 +4001,35 @@ function ValidarBonificados(numero) {
   return datos;
 }
 
-function CargaGruposClientes(grupo) {
-  $.ajax({
-    type: "POST",
-    encoding: "UTF-8",
-    url: "../models/CRM.php",
-    async: false,
-    dataType: "json",
-    beforeSend: function () { },
-    data: {
-      op: "S_GRUPOS_CLIENTES",
-      grupo: grupo
-    },
-    success: function (data) {
-      let options = '<option value="">SIN ASIGNAR</option>';
-      for (var i = 0; i <= data.length - 1; i++) {
-        options += '<option value="' + data[i].GRUPO + '">' + data[i].GRUPO + ' - ' + data[i].DESCRIPCION + '</option>';
-      }
+async function CargaGruposClientes(grupo) {
+  try {
+    let options = '<option value="">SIN ASIGNAR</option>';
+    const data = await enviarPeticion({op: "S_GRUPOS_CLIENTES", link: "../models/CRM.php", grupo});
+    if (data.length) {
+      data.forEach(item => options += `<option value="${item.GRUPO}">${item.GRUPO} '-' ${item.DESCRIPCION}</option>`);
       switch (grupo) {
         case 1:
-          {
-            $("#txtGrp1").html(options);
-          }
+          $("#txtGrp1").html(options);
           break;
         case 2:
-          {
-            $("#txtGrp2").html(options);
-          }
+          $("#txtGrp2").html(options);
           break;
         case 3:
-          {
-            $("#txtGrp3").html(options);
-          }
+          $("#txtGrp3").html(options);
           break;
         case 4:
-          {
-            $("#txtGrp4").html(options);
-          }
+          $("#txtGrp4").html(options);
           break;
         case 5:
-          {
-            $("#txtGrp5").html(options);
-          }
+          $("#txtGrp5").html(options);
           break;
       }
-
     }
-  }).fail(function (data) {
-    console.error(data);
-  });
+  } catch (error) {
+    console.error(error)
+  } 
 }
-
-//Nuevo para manejar permisos de Bodega 
+// NUEVO PARA MANEJAR PERMISOS DE BODEGA 
 function Permisos() {
   $.ajax({
     type: "POST",
@@ -4388,7 +4177,7 @@ const crearPedidoRedencion = async () => {
       try {
         $("#ModalPP").modal('hide');
         $("#ModalPPDetalle").modal('hide');
-        LoadImg('Generando solicitud, por favor espere... ⏳⏳⏳');
+        LoadImg('Generando solicitud, por favor espere...');
         const resp = await enviarPeticion(data);
         if (!resp.error) {
           if (resp.cod_error == 0) {
@@ -4567,7 +4356,6 @@ const Presupuesto_datos = async () => {
 function toggleButton(button, checkboxDivId) {
   // Alternar la clase 'btn-success' en el botón
   $(button).toggleClass('btn-light btn-success');
-
   // Alternar el estado visual del "checkbox" simulado
   toggleDivCheckbox(checkboxDivId);
 }
@@ -4767,13 +4555,13 @@ const validarCargaClientes = () => {
 }
 
 // EJECUCIÓN DE LAS FUNCIONALIDADES AL CARGAR EL DOM
-$(function () { 
+$(function () {
   Permisos(); // Validacion de permisos
   Notificaciones(); // Nuevas notificaciones emergentes - se quita porque se acabo la convención
   setInterval(function () {
     Notificaciones();
   }, 300000);
-  
+
   CargaGruposClientes(1); // Nueva distribución de grupos 
   CargaGruposClientes(2);
 
@@ -4815,7 +4603,7 @@ $(function () {
   $("#btnMenu9").click(function () {
     let num = $.trim($("#ped_numero").val());
     consultaOpciones(num);
-    showToastr("success", "Ejecutado correctamente", `<strong>ACTUALIZAR INFO PEDIDO ${num}</strong></br>`);   
+    showToastr("success", "Ejecutado correctamente", `<strong>ACTUALIZAR INFO PEDIDO ${num}</strong></br>`);
   });
 
   $("#exportar_gestion").click(function () {
@@ -5011,7 +4799,7 @@ $(function () {
   $("#OficinaEntregas").on('change', function () {
     GestionEntregas();
   });
-  
+
   // Búsqueda o carga de cliente según departamento
   let DepId = $("#Dpto").val();
   if (DepId == 10) {
@@ -5036,8 +4824,8 @@ $(function () {
       </button>
       </span>
     </div>`;
-    $("#colCliente").html(inputCliente);   
-    
+    $("#colCliente").html(inputCliente);
+
     let timer;
     $('#txt_cliente').autocomplete({
       source: function (request, response) {
@@ -5116,7 +4904,7 @@ $(function () {
     } else {
       $(this).addClass('DivCheckBoxTrue');
     }
-    
+
     id = $(this).attr("id");
     if (id == 'DvChkKits') {
       BuscarProductos();
@@ -5483,7 +5271,7 @@ $(function () {
       $("#n_resultados").text("");
     }
   });
-  
+
   // Nuevo para carga de archivo plano 
   $("#filename").val('');
   $("#filename").change(function (e) {
@@ -5576,7 +5364,7 @@ $(function () {
   } else {
     ListarCompetencia();
   }
-  
+
   $("#btnFeriaVirtual").click(function () { //Ferias virtuales
     let cod = $("#txt_codigoSap").val();
     if (cod != '') {
@@ -5584,13 +5372,13 @@ $(function () {
       QueryFeria(4);
     } else Swal.fire("Oops!!", "Debe seleccionar un cliente", "Warning");
   });
-  
+
   GruposArticulos(); // Grupos Articulos
   $("#txtGrupoArticulo").change(function () {
     $("#txt_bproductos").val($.trim($(this).val()));
     BuscarProductoArr(0);
-  });  
- 
+  });
+
   $("#btnDescuentos").on('click', function () {  // Descuentos ir
     activaTab('dvProductos');
     if ($("#txtGrp1").val() == '100') $("#txt_bproductos").val('OFERTA EXCLUSIVA CLIENTE WEB');
