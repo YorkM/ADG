@@ -215,6 +215,10 @@ Redireccionar();
       font-size: 10px !important;
     }
 
+    .size-11 {
+      font-size: 11px !important;
+    }
+
     .size-12 {
       font-size: 12px !important;
     }
@@ -750,7 +754,7 @@ Redireccionar();
                     <button type="button" id="btnMenu9" class="list-group-item text-start size-a" title="Refrescar">
                       <i class="fa-solid fa-arrows-rotate"></i> Refrescar
                     </button>
-                    <button type="button" id="btnMenu10" class="list-group-item text-start size-a" title="Log de modificaciones">
+                    <button type="button" id="btnMenu10" class="list-group-item text-start size-a" title="Log de notificaciones">
                       <i class="fa-solid fa-magnifying-glass-plus"></i> Historial
                     </button>
                   </ul>
@@ -1233,76 +1237,6 @@ Redireccionar();
 
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cerrar</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- MODAL FERIA VIRTUAL -->
-  <div class="modal fade" id="ModalFeriaVirtual" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" style="min-width: 60%;">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5">SEGUIMIENTO GRAN FERIA VIRTUAL MAYO</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-        </div>
-        <div class="modal-body" id="DetalleLog">
-          <div class="panel with-nav-tabs panel-info">
-            <div class="panel-heading">
-              <ul class="nav nav-tabs">
-                <li class=""><a href="#dvGenericos" data-toggle="tab" onClick="QueryFeria(1)">POPULARES</a></li>
-                <li class=""><a href="#dvPopulares" data-toggle="tab" onClick="QueryFeria(2)">GENERICOS</a></li>
-                <li class=""><a href="#dvFarma" data-toggle="tab" onClick="QueryFeria(3)">FARMA</a></li>
-                <li class="active"><a href="#dvOTC" data-toggle="tab" onClick="QueryFeria(4)">OTC</a></li>
-                <li class=""><a href="#dvGranSorteo" data-toggle="tab" onClick="QueryFeria(5)">RESUMEN</a></li>
-              </ul>
-            </div>
-            <div class="panel-body">
-              <div class="tab-content">
-                <div id="dvGenericos" class="tab-pane fade in active" role="dialog">
-                  <div class="alert alert-warning" role="alert">
-                    <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
-                    Evento válido desde el 02-05-2022 al 07-05-2022
-                  </div>
-                  <div id="dvPopularesDetalle"></div>
-                </div>
-                <div id="dvPopulares" class="tab-pane fade in" role="dialog">
-                  <div class="alert alert-warning" role="alert">
-                    <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
-                    Evento válido desde el 09-05-2022 al 14-05-2022
-                  </div>
-                  <div id="dvGenericosDetalle"></div>
-                </div>
-                <div id="dvFarma" class="tab-pane fade in " role="dialog">
-                  <div class="alert alert-warning" role="alert">
-                    <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
-                    Evento válido desde el 16-05-2022 al 21-05-2022
-                  </div>
-                  <div id="dvFarmaDetalle"></div>
-                </div>
-                <div id="dvOTC" class="tab-pane fade in " role="dialog">
-                  <div class="alert alert-sm alert-warning" role="alert">
-                    <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
-                    Evento válido desde el 23-05-2022 al 31-05-2022
-                  </div>
-                  <div id="dvOTCDetalle"></div>
-                </div>
-                <div id="dvGranSorteo" class="tab-pane fade in" role="dialog">
-                  <div class="alert alert-danger" role="alert">
-                    <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
-                    Estimado cliente, ten presente que solo podras reclamar las boletas semanales siempre y cuando cumplas
-                    con todas las semanas
-                  </div>
-                  <div id="dvGranSorteoDetalle"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <div>
-            <p align="left" id="valor_orden"></p>
-          </div>
           <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cerrar</button>
         </div>
       </div>

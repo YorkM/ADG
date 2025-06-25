@@ -2012,7 +2012,7 @@ const Temporales = async () => {
       });
     } else {
       let msgHtml = `
-      <div class="alert alert-danger" role="alert">
+      <div class="alert alert-danger mt-3" role="alert">
         <i class="fa-solid fa-triangle-exclamation"></i>
         <span class="sr-only">Error:</span>NO EXISTEN RESULTADOS PARA LAS CONDICIONES SELECCIONADAS
       </div>`;
@@ -2177,14 +2177,14 @@ const Guardar = async () => {
   let op = '';
   let numeroSAP = 0;
 
-  if (VerficarPedido(numero) == 0) {
+  if (await VerficarPedido(numero) == 0) {
     op = 'NUEVO';
   } else {
     op = 'MODIFICAR';
     numeroSAP = NumeroSAP(numero);
   }
 
-  let BoniDatos = ValidarBonificados(numero);
+  let BoniDatos = await ValidarBonificados(numero);
   if (parseInt(BoniDatos.Id) == 0) {
     if (numero != '' && numero > 0) {
       const result = await confirmAlert(`¿Está seguro(a) de enviar el pedido número ${numero}?`, "Después de aceptar no podrá reversar la operación!!!");
@@ -3071,14 +3071,14 @@ async function GuardarDirecto() {
   let numeroSAP = 0;
   let op = '';
   
-  if (VerficarPedido(numero) == 0) {
+  if (await VerficarPedido(numero) == 0) {
     op = 'NUEVO';
   } else {
     op = 'MODIFICAR';
     numeroSAP = NumeroSAP(numero);
   }
 
-  let BoniDatos = ValidarBonificados(numero);
+  let BoniDatos = await ValidarBonificados(numero);
   if (parseInt(BoniDatos.Id) == 0) {
     const result = await confirmAlert(`¿Está seguro de enviar el pedido número ${numero}?`, "Después de aceptar no podrá reversar la operación");
     if (result.isConfirmed) {
@@ -3481,101 +3481,51 @@ const Faltante = async () => {
   }
 }
 // NUEVAS FUNCIONES PARA VERIFICACIÓN DE PEDIDOS
-function VerficarPedido(numTMP) {
-  var result = 0;
-  $.ajax({
-    type: "POST",
-    encoding: "UTF-8",
-    url: "../models/PW-SAP.php",
-    global: false,
-    error: function (OBJ, ERROR, JQERROR) { },
-    beforeSend: function () { },
-    data: ({
-      op: 'VERIFY_PEDIDO',
-      numTMP: numTMP
-    }),
-
-
-    dataType: "json",
-    async: false,
-    success: function (data) {
-      result = data[0].ESTADO;
-    }
-  }).always(function (data) {
-    //console.log('Estado pedido : '+data);
-  });
+async function VerficarPedido(numTMP) {
+  let result = 0;
+  try {
+    const data = await enviarPeticion({op: "VERIFY_PEDIDO", link: "../models/PW-SAP.php", numTMP: numTMP});
+    result = data[0].ESTADO;
+  } catch (error) {
+    console.error(error);
+  }  
   return result;
 }
 // FUNCIÓN QUE RETORNA NÚMERO SAP
-function NumeroSAP(numTMP) {
-  var result = 0;
-  $.ajax({
-    type: "POST",
-    encoding: "UTF-8",
-    url: "../models/PW-SAP.php",
-    global: false,
-    error: function (OBJ, ERROR, JQERROR) { },
-    beforeSend: function () { },
-    data: ({
-      op: 'NUMERO_SAP',
-      numTMP: numTMP
-    }),
-    dataType: "json",
-    async: false,
-    success: function (data) {
-      result = data[0].NUMERO_SAP;
-    }
-  });
+async function NumeroSAP(numTMP) {
+  let result = 0;
+  try {
+    const data = await enviarPeticion({op: 'NUMERO_SAP', link: "../models/PW-SAP.php", numTMP: numTMP});
+    result = data[0].NUMERO_SAP;
+  } catch (error) {
+    console.error(error);
+  }
   return result;
 }
 // FUNCIÓN DATOS CUPO
-function datos_cupo() {
-  return new Promise((resolve, reject) => {
-    $.ajax({
-      type: "POST",
-      url: "../models/PW-SAP.php",
-      async: true,
-      dataType: "json",
-      data: {
-        op: "S_CUPO_CREDITO",
-        org: $.trim($("#Organizacion").val()),
-        codigo: $.trim($("#txt_codigoSap").val())
-      },
-      success: function (data) {
-        resolve(data)
-      }
-    }).fail(function (data) {
-      reject(data)
-    });
-  });
+async function datos_cupo() {
+  let org = $.trim($("#Organizacion").val());
+  let codigo = $.trim($("#txt_codigoSap").val());
+  try {
+    const data = await enviarPeticion({op: "S_CUPO_CREDITO", link: "../models/PW-SAP.php", org, codigo});
+    return data;
+  } catch (error) {
+    console.log(error);
+  } 
 }
 // FUNCIÓN TOP 10 MATERIALES
-function top10_materiales() {
-  var ano = new Date().getFullYear();
-  var mes = new Date().getMonth() + 1;
+async function top10_materiales() {
+  let ano = new Date().getFullYear();
+  let mes = new Date().getMonth() + 1;
+  let cod = $("#txt_codigoSap").val();
+  let org = $("#Organizacion").val();
 
-  return new Promise((resolve, reject) => {
-    $.ajax({
-      type: "POST",
-      url: "../models/PW-SAP.php",
-      beforeSend: function () { },
-      data: ({
-        op: 'B_TOP20_MATERIALES',
-        cod: $("#txt_codigoSap").val(),
-        org: $("#Organizacion").val(),
-        ano: ano,
-        mes: mes
-      }),
-      dataType: "json",
-      async: true,
-      success: function (data) {
-        resolve(data);
-
-      }
-    }).fail(function (error) {
-      reject(error);
-    });
-  });
+  try {
+    const data = await enviarPeticion({op: 'B_TOP20_MATERIALES', link: "../models/PW-SAP.php", cod, org, ano,  mes});
+    return data;
+  } catch (error) {
+    console.error(error);
+  } 
 }
 // FUNCIÓN PASAR MESES
 function pasarMeses(claves) {
@@ -3586,87 +3536,55 @@ function pasarMeses(claves) {
   return resultado;
 }
 // FUNCIÓN DATA COMPORTAMIENTO
-function dataComportamiento() {
-  let datos = new Array();
-  let datos_ant = new Array();
+async function dataComportamiento() {
   let ano = new Date().getFullYear();
   let mes = new Date().getMonth() + 1;
-  let ano_ant = new Date().getFullYear() - 1;
-
-  return new Promise((resolve, reject) => {
-    $.ajax({
-      type: "POST",
-      url: "../models/PW-SAP.php",
-      beforeSend: function () { },
-      data: ({
-        op: 'B_FACTURACION_MES',
-        cod: $("#txt_codigoSap").val(),
-        org: $("#Organizacion").val(),
-        ano: ano,
-        mes: mes
-      }),
-      dataType: "json",
-      async: true,
-      success: function (data) {
-        resolve(data)
-      }
-    }).fail(function (error) {
-      reject();
-    });
-  })
+  let org = $("#Organizacion").val();
+  let cod = $("#txt_codigoSap").val().trim();
+  if (cod === "") {
+    cod = $('#CodigoSAP').val();
+  }
+  try {
+    const data = await enviarPeticion({op: 'B_FACTURACION_MES', link: "../models/PW-SAP.php", cod, org, ano, mes});
+    return data;
+  } catch (error) {
+    console.error(error);
+  }  
 }
 // FUNCIÓN NOTA RÁPIDA
-function NotaRapida() {
-  var nota = $.trim($("#NotasRapidas").val());
-  var nump = $.trim($("#ped_numero").val());
-  var nums = $.trim($("#ped_numero_sap").val());
-  var entr = $.trim($("#ped_entrega").val());
+async function NotaRapida() {
+  let nota = $.trim($("#NotasRapidas").val());
+  let nump = $.trim($("#ped_numero").val());
+  let nums = $.trim($("#ped_numero_sap").val());
+  let entr = $.trim($("#ped_entrega").val());
+
   if (entr == '' || entr == 0 || entr == '0') {
-    $.ajax({
-      type: "POST",
-      encoding: "UTF-8",
-      url: "../models/PW-SAP.php",
-      global: false,
-      error: function (OBJ, ERROR, JQERROR) {
-        alert(JQERROR);
-      },
-      data: ({
-        op: "U_NOTAS",
-        nota: nota,
-        nump: nump
-      }),
-      dataType: "html",
-      async: false,
-      success: function (data) {
-        if (nums != 0) {
-          GuardarDirecto();
-        } else {
-          Swal.fire('Excelente', 'Nota actualizada con éxito.', 'success');
-        }
-      }
-    });
+    try {
+      const data = await enviarPeticion({op: "U_NOTAS", link: "../models/PW-SAP.php", nota, nump});
+      if (nums != 0) GuardarDirecto();
+      else Swal.fire('Excelente', 'Nota actualizada con éxito.', 'success');
+    } catch (error) {
+      console.log(error);
+    }   
   } else {
     Swal.fire('Opps', 'El pedido ya posee entrega, no puede modificarse la nota!', 'error');
   }
 }
 // FUNCIÓN FILTROS TIPO PEDIDOS
 function FiltrosTipoPedidos(tipo) {
-  var valor = 0;
-  var valor_total = 0;
+  let valor = 0;
+  let valor_total = 0;
+
   if (tipo == 'A') {
-    $("#tableRescueTerceros tr:gt(0)").each(function (index, element) {
+    $("#tableRescueTerceros tr:gt(0)").each(function () {
       $(this).show();
-      //console.log('-='+$(this).find("td").eq(4).html())
       valor = $.trim(unformatNum($(this).find("td").eq(4).html()));
       valor_total += parseFloat(valor);
-
-    })
-    $("#VtotalTerceros").html('<div class="alert alert-info" role="info"><b>VALOR TOTAL: ' + formatNum(valor_total, '$') + '</b></div>');;
+    });
+    $("#VtotalTerceros").html(`<div class="alert alert-info" role="info"><strong>VALOR TOTAL: ${formatNum(valor_total, '$')}</strong></div>`);
   } else {
-    $("#tableRescueTerceros tr").each(function (index, element) {
-      tipoPed = $.trim($(this).find("td").eq(8).html());
-
-      //console.log(tipoPed +'!= '+tipo+' - -'+valor)
+    $("#tableRescueTerceros tr").each(function () {
+      let tipoPed = $.trim($(this).find("td").eq(8).html());
       if (tipoPed != tipo) {
         $(this).hide();
       } else {
@@ -3675,338 +3593,109 @@ function FiltrosTipoPedidos(tipo) {
         valor_total += parseFloat(valor);
       }
     });
-    $("#VtotalTerceros").html('<div class="alert alert-info" role="info"><b>VALOR TOTAL: ' + formatNum(valor_total, '$') + '</b></div>');
+    $("#VtotalTerceros").html(`<div class="alert alert-info" role="info"><strong>VALOR TOTAL: ${formatNum(valor_total, '$')}</strong></div>`);
   }
 }
-// FUNCIÓN QUERY FERIA
-function QueryFeria(grupo) {
-  var codigo = $("#txt_codigoSap").val();
-  $.ajax({
-    type: "POST",
-    encoding: "UTF-8",
-    url: "../models/PW-SAP.php",
-    global: false,
-    error: function (OBJ, ERROR, JQERROR) {
-      alert(JQERROR);
-    },
-    data: ({
-      op: "S_FERIA",
-      grupo: grupo,
-      codigo: codigo
-    }),
-    beforeSend: function () {
-      LoadImg("Consultando Información");
-    },
-    dataType: "json",
-    async: true,
-    success: function (data) {
-      if (data.length > 0) {
-        var tabla_consolidado = '';
-        var tabla = '';
-        var tabla_resumen = '';
-        tabla = '<table class="table" align="center" id="tdFeria" width="95%">'
-          + '<thead>'
-          + '<tr>'
-          + '<th data-breakpoints="xs">Grupo/Nit</th>'
-          + '<th data-breakpoints="xs">Descripción</th>'
-          + '<th data-breakpoints="xs">Compras</th>'
-          + '<th data-breakpoints="xs">Estado</th>'
-          + '</tr>'
-          + '</thead>'
-          + '<body>';
-        //----------------------------------------------------------------------------------
-        tabla_resumen = '<table class="table" align="center" id="tdFeriaResumen" width="95%">'
-          + '<thead>'
-          + '<tr>'
-          + '<th data-breakpoints="xs">Codigo/Grupo</th>'
-          + '<th data-breakpoints="xs">Nombre/grupo</th>'
-          + '<th data-breakpoints="xs">Monto</th>'
-          + '<th data-breakpoints="xs">Compras</th>'
-          + '<th data-breakpoints="xs">Estado</th>'
-          + '</tr>'
-          + '</thead>'
-          + '<body>';
-        var cant_grupos = 0;
-        var cant_cumple = 0;
-        var cant_cumpleR = 0;
-        var vlr_total = 0;
-        var vlr_compras = 0;
-        var vlr_cumple = 0;
-        var cant_boleta = 0;
-        var img = '';
-        for (var i = 0; i <= data.length - 1; i++) {
-          //----ESTATUS SEMANAL----------------------------------------------------------------------------------------------------
-          var status = '<button type="button" class="btn btn-sm btn-danger" aria-label="Left Align">'
-            + '<span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span>'
-            + '</button>';
-          if (parseFloat(data[i].COMPRAS) > 0) {
-            status = '<button type="button" class="btn btn-sm btn-success" aria-label="Left Align">'
-              + '<span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span>'
-              + '</button>';
-            cant_cumple++;
-            vlr_cumple += parseInt(parseFloat(data[i].COMPRAS) / parseFloat(data[i].VALOR));
-          }
-          //---ESTAUS RESUMEN-----------------------------------------------------------------------------------------------------
-          var statusR = '<button type="button" class="btn btn-sm btn-danger" aria-label="Left Align">'
-            + '<span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span>'
-            + '</button>';
-          if (parseFloat(data[i].ESTATUS) == 1) {
-            statusR = '<button type="button" class="btn btn-sm btn-success" aria-label="Left Align">'
-              + '<span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span>'
-              + '</button>';
-            cant_cumpleR++;
-          }
-          //--------------------------------------------------------------------------------------------------------
-          var cod = '';
-          if (grupo != 5) {
-            cod = data[i].GRUPO_ARTICULO;
-            tabla += '<tr>'
-              + '<td>' + cod + '</td>'
-              + '<td>' + data[i].DESCRIPCION1 + '</td>'
-              + '<td>' + formatNum(data[i].COMPRAS, '$') + '</td>'
-              + '<td align="center">' + status + '</td>'
-              + '</tr>';
-          } else {
-            tabla_resumen += '<tr>'
-              + '<td>' + data[i].CODIGO_GRUPO + '</td>'
-              + '<td>' + data[i].NOMBRE_GRUPO + '</td>'
-              + '<td>' + formatNum(1000000, '$') + '</td>'
-              + '<td>' + formatNum(data[i].COMPRAS, '$') + '</td>'
-              + '<td align="center">' + statusR + '</td>'
-              + '</tr>';
-          }
-
-          cant_grupos++;
-          vlr_total += parseFloat(data[i].VALOR);
-          vlr_compras += parseFloat(data[i].COMPRAS);
-        }
-        tabla += '</tbody></table>';
-        //--------------------------------------------------------------------------------
-        var img_resumen = '';
-        var bol_resumen = 0;
-        if (cant_cumpleR == 4) {
-          img_resumen = '<img src="../resources/icons/riendo.gif" width="80"  heigth="80"/>';
-          bol_resumen = 4;
-        } else {
-          img_resumen = '<img src="../resources/icons/llorando.gif" width="80"  heigth="80"/>';
-        }
-        tabla_resumen += '<tr>'
-          + '<td colspan="2" align="center">' + img_resumen + '</td>'
-          + '<td colspan="3" align="center"><b><h3>BOLETAS ' + bol_resumen + '</h3></b></td>'
-          + '</tr>' + '</tbody></table>';
-        //--------------------------------------------------------------------------------
-
-        if ( /*cant_cumple >= 10 && */ vlr_compras >= 1000000) {
-          cant_boleta = 1;
-          img = '<img src="../resources/icons/riendo.gif" width="64"  heigth="64"/>';
-        } else {
-          cant_boleta = 0;
-          img = '<img src="../resources/icons/llorando.gif" width="64"  heigth="64"/>';
-        }
-
-        if (grupo != 5) {
-          tabla_consolidado = '<table class="form" width="100%" align="center" id="tdFeriaEncabezado">'
-            + '<tbody>'
-            + '<tr>'
-            + '<td colspan="4" align="center"><img src="../resources/icons/logo_aniversario.png" width="128"  heigth="128"/></td>'
-            + '</tr>'
-            + '<tr>'
-            + '<td colspan="4" class="alert alert-info"><b>GRUPOS DISPONIBLES</b></td>'
-            + '</tr>'
-            + '<tr>'
-            + '<td>#GRUPOS</td>'
-            + '<td>' + cant_grupos + '</td>'
-            + '<td>VALOR TOTAL</td>'
-            +
-            //'<td>'+formatNum(vlr_total,'$')+'</td>'+
-            '<td>' + formatNum(1000000, '$') + '</td>'
-            + '</tr>'
-            + '<tr>'
-            + '<td colspan="4" class="alert alert-success"><b>COMPRAS REALIZADAS</b></td>'
-            + '</tr>'
-            + '<tr>'
-            + '<td>#GRUPOS</td>'
-            + '<td>' + cant_cumple + '</td>'
-            + '<td>VALOR TOTAL</td>'
-            + '<td>' + formatNum(vlr_compras, '$') + '</td>'
-            + '</tr>'
-            + '<tr>'
-            + '<td colspan="2" align="center">' + img + '</td>'
-            + '<td colspan="2" align="center"><b><h3>BOLETAS ' + cant_boleta + '</h3></b></td>'
-            + '</tr>'
-            + '</tbody>'
-            + '</table>';
-        } else { }
-
-      } else {
-        tabla = '<div class="alert alert-danger" role="alert">'
-          + '<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>'
-          + '<span class="sr-only">Error:</span>NO EXISTEN RESULTADOS PARA LAS CONDICIONES SELECCIONADAS' + '</div>';
-      }
-      switch (parseInt(grupo)) {
-        case 1:
-          {
-            $("#dvPopularesDetalle").html(tabla_consolidado + tabla)
-          }
-          break;
-        case 2:
-          {
-            $("#dvGenericosDetalle").html(tabla_consolidado + tabla)
-          }
-          break;
-        case 3:
-          {
-            $("#dvFarmaDetalle").html(tabla_consolidado + tabla)
-          }
-          break;
-        case 4:
-          {
-            $("#dvOTCDetalle").html(tabla_consolidado + tabla)
-          }
-          break;
-        case 5:
-          {
-            $("#dvGranSorteoDetalle").html(tabla_resumen)
-          }
-          break;
-      }
-
-    }
-  }).always(function () {
-    UnloadImg();
-  })
-}
-
+// FUNCIÓN DESCARGAR EXCEL
 function DescargarExcel(OPC) {
   switch (OPC) {
     case 'PEDIDO':
-      {
-        var num = $.trim($("#ped_numero").val());
-        ExcelPedido(num);
-      }
+      var num = $.trim($("#ped_numero").val());
+      ExcelPedido(num);
       break;
     case 'ENTREGA':
-      {
-        var numE = $.trim($("#ped_entrega").val());
-        var numP = $.trim($("#ped_numero_sap").val());
-        ExcelEntrega(numE, numP)
-      }
+      var numE = $.trim($("#ped_entrega").val());
+      var numP = $.trim($("#ped_numero_sap").val());
+      ExcelEntrega(numE, numP)
       break;
     case 'OT':
-      {
-        var num = $.trim($("#ped_ot").val());
-        ExcelOrden(num);
-      }
+      var num = $.trim($("#ped_ot").val());
+      ExcelOrden(num);
       break;
     case 'FACTURA':
-      {
-        var num = $("#ped_factura").val();
-        ExcelFactura(num);
-      }
+      var num = $("#ped_factura").val();
+      ExcelFactura(num);
       break;
   }
-
 }
-
-function LogDatos() {
-  var Ped = $("#ped_numero").val() == 0 ? '' : $("#ped_numero").val();
-  var PedSAP = $("#ped_numero_sap").val() == 0 ? '' : $("#ped_numero_sap").val();
-  var Entrega = $("#ped_entrega").val() == 0 ? '' : $("#ped_entrega").val();
-  var Orden = $("#ped_ot").val() == 0 ? '' : $("#ped_ot").val();
-  var Factura = $("#ped_factura").val() == 0 ? '' : $("#ped_factura").val();
-  $.ajax({
-    type: "POST",
-    encoding: "UTF-8",
-    url: "../models/PW-SAP.php",
-    global: false,
-    error: function (OBJ, ERROR, JQERROR) {
-      alert(JQERROR);
-    },
-    data: ({
+// FUNCIÓN PARA GRABAR LOG DE DATOS
+async function LogDatos() {
+  let Ped = $("#ped_numero").val() == 0 ? '' : $("#ped_numero").val();
+  let PedSAP = $("#ped_numero_sap").val() == 0 ? '' : $("#ped_numero_sap").val();
+  let Entrega = $("#ped_entrega").val() == 0 ? '' : $("#ped_entrega").val();
+  let Orden = $("#ped_ot").val() == 0 ? '' : $("#ped_ot").val();
+  let Factura = $("#ped_factura").val() == 0 ? '' : $("#ped_factura").val();
+  try {
+    const data = await enviarPeticion({
       op: "CONSULTA_LOG",
+      link: "../models/PW-SAP.php",
       Ped: Ped,
       PedSAP: PedSAP,
       Entrega: Entrega,
       Orden: Orden,
       Factura: Factura
-    }),
-    dataType: "json",
-    async: false,
-    success: function (data) {
-      if (data != '' && data != null) {
-        var tabla = '<table class="table" align="center" id="tdLog">'
-          + '<thead>'
-          + '<tr>'
-          + '<th data-breakpoints="xs">ID</th>'
-          + '<th data-breakpoints="xs">TIPO</th>'
-          + '<th data-breakpoints="xs">ACCION</th>'
-          + '<th data-breakpoints="xs">MENSAJE</th>'
-          + '<th data-breakpoints="xs">USUARIO</th>'
-          + '<th data-breakpoints="xs">FECHA_HORA</th>'
-          + '<th data-breakpoints="xs">DOCUMENTO</th>'
-          + '</tr>'
-          + '</thead>'
-          + '<body>';
-        var cont = 0;
-        var total = 0;
-        var usr = '';
-        var visualizar = '';
-        for (var i = 0; i <= data.length - 1; i++) {
-          tabla += '<tr>'
-            + '<td>' + data[i].ID + '</td>'
-            + '<td>' + data[i].TIPO + '</td>'
-            + '<td>' + data[i].ACCION + '</td>'
-            + '<td>' + data[i].MENSAJE + '</td>'
-            + '<td>' + data[i].USUARIO + '</td>'
-            + '<td>' + data[i].FECHA_HORA + '</td>'
-            + '<td>' + data[i].DOCUMENTO + '</td>'
-            + '</tr>';
-          //total+=parseFloat(data[i].VALOR);
-        }
-        tabla += '</body></table>';
-        $("#DetalleLog").html(tabla);
-      } else {
-        $("#DetalleLog").html('<div class="alert alert-danger" role="alert">'
-          + '<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>'
-          + '<span class="sr-only">Error:</span>NO EXISTEN RESULTADOS PARA LAS CONDICIONES SELECCIONADAS' + '</div>');
-      }
+    });
+    if (data.length) {
+      let tabla = `
+      <table class="table table-bordered table-hover table-sm" width="100%" id="tdLog">
+        <thead>
+          <tr>
+            <th class="bag-info text-green">ID</th>
+            <th class="bag-info text-green">TIPO</th>
+            <th class="bag-info text-green">ACCION</th>
+            <th class="bag-info text-green">MENSAJE</th>
+            <th class="bag-info text-green">USUARIO</th>
+            <th class="bag-info text-green">FECHA/HORA</th>
+            <th class="bag-info text-green">DOCUMENTO</th>
+          </tr>
+        </thead>
+        <body>`;
+      data.forEach(item => {
+        tabla += `
+        <tr>
+          <td class="size-11">${item.ID}</td>
+          <td class="size-11">${item.TIPO}</td>
+          <td class="size-11">${item.ACCION}</td>
+          <td class="size-11">${item.MENSAJE}</td>
+          <td class="size-11">${item.USUARIO}</td>
+          <td class="size-11">${item.FECHA_HORA}</td>
+          <td class="size-11">${item.DOCUMENTO}</td>
+        </tr>`;
+      });
+      tabla += `</body></table>`;
+      $("#DetalleLog").html(tabla);
+    } else {
+      let msgHtml = `
+      <div class="alert alert-danger" role="alert">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span class="sr-only">Error:</span>NO EXISTEN RESULTADOS PARA LAS CONDICIONES SELECCIONADAS
+      </div>`;
+      $("#DetalleLog").html(msgHtml);
     }
-  });
-
-  $("#ModalOpciones").modal('hide');
-  $("#ModalLog").modal('show');
-
+    $("#ModalOpciones").modal('hide');
+    $("#ModalLog").modal('show');
+  } catch (error) {
+    console.error(error);
+  }
 }
-
-function ValidarBonificados(numero) {
-  //var numero = $.trim($("#ped_numero").val());
-  var datos;
-  $.ajax({
-    type: "POST",
-    encoding: "UTF-8",
-    url: "../models/PW-SAP.php",
-    global: false,
-    data: ({
-      op: "VALIDA_BONIFICADO_S",
-      numero: numero
-    }),
-    dataType: "json",
-    async: false,
-    success: function (data) {
-      datos = data;
-    }
-  }).fail(function (data) {
-    console.error(data);
-  });
+// FUNCIÓN PARA VALIDAR BONIFICADOS
+async function ValidarBonificados(numero) {
+  let datos;
+  try {
+    const data = enviarPeticion({op: "VALIDA_BONIFICADO_S", link: "../models/PW-SAP.php", numero});
+    datos = data;
+  } catch (error) {
+    console.error(error);
+  }
   return datos;
 }
-
+// FUNCIÓN CARGAR GRUPOS DE CLIENTES
 async function CargaGruposClientes(grupo) {
   try {
     let options = '<option value="">SIN ASIGNAR</option>';
     const data = await enviarPeticion({op: "S_GRUPOS_CLIENTES", link: "../models/CRM.php", grupo});
     if (data.length) {
-      data.forEach(item => options += `<option value="${item.GRUPO}">${item.GRUPO} '-' ${item.DESCRIPCION}</option>`);
+      data.forEach(item => options += `<option value="${item.GRUPO}">${item.GRUPO} - ${item.DESCRIPCION}</option>`);
       switch (grupo) {
         case 1:
           $("#txtGrp1").html(options);
@@ -4030,33 +3719,22 @@ async function CargaGruposClientes(grupo) {
   } 
 }
 // NUEVO PARA MANEJAR PERMISOS DE BODEGA 
-function Permisos() {
-  $.ajax({
-    type: "POST",
-    encoding: "UTF-8",
-    url: "../models/PW-SAP.php",
-    dataType: "json",
-    data: {
-      op: "S_PERMISOS",
-      rol: $("#Rol").val(),
-      modulo: '0101'
-    },
-    async: false,
-    success: function (data) {
-      if (data.length > 0) {
-        for (var i = 0; i < data.length; i++) {
-          d = data[i];
-          if (d.id_mod_per == 1023) {
-            Perm_Cambiar_Bodega = d.chck;
-          }
-
+async function Permisos() {
+  let rol = $("#Rol").val();
+  try {
+    const data = await enviarPeticion({op: "S_PERMISOS", link: "../models/PW-SAP.php", rol, modulo: '0101'});
+    if (data.length) {
+      data.forEach(item => {
+        if (item.id_mod_per == 1023) {
+          Perm_Cambiar_Bodega = item.chck;
         }
-      }
-
+      });
     }
-  });
+  } catch (error) {
+    console.error(error);
+  } 
 }
-
+// FUNCIÓN CONSULTAR PUNTOS
 const consultarPuntos = async (codigo_sap) => {
   try {
     const resp = await enviarPeticion({
@@ -4073,7 +3751,7 @@ const consultarPuntos = async (codigo_sap) => {
     console.log();
   }
 }
-
+// FUNCIÓN CONSULTAR OBSEQUIOS
 const consultarObsequios = async () => {
   const organizacion = $.trim($("#Organizacion").val());
   const oficina = $.trim($("#txt_oficina").val());
@@ -4121,22 +3799,21 @@ const consultarObsequios = async () => {
     console.log(error);
   }
 }
-
+// FUNCIÓN REDIMIR PUNTOS
 const redimirProducto = async (codigo, url) => {
   const organizacion = $.trim($("#Organizacion").val());
   const oficina = $.trim($("#txt_oficina").val());
   const lista = $.trim($("#txt_lista").val());
-  const data = {
-    link: "../models/PW-SAP.php",
-    op: "S_OBSEQUIOS_PUNTOS_PRODUCTO",
-    organizacion,
-    oficina,
-    codigo,
-    lista
-  }
   try {
-    const resp = await enviarPeticion(data);
-    resp.forEach(function (d, i) {
+    const resp = await enviarPeticion({
+      link: "../models/PW-SAP.php",
+      op: "S_OBSEQUIOS_PUNTOS_PRODUCTO",
+      organizacion,
+      oficina,
+      codigo,
+      lista
+  });
+    resp.forEach(function (d) {
       $("#redimePuntos").val(d.puntos);
       $("#redimeProducto").val(codigo);
       $("#descripcionDetallePuntos").html(`<h4><b>${d.descripcion}</b></h4>`);
@@ -4149,8 +3826,17 @@ const redimirProducto = async (codigo, url) => {
   $("#imgDetalle").attr('src', url);
   $("#ModalPPDetalle").modal('show');
 }
-
+// FUNCIÓN CREAR PEDIDO REDENCIÓN
 const crearPedidoRedencion = async () => {
+  const result = await confirmAlert("¿Esta seguro de redimir este producto?", "Una vez iniciado el proceso no se puede reversar");
+  if (result.isConfirmed) {
+
+  } else {
+
+  }
+
+// TODO: AQUÍ QUEDÉ CON LA REFACTORIACIÓN DEL CÓDIGO - ARRANCAR AQUÍ
+
   Swal.fire({
     title: "¿Esta seguro de redimir este producto?",
     text: "Una vez iniciado el proceso no se puede reversar",
@@ -4551,6 +4237,157 @@ const validarCargaClientes = () => {
     }
   } else {
     LoadArrayCli();
+  }
+}
+// FUNCIÓN PARA MOSTRAR MENSAJES DINÁMICOS - ESTADISTICAS
+function mostrarMensaje(selector, tipo = 'info', mensaje = 'Cargando...') {
+  $(selector).html(`<div class="alert alert-${tipo}">${mensaje}</div>`);
+}
+// FUNCIÓN PARA CARGAR COMPRAS POR MES - ESTADISTICAS
+async function cargarComprasMes() {
+  const selector = "#container";
+  mostrarMensaje(selector, 'danger', 'Cargando...');
+  try {
+    const resp = await dataComportamiento();
+    const claves = pasarMeses(resp.claves);
+
+    Highcharts.chart('container', {
+      chart: { type: 'column' },
+      title: { text: 'Compras mes a mes' },
+      subtitle: { text: '12 meses atrás' },
+      xAxis: { categories: claves, crosshair: true },
+      yAxis: {
+        min: 0,
+        title: { text: 'Valor compra' }
+      },
+      legend: { enabled: false },
+      tooltip: {
+        headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+        pointFormat: `<span style="color:{point.color}">{point.name}</span>: <b>{point.y:,.0f}</b><br/>`
+      },
+      plotOptions: {
+        column: { pointPadding: 0.2, borderWidth: 0 },
+        dataLabels: { enabled: true }
+      },
+      series: [{ name: 'valores', data: resp.datos }]
+    });
+
+  } catch (err) {
+    console.error(err);
+    mostrarMensaje(selector, 'danger', 'Se produjo un error!');
+  }
+}
+// FUNCIÓN CARGAR TOP 20 PRODUCTOSM - ESTADISTICAS
+async function cargarTopProductos() {
+  const selector = "#container2";
+  mostrarMensaje(selector, 'warning', 'Cargando...');
+  try {
+    const resp = await top10_materiales();
+    const ano = new Date().getFullYear();
+
+    const data = resp.map(item => ({
+      name: `(${item.codigo_material}) ${item.descripcion}`,
+      y: Math.round(item.frecuencia)
+    }));
+
+    if (!data.length) {
+      $(selector).html(`<h4>Top 20 de productos más comprados</h4><br><div class="alert alert-danger">Sin resultados!</div>`);
+      return;
+    }
+
+    Highcharts.chart('container2', {
+      chart: { type: 'column' },
+      title: { text: 'Top 20 de productos más comprados' },
+      subtitle: { text: `Frecuencia de compra: ${ano}` },
+      accessibility: {
+        announceNewData: { enabled: true }
+      },
+      xAxis: { type: 'category' },
+      yAxis: {
+        title: { text: 'Frecuencia de compra' }
+      },
+      legend: { enabled: false },
+      plotOptions: {
+        series: {
+          borderWidth: 0,
+          dataLabels: {
+            enabled: true,
+            format: '{point.y:f}'
+          }
+        }
+      },
+      tooltip: {
+        headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+        pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:f}</b><br/>'
+      },
+      series: [{
+        name: "Materiales",
+        colorByPoint: true,
+        data: data
+      }]
+    });
+
+  } catch (err) {
+    console.error(err);
+    mostrarMensaje(selector, 'danger', 'Se produjo un error!');
+  }
+}
+// FUNCIÓN CARGAR CUPO CREDITO - ESTADISTICAS
+async function cargarCupoCredito() {
+  const selector = "#container3";
+  mostrarMensaje(selector, 'info', 'Cargando...');
+  try {
+    const resp = await datos_cupo();
+    let datos = [];
+
+    if (resp.length > 0) {
+      datos = [
+        { name: 'Disponible', y: parseInt(resp[0].DISPONIBLE), sliced: true, selected: true },
+        { name: 'Comprometido', y: parseInt(resp[0].COMPROMETIDO) }
+      ];
+
+      $("#cupo_txt1").text(`COMPROMETIDO : ${formatNum(resp[0].COMPROMETIDO, '$')}`);
+      $("#cupo_txt2").text(`DISPONIBLE   : ${formatNum(resp[0].DISPONIBLE, '$')}`);
+    } else {
+      datos = [
+        { name: 'Disponible', y: 100, sliced: true, selected: true },
+        { name: 'Comprometido', y: 0 }
+      ];
+      $("#cupo_txt1").text('COMPROMETIDO : $0');
+      $("#cupo_txt2").text(`DISPONIBLE   : ${$("#txt_cupo").val()}`);
+    }
+
+    Highcharts.chart('container3', {
+      chart: {
+        plotBackgroundColor: null,
+        plotBorderWidth: null,
+        plotShadow: false,
+        type: 'pie'
+      },
+      title: { text: 'Cupo de crédito' },
+      tooltip: { pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>' },
+      accessibility: {
+        point: { valueSuffix: '%' }
+      },
+      plotOptions: {
+        pie: {
+          allowPointSelect: true,
+          cursor: 'pointer',
+          dataLabels: {
+            enabled: true,
+            format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+          }
+        }
+      },
+      series: [{
+        name: 'Cupo',
+        data: datos
+      }]
+    });
+
+  } catch (err) {
+    console.error(err);
+    mostrarMensaje(selector, 'danger', 'Se produjo un error!');
   }
 }
 
@@ -4975,7 +4812,6 @@ $(function () {
   //Teclas de acceso rapido
   $(document).keyup(function (e) {
     tecla = e.keyCode;
-    //Ubicar y limpiar caja de texto de busqueda de productos
     if (tecla == 113) { //Funcion tecla F2 
       var sw = 0;
       if ($("#liProductos").hasClass("disabled")) {
@@ -5001,234 +4837,25 @@ $(function () {
         Guardar();
       }
     }
-
-
   });
-  //==================================NUEVO PARA EDICION DE PEDIDOS======================================================
+  // NUEVO PARA EDICION DE PEDIDOS
   $("#btnEditar").click(function () {
     $("#ModalEditarPedidos").modal("show");
   });
-
+  // CLICK ESTADISTICAS DE COMPRAS Y MÁS
   $("#btnEstadisticas").click(function () {
-    // Comportamiento();
     $("#ModalEstadisticas").modal("show");
-    $("#container").html(`<div class="alert alert-danger">Cargando...</div>`);
-    dataComportamiento()
-      .then(resp => {
-
-        let claves = pasarMeses(resp.claves);
-
-        Highcharts.chart('container', {
-          chart: {
-            type: 'column'
-          },
-          title: {
-            text: 'Compras mes a mes'
-          },
-          subtitle: {
-            text: '12 meses atrás'
-          },
-          xAxis: {
-            categories: claves,
-            crosshair: true
-          },
-          yAxis: {
-            min: 0,
-            title: {
-              text: 'Valor compra'
-            }
-          },
-          legend: {
-            enabled: false
-          },
-          tooltip: {
-            headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
-            pointFormat: `<span style="color:{point.color}">{point.name}</span>: <b>{point.y:,.0f}</b> of total<br/>`
-          },
-          plotOptions: {
-            column: {
-              pointPadding: 0.2,
-              borderWidth: 0
-            },
-            dataLabels: {
-              enabled: true,
-            }
-          },
-          series: [{
-            name: 'valores',
-            data: resp.datos
-
-          },]
-        });
-
-      })
-      .catch(err => {
-        console.log(err);
-        $("#container").html(`<div class="alert alert-danger">Se produjo un error!</div>`);
-      })
-
-    $("#container2").html(`<div class="alert alert-warning">Cargando...</div>`);
-    top10_materiales()
-      .then(resp => {
-
-        let ano = new Date().getFullYear();
-        let mes = new Date().getMonth() + 1;
-        let pluginArrayArg = new Array();
-        let jsonArray = '';
-
-        resp.forEach(item => {
-
-          let dato = new Object();
-          dato.name = '(' + item.codigo_material + ') ' + item.descripcion;
-          dato.y = Math.round(item.frecuencia);
-          pluginArrayArg.push(dato);
-        })
-        jsonArray = JSON.parse(JSON.stringify(pluginArrayArg));
-
-        if (pluginArrayArg.length > 0) {
-
-          Highcharts.chart('container2', {
-            chart: {
-              type: 'column'
-            },
-            title: {
-              text: 'TOP 20 DE PRODUCTOS MAS COMPRADOS'
-            },
-            subtitle: {
-              text: 'Frecuencia de compra : ' + ano
-            },
-            accessibility: {
-              announceNewData: {
-                enabled: true
-              }
-            },
-            xAxis: {
-              type: 'category'
-            },
-            yAxis: {
-              title: {
-                text: 'Frecuencia de compra'
-              }
-
-            },
-            legend: {
-              enabled: false
-            },
-            plotOptions: {
-              series: {
-                borderWidth: 0,
-                dataLabels: {
-                  enabled: true,
-                  format: '{point.y:f}'
-                }
-              }
-            },
-
-            tooltip: {
-              headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
-              pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:f}</b> <br/>'
-            },
-
-            series: [{
-              name: "Browsers",
-              colorByPoint: true,
-              data: jsonArray
-            }]
-
-          });
-        } else {
-
-          $("#container2").html('<h4>TOP 20 DE PRODUCTOS MAS COMPRADOS</h4><br><div class="alert alert-danger">Sin resultados!</div>');
-
-        }
-
-      }).catch(err => {
-        console.error(err);
-        $("#container2").html(`<div class="alert alert-danger">Se produjo un error!</div>`);
-      });
-
-
-    $("#container3").html(`<div class="alert alert-info">Cargando...</div>`);
-    datos_cupo()
-      .then(resp => {
-
-        let datos = '';
-
-        if (resp.length > 0) {
-          datos = [{
-            name: 'Disponible',
-            y: parseInt(resp[0].DISPONIBLE),
-            sliced: true,
-            selected: true
-          }, {
-            name: 'Comprometido',
-            y: parseInt(resp[0].COMPROMETIDO)
-          }];
-          $("#cupo_txt1").text('COMPROMETIDO : ' + formatNum(resp[0].COMPROMETIDO, '$'));
-          $("#cupo_txt2").text('DISPONIBLE   : ' + formatNum(resp[0].DISPONIBLE, '$'));
-        } else {
-          datos = [{
-            name: 'Disponible',
-            y: 100,
-            sliced: true,
-            selected: true
-          }, {
-            name: 'Comprometido',
-            y: 0
-          }];
-          $("#cupo_txt1").text('COMPROMETIDO : ' + formatNum(0, '$'));
-          $("#cupo_txt2").text('DISPONIBLE   : ' + $("#txt_cupo").val());
-        }
-
-        Highcharts.chart('container3', {
-          chart: {
-            plotBackgroundColor: null,
-            plotBorderWidth: null,
-            plotShadow: false,
-            type: 'pie'
-          },
-          title: {
-            text: 'CUPO DE CRÉDITO'
-          },
-          tooltip: {
-            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-          },
-          accessibility: {
-            point: {
-              valueSuffix: '%'
-            }
-          },
-          plotOptions: {
-            pie: {
-              allowPointSelect: true,
-              cursor: 'pointer',
-              dataLabels: {
-                enabled: true,
-                format: '<b>{point.name}</b>: {point.percentage:.1f} %'
-              }
-            }
-          },
-          series: [{
-            name: 'Brands',
-            // colorByPoint: true,
-            data: datos
-          }]
-        });
-      })
-      .catch(err => {
-        console.error(err);
-        $("#container3").html(`<div class="alert alert-danger">Se produjo un error!</div>`);
-      });
-
+    cargarComprasMes();
+    cargarTopProductos();
+    cargarCupoCredito();
   });
-
-
+  // CLICK BUSCAR Y EDITAR
   $("#btnBuscarEditar").click(function () {
     if ($("#EdtNumeroPedido").val() != '' && $("#EdtNumeroPedido").val() > 0) {
       EditarPedido($("#EdtNumeroPedido").val(), $("#EdtTipo").val());
     }
   });
-
+  // EVENTO DE TECLADO PARA BÚSQUEDA DE PRODUCTOS
   $("#txt_bproductos").keyup(function (e) {
     tecla = (document.all) ? e.keyCode : e.which;
     valor = $.trim($(this).val());
@@ -5364,14 +4991,6 @@ $(function () {
   } else {
     ListarCompetencia();
   }
-
-  $("#btnFeriaVirtual").click(function () { //Ferias virtuales
-    let cod = $("#txt_codigoSap").val();
-    if (cod != '') {
-      $("#ModalFeriaVirtual").modal('show');
-      QueryFeria(4);
-    } else Swal.fire("Oops!!", "Debe seleccionar un cliente", "Warning");
-  });
 
   GruposArticulos(); // Grupos Articulos
   $("#txtGrupoArticulo").change(function () {

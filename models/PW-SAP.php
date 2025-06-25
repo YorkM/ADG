@@ -100,8 +100,6 @@ switch ( $_POST[ 'op' ] ) {
     }
     break;
   case 'B_FACTURACION_MES':
-    {
-
       $sp = mssql_init( 'P_VENTAS_MES_A_MES' );
       mssql_bind( $sp, '@CODIGO_SAP', $_POST[ "cod" ], SQLVARCHAR, false, false );
       mssql_bind( $sp, '@ORG', $_POST[ "org" ], SQLVARCHAR, false, false );
@@ -126,21 +124,21 @@ switch ( $_POST[ 'op' ] ) {
       mssql_bind( $sp2, '@ORG', $_POST[ "org" ], SQLVARCHAR, false, false );
       $r2 = mssql_execute( $sp2 );
 
-      while ( $row = mssql_fetch_assoc( $r2 ) ) {
-
-        foreach ( $claves as $k ) {
-
-          if ( array_key_exists( $k, $row ) ) {
-            $matriz[] = $row[ $k ] /*array($k=>$row[$k])*/ ;
+      if ($r2) {
+        while ( $row = mssql_fetch_assoc( $r2 ) ) {
+  
+          foreach ( $claves as $k ) {
+  
+            if ( array_key_exists( $k, $row ) ) {
+              $matriz[] = $row[ $k ] /*array($k=>$row[$k])*/ ;
+            }
           }
         }
+  
+        echo json_encode( array('claves' => $claves, 'datos' => $matriz ) );
+      } else {
+        echo json_encode(['ok' => false, 'msg' => "Error al obtener datos de comportamiento"]);
       }
-
-      echo json_encode( array(
-        'claves' => $claves,
-        'datos' => $matriz
-      ) );
-    }
     mssql_close();
     break;
   case 'B_TOP20_MATERIALES':
