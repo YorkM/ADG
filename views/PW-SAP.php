@@ -1,5 +1,5 @@
 <?php
-/* DESARROLLADO POR ING CRISTIAN BULA 09-12-2016 */
+// DESARROLLADO POR ING CRISTIAN BULA 09-12-2016
 header("Cache-Control: no-cache, must-revalidate");
 header("Expires: Sat, 1 Jul 2000 05:00:00 GMT");
 include('../models/funciones.php');
@@ -169,8 +169,8 @@ Redireccionar();
     }
 
     .size-th {
-      font-size: 14px;
-      color: #055160;
+      font-size: 14px !important;
+      color: #055160 !important;
     }
 
     .text-green {
@@ -1282,7 +1282,7 @@ Redireccionar();
   </div>
   <!-- MODAL TOP 20 MAS VENDIDOS 100 Y 130 -->
   <div class="modal fade" id="ModalTop20_100_130" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" style="min-width: 60%;">
+    <div class="modal-dialog" style="min-width: 80%;">
       <div class="modal-content">
         <div class="modal-header">
           <h1 class="modal-title fs-5">Top 20 Productos destacados</h1>
@@ -1500,7 +1500,7 @@ Redireccionar();
   </div>
   <!-- MODAL AJUSTE BÚSQUEDA -->
   <div class="modal fade" id="ModalAjustesBusqueda" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" style="min-width: 50%;">
+    <div class="modal-dialog" style="min-width: 70%;">
       <div class="modal-content">
         <div class="modal-header">
           <h1 class="modal-title fs-5" id="exampleModalLabel">Configuración de búsqueda</h1>

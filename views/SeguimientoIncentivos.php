@@ -150,7 +150,7 @@
                                 <label for="proveedor">Proveedor - GA</label>
                             </div>
                             <div class="col-md-9">
-                                <select class="form-select form-select-sm" id="proveedor">
+                                <select class="form-select form-select-sm" id="proveedor" multiple="multiple">
 
                                 </select>
                             </div>
@@ -219,6 +219,7 @@
                                 <th>N°</th>
                                 <th>OFICINA VENTAS</th>
                                 <th>PROVEEDOR - GA</th>
+                                <th>PROVEEDORES</th>
                                 <th>DESCRIPCIÓN</th>
                                 <th>CUOTA EN VALORES</th>
                                 <th>CUOTA EN IMPACTOS</th>
@@ -236,7 +237,7 @@
                 </div>
             </div>
             <div class="tab-pane fade p-2" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
-                <h4 class="text-center text-green">Seguimiento Incentivo - Liquidación Proveedor</h4>
+                <h5 class="text-center text-green">SEGUIMIENTO INCENTIVO - LIQUIDACIÓN PROVEEDOR</h5>
                 <div class="overflow mt-3 mb-3">
                     <table class="table table-bordered table-sm" id="tablaPorcentajes">
                         <thead class="table-info">
@@ -265,7 +266,7 @@
                         </tbody>
                     </table>
                 </div>
-                <h4 class="text-center text-green">Resumen por Proveedor - Por Zonas de Ventas</h4>
+                <h5 class="text-center text-green">RESUMEN POR PROVEEDOR - POR ZONAS DE VENTAS</h5>
                 <div class="overflow mt-3 mb-3">
                     <table class="table table-bordered table-hover table-sm mx-auto" id="tablaResumen" style="width: 60%;">
                         <thead class="table-info">
@@ -302,7 +303,7 @@
             </div>
             <div class="tab-pane fade p-2" id="nav-profile-2" role="tabpanel" aria-labelledby="nav-profile-tab">
                 <input type="hidden" id="seguimientoOculto">               
-                <h4 class="text-center text-green mb-3">Gestionar Datos Nota Crédito</h4>
+                <h5 class="text-center text-green mb-3">GESTIONAR DATOS NOTA CRÉDITO</h5>
                 <div style="width: 98%; margin: 0 auto;">
                     <div class="row justify-content-center mb-2" style="border: 1px solid #ccc; padding: 15px; border-radius: 5px;">
                         <div class="col-md-5">
@@ -322,7 +323,7 @@
                         </div>
                     </div>
                 </div>
-                <h4 class="text-center text-green mb-3 mt-5">Liquidación FDV - Beneficiarios</h4>
+                <h5 class="text-center text-green mb-3 mt-5">LIQUIDACIÓN FDV - BENEFICIARIOS</h5>
                 <div class="overflow mt-3 mb-3" id="contenedorTablaLiquidacion">
                     
                 </div>               
@@ -349,19 +350,35 @@
                 </div>
                 <div class="modal-body" style="padding-bottom: 30px;">
                     <div class="row">
-                        <div class="col-md-5">
+                        <div class="col-md-6">
                             <div class="form-group">
                                 <label for="cuotaValor">Cuota en Valores</label>
                                 <input type="text" class="form-control form-control-sm" id="cuotaValor">
                             </div>
                         </div>
-                        <div class="col-md-5">
+                        <div class="col-md-6">
                             <div class="form-group">
                                 <label for="cuotaImpacto">Cuota en Impactos</label>
                                 <input type="text" class="form-control form-control-sm" id="cuotaImpacto">
                             </div>
                         </div>
-                        <div class="col-md-2 align-self-end">
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="fechaInicioEdi">Fecha Inicio</label>
+                                <input type="date" class="form-control form-control-sm" id="fechaInicioEdi">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="fechaFinalEdi">Fecha Final</label>
+                                <input type="date" class="form-control form-control-sm" id="fechaFinalEdi">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-12 align-self-end">
                             <button class="btn btn-outline-primary btn-sm w-100" id="actualizarDatos">Actualizar</button>
                         </div>
                     </div>

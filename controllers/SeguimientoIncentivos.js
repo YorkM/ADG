@@ -16,7 +16,6 @@ const confirmAlert = async (title, text) => {
         confirmButtonText: 'Aceptar',
         cancelButtonText: 'Cancelar'
     });
-
     return result;
 }
 
@@ -65,7 +64,7 @@ const getGruposArticulos = async () => {
 
     let grupos = `<option value="">0000 - TODOS</option>`;
     resp.data.forEach(item => {
-        grupos += `<option value="${item.GRUPO_ARTICULO}">${item.GRUPO_ARTICULO} - ${item.DESCRIPCION1}</option>`;
+        grupos += `<option value="${item.GRUPO_ARTICULO.trim()}">${item.GRUPO_ARTICULO} - ${item.DESCRIPCION1}</option>`;
     });
     $('#proveedor').html(grupos);
 }
@@ -73,7 +72,8 @@ const getGruposArticulos = async () => {
 const guardarDatosBase = async () => {
     const orgVentas = $('#numOrg').val();
     const oficinaVentas = $('#oficina').val();
-    const proveedor = $('#proveedor').val().trim();
+    const proveedorDos = $('#proveedor').val().join('-');
+    const proveedor = proveedorDos.split("-")[0];
     const cuotaValor = $('#cuotaValores').val().replace(/^\$|\.|,/g, "");
     const cuotaImpactos = $('#cuotaImpactos').val();
     const tipoSeguimiento = $('#seguimiento').val();
@@ -94,6 +94,7 @@ const guardarDatosBase = async () => {
         orgVentas,
         oficinaVentas,
         proveedor,
+        proveedorDos,
         cuotaValor,
         cuotaImpactos,
         tipoSeguimiento,
@@ -174,6 +175,7 @@ const getDatosBase = async () => {
                 <td class="custom-td-2">${item.ID}</td>
                 <td class="custom-td">${item.OFICINA_VENTAS}</td>
                 <td class="custom-td">${item.PROVEEDOR}</td>
+                <td class="custom-td">${item.PROVEEDOR_2}</td>
                 <td class="custom-td">${item.DESCRIPCION1}</td>
                 <td class="custom-td-2">${formatNum(item.CUOTA_VALOR, "$")}</td>
                 <td class="custom-td-2">${item.CUOTA_IMPACTOS}</td>
@@ -203,12 +205,13 @@ const getDatosBase = async () => {
             idSeguimiento: fila.eq(0).text(),
             oficina: fila.eq(1).text(),
             grupoArticulo: fila.eq(2).text(),
-            descProveedor: fila.eq(3).text(),
-            cuota: fila.eq(4).text(),
-            impacto: fila.eq(5).text(),
-            tipoSeguimiento: fila.eq(6).text(),
-            fechaInicio: fila.eq(7).text(),
-            fechaFinal: fila.eq(8).text()
+            grupoArticulo2: fila.eq(3).text(),
+            descProveedor: fila.eq(4).text(),
+            cuota: fila.eq(5).text(),
+            impacto: fila.eq(6).text(),
+            tipoSeguimiento: fila.eq(7).text(),
+            fechaInicio: fila.eq(8).text(),
+            fechaFinal: fila.eq(9).text()
         }
 
         sessionStorage.ItemSeguimiento = JSON.stringify(item);
@@ -221,14 +224,18 @@ const getDatosBase = async () => {
 
         const item = {
             idSeguimiento: fila.eq(0).text(),
-            cuota: fila.eq(4).text(),
-            impacto: fila.eq(5).text()
+            cuota: fila.eq(5).text(),
+            impacto: fila.eq(6).text(),
+            fechaInicio: fila.eq(8).text(),
+            fechaFinal: fila.eq(9).text()
         }
 
         sessionStorage.ItemActualizar = JSON.stringify(item);
 
         $('#cuotaValor').val(item.cuota);
         $('#cuotaImpacto').val(item.impacto);
+        $('#fechaInicioEdi').val(item.fechaInicio);
+        $('#fechaFinalEdi').val(item.fechaFinal);
         $('#modalSeguimiento').modal('show');
     });
 }
@@ -237,10 +244,14 @@ const gestionarSeguimiento = async (item) => {
     try {
         showLoadingSwalAlert2("Cargando los datos... Espere un momento", false, true);
 
-        const { idSeguimiento, organizacion, oficina, grupoArticulo, descProveedor, cuota, impacto, tipoSeguimiento, fechaInicio, fechaFinal } = item;
+        const { idSeguimiento, organizacion, oficina, grupoArticulo, grupoArticulo2, descProveedor, cuota, impacto, tipoSeguimiento, fechaInicio, fechaFinal } = item;
         let zona = oficina.substring(0, 2);
         let fechaRappelsMes = fechaInicio.split("-")[1];
         let fechaRappelsAnio = fechaInicio.split("-")[0];
+
+        let grupoArray = grupoArticulo2.split("-");
+        let grupoArrayIN = grupoArray.map(item => `'${item}'`).join(", ");
+        console.log(grupoArrayIN);
 
         $('#seguimientoOculto').val(idSeguimiento);
 
@@ -249,7 +260,7 @@ const gestionarSeguimiento = async (item) => {
             link: "../models/SeguimientoIncentivos.php",
             organizacion,
             zona,
-            grupoArticulo,
+            grupoArticulo: grupoArrayIN,
             fechaInicio,
             fechaFinal
         });
@@ -499,20 +510,26 @@ const gestionarDatosNota = async () => {
             gestionarSeguimiento(item);
         }
     }
+
+    getResumenIncentivos();
 }
 // FUNCIÓN PARA ACTUALIZAR LOS DATOS BASE
 const actualizarDatos = async () => {
-    let { idSeguimiento, cuota, impacto } = JSON.parse(sessionStorage.ItemActualizar);
+    let { idSeguimiento, cuota, impacto, fechaInicio, fechaFinal } = JSON.parse(sessionStorage.ItemActualizar);
     cuota = cuota.replace(/^\$|\.|,/g, "");
     const cuotaValor = $('#cuotaValor').val().replace(/^\$|\.|,/g, "");
     const cuotaImpacto = $('#cuotaImpacto').val();
+    const fechaInicioEdi = $('#fechaInicioEdi').val();
+    const fechaFinalEdi = $('#fechaFinalEdi').val();
 
-    if (cuota === cuotaValor && impacto === cuotaImpacto) {
+    console.log({ cuota, cuotaValor, impacto, cuotaImpacto, fechaInicio, fechaInicioEdi, fechaFinal, fechaFinalEdi });
+
+    if (cuota === cuotaValor && impacto === cuotaImpacto && fechaInicio === fechaInicioEdi && fechaFinal === fechaFinalEdi) {
         $('#modalSeguimiento').modal('hide');
         return; 
     }
 
-    const result = await confirmAlert("Actualizar Datos", "Se actualizará la Cuota en Valores y la Cuota en Impactos... ¿Desea continuar?");
+    const result = await confirmAlert("Actualizar Datos", "Se actualizarán los datos... ¿Desea continuar?");
     if (!result.isConfirmed) return;
 
     const resp = await enviarPeticion({
@@ -520,7 +537,9 @@ const actualizarDatos = async () => {
         link: "../models/SeguimientoIncentivos.php",
         idSeguimiento,
         cuotaValor,
-        cuotaImpacto
+        cuotaImpacto,
+        fechaInicioEdi,
+        fechaFinalEdi
     });
 
     if (resp.ok) {
@@ -537,7 +556,11 @@ $(function () {
     getDatosBase();
 
     setTimeout(() => {
-        $("#oficina, #proveedor").select2();
+        $("#oficina").select2();
+        $('#proveedor').select2({
+            placeholder: "Seleccione uno o varios grupo de articulos",
+            allowClear: true
+        });
     }, 500);
 
     const oficinas = OficinasVentas('S');

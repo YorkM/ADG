@@ -17,13 +17,14 @@ switch ($_POST['op']) {
         $orgVentas = $_POST["orgVentas"];
         $oficinaVentas = $_POST["oficinaVentas"];
         $proveedor = $_POST["proveedor"];
+        $proveedorDos = $_POST["proveedorDos"];
         $cuotaValor = $_POST["cuotaValor"];
         $cuotaImpactos = $_POST["cuotaImpactos"];
         $tipoSeguimiento = $_POST["tipoSeguimiento"];
         $fechaInicio = $_POST["fechaInicio"];
         $fechaFinal = $_POST["fechaFinal"];
 
-        $query = "INSERT INTO T_SEGUIMIENTO_INCENTIVOS (ORGANIZACION_VENTAS, OFICINA_VENTAS, PROVEEDOR, CUOTA_VALOR, CUOTA_IMPACTOS, TIPO_SEGUIMIENTO, FECHA_INICIO, FECHA_FINAL) VALUES ('$orgVentas', '$oficinaVentas', '$proveedor', '$cuotaValor', '$cuotaImpactos', '$tipoSeguimiento', '$fechaInicio', '$fechaFinal')";
+        $query = "INSERT INTO T_SEGUIMIENTO_INCENTIVOS (ORGANIZACION_VENTAS, OFICINA_VENTAS, PROVEEDOR, PROVEEDOR_2, CUOTA_VALOR, CUOTA_IMPACTOS, TIPO_SEGUIMIENTO, FECHA_INICIO, FECHA_FINAL) VALUES ('$orgVentas', '$oficinaVentas', '$proveedor', '$proveedorDos', '$cuotaValor', '$cuotaImpactos', '$tipoSeguimiento', '$fechaInicio', '$fechaFinal')";
 
         $resultado = mssql_query($query);
         if ($resultado) echo json_encode(['ok' => true, 'msg' => "Se insertaron los datos correctamente"]);
@@ -61,7 +62,7 @@ switch ($_POST['op']) {
                 WHERE CAST(FECHA_PEDIDO AS DATE) 
                     BETWEEN  CAST('$fechaInicio' AS DATE) 
                     AND CAST('$fechaFinal' AS DATE)
-                    AND GRUPO_ARTICULOS = '$grupoArticulo'
+                    AND GRUPO_ARTICULOS IN ($grupoArticulo)
                     AND ORGANIZACION_VENTAS = '$organizacion'
                     AND VF.ZONA_VENTAS LIKE '$zona%'
                 GROUP BY 
@@ -118,8 +119,12 @@ switch ($_POST['op']) {
         $idSeguimiento = intval($_POST["idSeguimiento"]);
         $cuotaValor = $_POST["cuotaValor"];
         $cuotaImpacto = $_POST["cuotaImpacto"];
+        $fechaInicioEdi = $_POST["fechaInicioEdi"];
+        $fechaFinalEdi = $_POST["fechaFinalEdi"];
 
-        $query = "UPDATE T_SEGUIMIENTO_INCENTIVOS SET CUOTA_VALOR = '$cuotaValor', CUOTA_IMPACTOS = '$cuotaImpacto' WHERE ID = $idSeguimiento";
+        $query = "UPDATE T_SEGUIMIENTO_INCENTIVOS 
+                  SET CUOTA_VALOR = '$cuotaValor', CUOTA_IMPACTOS = '$cuotaImpacto', FECHA_INICIO = '$fechaInicioEdi', FECHA_FINAL = '$fechaFinalEdi' 
+                  WHERE ID = $idSeguimiento";
 
         $resultado = mssql_query($query);
         if ($resultado) echo json_encode(['ok' => true, 'msg' => "Se actualizaron los datos correctamente"]);

@@ -1,6 +1,6 @@
-let ArrProd = new Array();
-let ArrEan = new Array();
-let ArrCli = new Array();
+let ArrProd = [];
+let ArrEan = [];
+let ArrCli = [];
 let Arr = "";
 let OfcN = "";
 let OfcS = "";
@@ -15,7 +15,7 @@ const confirmAlert = async (title, text) => {
     confirmButtonColor: '#3085d6',
     cancelButtonColor: '#d33',
     confirmButtonText: 'Aceptar',
-    cancelButtonText: 'Cancelar'
+    cancelButtonText: 'Cancelar',
   });
   return result;
 }
@@ -42,7 +42,7 @@ const validaEstadoDesbloqueo = async () => {
 };
 // FUNCIÓN PARA GESTIONAR SOLICITUD DE DESBLOQUEO
 const SolDesbloqueo = async () => {
-  /*2024-10-04 Christian Bula: Se añade control para solo poder volver a montar la solicitud si el estado es (R:Rechazado - A: Aprobado)*/
+  // 2024-10-04 Christian Bula: Se añade control para solo poder volver a montar la solicitud si el estado es (R:Rechazado - A: Aprobado)*/
   let status = await validaEstadoDesbloqueo();
   if (status) {
     Swal.fire({
@@ -53,7 +53,7 @@ const SolDesbloqueo = async () => {
     });
     return;
   }
-  /*2024-10-04 Christian Bula */
+  // 2024-10-04 Christian Bula
   Swal.fire({
     title: "Solicitud de desbloqueo del pedido #" + $("#ped_numero_sap").val(),
     html: `<textarea id="nota" class="swal2-input form-control"  placeholder="Si tienes una observacion , escribela aquí"></textarea>`,
@@ -114,8 +114,7 @@ const MostrarEstadoSolDesbloqueo = async (pedido) => {
       break;
   }
 
-  Swal.fire("Estado de la solicitud", "Tu solicitud se encuentra  " + estado + "  <br> Nota :" + resp[0].RESPUESTA, "info");
-  Swal.fire("Estado de la solicitud", "Tu solicitud se encuentra  " + estado + "  <br> Nota :" + resp[0].RESPUESTA, "info");
+  Swal.fire("Estado de la solicitud", `Tu solicitud se encuentra ${estado}<br> Nota: ${resp[0].RESPUESTA}`, "info");
 }
 
 const guardSolicitudesDesbloqueoPedidos = async () => {
@@ -2452,6 +2451,7 @@ async function Entregas() {
       const result = await confirmAlert("El pedido no posee entrega... ¿Desea crearla?", "Después de aceptar no podrá reversar la operación");
       if (result.isConfirmed) {
         const data = await enviarPeticion({op: 'CREA_ENTREGAS', link: "../models/WS-PW.php", numero});
+        console.log(data);
         if (data.Tipo != 'S') {
           Swal.fire("Error", data.Msj, "error");
         } else {
@@ -2610,12 +2610,12 @@ async function Prioridad_ot(ot, almacen, despacho, punto) {
   }
 }
 // FUNCIÓN ORDENES
-// todo: código pendiente por refactorizar y modernizar
-function Ordenes() {
+async function Ordenes() {
   let entrega = $.trim($("#ped_entrega").val());
   let NumTmp = $.trim($("#ped_numero").val());
   let pedidoBodega = $.trim($("#ped_bodega").val());
   let almacen = '';
+
   switch (pedidoBodega) {
     case '1100':
       almacen = 'D01';
@@ -2637,6 +2637,22 @@ function Ordenes() {
       break; // Barranquilla
   }
 
+  let htmlConfirm = `
+  <div style="text-align: left; margin-top: 20px;">
+        <label style="display: block; margin-bottom: 10px;">
+            <input type="checkbox" id="recojeDespachos" name="recojeDespachos"> 
+            Recoge en Despachos
+        </label>
+        ${pedidoBodega == '1100' ?
+      `<label style="display: block;">
+            <input type="checkbox" id="recojePuntoVenta" name="recojePuntoVenta"> 
+            Recoge en Punto de venta
+        </label>` : ''}
+  </div>`;
+
+  const recojeDespachos = document.getElementById('recojeDespachos').checked;
+  const recojePuntoVenta = document.getElementById('recojePuntoVenta').checked;
+
   if (entrega != 0 && entrega != '') {
     let Num = $.trim($("#ped_ot").val());
     if (Num == '0') {
@@ -2646,132 +2662,92 @@ function Ordenes() {
         text: "Despues de aceptar no podra reversar la operacion!",
         icon: "question",
         showCancelButton: true,
-        confirmButtonColor: "#82ED81",
-        cancelButtonColor: "#FFA3A4",
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
         confirmButtonText: "Aceptar",
         cancelButtonText: "Cancelar",
-        closeOnConfirm: false,
-        closeOnCancel: false,
-        html: `<div style="text-align: left; margin-top: 20px;">
-                    <label style="display: block; margin-bottom: 10px;">
-                        <input type="checkbox" id="recojeDespachos" name="recojeDespachos"> 
-                        Recoge en Despachos
-                    </label>
-                    ${pedidoBodega == '1100' ?
-                   `<label style="display: block;">
-                        <input type="checkbox" id="recojePuntoVenta" name="recojePuntoVenta"> 
-                        Recoge en Punto de venta
-                    </label>` : ''}
-              </div>`,
+        html: htmlConfirm,
         preConfirm: () => {
           return {
-            recojeDespachos: document.getElementById('recojeDespachos').checked,
-            recojePuntoVenta: pedidoBodega == '1100'
-              ? document.getElementById('recojePuntoVenta').checked : false
+            recojeDespachos,
+            recojePuntoVenta: (pedidoBodega == '1100') ? recojePuntoVenta : false
           }
         }
       };
 
-      Swal.fire(swalOptions).then((result) => {
+      Swal.fire(swalOptions).then(async result => {
         if (result.value) {
-          const opcionesRecojo = result.value;
-          console.log('Opciones seleccionadas:', opcionesRecojo);
+          try {
+            const opcionesRecojo = result.value;
+            console.log('Opciones seleccionadas:', opcionesRecojo);
 
-          $.ajax({
-            type: "POST",
-            encoding: "UTF-8",
-            url: "../models/WS-PW.php",
-            global: false,
-            error: function (OBJ, ERROR, JQERROR) {
-              alert(JQERROR + " ");
-            },
-            data: ({
-              op: 'CREA_ORDENES',
+            const data = await enviarPeticion({
+              op: "CREA_ORDENES",
+              link: "../models/WS-PW.php",
               almacen: almacen,
               entrega: entrega,
-              recojeDespachos: opcionesRecojo.recojeDespachos ? '1' : '0',
-              recojePuntoVenta: opcionesRecojo.recojePuntoVenta ? '1' : '0'
-            }),
-            dataType: "json",
-            async: false,
-            success: function (data) {
-              if (data.Tipo != 'S') {
-                Swal.fire("Error", data.Msj, "error");
-              } else {
-                // Extraer el número de OT del mensaje
-                let nueva_ot = '';
-                let rdespa = opcionesRecojo.recojeDespachos ? '1' : '0';
-                let rpunto = opcionesRecojo.recojePuntoVenta ? '1' : '0';
-                Swal.fire("Excelente", data.Msj, "success");
+              recojeDespachos: opcionesRecojo.recojeDespachos ? "1" : "0",
+              recojePuntoVenta: opcionesRecojo.recojePuntoVenta ? "1" : "0"
+            });
 
-                var delayInMilliseconds = 2000; //1 segundo
-                setTimeout(function () {
-                  //Temporales propios
-                  Temporales();
-                  //Temporales de terceros
-                  GestionPedidos();
-                  //Actualizacion de datos en modal
-                  consultaOpciones(NumTmp, almacen, rdespa, rpunto);
-                  //-----------------------------------//
+            if (data.Tipo != 'S') {
+              Swal.fire("Error", data.Msj, "error");
+            } else {
+              let rdespa = opcionesRecojo.recojeDespachos ? '1' : '0';
+              let rpunto = opcionesRecojo.recojePuntoVenta ? '1' : '0';
+              Swal.fire("Excelente", data.Msj, "success");
 
-                }, delayInMilliseconds);
-              }
+              setTimeout(function () {
+                Temporales(); // Temporales propios                  
+                GestionPedidos(); // Temporales de terceros                  
+                consultaOpciones(NumTmp, almacen, rdespa, rpunto); // Actualización de datos en modal
+              }, 2000);
             }
-          }).fail(function (data) {
-            console.log(data);
-          });
+
+          } catch (error) {
+            console.error(error);
+          }
         } else {
           Swal.fire("Cancelado", "La operacion ha sido cancelada!", "error");
         }
       });
     } else {
-      $.ajax({
-        type: "POST",
-        encoding: "UTF-8",
-        url: "../models/PW-SAP.php",
-
-        global: false,
-        error: function (OBJ, ERROR, JQERROR) {
-          alert(JQERROR + " ");
-        },
-        data: ({
-          op: 'S_ORDEN',
-          numero: Num
-        }),
-        dataType: "json",
-        async: false,
-        success: function (data) {
-          //$("#ModalOpciones").modal("hide");
-          var detalle = '';
-          var clas = '';
-          var Pneto = 0;
-          for (var i = 0; i <= data.length - 1; i++) {
-            if (parseInt(data[i].ENTREGA) == 0) {
-              clas = 'class="alert-danger"';
-            }
-            detalle += '<tr ' + clas + '>'
-              + '<td>' + data[i].posicion_ot + '</td>'
-              + '<td>' + data[i].codigo_material + '</td>'
-              + '<td>' + data[i].descripcion + '</td>'
-              + '<td><input type="text" value="' + data[i].cantidad + '" class="form-control form-control-sm" size="2%"></td>'
-              + '<td>' + data[i].lote + '</td>'
-              + '<td>' + data[i].numero_ot + '</td>'
-              + '<td align="center"><input type="checkbox"/></td>'
-              + '</tr>';
-            Pneto = Pneto + parseFloat((data[i].pneto));
+      try {
+        let detalle = '';
+        let clas = '';
+        let Pneto = 0;
+        const data = await enviarPeticion({ op: 'S_ORDEN', link: "../models/PW-SAP.php", numero: Num });
+        data.forEach(item => {
+          if (parseInt(item.ENTREGA) == 0) {
+            clas = 'class="alert-danger"';
           }
-          $("#tdDetalleOrdenes").html(detalle);
-          $("#ModalOpciones").modal("hide");
-          $("#ModalOrdenes").modal("show");
-          $("#valor_orden").html(`VALOR ORDEN: <span><strong>${formatNum(Pneto, '$')}</strong></span>`);
 
-        }
-      }).done(function (data) {
-        //console.log(data);	
-      });
+          detalle += `
+          <tr ${clas}>
+            <td>${item.posicion_ot}</td>
+            <td>${item.codigo_material}</td>
+            <td>${item.descripcion}</td>
+            <td>
+              <input type="text" value="${item.cantidad}" class="form-control form-control-sm" size="2%">
+            </td>
+            <td>${item.lote}</td>
+            <td>${item.numero_ot}</td>
+            <td align="center">
+              <input type="checkbox"/>
+            </td>
+          </tr>`;
+          Pneto += parseFloat((item.pneto));
+        });
+        $("#tdDetalleOrdenes").html(detalle);
+        $("#ModalOpciones").modal("hide");
+        $("#ModalOrdenes").modal("show");
+        $("#valor_orden").html(`VALOR ORDEN: <span><strong>${formatNum(Pneto, '$')}</strong></span>`);
+      } catch (error) {
+        console.error(error);
+      }
     }
   } else {
-    Swal.fire('Error', 'El pedido no tiene entrega, no se puede generar OT', 'error');
+    Swal.fire("Error", "El pedido no tiene entrega, no se puede generar OT", "error");
   }
 }
 // FUNCIÓN ELIMINAR OT
@@ -3830,77 +3806,53 @@ const redimirProducto = async (codigo, url) => {
 const crearPedidoRedencion = async () => {
   const result = await confirmAlert("¿Esta seguro de redimir este producto?", "Una vez iniciado el proceso no se puede reversar");
   if (result.isConfirmed) {
-
-  } else {
-
-  }
-
-// TODO: AQUÍ QUEDÉ CON LA REFACTORIACIÓN DEL CÓDIGO - ARRANCAR AQUÍ
-
-  Swal.fire({
-    title: "¿Esta seguro de redimir este producto?",
-    text: "Una vez iniciado el proceso no se puede reversar",
-    icon: "question",
-    confirmButtonColor: "#82ED81",
-    cancelButtonColor: "#FFA3A4",
-    confirmButtonText: "Si,continuar",
-    cancelButtonText: "No,cancelar",
-    showLoaderOnConfirm: true,
-    showCancelButton: true,
-  }).then(async (result) => {
-    if (result.value) {
-      const codigo_sap = $("#txt_codigoSap").val();
-      const puntos = $("#redimePuntos").val();
-      const codigo_material = $("#redimeProducto").val();
-      const data = {
+    const codigo_sap = $("#txt_codigoSap").val();
+    const puntos = $("#redimePuntos").val();
+    const codigo_material = $("#redimeProducto").val();
+    try {
+      $("#ModalPP").modal('hide');
+      $("#ModalPPDetalle").modal('hide');
+      LoadImg('Generando solicitud, por favor espere...');
+      const resp = await enviarPeticion({
         link: "../models/PW-SAP.php",
         op: "I_CREAR_PEDIDO_REDENCION",
         codigo_sap,
         puntos,
         codigo_material
-      }
-
-      try {
-        $("#ModalPP").modal('hide');
-        $("#ModalPPDetalle").modal('hide');
-        LoadImg('Generando solicitud, por favor espere...');
-        const resp = await enviarPeticion(data);
-        if (!resp.error) {
-          if (resp.cod_error == 0) {
-            await enviarPeticion({
-              link: "../models/PW-SAP.php",
-              op: "MAIL_REDENCIONES",
-              id: resp.numero
-            });
-            Swal.fire('Excelente!', 'Redención realizada con éxito.', 'success');
-          } else {
-            Swal.fire('Error', resp.mensaje, 'error');
-          }
+      });
+      if (!resp.error) {
+        if (resp.cod_error == 0) {
+          await enviarPeticion({
+            link: "../models/PW-SAP.php",
+            op: "MAIL_REDENCIONES",
+            id: resp.numero
+          });
+          Swal.fire('Excelente!', 'Redención realizada con éxito.', 'success');
         } else {
-          Swal.fire('Error', 'No fue posible crear su solicitud. Por favor, verifique e intente nuevamente. En caso de persistir el error, por favor, comuníquese con su ejecutivo comercial.', 'error');
+          Swal.fire('Error', resp.mensaje, 'error');
         }
-        UnloadImg();
-
-      } catch (error) {
-        console.log(error);
-        UnloadImg();
+      } else {
+        Swal.fire('Error', 'No fue posible crear su solicitud. Por favor, verifique e intente nuevamente. En caso de persistir el error, por favor, comuníquese con su ejecutivo comercial.', 'error');
       }
-    } else {
-      Swal.fire('Cancelado', 'ha cancelado la operación', 'warning');
+      UnloadImg();
+    } catch (error) {
+      console.log(error);
+      UnloadImg();
     }
-  });
+  } else {
+    Swal.fire('Cancelado', 'ha cancelado la operación', 'warning');
+  }  
 }
-
+// FUNCIÓN CREAR PEDIDO REENCIÓN SAP
 const crearPedidoRedencionSAP = async (numero) => {
-  var numPedSAP = 0;
-  const data = {
-    link: "../models/WS-PW.php",
-    op: 'NUEVO',
-    numero,
-    numeroSAP: 0
-  }
+  let numPedSAP = 0;
   try {
-    const resp = await enviarPeticion(data);
+    const resp = await enviarPeticion({
+      link: "../models/WS-PW.php",
+      op: 'NUEVO',
+      numero,
+      numeroSAP: 0
+    });
     numPedSAP = resp.Num;
 
   } catch (error) {
@@ -3908,18 +3860,16 @@ const crearPedidoRedencionSAP = async (numero) => {
   }
   return numPedSAP;
 }
+// FUNCIÓN CREAR ENTREGA REDENCIÓN SAP
 const crearEntregaRedencionSAP = async (numero) => {
-  var numEntregaSAP = 0;
-  const data = {
-    link: "../models/WS-PW.php",
-    op: 'CREA_ENTREGAS',
-    numero,
-  }
+  let numEntregaSAP = 0;
   try {
-    const resp = await enviarPeticion(data);
-    // numEntregaSAP = resp.Num;
+    const resp = await enviarPeticion({
+      link: "../models/WS-PW.php",
+      op: 'CREA_ENTREGAS',
+      numero,
+    });
     console.log(resp);
-
   } catch (error) {
     console.log(error);
   }
@@ -4038,31 +3988,27 @@ const Presupuesto_datos = async () => {
     console.log(error);
   }
 };
-
+// FUNCIÓN PARA ALTERNAR CLASES
 function toggleButton(button, checkboxDivId) {
-  // Alternar la clase 'btn-success' en el botón
   $(button).toggleClass('btn-light btn-success');
-  // Alternar el estado visual del "checkbox" simulado
   toggleDivCheckbox(checkboxDivId);
 }
-
+// FUNCIÓN PARA EL MANEJO DEL TOGGLE CHECK-BOX
 function toggleDivCheckbox(checkboxDivId) {
-  var checkboxDiv = $('#' + checkboxDivId);
-  var icon = checkboxDiv.find('.checkbox-icon'); // Buscar el icono dentro del div
+  let checkboxDiv = $('#' + checkboxDivId);
+  let icon = checkboxDiv.find('.checkbox-icon');
 
   // Verificar si el div tiene la clase 'DivCheckBoxTrue'
   if (checkboxDiv.hasClass('DivCheckBoxTrue')) {
-    // Si ya tiene la clase, quitarla y cambiar el icono
     checkboxDiv.removeClass('DivCheckBoxTrue');
     icon.text('☐'); // Cambiar a desmarcado
   } else {
-    // Si no tiene la clase, añadirla y cambiar el icono
     checkboxDiv.addClass('DivCheckBoxTrue');
     icon.text('✔'); // Cambiar a marcado
   }
 }
 
-// Funciones específicas para cada botón
+// FUNCIONES ESPECIFICAS PARA CADA BOTÓN
 function BotonBonificado(button) {
   toggleButton(button, 'DvChkBonif');
 }
@@ -4074,10 +4020,9 @@ function BotonOfertas(button) {
 function BotonDescuentos(button) {
   toggleButton(button, 'DvChkDctos');
 }
-
+//  FUNCIÓN PARA FILTRAR POR CÓDIGOS
 function filtrarPorCodigos(objeto1, objeto2) {
   const mapaGrupo130 = new Map(objeto2.map(item => [item.CODIGO_MATERIAL, item.GRUPO_130]));
-
   const resultado = objeto1
     .filter(item => mapaGrupo130.has(item.codigo_material))
     .map(item => ({
@@ -4087,9 +4032,8 @@ function filtrarPorCodigos(objeto1, objeto2) {
 
   return resultado;
 }
-
+// FUNCIÓN PARA OBTENER EL TOP 20 DE PRODUCTOS MAS VENDIDOS
 async function Top_20_mas_vendidos_con_copi() {
-  console.log('envio');
   const resp = await enviarPeticion({
     link: '../models/PW-SAP.php',
     op: 'Top_20_mas_vendidos_con_copi',
@@ -4098,26 +4042,19 @@ async function Top_20_mas_vendidos_con_copi() {
     oficina: $("#txt_oficina").val()
   });
 
-  console.log(resp);
   let obj = filtrarPorCodigos(ArrProd, resp);
-  console.log(obj);
-
-
   let $tabla = $('<table>', {
     'class': 'table table-bordered table-hover table-sm',
     'id': 'tablaTop20Productos'
   });
 
-  const headers = [
-    'Código', 'Descripción', 'Valor Unitario', 'IVA', 'Descuento',
-    'Valor Neto', ''
-  ];
+  const headers = ['CÓDIGO', 'DESCRIPCIÓN', 'VALOR UNITARIO', 'IVA', 'DESCUENTO', 'VALOR NETO', ''];
 
   let $thead = $('<thead>').addClass('thead-dark');
   let $headerRow = $('<tr>');
 
   $.each(headers, function (i, header) {
-    $headerRow.append($('<th>').text(header));
+    $headerRow.append($('<th>').text(header).addClass("bag-info size-th"));
   });
 
   $thead.append($headerRow);
@@ -4129,12 +4066,9 @@ async function Top_20_mas_vendidos_con_copi() {
     let $row = $('<tr>', {
       'class': 'fila-producto',
       'data-codigo': item.codigo_material,
-      'css': {
-        'cursor': 'pointer'
-      }
+      'css': {'cursor': 'pointer'}
     });
 
-    // Código
     $row.append($('<td>').text(item.codigo_material));
 
     // Descripción con icono si bonificado ≠ 0
@@ -4156,10 +4090,7 @@ async function Top_20_mas_vendidos_con_copi() {
         src: '../resources/icons/regalo.png',
         width: 24,
         height: 24,
-        align: 'absmiddle',
-        // title: 'Código: ' + item.codigo_material + '\n' +
-        //         'Descripción: ' + item.descripcion + '\n' +
-        //         'Condición: ' + item.condicion_b,
+        align: 'absmiddle',      
         onclick: `event.stopPropagation(); InfoBon('${descripcionCompleta.replace(/'/g, "\\'")}', '${descBonificadoN.replace(/'/g, "\\'")}', '${stock}', '${stockBonificado}', '${condicion}', '${stockPrepack}')`
       }).css({
         marginRight: '8px',
@@ -4167,13 +4098,13 @@ async function Top_20_mas_vendidos_con_copi() {
         verticalAlign: 'middle',
         cursor: 'pointer'
       });
-
       $contenedor.append($img);
     }
 
     let $textoDesc = $('<span>').text(item.descripcion).css({
       display: 'inline-block',
-      verticalAlign: 'middle'
+      verticalAlign: 'middle',
+      fontSize: '11px'
     });
 
     $contenedor.append($textoDesc);
@@ -4182,13 +4113,10 @@ async function Top_20_mas_vendidos_con_copi() {
 
     // Valor Unitario
     $row.append($('<td>').text('$' + parseFloat(item.valor_unitario).toLocaleString('es-CO')));
-
     // IVA
     $row.append($('<td>').text(item.iva));
-
     // Descuento
     $row.append($('<td>').text(item.descuento));
-
     // Valor Neto
     $row.append($('<td>').text('$' + parseFloat(item.valor_neto).toLocaleString('es-CO')));
 
@@ -4196,7 +4124,7 @@ async function Top_20_mas_vendidos_con_copi() {
     let $grupoCell = $('<td>');
     if (parseInt(item.GRUPO_130) === 1) {
       let $estrella = $('<img>', {
-        src: '../resources/icons/estrella.png',
+        src: '../resources/icons/pw/estrella.png',
         width: 24,
         height: 24,
         align: 'absmiddle'
@@ -4204,7 +4132,6 @@ async function Top_20_mas_vendidos_con_copi() {
       $grupoCell.append($estrella);
     }
     $row.append($grupoCell);
-
     $tbody.append($row);
   });
 
@@ -4223,7 +4150,7 @@ async function Top_20_mas_vendidos_con_copi() {
 
   $('#ModalTop20_100_130').modal('show');
 }
-
+// FUNCIÓN PARA VALIDAR LA CARGA DE CLIENTES
 const validarCargaClientes = () => {
   let DepId = $("#Dpto").val();
   if (DepId == 10) {
@@ -4390,6 +4317,22 @@ async function cargarCupoCredito() {
     mostrarMensaje(selector, 'danger', 'Se produjo un error!');
   }
 }
+// FUNCIÓN PARA FILTRAR EN TODOS LOS CAMPOS CLIENTES
+const filtrarClientesCampos = (idCampo) => {
+  let Arr_cli = ArrCli;
+  let valor = $.trim($(`#${idCampo}`).val());
+  if (validarSiNumero(valor) == 1) {
+    Arr_cli = FiltrarCli(valor, Arr_cli, 1);
+  } else {
+    let div_cadena = valor;
+    div_cadena = div_cadena.split(" ");
+    for (var x = 0; x < div_cadena.length; x++) {
+      let expr = $.trim(div_cadena[x]);
+      Arr_cli = FiltrarCli(expr, Arr_cli, 2);
+    }
+  }
+  return Arr_cli.slice(0, 10);
+}
 
 // EJECUCIÓN DE LAS FUNCIONALIDADES AL CARGAR EL DOM
 $(function () {
@@ -4414,7 +4357,7 @@ $(function () {
   // VALIDO SI EXISTE NIT PARA LOS CLIENTES
   validarCargaClientes();
 
-  // Tabulacion de pestañas de seleccion	
+  // TABULACIÓN DE PESTAÑAS DE SELECCIÓN	
   $("#btnProductos").click(function () {
     VerificaPedido();
     $("#txt_destinatario").attr('disabled', true);
@@ -4442,7 +4385,7 @@ $(function () {
     consultaOpciones(num);
     showToastr("success", "Ejecutado correctamente", `<strong>ACTUALIZAR INFO PEDIDO ${num}</strong></br>`);
   });
-
+  // CLICK'S
   $("#exportar_gestion").click(function () {
     Exportar('DvRecuperablesTerceros')
   });
@@ -4507,22 +4450,10 @@ $(function () {
 
   $("#dvCentros").hide();
 
-  //Busqueda de clientes para filtro de pedidos 
+  // BÚSQUEDA DE CLIENTES PARA FILTRO DE PEDIDOS 
   $('#txtCliente').autocomplete({
-    source: function (request, response) {
-      let Arr_cli = ArrCli;
-      valor = $.trim($("#txtCliente").val());
-      if (validarSiNumero(valor) == 1) {
-        Arr_cli = FiltrarCli(valor, Arr_cli, 1);
-      } else {
-        div_cadena = valor;
-        div_cadena = div_cadena.split(" ");
-        for (var x = 0; x < div_cadena.length; x++) {
-          expr = $.trim(div_cadena[x]);
-          Arr_cli = FiltrarCli(expr, Arr_cli, 2);
-        }
-      }
-      response(Arr_cli.slice(0, 10));
+    source: function (request, response) {      
+      response(filtrarClientesCampos("txtCliente"));
     },
     maxResults: 10,
     minLength: 3,
@@ -4539,24 +4470,10 @@ $(function () {
     }
   });
 
-  // Busqueda de clientes gestion de entregas
+  // BÚSQUEDA DE CLIENTES GESTION DE ENTREGAS
   $('#ClienteEntregas').autocomplete({
-    source: function (request, response) {
-      let Arr_cli = ArrCli;
-      valor = $.trim($("#ClienteEntregas").val());
-      if (validarSiNumero(valor) == 1) {
-        Arr_cli = FiltrarCli(valor, Arr_cli, 1);
-      } else {
-        div_cadena = valor;
-
-
-        div_cadena = div_cadena.split(" ");
-        for (var x = 0; x < div_cadena.length; x++) {
-          expr = $.trim(div_cadena[x]);
-          Arr_cli = FiltrarCli(expr, Arr_cli, 2);
-        }
-      }
-      response(Arr_cli.slice(0, 10));
+    source: function (request, response) {      
+      response(filtrarClientesCampos("ClienteEntregas"));
     },
     maxResults: 10,
     minLength: 3,
@@ -4574,22 +4491,10 @@ $(function () {
     }
   });
 
-  // Busqueda de clientes en facturacion
+  // BÚSQUEDA DE CLIENTES EN FACTURACIÓN
   $('#txtFactCliente').autocomplete({
-    source: function (request, response) {
-      let Arr_cli = ArrCli;
-      valor = $.trim($("#txtFactCliente").val());
-      if (validarSiNumero(valor) == 1) {
-        Arr_cli = FiltrarCli(valor, Arr_cli, 1);
-      } else {
-        div_cadena = valor;
-        div_cadena = div_cadena.split(" ");
-        for (var x = 0; x < div_cadena.length; x++) {
-          expr = $.trim(div_cadena[x]);
-          Arr_cli = FiltrarCli(expr, Arr_cli, 2);
-        }
-      }
-      response(Arr_cli.slice(0, 10));
+    source: function (request, response) {      
+      response(filtrarClientesCampos("txtFactCliente"));
     },
     maxResults: 10,
     minLength: 3,
@@ -4600,22 +4505,10 @@ $(function () {
     }
   });
 
-  // Busqueda de clientes en faltantes
+  // BÚSQUEDA DE CLIENTES EN FALTANTES
   $('#txtFaltanteCliente').autocomplete({
-    source: function (request, response) {
-      let Arr_cli = ArrCli;
-      valor = $.trim($("#txtFaltanteCliente").val());
-      if (validarSiNumero(valor) == 1) {
-        Arr_cli = FiltrarCli(valor, Arr_cli, 1);
-      } else {
-        div_cadena = valor;
-        div_cadena = div_cadena.split(" ");
-        for (var x = 0; x < div_cadena.length; x++) {
-          expr = $.trim(div_cadena[x]);
-          Arr_cli = FiltrarCli(expr, Arr_cli, 2);
-        }
-      }
-      response(Arr_cli.slice(0, 10));
+    source: function (request, response) {      
+      response(filtrarClientesCampos("txtFaltanteCliente"));
     },
     maxResults: 10,
     minLength: 3,
@@ -4637,7 +4530,7 @@ $(function () {
     GestionEntregas();
   });
 
-  // Búsqueda o carga de cliente según departamento
+  // BÚSQUEDA O CARGA DE CLIENTE SEGÚN DEPARTAMENTO
   let DepId = $("#Dpto").val();
   if (DepId == 10) {
     $("#colCliente").html('<select id="txt_cliente" class="form-select size-text"></select>');
@@ -4665,23 +4558,8 @@ $(function () {
 
     let timer;
     $('#txt_cliente').autocomplete({
-      source: function (request, response) {
-        clearTimeout(timer);
-        timer = setTimeout(() => {
-          const termino = $.trim(request.term).toLowerCase();
-          if (termino.length < 3) {
-            response([]);
-            return;
-          }
-
-          const resultados = ArrCli.filter(cli =>
-            cli.nombres.toLowerCase().includes(termino) ||
-            cli.razon_comercial.toLowerCase().includes(termino) ||
-            cli.nit.includes(termino)
-          );
-
-          response(resultados.slice(0, 10));
-        }, 150);
+      source: function (request, response) {       
+        response(filtrarClientesCampos("txt_cliente"));       
       },
       minLength: 3,
       select: function (event, ui) {
@@ -4733,55 +4611,35 @@ $(function () {
 
   Limpiar();
 
-  //Filtros descuentos, bonificados y stock
-  $(".DivCheckBox").click(function () {
-    var id = $(this).attr('id');
-    if ($(this).hasClass('DivCheckBoxTrue')) {
-      $(this).removeClass('DivCheckBoxTrue');
-    } else {
-      $(this).addClass('DivCheckBoxTrue');
-    }
+  // FILTROS DESCUENTOS, BONIFICADOS Y STOCK
+  $(".DivCheckBox").click(async function () {
+    let id = $(this).attr('id');
+
+    if ($(this).hasClass('DivCheckBoxTrue')) $(this).removeClass('DivCheckBoxTrue');
+    else $(this).addClass('DivCheckBoxTrue');
 
     id = $(this).attr("id");
-    if (id == 'DvChkKits') {
-      BuscarProductos();
-    }
+    if (id == 'DvChkKits') BuscarProductos();
 
-    var n = 0;
-    var sto = 0;
-    if (validarSiNumero(valor) == 1) {
-      n = 1;
-    }
-    if ($("#DvChkStock").hasClass('DivCheckBoxTrue')) {
-      sto = 1;
-    } //solo con stock
+    let n = 0;
+    let sto = 0;
+    // if (validarSiNumero(valor) == 1) n = 1;
+
+    if ($("#DvChkStock").hasClass('DivCheckBoxTrue')) sto = 1; // solo con stock
+
     if (sto == 1) {
       BuscarProductoArr(n);
     } else {
       if (id == 'DvChkStock') {
-        Swal.fire({
-          title: "¿Esta seguro?",
-          text: "Esta opción puede tornar lenta las búsquedas, esta seguro de continuar?",
-          icon: "question",
-          confirmButtonColor: "#82ED81",
-          cancelButtonColor: "#FFA3A4",
-          confirmButtonText: "Si,continuar",
-          cancelButtonText: "No,cancelar",
-          showLoaderOnConfirm: true,
-          showCancelButton: true,
-        }).then((result) => {
-          if (result.value) {
-            BuscarProductos();
-          } else {
-            $("#DvChkStock").addClass('DivCheckBoxTrue');
-          }
-        });
+        const result = await confirmAlert("¿Está seguro(a)?", "Esta opción puede tornar lenta las búsquedas... ¿Está seguro(a) de continuar?");
+        if (result.isConfirmed) BuscarProductos();
+        else $("#DvChkStock").addClass('DivCheckBoxTrue');        
       } else {
         BuscarProductoArr(n);
       }
     }
-    // }
   });
+
   $("#txt_reg").on('change', function () {
     if ($("#txt_bproductos").val() != '') {
       BuscarProductoArr();
@@ -4809,14 +4667,13 @@ $(function () {
     ListarEvento();
   });
 
-  //Teclas de acceso rapido
+  // TECLAS DE ACCESO RÁPIDO
   $(document).keyup(function (e) {
     tecla = e.keyCode;
-    if (tecla == 113) { //Funcion tecla F2 
-      var sw = 0;
-      if ($("#liProductos").hasClass("disabled")) {
-        sw = 1;
-      }
+    if (tecla == 113) { // Función tecla F2 
+      let sw = 0;
+      if ($("#liProductos").hasClass("disabled")) sw = 1;
+
       if (sw == 0) {
         activaTab("dvProductos");
         $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
@@ -4827,21 +4684,23 @@ $(function () {
         $("#txt_bproductos").val('');
       }
     }
-    if (tecla == 115) { //Funcion tecla F4
-      var sw = 0;
-      if ($("#liPedidos").hasClass("disabled")) {
-        sw = 1;
-      }
+
+    if (tecla == 115) { // Función tecla F4
+      let sw = 0;
+      if ($("#liPedidos").hasClass("disabled")) sw = 1;
+
       if (sw == 0) {
         activaTab("dvPedidos");
         Guardar();
       }
     }
   });
+
   // NUEVO PARA EDICION DE PEDIDOS
   $("#btnEditar").click(function () {
     $("#ModalEditarPedidos").modal("show");
   });
+
   // CLICK ESTADISTICAS DE COMPRAS Y MÁS
   $("#btnEstadisticas").click(function () {
     $("#ModalEstadisticas").modal("show");
@@ -4849,28 +4708,23 @@ $(function () {
     cargarTopProductos();
     cargarCupoCredito();
   });
+
   // CLICK BUSCAR Y EDITAR
   $("#btnBuscarEditar").click(function () {
     if ($("#EdtNumeroPedido").val() != '' && $("#EdtNumeroPedido").val() > 0) {
       EditarPedido($("#EdtNumeroPedido").val(), $("#EdtTipo").val());
     }
   });
+
   // EVENTO DE TECLADO PARA BÚSQUEDA DE PRODUCTOS
   $("#txt_bproductos").keyup(function (e) {
-    tecla = (document.all) ? e.keyCode : e.which;
-    valor = $.trim($(this).val());
+    const tecla = e.keyCode || e.which;
+    const valor = $.trim($(this).val());
     if (valor != "") {
       if ($(this).val().length > 2) {
         if (tecla == 13) {
-          //verifico si solo son numer
-          //busco por codigo sap o codigo de barras
-          if (validarSiNumero(valor) == 1) {
-            //busco por codigo de barras
-            BuscarProductoArr(1);
-          } else {
-            BuscarProductoArr(0);
-          }
-
+          if (validarSiNumero(valor) == 1) BuscarProductoArr(1);
+          else BuscarProductoArr(0);
         }
       }
     } else {
@@ -4879,19 +4733,13 @@ $(function () {
     }
   });
 
-  // Fin se coloca para mitigar el problema mobil
+  // EVENTO PARA ACTIVAR LA FUNCIÓN AL DAR CLICK POR FUERA DEL CAMPO
   $("#txt_bproductos").focusout(function (e) {
-    valor = $.trim($(this).val());
+    const valor = $.trim($(this).val());
     if (valor != "") {
       if ($(this).val().length > 2) {
-        //verifico si solo son numer
-        //busco por codigo sap o codigo de barras
-        if (validarSiNumero(valor) == 1) {
-          //busco por codigo de barras
-          BuscarProductoArr(1);
-        } else {
-          BuscarProductoArr(0);
-        }
+        if (validarSiNumero(valor) == 1) BuscarProductoArr(1);
+        else BuscarProductoArr(0);
       }
     } else {
       $("#dvResultProductos").html("");
@@ -4899,106 +4747,84 @@ $(function () {
     }
   });
 
-  // Nuevo para carga de archivo plano 
+  // NUEVO PARA CARGA DE ARCHIVO PLANO 
   $("#filename").val('');
   $("#filename").change(function (e) {
-    var ext = $("input#filename").val().split(".").pop().toLowerCase();
+    const ext = $("input#filename").val().split(".").pop().toLowerCase();
+
     if ($.inArray(ext, ["csv"]) == -1) {
-      alert('Solo se permiten archivos CSV');
+      Swal.fire("Oops!!!", "Solo se permiten archivos CSV");
       $("#filename").val('');
       return false;
     }
+
     if (e.target.files != undefined) {
       $("#ModalAjustesBusqueda").modal("hide");
       LoadImg("Subiendo CSV");
-      var reader = new FileReader();
-      reader.onload = function (e) {
-        var csvval = e.target.result.split("\n");
-        var SiAdd = new Array();
-        var NoAdd = '';
 
-        for (var i = 0; i < csvval.length; i++) { //for 1		
-          var row = csvval[i];
+      let reader = new FileReader();
+      reader.onload = function (e) {
+        let csvval = e.target.result.split("\n");
+        let SiAdd = new Array();
+        let NoAdd = '';
+
+        for (let i = 0; i < csvval.length; i++) {
+          let row = csvval[i];
           if (row != '') {
-            var col = row.split(',');
-            var desc = escapeRegExp($.trim(col[0]));
-            var SwAdd = 0;
+            let col = row.split(',');
+            let desc = escapeRegExp($.trim(col[0]));
+            let SwAdd = 0;
             Arr = ArrProd;
             Arr = recursiva(desc, Arr, 0, 0, 0, 1);
 
             if (Arr.length > 0) {
-              for (var x = 0; x < Arr.length; x++) { //for 2									
-                d = Arr[0];
-                for (var y = 0; y < SiAdd.length; y++) {
-                  if (SiAdd[y].codigo == $.trim(d.codigo_material)) {
-                    SwAdd = 1
-                  }
+              for (let x = 0; x < Arr.length; x++) {							
+                let d = Arr[0];
+                for (let y = 0; y < SiAdd.length; y++) {
+                  if (SiAdd[y].codigo == $.trim(d.codigo_material)) SwAdd = 1;
                 }
                 if (SwAdd == 0) {
-                  cant = parseInt($.trim(col[1]));
-                  reg = parseInt($.trim(d.cant_regular));
+                  let cant = parseInt($.trim(col[1]));
+                  let reg = parseInt($.trim(d.cant_regular));
                   if ((reg > 0) && (reg > cant)) {
-                    UnloadImg()
-                    if (confirm("El producto " + $.trim(d.descripcion) + " presenta bonificado,"
-                      + "desea aumentar la cantidad a " + reg + " unidades para ganarlo?")) {
-                      cant = reg;
-                    }
+                    UnloadImg();
+                    if (confirm(`El producto ${$.trim(d.descripcion)} presenta bonificado, desea aumentar la cantidad a ${reg} unidades para ganarlo?`)) cant = reg;
                     LoadImg("Subiendo CSV");
                   }
-                  AddProductoPlano($.trim(d.codigo_material),
-                    $.trim(d.valor_unitario),
-                    $.trim(d.iva),
-                    $.trim(d.descuento),
-                    cant,
-                    $.trim(d.valor_neto),
-                    $.trim(d.stock),
-                    $.trim(d.vlr_pedido),
-                    $.trim(d.id_pedido),
-                    $.trim(0),
-                    $.trim(d.cant_bonificado),
-                    $.trim(d.cant_regular),
-                    $.trim(d.stock_bonificado));
-                  d = {
-                    'codigo': desc
-                  }
+                  AddProductoPlano($.trim(d.codigo_material), $.trim(d.valor_unitario), $.trim(d.iva), $.trim(d.descuento), cant, $.trim(d.valor_neto), $.trim(d.stock), $.trim(d.vlr_pedido), $.trim(d.id_pedido), $.trim(0), $.trim(d.cant_bonificado), $.trim(d.ant_regular), $.trim(d.stock_bonificado));
+                  d = {codigo: desc}
                   SiAdd.push(d);
                 } else {
                   NoAdd += $.trim(col[0]) + ",\n";
                 }
-              } //fin for 2	
-            } else {
-              NoAdd += $.trim(col[0]) + ",\n";
-            }
-          } //fin if
-        } //fin for 1	
+              }
+            } else NoAdd += $.trim(col[0]) + ",\n";
+          }
+        }
 
         WSInvenTotal();
         ListarPedido();
         activaTab("dvPedidos");
         $("#filename").val('');
         UnloadImg();
-        if (NoAdd != '') {
-          Swal.fire('Codigos no encontrados o no validos', NoAdd, 'warning');
-        }
+        if (NoAdd != '') Swal.fire('Codigos no encontrados o no validos', NoAdd, 'warning');
       };
       reader.readAsText(e.target.files.item(0));
     }
     return false;
   });
 
-  if ($("#Rol").val() == '10' || $("#Dpto").val() == '11') {
-    console.log('cliente o transferencista no carga competencia')
-  } else {
-    ListarCompetencia();
-  }
+  if ($("#Rol").val() == '10' || $("#Dpto").val() == '11') console.log('cliente o transferencista no carga competencia');
+  else ListarCompetencia();
 
-  GruposArticulos(); // Grupos Articulos
+  GruposArticulos();
+
   $("#txtGrupoArticulo").change(function () {
     $("#txt_bproductos").val($.trim($(this).val()));
     BuscarProductoArr(0);
   });
 
-  $("#btnDescuentos").on('click', function () {  // Descuentos ir
+  $("#btnDescuentos").on('click', function () {
     activaTab('dvProductos');
     if ($("#txtGrp1").val() == '100') $("#txt_bproductos").val('OFERTA EXCLUSIVA CLIENTE WEB');
     else $("#txt_bproductos").val('*');
@@ -5006,7 +4832,7 @@ $(function () {
     BuscarProductoArr(0);
   });
 
-  // carga por defecto el usuario que se le esta haciendo la gestion en el 0102 
+  // CARGA POR DEFECTO EL USUARIO QUE SE LE ESTÁ HACIENDO LA GESTIÓN EN EL 0102 
   if ($("#link_pro").val() != '') {
     preLoadCliente($("#link_pro").val());
   }
@@ -5025,7 +4851,7 @@ $(function () {
     });
   });
 
-  // Plan de puntos para clientes
+  // PLAN DE PUNTOS PARA CLIENTES
   $("#btnPuntos").click(function () {
     if ($("#txt_codigoSap").val() != '') consultarPuntos($("#txt_codigoSap").val());
     else Swal.fire("Oops!!", "Dede seleccionar un cliente", "error");
