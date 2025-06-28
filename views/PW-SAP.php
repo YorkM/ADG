@@ -705,7 +705,7 @@ Redireccionar();
 
   <!-- MODAL MENU DE OPCIONES PARA PEDIDOS -->
   <div class="modal fade" id="ModalOpciones" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" style="min-width: 60%;">
+    <div class="modal-dialog" style="min-width: 70%;">
       <div class="modal-content">
         <div class="modal-header">
           <h1 class="modal-title fs-5">Menú de opciones</h1>

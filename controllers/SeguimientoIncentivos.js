@@ -1,3 +1,9 @@
+// TODO: REALIZAR AJUSTES DE CALCULOS, VALIDACIONES, PRESENTACIÓN DE INFORMACIÓN
+// TODO: RETOMAR LA PROXIMA SEMANA LA FUNCIONALIDAD Y DEJAR ESO MELO
+
+
+
+
 const porcentajeFDV = 88;
 const porcentajeMercadeo = 5;
 const porcentajeGerComer = 3;
@@ -265,8 +271,10 @@ const gestionarSeguimiento = async (item) => {
             fechaFinal
         });
 
+        console.log(resp);
+
         const cuotaLimpia = parseFloat(cuota.replace(/^\$|\.|,/g, ""));
-        const cuotaActual = resp.data.reduce((acumulado, item) => acumulado + parseFloat(item.TOTAL_NETO_FACT), 0);
+        const cuotaActual = resp.data.reduce((acumulado, item) => acumulado + parseFloat(item.VALOR_NETO), 0);
         const impactoActual = resp.data.reduce((acumulado, item) => acumulado + parseFloat(item.IMPACTOS), 0);
         const cantidadActual = resp.data.reduce((acumulado, item) => acumulado + parseFloat(item.CANTIDAD), 0);
         let difCuota = 0;
@@ -310,11 +318,11 @@ const gestionarSeguimiento = async (item) => {
         resp.data.forEach(item => {
             datosResumen += `
                 <tr>
-                    <td class="custom-td-2">${item.ZONA_VENTAS}</td>
+                    <td class="custom-td-2">${item.ZONA}</td>
                     <td class="custom-td">${item.ZONA_DESCRIPCION}</td>
                     <td class="custom-td-2">${item.CANTIDAD}</td>
                     <td class="custom-td-2">${item.IMPACTOS}</td>
-                    <td class="custom-td-2">${formatNum(item.TOTAL_NETO_FACT, "$")}</td>
+                    <td class="custom-td-2">${formatNum(item.VALOR_NETO, "$")}</td>
                 </tr>`;
         });
         $('#tablaResumen tbody').html(datosResumen);
@@ -398,16 +406,16 @@ const gestionarSeguimiento = async (item) => {
 
             if (tipoSeguimiento === "VALOR NETO") {
                 resp.data.forEach(item => {
-                    const porcentajeVenta = (parseInt(item.TOTAL_NETO_FACT) / cuotaActual) * 100;
+                    const porcentajeVenta = (parseInt(item.VALOR_NETO) / cuotaActual) * 100;
                     // const porcentajeVenta = (parseInt(item.TOTAL_NETO_FACT) /  56053246) * 100;
                     const incentivoZona = (liquidacG * porcentajeVenta) / 100;
                     const valorCadaVendedor = incentivoZona / 2;
                     
                     tablaLiquidacionZonas += `
                             <tr>
-                                <td class="custom-td-2">${item.ZONA_VENTAS}</td>
+                                <td class="custom-td-2">${item.ZONA}</td>
                                 <td class="custom-td">${item.ZONA_DESCRIPCION}</td>
-                                <td class="custom-td-2">${formatNum(item.TOTAL_NETO_FACT, "$")}</td>
+                                <td class="custom-td-2">${formatNum(item.VALOR_NETO, "$")}</td>
                                 <td class="custom-td-2">${porcentajeVenta.toFixed(2)}%</td>
                                 <td class="custom-td-2">${formatNum(Math.round(incentivoZona), "$")}</td>
                                 <td class="custom-td-2">${formatNum(Math.round(valorCadaVendedor), "$")}</td>
@@ -422,15 +430,15 @@ const gestionarSeguimiento = async (item) => {
             } else {
                 resp.data.forEach(item => {
                     // const porcentajeImpactos = (parseFloat(item.CANTIDAD) / parseInt(impacto)) * 100;
-                    const porcentajeImpactos = (parseFloat(item.CANTIDAD) / 8977) * 100;
+                    const porcentajeImpactos = (parseFloat(item.COSTO_INTERNO) / 8977) * 100;
                     const incentivoZona = (liquidacG * porcentajeImpactos) / 100;
                     const valorCadaVendedor = incentivoZona / 2;
                     
                     tablaLiquidacionZonas += `
                             <tr>
-                                <td class="custom-td-2">${item.ZONA_VENTAS}</td>
+                                <td class="custom-td-2">${item.ZONA}</td>
                                 <td class="custom-td">${item.ZONA_DESCRIPCION}</td>
-                                <td class="custom-td-2">${item.CANTIDAD}</td>
+                                <td class="custom-td-2">${item.COSTO_INTERNO}</td>
                                 <td class="custom-td-2">${porcentajeImpactos.toFixed(2)}%</td>
                                 <td class="custom-td-2">${formatNum(Math.round(incentivoZona), "$")}</td>
                                 <td class="custom-td-2">${formatNum(Math.round(valorCadaVendedor), "$")}</td>

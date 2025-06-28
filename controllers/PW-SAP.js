@@ -2352,7 +2352,7 @@ const EliminarPedido = async () => {
 // FUNCIÓN PARA ELIMINAR PEDIDO WEB
 const EliminarPW = async (numero) => {
   try {
-    const result = await confirmAlert("Eliminar Pedido", "¿Está seguro(a) de eliminar el pedido?");
+    const result = await confirmAlert("Eliminar Pedido Web", "¿Está seguro(a) de eliminar el pedido?");
     if (!result.isConfirmed) return;
 
     const data = await enviarPeticion({ op: "D_PEDIDO", link: "../models/PW-SAP.php", numero });
@@ -2370,7 +2370,7 @@ const EliminarPW = async (numero) => {
 // FUNCIÓN PARA ELIMINAR PEDIDO SAP
 const EliminarSAP = async (numero_sap, numero) => {
   try {
-    const result = await confirmAlert("Oops!!", "¿Está seguro(a) de eliminar el pedido?");
+    const result = await confirmAlert("Eliminar Pedido SAP", "¿Está seguro(a) de eliminar el pedido?");
     if (!result.isConfirmed) return;
 
     const data = await enviarPeticion({ op: "ELIMINAR", link: "../models/WS-PW.php", numero: numero_sap });
@@ -2451,7 +2451,6 @@ async function Entregas() {
       const result = await confirmAlert("El pedido no posee entrega... ¿Desea crearla?", "Después de aceptar no podrá reversar la operación");
       if (result.isConfirmed) {
         const data = await enviarPeticion({op: 'CREA_ENTREGAS', link: "../models/WS-PW.php", numero});
-        console.log(data);
         if (data.Tipo != 'S') {
           Swal.fire("Error", data.Msj, "error");
         } else {
@@ -2639,28 +2638,26 @@ async function Ordenes() {
 
   let htmlConfirm = `
   <div style="text-align: left; margin-top: 20px;">
-        <label style="display: block; margin-bottom: 10px;">
+        <label style="display: block; margin-bottom: 10px; text-align: center;">
             <input type="checkbox" id="recojeDespachos" name="recojeDespachos"> 
             Recoge en Despachos
         </label>
         ${pedidoBodega == '1100' ?
-      `<label style="display: block;">
+      `<label style="display: block; text-align: center;">
             <input type="checkbox" id="recojePuntoVenta" name="recojePuntoVenta"> 
             Recoge en Punto de venta
         </label>` : ''}
   </div>`;
 
-  const recojeDespachos = document.getElementById('recojeDespachos').checked;
-  const recojePuntoVenta = document.getElementById('recojePuntoVenta').checked;
-
+  
   if (entrega != 0 && entrega != '') {
     let Num = $.trim($("#ped_ot").val());
     if (Num == '0') {
       // Configuración inicial del Swal con checkboxes dinámicos
       let swalOptions = {
-        title: "El pedido no posee Orden de transporte, desea crearla?",
-        text: "Despues de aceptar no podra reversar la operacion!",
-        icon: "question",
+        title: "El pedido no posee orden de transporte... ¿Desea crearla?",
+        text: "Después de aceptar no podrá reversar la operación!",
+        icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#3085d6",
         cancelButtonColor: "#d33",
@@ -2669,8 +2666,8 @@ async function Ordenes() {
         html: htmlConfirm,
         preConfirm: () => {
           return {
-            recojeDespachos,
-            recojePuntoVenta: (pedidoBodega == '1100') ? recojePuntoVenta : false
+            recojeDespachos: document.getElementById('recojeDespachos').checked,
+            recojePuntoVenta: (pedidoBodega == '1100') ? document.getElementById('recojePuntoVenta').checked : false
           }
         }
       };
