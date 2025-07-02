@@ -211,8 +211,10 @@
                         </div>
                     </div>
                 </div>
+                <hr>
                 <!-- TABLA DE INCENTIVOS EN SEGUIMIENTO -->
-                <div class="overflow mt-3" id="contenedorTablaIncentivos">
+                 <h5 class="text-center text-green mt-3 mb-2">LISTADO DE SEGUIMIENTO INCENTIVO</h5>
+                <div class="overflow" id="contenedorTablaIncentivos">
                     <table class="table table-bordered table-hover table-sm" id="tablaIncentivos">
                         <thead class="table-info">
                             <tr>

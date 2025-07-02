@@ -34,9 +34,11 @@ switch ($_POST['op']) {
     case "G_DATOS_BASE":
         $organizacion = $_POST['organizacion'];
         $query = "SELECT * FROM T_SEGUIMIENTO_INCENTIVOS SI
-        INNER JOIN T_GRUPOS_ARTICULOS GA 
-        ON SI.PROVEEDOR = GA.GRUPO_ARTICULO
-        WHERE SI.ORGANIZACION_VENTAS = '$organizacion'";
+                    INNER JOIN T_GRUPOS_ARTICULOS GA 
+                    ON SI.PROVEEDOR = GA.GRUPO_ARTICULO
+                    INNER JOIN T_OFICINAS_VENTAS OV 
+                    ON SI.OFICINA_VENTAS = OV.OFICINA_VENTAS
+                    WHERE SI.ORGANIZACION_VENTAS = '$organizacion'";
         $resultado = GenerarArray($query, "");
         if ($resultado) echo json_encode(['ok' => true, 'data' => $resultado]);
         else echo json_encode(['ok' => false, 'data' => []]);
@@ -82,7 +84,7 @@ switch ($_POST['op']) {
 
         $query = "select
                     a.bzirk_auft as zona,
-                    trim(REPLACE_REGEXPR('([^a-zA-Z0-9-])' IN h.bztxt WITH '' OCCURRENCE ALL)) as zona_descripcion,
+                    trim(REPLACE_REGEXPR('[^a-zA-Z0-9\s-]' IN REPLACE_REGEXPR('[/+]' IN h.bztxt WITH '-' OCCURRENCE ALL) WITH '' OCCURRENCE ALL)) AS zona_descripcion,
                     cast(sum(case when b.fkart like 'ZN%' then a.fkimg *-1 else a.fkimg end) as decimal(18,0)) as cantidad,
                     cast(sum(case when b.fkart like 'ZN%' then (a.wavwr*100)*-1 else (a.wavwr*100) end) as decimal(18,0)) as costo_interno,
                     cast(sum(case when b.fkart like 'ZN%' then (a.netwr*100)*-1 else (a.netwr*100) end) as decimal(18,0)) as valor_neto,
@@ -96,13 +98,14 @@ switch ($_POST['op']) {
                 inner join t023t  as g on g.matkl = a.matkl and g.spras='S'
                 left  join t171t  as h on h.bzirk = a.bzirk_auft and h.mandt = '400'
                 where 
-                    a.erdat between '20250601' and '20250625' and 
-                    a.vkorg_auft = '2000' and 
-                    a.matkl in('FAM00970') and 
-                    a.bzirk_auft like '21%'
+                    a.erdat between '$fechaInicio' and '$fechaFinal' and 
+                    a.vkorg_auft = '$organizacion' and 
+                    a.matkl in($grupoArticulo) and 
+                    a.bzirk_auft like '$zona%'
                 group by 
                 a.bzirk_auft,
-                h.bztxt";
+                h.bztxt 
+                order by a.bzirk_auft asc";
         $resultado = generarArrayHana($query, "");
         if ($resultado) echo json_encode(['ok' => true, 'data' => $resultado]);
         else echo json_encode(['ok' => false, 'data' => []]);
@@ -133,6 +136,34 @@ switch ($_POST['op']) {
                   ON SI.PROVEEDOR = GA.GRUPO_ARTICULO
                   WHERE SI.ORGANIZACION_VENTAS = '$organizacion'
                   AND VALOR_NOTA IS NOT NULL";
+        $resultado = GenerarArray($query, "");
+        if ($resultado) echo json_encode(['ok' => true, 'data' => $resultado]);
+        else echo json_encode(['ok' => false, 'data' => []]);
+        break;
+        
+    case "G_BENEFICIARIOS":
+        $oficina = $_POST['oficina'];
+        $query = "SELECT U.ID, U.IDENTIFICACION, UPPER(CONCAT(U.NOMBRES, ' ', U.APELLIDOS)) AS NOMBRE,
+                    U.ROLES_ID AS ROL, UZ.ZONA_VENTAS
+                    FROM T_USUARIOS U 
+                    LEFT JOIN T_USUARIOS_ZONAS UZ ON U.ID = UZ.ID_USUARIO
+                    WHERE ROLES_ID IN (44, 3, 13, 118) 
+                    AND OFICINA_VENTAS = '$oficina'
+                    AND ESTADO = 'A' AND ID NOT IN(7228, 30972)";
+        $resultado = GenerarArray($query, "");
+        if ($resultado) echo json_encode(['ok' => true, 'data' => $resultado]);
+        else echo json_encode(['ok' => false, 'data' => []]);
+        break;
+
+    case "G_BENEFICIARIOS_2":
+        $oficina = $_POST['oficina'];
+        $query = "SELECT U.ID, U.IDENTIFICACION, UPPER(CONCAT(U.NOMBRES, ' ', U.APELLIDOS)) AS NOMBRE,
+                    U.ROLES_ID AS ROL, UZ.ZONA_VENTAS
+                    FROM T_USUARIOS U 
+                    LEFT JOIN T_USUARIOS_ZONAS UZ ON U.ID = UZ.ID_USUARIO
+                    WHERE ROLES_ID IN (12, 14) 
+                    AND OFICINA_VENTAS = '2100'
+                    AND ESTADO = 'A' AND ID NOT IN(7228, 30972)";
         $resultado = GenerarArray($query, "");
         if ($resultado) echo json_encode(['ok' => true, 'data' => $resultado]);
         else echo json_encode(['ok' => false, 'data' => []]);
