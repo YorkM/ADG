@@ -331,7 +331,11 @@
                 </div>               
                 <div class="overflow mt-3 mb-3" id="contenedorTablaLiquidacionZonas">
                     
-                </div>               
+                </div>
+                <h5 class="text-center text-green">CONSOLIDADO BENEFICIARIOS - LIQUIDACIÓN</h5>
+                <div class="overflow mt-3 mb-3" id="contenedorTablaLiquidacionConsolidados">
+                    
+                </div>         
             </div>
             <div class="tab-pane fade p-2" id="nav-profile-3" role="tabpanel" aria-labelledby="nav-profile-tab">
                 <div class="overflow mt-3 mb-3" id="contenedorTablaResumen">

@@ -7,6 +7,7 @@ let coordinadores;
 let gerenteMercadeo;
 let gerenteVentas;
 let coordContact;
+let zonasParejas;
 
 // FUNCIÓN CONFIRMAR ACCIONES
 const confirmAlert = async (title, text) => {
@@ -79,6 +80,7 @@ const getBeneficiarios = async (oficina) => {
       link: "../models/SeguimientoIncentivos.php",
       oficina
    });
+   gerenteMercadeo = resp.data.filter(item => item.ROL === "118");
    coordinadores = resp.data.filter(item => item.ROL === "44");
    gerenteVentas = resp.data.filter(item => item.ROL === "3");
    coordContact = resp.data.filter(item => item.ROL === "13");
@@ -116,9 +118,7 @@ const getBeneficiarios2 = async (oficina = "2100") => {
       integrantes
    }));
 
-   const prueba = resultadoFinal.filter(item => item.integrantes.length == 2);
-
-   console.log(prueba);
+   zonasParejas = resultadoFinal.filter(item => item.integrantes.length == 2);
 }
 // OBTENER Y CALCULAR DATOS COORDINADORES
 const resumenDatosCoordinadores = (zonas, cuotaActual, valorNota) => {
@@ -130,6 +130,7 @@ const resumenDatosCoordinadores = (zonas, cuotaActual, valorNota) => {
          zonasPorCoordinador[u.ID] = {
             ID: u.ID,
             NOMBRE: u.NOMBRE,
+            IDENTIFICACION: u.IDENTIFICACION,
             ZONAS: new Set(),
          };
       }
@@ -160,6 +161,7 @@ const resumenDatosCoordinadores = (zonas, cuotaActual, valorNota) => {
       resumen.push({
          ID: datosUsuario.ID,
          NOMBRE: datosUsuario.NOMBRE,
+         IDENTIFICACION: datosUsuario.IDENTIFICACION,
          TOTAL_CANTIDAD: cantidad,
          TOTAL_VALOR_NETO: valorNeto,
          TOTAL_COSTO_INTERNO: costoInterno,
@@ -227,16 +229,16 @@ const getResumenIncentivos = async () => {
 
    if (resp.data.length) {
       let tablaResumen = `
-            <table class="table table-bordered table-hover table-sm" id="tablaResumen2" style="width: 100%;">
-                <thead class="table-info">        
-                    <tr>
-                        <th>LABORATORIO</th>
-                        <th>CONCEPTO</th>
-                        <th>DOCUMENTO</th>
-                        <th>VALOR FINAL</th>                       
-                    </tr>
-                </thead>
-                <tbody>`;
+      <table class="table table-bordered table-hover table-sm" id="tablaResumen2" style="width: 100%;">
+            <thead class="table-info">        
+               <tr>
+                  <th>LABORATORIO</th>
+                  <th>CONCEPTO</th>
+                  <th>DOCUMENTO</th>
+                  <th>VALOR FINAL</th>                       
+               </tr>
+            </thead>
+            <tbody>`;
 
       const totalValorFinal = resp.data.reduce((acumulado, item) => acumulado + parseFloat(item.VALOR_FINAL), 0);
 
@@ -244,22 +246,22 @@ const getResumenIncentivos = async () => {
          let mes = (parseInt(item.MES) < 10) ? `0${item.MES}` : `${item.MES}`;
          const concepto = `INCENTIVO FDV ${meses[mes]} ${item.ANIO}`;
          tablaResumen += `
-                    <tr>
-                        <td class="custom-td">${item.LABORATORIO}</td>
-                        <td class="custom-td">${concepto}</td>
-                        <td class="custom-td-2">${item.DOCUMENTO}</td>
-                        <td class="custom-td-2">${formatNum(item.VALOR_FINAL, "$")}</td>                        
-                    </tr>`;
+         <tr>
+            <td class="custom-td">${item.LABORATORIO}</td>
+            <td class="custom-td">${concepto}</td>
+            <td class="custom-td-2">${item.DOCUMENTO}</td>
+            <td class="custom-td-2">${formatNum(item.VALOR_FINAL, "$")}</td>                        
+         </tr>`;
       });
       tablaResumen += `
-                </tbody>
-                <tfoot class="table-info">        
-                    <tr>
-                        <td class="text-green" colspan="3">TOTAL</td>
-                        <td class="text-green">${formatNum(totalValorFinal, "$")}</td>                                                  
-                    </tr>
-                </tfoot>                       
-            </table>`;
+            </tbody>
+            <tfoot class="table-info">        
+               <tr>
+                  <td class="text-green" colspan="3">TOTAL</td>
+                  <td class="text-green">${formatNum(totalValorFinal, "$")}</td>                                                  
+               </tr>
+            </tfoot>                       
+      </table>`;
       $('#contenedorTablaResumen').html(tablaResumen);
    } else {
       const texto = `<p class="lead text-center">Resumen no disponible, Aún no se registra incentivo!!!</p>`;
@@ -278,28 +280,20 @@ const getDatosBase = async () => {
    let elementos = ``;
    resp.data.forEach(item => {
       elementos += `
-            <tr>
-                <td class="custom-td-2">${item.ID}</td>
-                <td class="custom-td">${item.OFICINA_VENTAS} - ${item.CIUDAD}</td>
-                <td class="custom-td">${item.PROVEEDOR}</td>
-                <td class="custom-td">${item.PROVEEDOR_2}</td>
-                <td class="custom-td">${item.DESCRIPCION1}</td>
-                <td class="custom-td-2">${formatNum(item.CUOTA_VALOR, "$")}</td>
-                <td class="custom-td-2">${item.CUOTA_IMPACTOS}</td>
-                <td class="custom-td">${item.TIPO_SEGUIMIENTO}</td>
-                <td class="custom-td-2">${item.FECHA_INICIO}</td>
-                <td class="custom-td-2">${item.FECHA_FINAL}</td>
-                <td>
-                    <button class="btn btn-success custom-btn seguimiento">
-                        <i class="fa-solid fa-eye custom-fa"></i>
-                    </button>
-                </td>
-                <td>
-                    <button class="btn btn-warning custom-btn editar">
-                        <i class="fa-solid fa-pen-to-square custom-fa"></i>
-                    </button>
-                </td>              
-            </tr>`;
+      <tr>
+         <td class="custom-td-2">${item.ID}</td>
+         <td class="custom-td">${item.OFICINA_VENTAS} - ${item.CIUDAD}</td>
+         <td class="custom-td">${item.PROVEEDOR}</td>
+         <td class="custom-td">${item.PROVEEDOR_2}</td>
+         <td class="custom-td">${item.DESCRIPCION1}</td>
+         <td class="custom-td-2">${formatNum(item.CUOTA_VALOR, "$")}</td>
+         <td class="custom-td-2">${item.CUOTA_IMPACTOS}</td>
+         <td class="custom-td">${item.TIPO_SEGUIMIENTO}</td>
+         <td class="custom-td-2">${item.FECHA_INICIO}</td>
+         <td class="custom-td-2">${item.FECHA_FINAL}</td>
+         <td><button class="btn btn-success custom-btn seguimiento"><i class="fa-solid fa-eye custom-fa"></i></button></td>
+         <td><button class="btn btn-warning custom-btn editar"><i class="fa-solid fa-pen-to-square custom-fa"></i></button></td>              
+      </tr>`;
    });
    $('#tablaIncentivos tbody').html(elementos);
 
@@ -424,20 +418,19 @@ const gestionarSeguimiento = async (item) => {
          let VN = formatNum(item.VALOR_NETO, "$");
          let CI = formatNum(item.COSTO_INTERNO, "$");
          datosResumen += `
-                <tr>
-                    <td class="custom-td-2">${item.ZONA}</td>
-                    <td class="custom-td">${item.ZONA_DESCRIPCION}</td>
-                    <td class="custom-td-2">${item.CANTIDAD}</td>
-                    <td class="custom-td-2">${item.IMPACTOS}</td>
-                    <td class="custom-td-2">${(tipoSeguimiento === "VALOR NETO") ? VN : CI}</td>
-                </tr>`;
+         <tr>
+            <td class="custom-td-2">${item.ZONA}</td>
+            <td class="custom-td">${item.ZONA_DESCRIPCION}</td>
+            <td class="custom-td-2">${item.CANTIDAD}</td>
+            <td class="custom-td-2">${item.IMPACTOS}</td>
+            <td class="custom-td-2">${(tipoSeguimiento === "VALOR NETO") ? VN : CI}</td>
+         </tr>`;
       });
       $('#tablaResumen tbody').html(datosResumen);
       $('#totalResumen').text(formatNum(cuotaActual, "$"));
       $('#totalImpactos').text(impactoActual);
       $('#totalCantidad').text(cantidadActual);
       $('#descProveedor').text(descProveedor);
-
       $('#contenedorTablaLiquidacion').html(``);
       $('#contenedorTablaLiquidacionZonas').html(``);
       $('#numeroNota').val("");
@@ -466,6 +459,32 @@ const gestionarSeguimiento = async (item) => {
 
          let thCoords = ``;
          let tdCoords = ``;
+         let tdCoords2 = ``;
+
+         const renderTemplatesCoords = (identificacion, nombre, valorNota) => `
+            <tr>
+               <td class="custom-td-2">${identificacion}</td>
+               <td class="custom-td">${nombre}</td>
+               <td class="custom-td-2">${formatNum(Math.round(valorNota), "$")}</td>                    
+               <td class="custom-td">${descProveedor} ${meses[fechaRappelsMes]} ${fechaRappelsAnio}</td>                    
+               <td class="custom-td">CONSIGNACIÓN</td>                    
+            </tr>`;
+
+         const renderTemplatesCoords2 = (id1, id2, name1, name2, valor1) => `
+            <tr>
+               <td class="${(id1) ? 'custom-td-2' : 'custom-td text-danger'}">${id1 || "NO DISPONIBLE"}</td>
+               <td class="custom-td ${(name1) ? '' : 'text-danger'}">${name1 || "NO DISPONIBLE"}</td>
+               <td class="custom-td-2">${formatNum(Math.round(valor1), "$")}</td>                    
+               <td class="custom-td">${descProveedor} ${meses[fechaRappelsMes]} ${fechaRappelsAnio}</td>                    
+               <td class="custom-td">CONSIGNACIÓN</td>                    
+            </tr>
+            <tr>
+               <td class="${(id2) ? 'custom-td-2' : 'custom-td text-danger'}">${id2 || "NO DISPONIBLE"}</td>
+               <td class="custom-td ${(name2) ? '' : 'text-danger'}">${name2 || "NO DISPONIBLE"}</td>
+               <td class="custom-td-2">${formatNum(Math.round(valor1), "$")}</td>                    
+               <td class="custom-td">${descProveedor} ${meses[fechaRappelsMes]} ${fechaRappelsAnio}</td>                    
+               <td class="custom-td">CONSIGNACIÓN</td>                    
+            </tr>`;
 
          if (resumen.length) {
             resumen.forEach((item, index) => {
@@ -473,110 +492,142 @@ const gestionarSeguimiento = async (item) => {
                const costo = item.TOTAL_NOTA_COORD_C;
                thCoords += `<th>COORDINADOR COMERCIAL ${index + 1} (${porcentajeCoorComer}%)</th>`;
                tdCoords += `
-                  <td>
-                     <div class="d-flex gap-2 align-items-center">
-                        <p class="m-0">${item.NOMBRE.split(' ')[0]}:</p>
-                        <p class="m-0">${formatNum(Math.round((tipoSeguimiento === "VALOR NETO") ? neto : costo), "$")}</p>
-                     </div>
-                  </td>`;
+               <td>
+                  <div class="d-flex gap-2 align-items-center">
+                     <p class="m-0">${item.NOMBRE.split(' ')[0]}:</p>
+                     <p class="m-0">${formatNum(Math.round((tipoSeguimiento === "VALOR NETO") ? neto : costo), "$")}</p>
+                  </div>
+               </td>`;
+
+               tdCoords2 += renderTemplatesCoords(item.IDENTIFICACION, item.NOMBRE, item.TOTAL_NOTA_COORD_N);
             });
          }
 
          const tablaLiquidacion = `
-                <table class="table table-bordered table-sm mx-auto" id="tablaLiquidacion" style="width: 100%;">
-                    <thead class="table-info">
-                        <tr>
-                            <th>VALOR NOTA</th>
-                            <th>NÚMERO NOTA</th>
-                            <th>LIQUIDACIÓN FDV (${porcentajeFDV}%)</th>                      
-                            <th>MERCADEO (${porcentajeMercadeo}%)</th>
-                            <th>GERENCIA COMERCIAL (${porcentajeGerComer}%)</th>
-                            <th>COORDINADOR CONTACT CENTER (${porcentajeCoorContac}%)</th>
-                            ${thCoords}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>${formatNum(VALOR_NOTA, "$")}</td>
-                            <td>${NUMERO_NOTA}</td>
-                            <td>${formatNum(Math.round(liquidacG), "$")}</td>
-                            <td>${formatNum(Math.round(mercadeo), "$")}</td>
-                            <td>${formatNum(Math.round(gerenciaC), "$")}</td>
-                            <td>${formatNum(Math.round(coordCont), "$")}</td>
-                            ${tdCoords}
-                        </tr>
-                    </tbody>                       
-                </table>`;
-         $('#contenedorTablaLiquidacion').html(tablaLiquidacion);
+         <table class="table table-bordered table-sm mx-auto" id="tablaLiquidacion" style="width: 100%;">
+            <thead class="table-info">
+               <tr>
+                  <th>VALOR NOTA</th>
+                  <th>NÚMERO NOTA</th>
+                  <th>LIQUIDACIÓN FDV (${porcentajeFDV}%)</th>                      
+                  <th>MERCADEO (${porcentajeMercadeo}%)</th>
+                  <th>GERENCIA COMERCIAL (${porcentajeGerComer}%)</th>
+                  <th>COORDINADOR CONTACT CENTER (${porcentajeCoorContac}%)</th>
+                  ${thCoords}
+               </tr>
+            </thead>
+            <tbody>
+               <tr>
+                  <td>${formatNum(VALOR_NOTA, "$")}</td>
+                  <td>${NUMERO_NOTA}</td>
+                  <td>${formatNum(Math.round(liquidacG), "$")}</td>
+                  <td>${formatNum(Math.round(mercadeo), "$")}</td>
+                  <td>${formatNum(Math.round(gerenciaC), "$")}</td>
+                  <td>${formatNum(Math.round(coordCont), "$")}</td>
+                  ${tdCoords}
+               </tr>
+            </tbody>                       
+         </table>`;
+         $('#contenedorTablaLiquidacion').html(tablaLiquidacion);        
 
          let tablaLiquidacionZonas = `
-                <table class="table table-bordered table-hover table-sm mx-auto" id="tablaLiquidacionZonas" style="width: 100%;">
-                    <thead class="table-info">
-                        <tr>
-                            <th colspan="4">RAPPELS</th>
-                            <th class="custom-td" colspan="4">${descProveedor} ${meses[fechaRappelsMes]} ${fechaRappelsAnio}</th>                           
-                        </tr>
-                        <tr>
-                            <th colspan="8" style="background-color: white;"></th>                            
-                        </tr>
-                        <tr>
-                            <th>ZONA</th>
-                            <th>NOMBRE ZONA</th>
-                            <th>VALORES</th>
-                            <th>% LIQUIDACIÓN</th>                            
-                            <th>VALOR ZONA</th>
-                            <th>VALOR X CADA UNO</th>
-                            <th>NOTA</th>
-                            <th>MEDIO</th>
-                        </tr>
-                    </thead>
-                    <tbody>`;
+         <table class="table table-bordered table-hover table-sm mx-auto" id="tablaLiquidacionZonas" style="width: 60%;">
+            <thead class="table-info">
+               <tr>
+                  <th colspan="4">RAPPELS</th>
+                  <th class="custom-td" colspan="4">${descProveedor} ${meses[fechaRappelsMes]} ${fechaRappelsAnio}</th>                           
+               </tr>
+               <tr>
+                  <th colspan="8" style="background-color: white;"></th>                            
+               </tr>
+               <tr>
+                  <th>ZONA</th>
+                  <th>NOMBRE ZONA</th>
+                  <th>VALORES</th>
+                  <th>% LIQUIDACIÓN</th>                            
+                  <th>VALOR ZONA</th>
+                  <th>VALOR X CADA UNO</th>                            
+               </tr>
+            </thead>
+            <tbody>`;
+
+         let tablaLiquidacionConsolidados = `
+         <table class="table table-bordered table-hover table-sm mx-auto" id="tablaLiquidacionZonas" style="width: 60%;">
+            <thead class="table-info">
+               <tr>
+                  <th>CEDULA</th>
+                  <th>BENEFICIARIO</th>
+                  <th>VALOR INCENTIVO</th>
+                  <th>NOTA</th>                            
+                  <th>MEDIO</th>
+               </tr>
+            </thead>
+            <tbody> 
+            ${renderTemplatesCoords(gerenteMercadeo[0]?.IDENTIFICACION, gerenteMercadeo[0]?.NOMBRE, mercadeo)}
+            ${renderTemplatesCoords(gerenteVentas[0]?.IDENTIFICACION, gerenteVentas[0]?.NOMBRE, gerenciaC)}
+            ${renderTemplatesCoords(coordContact[0]?.IDENTIFICACION, coordContact[0]?.NOMBRE, coordCont)}
+            ${tdCoords2}`;
+
          if (tipoSeguimiento === "VALOR NETO") {
             resp.data.forEach(item => {
-               // TODO: VALIDAR CALCULOS DE BENEFICIARIOS Y ASIGNAR LOS DATOS DE LOS MISMOS
-               // TODO: BUSCAR LA MENERA DE PINTAR LOS DATOS DE LOS BENEFICIARIOS Y ASOCIAR A LA TABLA
+               const ZI = zonasParejas.filter(itemPareja => itemPareja.zona === item.ZONA);
+               const i1 = ZI[0]?.integrantes[0] || "";
+               const i2 = ZI[0]?.integrantes[1] || "";
                const porcentajeVenta = (parseInt(item.VALOR_NETO) / cuotaActual) * 100;
                const incentivoZona = (liquidacG * porcentajeVenta) / 100;
                const valorCadaVendedor = incentivoZona / 2;
 
                tablaLiquidacionZonas += `
-                            <tr>
-                                <td class="custom-td-2">${item.ZONA}</td>
-                                <td class="custom-td">${item.ZONA_DESCRIPCION}</td>
-                                <td class="custom-td-2">${formatNum(item.VALOR_NETO, "$")}</td>
-                                <td class="custom-td-2">${porcentajeVenta.toFixed(2)}%</td>
-                                <td class="custom-td-2">${formatNum(Math.round(incentivoZona), "$")}</td>
-                                <td class="custom-td-2">${formatNum(Math.round(valorCadaVendedor), "$")}</td>
-                                <td class="custom-td">${descProveedor} ${meses[fechaRappelsMes]} ${fechaRappelsAnio}</td>
-                                <td class="custom-td">CONSIGNACIÓN</td>
-                            </tr>`;
+               <tr>
+                  <td class="custom-td-2">${item.ZONA}</td>
+                  <td class="custom-td">${item.ZONA_DESCRIPCION}</td>
+                  <td class="custom-td-2">${formatNum(item.VALOR_NETO, "$")}</td>
+                  <td class="custom-td-2">${porcentajeVenta.toFixed(2)}%</td>
+                  <td class="custom-td-2">${formatNum(Math.round(incentivoZona), "$")}</td>
+                  <td class="custom-td-2">${formatNum(Math.round(valorCadaVendedor), "$")}</td>                               
+               </tr>`;
+
+               tablaLiquidacionConsolidados += renderTemplatesCoords2(i1.IDENTIFICACION, i2.IDENTIFICACION, i1.NOMBRE, i2.NOMBRE, valorCadaVendedor);
             });
             tablaLiquidacionZonas += `
-                        </tbody>                       
-                    </table>`;
+               </tbody>                       
+            </table>`;
             $('#contenedorTablaLiquidacionZonas').html(tablaLiquidacionZonas);
+
+            tablaLiquidacionConsolidados += `
+               </tbody>                       
+            </table>`;
+            $('#contenedorTablaLiquidacionConsolidados').html(tablaLiquidacionConsolidados);
          } else {
             resp.data.forEach(item => {
+               const ZI = zonasParejas.filter(itemPareja => itemPareja.zona === item.ZONA);
+               const i1 = ZI[0]?.integrantes[0] || "";
+               const i2 = ZI[0]?.integrantes[1] || "";
                const porcentajeVenta = (parseFloat(item.COSTO_INTERNO) / cuotaActual) * 100;
                const incentivoZona = (liquidacG * porcentajeVenta) / 100;
                const valorCadaVendedor = incentivoZona / 2;
 
                tablaLiquidacionZonas += `
-                            <tr>
-                                <td class="custom-td-2">${item.ZONA}</td>
-                                <td class="custom-td">${item.ZONA_DESCRIPCION}</td>
-                                <td class="custom-td-2">${formatNum(item.COSTO_INTERNO, "$")}</td>
-                                <td class="custom-td-2">${porcentajeVenta.toFixed(2)}%</td>
-                                <td class="custom-td-2">${formatNum(Math.round(incentivoZona), "$")}</td>
-                                <td class="custom-td-2">${formatNum(Math.round(valorCadaVendedor), "$")}</td>
-                                <td class="custom-td">${descProveedor} ${meses[fechaRappelsMes]} ${fechaRappelsAnio}</td>
-                                <td class="custom-td">CONSIGNACIÓN</td>
-                            </tr>`;
+               <tr>
+                  <td class="custom-td-2">${item.ZONA}</td>
+                  <td class="custom-td">${item.ZONA_DESCRIPCION}</td>
+                  <td class="custom-td-2">${formatNum(item.COSTO_INTERNO, "$")}</td>
+                  <td class="custom-td-2">${porcentajeVenta.toFixed(2)}%</td>
+                  <td class="custom-td-2">${formatNum(Math.round(incentivoZona), "$")}</td>
+                  <td class="custom-td-2">${formatNum(Math.round(valorCadaVendedor), "$")}</td>                            
+               </tr>`;
+
+               tablaLiquidacionConsolidados += renderTemplatesCoords2(i1.IDENTIFICACION, i2.IDENTIFICACION, i1.NOMBRE, i2.NOMBRE, valorCadaVendedor);
             });
             tablaLiquidacionZonas += `
-                        </tbody>                       
-                    </table>`;
+               </tbody>                       
+            </table>`;
             $('#contenedorTablaLiquidacionZonas').html(tablaLiquidacionZonas);
+
+            tablaLiquidacionConsolidados += `
+               </tbody>                       
+            </table>`;
+            $('#contenedorTablaLiquidacionConsolidados').html(tablaLiquidacionConsolidados);
          }
       } else {
          const texto = `<p class="lead text-center">Liquidación no disponible, aún no se fija el valor de la nota!!!</p>`;
