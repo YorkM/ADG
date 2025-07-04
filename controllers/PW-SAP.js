@@ -278,7 +278,7 @@ const ZonasVentas = async () => {
   }
 }
 // FUNCIÓN DE ACTIVACIÓN DE TABS
-function activaTab(tab) { $(`.nav-tabs a[href="#${tab}"]`).tab("show"); };
+function activaTab(btnTab) { $(`#${btnTab}`).click(); };
 // FUNCIÓN LOADING DE LA APP
 function LoadImg(texto = "Cargando...") {
   let n = 0;
@@ -404,13 +404,12 @@ const EditarPedido = async (Numero, Tipo) => {
     console.error(error);
   }
 }
-
 // FUNCIÓN PARA CARGA DE EVENTO AUTOMATICO
 function CargarEvento() {
   let DepId = $("#Dpto").val();
   if (parent.parent.$("#AbrirVentas").val() != 0) {
     if (DepId == 10 || $("#txt_codigoSap").val() != '') {
-      activaTab("dvProductos");
+      activaTab("btnProductos");
 
       let grupo = parent.parent.$("#AbrirVentas").val();
       let tipo = parent.parent.$("#AbrirVentasTipo").val();
@@ -497,7 +496,7 @@ function CargarClienteSeleccionado() {
 function CargarCliente(codSAP, sw) {
   let expresion = new RegExp(codSAP, "i");
   let filtro = ArrCli.filter(ArrCli => expresion.test(ArrCli.codigo_sap));
-  for (var i = 0; i < filtro.length; i++) {
+  for (let i = 0; i < filtro.length; i++) {
     const d = filtro[0];
     $('#txt_cliente').val(d.value);
     $("#txt_nit").val(d.nit);
@@ -632,11 +631,10 @@ function InfoBon(descripcion, desc_bonificado_n, stock, stock_bonificado, condic
 // FUNCIÓN PARA LIMPIAR CADENAS DE CARACTERES ESPECIALES
 function getCleanedString(cadena) {
   let specialChars = "!@#$^&%*()+=-[]\/{}|:<>?,.";
-  for (var i = 0; i < specialChars.length; i++) {
+  for (let i = 0; i < specialChars.length; i++) {
     cadena = cadena.replace(new RegExp("\\" + specialChars[i], 'gi'), '');
   }
   cadena = cadena.toLowerCase();
-  // Quitamos espacios y los sustituimos por _ porque nos gusta mas asi  
   // Quitamos acentos y "ñ". Fijate en que va sin comillas el primer parametro
   cadena = cadena.replace(/á/gi, "a");
   cadena = cadena.replace(/é/gi, "e");
@@ -798,7 +796,6 @@ const ListarCompetencia = async () => {
     console.error(error);
   }
 }
-
 // FUNCIÓN PARA FILTRAR CLIENTES
 function FiltrarCli(expr, ArrayCli, op) {
   const expresion = new RegExp(expr, "i");
@@ -1594,7 +1591,7 @@ async function VerificaPedido() {
     if (num > 0) {
       const data = await enviarPeticion({ op: "S_VERIFICA_PEDIDO", link: "../models/PW-SAP.php", num });
       if (data == '') {
-        var numsap = $.trim($("#txt_numero_sap").val());
+        let numsap = $.trim($("#txt_numero_sap").val());
         if (numsap != 0) {
           EliminarSAP(numsap, 0);
         }
@@ -1621,7 +1618,7 @@ async function enviarCotizacionEmail(numero) {
 
     if (resp.Tipo && resp.Tipo == "success") {
       showToastr("success", "Documento enviado");
-      activaTab("dvClientes");
+      activaTab("btnClientes");
       Limpiar();
       // valido si se abrio el modulo desde el 0102 
       if ($("#link_pro").val() != "0" || $("#link_pro").val() != "") {
@@ -1719,12 +1716,8 @@ const ListarPedido = async () => {
           <td>
             <input ${acces} ${style} type="number" id="CAF${item.codigo}" onKeyPress="return vnumeros(event)" value="${item.cantidad}" class="form-control size-td" tabindex="${(index + 1)}" onBlur="AddProducto('${$.trim(item.codigo)}', '${$.trim(item.valor_unitario)}', '${$.trim(item.iva)}', '${$.trim(item.descuento)}', this.value, '${$.trim(item.valor_neto)}', '${$.trim(item.stock)}', '${$.trim(item.valor_total)}', '${$.trim(item.id)}', '${$.trim(Bonifica)}', '${$.trim(item.cant_bonificado)}', '${$.trim(item.cant_regular)}', '${$.trim(item.stock_bonificado)}'); ListarPedido();">
           </td>
-          <td>
-            <input type="text" class="form-control size-td" id="TOF${item.codigo}" value="${item.valor_total}" disabled readonly>
-          </td>
-          <td>
-            <input type="text" class="form-control size-td" id="IDF${item.codigo}" value="${item.id}" disabled readonly>
-          </td>
+          <td><input type="text" class="form-control size-td" id="TOF${item.codigo}" value="${item.valor_total}" disabled readonly></td>
+          <td><input type="text" class="form-control size-td" id="IDF${item.codigo}" value="${item.id}" disabled readonly></td>
         </tr>`;
       });
 
@@ -1737,7 +1730,7 @@ const ListarPedido = async () => {
 
       if (NumPedSAP == 0) {
         btnEliminar = `
-        <button type="button" class="btn btn-danger btn-sm w-btn" onClick="EliminarPW('${NumPed}'); Limpiar(); activaTab('dvClientes');">
+        <button type="button" class="btn btn-danger btn-sm w-btn" onClick="EliminarPW('${NumPed}'); Limpiar(); activaTab('btnClientes');">
           <i class="fa-solid fa-trash-can"></i>
           Eliminar
         </button>`;
@@ -1761,7 +1754,7 @@ const ListarPedido = async () => {
       } else {
         if (Rol == 1 || Rol == 3 || Rol == 21 || Rol == 13) { // 1:Administrador | 3:Gerente de ventas | 21:Coordinador pw | 13:Coordinador Televentas
           btnEliminar = `
-          <button type="button" class="btn btn-danger btn-sm w-btn" onClick="EliminarSAP('${NumPedSAP}', '${NumPed}'); Limpiar(); activaTab('dvClientes');">
+          <button type="button" class="btn btn-danger btn-sm w-btn" onClick="EliminarSAP('${NumPedSAP}', '${NumPed}'); Limpiar(); activaTab('btnClientes');">
             <i class="fa-solid fa-trash-can"></i>
             Eliminar
           </button>`;
@@ -1794,7 +1787,7 @@ const ListarPedido = async () => {
           </button>
           ${btnEliminar}
         </div>
-        <textarea id="Pnotas" class="form-control mb-3" style="background-color: #FFC;" onblur="UpdNotas(this)" placeholder="Notas del pedido">${notas}</textarea>
+        <textarea id="Pnotas" class="form-control mb-3 shadow-sm" style="background-color: #FFC;" onblur="UpdNotas(this)" placeholder="Notas del pedido">${notas}</textarea>
         <div class="mb-3">
           <ul class="list-group">
             ${itemsList}
@@ -2063,7 +2056,7 @@ function AbrirOpciones(numero, valor_total, destinatario, direccion, bodega, cod
 }
 // FUNCIÓN PARA VISUALIZAR PEDIDO
 function VisualizarPedido() {
-  var num = $.trim($("#ped_numero").val());
+  let num = $.trim($("#ped_numero").val());
   $("#ContenidoPDF").html('<embed src="../resources/tcpdf/pedidos.php?ped=' + num + '&tipo=V" frameborder="0" width="100%" height="400px">');
   $("#ModalPDF").modal("show");
 }
@@ -2104,7 +2097,7 @@ function RecuperarPedido() {
       $("#txt_total").val(formatNum(valor, '$'));
       $("#btnPedidos").attr("disabled", false);
       $("#ModalOpciones").modal("hide");
-      activaTab('dvPedidos');
+      activaTab('btnPedidos');
 
       if (DepId == 10) {
         $("#txt_cliente").val(codigo_sap);
@@ -2149,7 +2142,7 @@ async function EnviarMailAnulacion(tipo, numero, texto) {
 }
 // FUNCIÓN PARA VALIDAR INVENTARIO ANTES DE GUARDAR
 function WSInvenTotal() {
-  var numero = $("#txt_numero").val();
+  let numero = $("#txt_numero").val();
   if (numero > 0) {
     $.ajax({
       encoding: "UTF-8",
@@ -2199,7 +2192,7 @@ const Guardar = async () => {
 
           if (data.Tipo == 'S') {
             Swal.fire("Excelente!", data.Msj, "success");
-            activaTab("dvClientes");
+            activaTab("btnClientes");
             Limpiar();
             // Envio de email para usuarios
             if (numeroSAP == 0) {
@@ -2309,9 +2302,9 @@ function AddEvento(grupo, tipo) {
 
     $("#txt_bproductos").val($.trim(grupo));
     BuscarProductoArr(0);
-    activaTab("dvProductos");
+    activaTab("btnProductos");
   } else {
-    activaTab("dvClientes");
+    activaTab("btnClientes");
     parent.parent.$("#AbrirVentas").val(grupo);
     parent.parent.$("#AbrirVentasTipo").val(tipo);
     Swal.fire('Información', 'Para visualizar el evento primero debe seleccionar un cliente', 'warning');
@@ -2648,7 +2641,6 @@ async function Ordenes() {
             Recoge en Punto de venta
         </label>` : ''}
   </div>`;
-
   
   if (entrega != 0 && entrega != '') {
     let Num = $.trim($("#ped_ot").val());
@@ -3571,22 +3563,23 @@ function FiltrosTipoPedidos(tipo) {
 }
 // FUNCIÓN DESCARGAR EXCEL
 function DescargarExcel(OPC) {
+  let num = "";
   switch (OPC) {
     case 'PEDIDO':
-      var num = $.trim($("#ped_numero").val());
+      num = $.trim($("#ped_numero").val());
       ExcelPedido(num);
       break;
     case 'ENTREGA':
-      var numE = $.trim($("#ped_entrega").val());
-      var numP = $.trim($("#ped_numero_sap").val());
+      let numE = $.trim($("#ped_entrega").val());
+      let numP = $.trim($("#ped_numero_sap").val());
       ExcelEntrega(numE, numP)
       break;
     case 'OT':
-      var num = $.trim($("#ped_ot").val());
+      num = $.trim($("#ped_ot").val());
       ExcelOrden(num);
       break;
     case 'FACTURA':
-      var num = $("#ped_factura").val();
+      num = $("#ped_factura").val();
       ExcelFactura(num);
       break;
   }
@@ -4323,7 +4316,7 @@ const filtrarClientesCampos = (idCampo) => {
   } else {
     let div_cadena = valor;
     div_cadena = div_cadena.split(" ");
-    for (var x = 0; x < div_cadena.length; x++) {
+    for (let x = 0; x < div_cadena.length; x++) {
       let expr = $.trim(div_cadena[x]);
       Arr_cli = FiltrarCli(expr, Arr_cli, 2);
     }
@@ -4430,7 +4423,7 @@ $(function () {
   });
 
   $("#btnMenu8").click(function () {
-    var num = $.trim($("#ped_factura").val());
+    let num = $.trim($("#ped_factura").val());
     VisualizarFactura(num);
   });
 
@@ -4534,7 +4527,6 @@ $(function () {
 
     $("#txt_cliente").on('change', function () {
       CargarClienteSeleccionado();
-      console.log("onChage...");
     });
 
     $("#tr_cliente_fact").hide();
@@ -4544,7 +4536,7 @@ $(function () {
     $("#tr_cliente_faltante").show();
     let inputCliente = `
     <div class="input-group">
-      <input type="text" id="txt_cliente" class="form-control size-td" placeholder="Búsqueda de clientes" tabindex="1">
+      <input type="text" id="txt_cliente" class="form-control size-td shadow-sm" placeholder="Búsqueda de clientes" tabindex="1">
       <span class="input-group-btn">
       <button class="btn btn-light btn-micro" type="button" title="Búsqueda de cliente por voz" onclick="iniciarVozATexto('txt_cliente',this)">
         <i class="fa-solid fa-microphone"></i>&nbsp;
@@ -4553,7 +4545,6 @@ $(function () {
     </div>`;
     $("#colCliente").html(inputCliente);
 
-    let timer;
     $('#txt_cliente').autocomplete({
       source: function (request, response) {       
         response(filtrarClientesCampos("txt_cliente"));       
@@ -4672,9 +4663,9 @@ $(function () {
       if ($("#liProductos").hasClass("disabled")) sw = 1;
 
       if (sw == 0) {
-        activaTab("dvProductos");
+        activaTab("btnProductos");
         $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-          var target = e.target.attributes.href.value;
+          let target = e.target.attributes.href.value;
           $(target + ' #txt_bproductos').focus();
         });
         $('#txt_bproductos').focus();
@@ -4687,7 +4678,7 @@ $(function () {
       if ($("#liPedidos").hasClass("disabled")) sw = 1;
 
       if (sw == 0) {
-        activaTab("dvPedidos");
+        activaTab("btnPedidos");
         Guardar();
       }
     }
@@ -4801,7 +4792,7 @@ $(function () {
 
         WSInvenTotal();
         ListarPedido();
-        activaTab("dvPedidos");
+        activaTab("btnPedidos");
         $("#filename").val('');
         UnloadImg();
         if (NoAdd != '') Swal.fire('Codigos no encontrados o no validos', NoAdd, 'warning');
@@ -4822,7 +4813,7 @@ $(function () {
   });
 
   $("#btnDescuentos").on('click', function () {
-    activaTab('dvProductos');
+    activaTab('btnProductos');
     if ($("#txtGrp1").val() == '100') $("#txt_bproductos").val('OFERTA EXCLUSIVA CLIENTE WEB');
     else $("#txt_bproductos").val('*');
     $("#DvChkDctos").addClass("DivCheckBoxTrue");

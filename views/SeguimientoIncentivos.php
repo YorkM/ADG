@@ -140,7 +140,7 @@
                                 <label for="oficina">Oficina Ventas</label>
                             </div>
                             <div class="col-12 col-md-9">
-                                <select class="form-select form-select-sm" id="oficina">
+                                <select class="form-select form-select-sm shadow-sm" id="oficina">
 
                                 </select>
                             </div>
@@ -150,7 +150,7 @@
                                 <label for="proveedor">Proveedor - GA</label>
                             </div>
                             <div class="col-md-9">
-                                <select class="form-select form-select-sm" id="proveedor" multiple="multiple">
+                                <select class="form-select form-select-sm shadow-sm" id="proveedor" multiple="multiple">
 
                                 </select>
                             </div>
@@ -160,7 +160,7 @@
                                 <label for="cuotaValores">Cuota en Valores</label>
                             </div>
                             <div class="col-md-9">
-                                <input type="text" class="form-control form-control-sm" placeholder="Cuota en Valores" id="cuotaValores">
+                                <input type="text" class="form-control form-control-sm shadow-sm" placeholder="Cuota en Valores" id="cuotaValores">
                             </div>
                         </div>
                         <div class="row align-items-center mb-2">
@@ -168,7 +168,7 @@
                                 <label for="cuotaImpactos">Cuota en Impactos</label>
                             </div>
                             <div class="col-md-9">
-                                <input type="text" class="form-control form-control-sm" placeholder="Cuota en Impactos" id="cuotaImpactos">
+                                <input type="text" class="form-control form-control-sm shadow-sm" placeholder="Cuota en Impactos" id="cuotaImpactos">
                             </div>
                         </div>
                     </div>
@@ -178,7 +178,7 @@
                                 <label for="seguimiento">Tipo Seguimiento</label>
                             </div>
                             <div class="col-md-9">
-                                <select class="form-select form-select-sm" id="seguimiento">
+                                <select class="form-select form-select-sm shadow-sm" id="seguimiento">
                                     <option disabled selected>Seleccione tipo seguimiento</option>
                                     <option value="COSTO">COSTO</option>
                                     <option value="VALOR NETO">VALOR NETO</option>
@@ -190,7 +190,7 @@
                                 <label for="fechaInicial">Fecha Inicial</label>
                             </div>
                             <div class="col-md-9">
-                                <input type="text" class="form-control form-control-sm" id="fechaInicial">
+                                <input type="text" class="form-control form-control-sm shadow-sm" id="fechaInicial">
                             </div>
                         </div>
                         <div class="row align-items-center mb-2">
@@ -198,7 +198,7 @@
                                 <label for="fechaFinal">Fecha Final</label>
                             </div>
                             <div class="col-md-9">
-                                <input type="text" class="form-control form-control-sm" id="fechaFinal">
+                                <input type="text" class="form-control form-control-sm shadow-sm" id="fechaFinal">
                             </div>
                         </div>
                         <div class="row align-items-center mb-2">
@@ -206,7 +206,7 @@
 
                             </div>
                             <div class="col-md-9">
-                                <button class="btn btn-outline-primary btn-sm w-100" id="guardarDatos">Guardar Datos Base</button>
+                                <button class="btn btn-outline-primary btn-sm w-100 shadow-sm" id="guardarDatos">Guardar Datos Base</button>
                             </div>
                         </div>
                     </div>
@@ -331,13 +331,13 @@
                 </div>               
                 <div class="overflow mt-3 mb-3" id="contenedorTablaLiquidacionZonas">
                     
-                </div>
-                <h5 class="text-center text-green">CONSOLIDADO BENEFICIARIOS - LIQUIDACIÓN</h5>
+                </div>               
                 <div class="overflow mt-3 mb-3" id="contenedorTablaLiquidacionConsolidados">
                     
                 </div>         
             </div>
             <div class="tab-pane fade p-2" id="nav-profile-3" role="tabpanel" aria-labelledby="nav-profile-tab">
+                <h5 class="text-center text-green">RESUMEN INCENTIVOS - LABORATORIOS</h5>
                 <div class="overflow mt-3 mb-3" id="contenedorTablaResumen">
                     
                 </div>               

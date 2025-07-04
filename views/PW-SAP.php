@@ -454,13 +454,13 @@ Redireccionar();
               </button>
             </div>
           </div>
-          <div class="input-group mb-2 shadow-sm">
-            <input type="text" id="txt_bproductos" class="form-control" tabindex="1" placeholder="F2 - Descripción de producto: Nombre - Código - Grupo">
+          <div class="input-group mb-2">
+            <input type="text" id="txt_bproductos" class="form-control shadow-sm" tabindex="1" placeholder="F2 - Descripción de producto: Nombre - Código - Grupo">
             <div class="input-group-btn">
-              <button class="btn btn-light btn-micro" type="button" title="Búsqueda de productos por voz" onclick="iniciarVozATexto('txt_bproductos',this)">
+              <button class="btn btn-light btn-micro shadow-sm" type="button" title="Búsqueda de productos por voz" onclick="iniciarVozATexto('txt_bproductos',this)">
                 <i class="fa-solid fa-microphone"></i>&nbsp;
               </button>
-              <button type="button" class="btn btn-light btn-micro" id="btnMas2">
+              <button type="button" class="btn btn-light btn-micro shadow-sm" id="btnMas2">
                 <i class="fa-solid fa-gear"></i>&nbsp;
               </button>
             </div>

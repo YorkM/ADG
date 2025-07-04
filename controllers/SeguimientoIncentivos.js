@@ -229,7 +229,7 @@ const getResumenIncentivos = async () => {
 
    if (resp.data.length) {
       let tablaResumen = `
-      <table class="table table-bordered table-hover table-sm" id="tablaResumen2" style="width: 100%;">
+      <table class="table table-bordered table-hover table-sm mx-auto" id="tablaResumen2" style="width: 60%;">
             <thead class="table-info">        
                <tr>
                   <th>LABORATORIO</th>
@@ -552,6 +552,7 @@ const gestionarSeguimiento = async (item) => {
             <tbody>`;
 
          let tablaLiquidacionConsolidados = `
+         <h5 class="text-center text-green mb-3">CONSOLIDADO BENEFICIARIOS - LIQUIDACIÓN</h5>
          <table class="table table-bordered table-hover table-sm mx-auto" id="tablaLiquidacionZonas" style="width: 60%;">
             <thead class="table-info">
                <tr>
