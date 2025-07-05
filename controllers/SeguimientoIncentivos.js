@@ -125,16 +125,16 @@ const resumenDatosCoordinadores = (zonas, cuotaActual, valorNota) => {
    const zonasPorCoordinador = {};
    const resumen = [];
 
-   coordinadores.forEach(u => {
-      if (!zonasPorCoordinador[u.ID]) {
-         zonasPorCoordinador[u.ID] = {
-            ID: u.ID,
-            NOMBRE: u.NOMBRE,
-            IDENTIFICACION: u.IDENTIFICACION,
+   coordinadores.forEach(item => {
+      if (!zonasPorCoordinador[item.ID]) {
+         zonasPorCoordinador[item.ID] = {
+            ID: item.ID,
+            NOMBRE: item.NOMBRE,
+            IDENTIFICACION: item.IDENTIFICACION,
             ZONAS: new Set(),
          };
       }
-      zonasPorCoordinador[u.ID].ZONAS.add(u.ZONA_VENTAS);
+      zonasPorCoordinador[item.ID].ZONAS.add(item.ZONA_VENTAS);
    });
 
    for (const idCoordinador in zonasPorCoordinador) {

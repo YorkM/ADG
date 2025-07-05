@@ -4,6 +4,9 @@ let ArrCli = new Array();
 let ArrDctos = new Array();
 let arrayLiquidador = new Array();
 
+// TODO: REVISAR LA FUNCIÓN ACTIVATAB... ESTÁ FALLANDO
+// TODO: SEGUIR CON LA ACTUALIZACIÓN DEL MODULO RECIBO CAJAS
+
 // EJECUCIÓN DE FUNCIONALIDADES
 $(function () {
   carga_anios('MultiAnio');
@@ -87,8 +90,6 @@ $(function () {
       } else {
         Swal.fire('Oops', 'Valor ya agregado', 'error');
       }
-
-
     }
   }).focusout(function () {
     $('#filtro').val('');
@@ -220,7 +221,7 @@ $(function () {
 
 
       $("#liAbonos").removeClass("disabled disabledTab");
-      $("#btnAbonos").attr("data-toggle", "tab");
+      $("#btnAbonos").attr("disabled", false);
 
       $("#liFacturas").removeClass("disabled disabledTab");
       $("#btnFacturas").attr("data-toggle", "tab");
@@ -1538,7 +1539,7 @@ function UnloadImg() {
   $(".form-control").attr("disabled", false);
 }
 
-function activaTab(tab) {
+function activaTab(btnTab) {
   $('.nav-tabs a[href="#' + tab + '"]').tab('show');
 };
 
@@ -1576,7 +1577,7 @@ function Limpiar() {
   $("#liFacturas").addClass('disabled disabledTab');
   $("#liMulticash").addClass('disabled disabledTab');
   $("#btnMulticash").attr("data-toggle", "");
-  $("#btnAbonos").attr("data-toggle", "");
+  $("#btnAbonos").attr("disabled", true);
   $("#btnFacturas").attr("data-toggle", "");
   $("#tdDetalleMulticash").html('');
 
@@ -1589,7 +1590,6 @@ function Limpiar() {
     $("#dvTotalAbono").hide();
     activaTab('dvPlanilla');
     // $("#liCliente").addClass('disabled disabledTab');
-    // $("#btnCliente").attr("data-toggle", "");
     $("#btnEliminarRC").hide();
     $("#btnEliminarPDF").hide();
   } else {
