@@ -1,420 +1,35 @@
-let ArrayMulticash = new Array();
-let ArrayMulticashBanco = new Array();
-let ArrCli = new Array();
-let ArrDctos = new Array();
-let arrayLiquidador = new Array();
-
-// TODO: REVISAR LA FUNCIÓN ACTIVATAB... ESTÁ FALLANDO
-// TODO: SEGUIR CON LA ACTUALIZACIÓN DEL MODULO RECIBO CAJAS
-
-// EJECUCIÓN DE FUNCIONALIDADES
-$(function () {
-  carga_anios('MultiAnio');
-  carga_mes('MultiMes');
-  carga_dias('MultiDay', $("#MultiMes").val(), $("#MultiAnio").val());
-
-  carga_anios('MultiAnio2');
-  carga_mes('MultiMes2');
-  carga_dias('MultiDay2', $("#MultiMes2").val(), $("#MultiAnio2").val());
-
-  LoadArrayCli();
-
-  $("#MultiMes,#MultiAnio").change(function () {
-    carga_dias('MultiDay', $("#MultiMes").val(), $("#MultiAnio").val());
-    ConsultarMulticash();
-  });
-
-  $("#MultiMes2, #MultiAnio2").change(function () {
-    carga_dias('MultiDay2', $("#MultiMes2").val(), $("#MultiAnio2").val());
-    ConsultarMulticashBanco();
-  });
-
-  $("#MultiDay").change(function () {
-    ConsultarMulticash();
-  });
-
-  $("#MultiDay2").change(function () {
-    ConsultarMulticashBanco();
-  });
-
-  $("#FiltroPlanilla").keyup(function () {
-    theTable = $("#tablePlanillas > tbody > tr");
-    var value = $(this).val().toLowerCase();
-    theTable.filter(function () {
-      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-    });
-  });
-
-  $("#filtro").autocomplete({
-    source: function (request, response) {
-      Array_Cash = ArrayMulticash;
-      valor = $.trim($("#filtro").val());
-      div_cadena = valor;
-      div_cadena = div_cadena.split(" ");
-
-      for (var x = 0; x < div_cadena.length; x++) {
-        expr = $.trim(div_cadena[x]);
-        Array_Cash = FiltrarArray(expr, Array_Cash, 2);
-      }
-      response(Array_Cash.slice(0, 40));
-    },
-    maxResults: 40,
-    minLength: 3,
-    search: function () { },
-    open: function (event, ui) { },
-    select: function (event, ui) {
-      var sw = 0;
-      $("#tdDetalleMulticash tr").each(function (index, element) {
-        var id = $(this).find('td').eq(9).html();
-        if (ui.item.id == id) {
-          sw = 1;
-        }
-      });
-      if (sw == 0) {
-        if (ui.item.estado == 0) {
-          $("#tdDetalleMulticash").append('<tr onDblClick="AddMulticash(this)">'
-            + '<td>' + ui.item.cuenta + '</td>'
-            + '<td>' + ui.item.descripcion + '</td>'
-            + '<td>' + ui.item.numero + '</td>'
-            + '<td>' + formatNum(ui.item.valor, '$') + '</td>'
-            + '<td>' + ui.item.texto + '</td>'
-            + '<td>' + ui.item.fecha_cont + '</td>'
-            + '<td>' + ui.item.fecha_val + '</td>'
-            + '<td>' + ui.item.estado + '</td>'
-            + '<td>' + ui.item.referencia + '</td>'
-            + '<td>' + ui.item.id + '</td>'
-            + '</tr>');
-        } else {
-          Swal.fire('Oops', 'Ya el valor se aplico en el recibo :' + ui.item.id_rc, 'error');
-        }
-      } else {
-        Swal.fire('Oops', 'Valor ya agregado', 'error');
-      }
-    }
-  }).focusout(function () {
-    $('#filtro').val('');
-  });
-
-  //Carga de archivo PDF
-  $("#DocPDF").change(function () {
-    uploadAjax();
-  })
-  var idRol = parseInt($("#RolId").val());
-  //Boton de autorizacion 
-  if (idRol == 1 || idRol == 26) { //Administrador & contabilidad
-    $("#btnAutorizar").show();
-    $("#btnCompensaciones").show();
-  } else {
-    $("#btnAutorizar").hide();
-    $("#btnCompensaciones").hide();
-  }
-  //Cuentas 
-  var sociedad = $("#Sociedad").val();
-  if (sociedad == 1000) {
-    $("#Cuenta").html('<option value="2815050503">2815050503 - AJUSTE AL PESO CM</option>');
-  } else {
-    $("#Cuenta").html('<option value="2815051601">2815051601 - AJUSTE AL PESO ROMA</option>');
-  }
-  //Cargue de multicash
-  if (idRol == 1 || idRol == 4) { //Tesoreria & administrador
-    $("#btnSubirMulticash").attr('disabled', false);
-  } else {
-    $("#btnSubirMulticash").attr('disabled', true);
-  }
-
-  const cssDeshabilatar = {
-    "pointer-events": "none",
-    "color": "#aaa !important",
-    "background-color": "#f5f5f5",
-    "cursor": "not-allowed",
-    "text-decoration": "none"
-  }
-
-  // RESTRICCIÓN DE ACCESO A LA PESTAÑA DE BANCOS 
-  if (idRol !== 17 && idRol !== 48 && idRol !== 72 && idRol !== 73 && idRol !== 1) {
-    document.getElementById('btnBancos').removeAttribute('data-toggle');
-    $('#btnBancos').css(cssDeshabilatar);
-  }
-
-  // RESTRICCIÓN DE ACCESO A LA PESTAÑA DE LIQUIDADOR 
-  if (idRol !== 17 && idRol !== 48 && idRol !== 72 && idRol && idRol !== 44 && idRol !== 3 && idRol !== 14 && idRol !== 13 && idRol !== 73 && idRol !== 1) {
-    document.getElementById('btnLiquidador').removeAttribute('data-toggle');
-    $('#btnLiquidador').css(cssDeshabilatar);
-  }
-
-  $("#FechaDocumento").datepicker({
-    changeMonth: true,
-    changeYear: true,
-    monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-    monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
-    dateFormat: 'yy-mm-dd',
-    width: 100,
-    heigth: 100,
-    minDate: -5
-  }).datepicker("setDate", new Date());
-
-  $("#FechaValor,#RptFhFin,#RptFhIni, #InfoFhIni,#InfoFhFin,#fhCompenIni,#fhCompenFin").datepicker({
-    changeMonth: true,
-    changeYear: true,
-    monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-    monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
-    dateFormat: 'yy-mm-dd',
-    width: 100,
-    heigth: 100
-  }).datepicker("setDate", new Date());
-
-  Limpiar();
-
-  $(document).keyup(function (e) {
-    tecla = e.keyCode;
-    if (tecla == 115) { //F4 para guardar documento
-      Guardar();
-    }
-  });
-
-  $("#txtValidaDocumento").keyup(function (e) {
-    var tecla = e.keyCode;
-    var valor = $(this).val();
-    if (tecla == 13) { //Enter para consultar
-      if (valor != '') {
-        ValidarDocumento(valor);
-      } else {
-        Swal.fire('Error', 'Debe ingresar un número de documento válido.', 'error');
-      }
-
-    }
-  })
-
-
-  $('#Cliente').autocomplete({
-    source: function (request, response) {
-      Arr_cli = ArrCli;
-      valor = $.trim($("#Cliente").val());
-      if (validarSiNumero(valor) == 1) {
-        Arr_cli = FiltrarCli(valor, Arr_cli, 1);
-      } else {
-        div_cadena = valor;
-        div_cadena = div_cadena.split(" ");
-        for (var x = 0; x < div_cadena.length; x++) {
-          expr = $.trim(div_cadena[x]);
-          Arr_cli = FiltrarCli(expr, Arr_cli, 2);
-        }
-      }
-      response(Arr_cli.slice(0, 10));
-    },
-    maxResults: 10,
-    minLength: 3,
-    search: function () { },
-    open: function (event, ui) { },
-    select: function (event, ui) {
-      limpiarDatos();
-
-      $("#tdBody").html("");
-
-      $("#CodigoSAP").val(ui.item.codigo_sap);
-      $("#Email").val(ui.item.email);
-      $("#EmailZona").val(ui.item.email_zona);
-      $("#Grupo").val(ui.item.grupo);
-      $("#DescGrupo").val(ui.item.desc_grupo);
-      $("#Lista").val(ui.item.lista);
-      $("#Oficina").val(ui.item.bodega);
-
-
-      $("#liAbonos").removeClass("disabled disabledTab");
-      $("#btnAbonos").attr("disabled", false);
-
-      $("#liFacturas").removeClass("disabled disabledTab");
-      $("#btnFacturas").attr("data-toggle", "tab");
-
-      $("#liMulticash").removeClass("disabled disabledTab");
-      if (idRol !== 14) {
-        $("#btnMulticash").attr("data-toggle", "tab");
-      }
-      CondicionesDcto();
-      Documentos();
-      ConsultarCondicionLista();
-    }
-  });
-  //-------------------------------------------------------------------------------
-  $('#txt_CondCliente').autocomplete({
-    source: function (request, response) {
-      Arr_cli = ArrCli;
-      valor = $.trim($("#txt_CondCliente").val());
-      if (validarSiNumero(valor) == 1) {
-        Arr_cli = FiltrarCli(valor, Arr_cli, 1);
-      } else {
-        div_cadena = valor;
-        div_cadena = div_cadena.split(" ");
-        for (var x = 0; x < div_cadena.length; x++) {
-          expr = $.trim(div_cadena[x]);
-          Arr_cli = FiltrarCli(expr, Arr_cli, 2);
-        }
-      }
-      response(Arr_cli.slice(0, 10));
-    },
-    maxResults: 10,
-    minLength: 3,
-    search: function () { },
-    open: function (event, ui) { },
-    select: function (event, ui) {
-      $("#txt_CondCodigo").val(ui.item.codigo_sap);
-    }
-  });
-  //-------------------------------------------------------------------------------  
-  $(".ClassNumero").maskMoney({
-    selectAllOnFocus: true, //evento onkeyup 
-    prefix: '$',
-    thousands: '.',
-    decimal: ',',
-    precision: 0
-  });
-
-  ConsultarPlanilla();
-  $("#RptFhFin,#RptFhIni").change(function () {
-    ConsultarPlanilla();
-  });
-  //Nuevo 29-04-2020
-  $("#btnSubirMulticash").click(function () {
-    $("#tr_det_cash").html('');
-    $("#filename").val('');
-    $("#dvSubirCash").modal('show');
-  })
-  //Cargue de plano Multicash
-  $("#filename").val('');
-  $("#filename").change(function (e) {
-    var ext = $("input#filename").val().split(".").pop().toLowerCase();
-    if ($.inArray(ext, ["csv"]) == -1) {
-      alert('Solo se permiten archivos CSV');
-      $("#filename").val('');
-      return false;
-    }
-    if (e.target.files != undefined) {
-      var reader = new FileReader();
-      reader.onload = function (e) {
-        var csvval = e.target.result.split("\n");
-        var detalle = '';
-        var vtotal = 0;
-        for (var i = 0; i < csvval.length; i++) { //for 1		
-          var row = csvval[i];
-          if (row != '') {
-            var col = row.split(',');
-            vtotal += parseFloat(col[1]);
-            detalle += '<tr>'
-              + '<td>' + $.trim(col[0]) + '</td>'
-              + '<td>' + $.trim(col[1]) + '</td>'
-              + '<td>' + formatNum(parseFloat($.trim(col[2])) * -1, '$') + '</td>'
-              + '<td>' + $.trim(col[3]) + '</td>'
-              + '<td>' + $.trim(col[4]) + '</td>'
-              + '<td>' + $.trim(col[5]) + '</td>'
-              + '<td>' + $.trim(col[6]) + '</td>'
-              + '</tr>';
-          }
-
-        } //fin for
-        if (detalle != '') {
-          //Importe,Texto,Fecha contabilización,Fecha valor
-          var tb = '<table class="form" width="100%" id="tdImportCash">'
-            + '<thead>'
-            + '<tr>'
-            + '<th>Cuenta</th>'
-            + '<th>Documento</th>'
-            + '<th>Importe</th>'
-            + '<th>Texto</th>'
-            + '<th>Fecha Conta.</th>'
-            + '<th>Fecha Valor.</th>'
-            + '<th>Referencia</th>'
-            + '</tr>'
-            + '</thead>'
-            + '<tbody>'
-            +
-
-            detalle
-            + '</tbody>'
-            + '</table>';
-          $("#tr_det_cash").html(tb);
-        }
-
-      };
-      reader.readAsText(e.target.files.item(0));
-    }
-    return false;
-  });
-  //------------------------------------------------------------
-  $("#btnEmailZona").click(function () {
-    ConsultarZonas();
-    ListarZonasEmail();
-    $("#dvEmailZonas").modal("show");
-  });
-  //------------------------------------------------------------
-  $("#btnCondicionDcto").click(function () {
-    if ($("#CodigoSAP").val() != '') {
-      $("#dvCondiciones").modal("show");
-    } else {
-      Swal.fire('Error', 'Debe seleccionar un cliente!.', 'error');
-    }
-  });
-  //----Botones de hipervinculos
-  actualizarElementoSegunPermisos("0401", "#0401");
-  actualizarElementoSegunPermisos("0102", "#0102");
-
-  $("#0401,#0102").click(function () {
-    let id = $(this).attr('id')
-    let url = '';
-    let title = '';
-
-    switch (id) {
-      case '0401':
-        url = 'CRM.php';
-        title = '0401 - CRM';
-        break;
-      case '0102':
-        url = 'ProgramacionCliente.php';
-        title = '0102 - PROGRAMACION DE CLIENTE';
-        break;
-    }
-    $("#ModalHipervinculo").modal("show")
-    $("#span-titulo-modulo").text(title);
-    $(".iframe").attr('src', url).show();
-  });
-
-  $("#btnCompensaciones").click(() => {
-    $("#modalCompensaciones").modal('show');
-  })
-
-  $("#btnCompensar").click(() => {
-    compensarDocumentos();
-  })
-
-  $('#btnSeleccionarTodas').click(async function () {
-    arrayLiquidador.length = 0;
-
-    if (!$("#tdFacturas tbody tr").length) {
-      Swal.fire("Agregar documentos", "No hay documentos para agregar al liquidador", "warning");
-      return;
-    }
-
-    const result = await confirmAlert("Agregar documentos", "Se agregarán todos los documentos disponibles al liquidador", "info");
-    if (!result.isConfirmed) return;
-
-    $("#tdFacturas tbody tr").each(function () {
-      let fila = $(this).find('td');
-      let item = JSON.parse($(fila.eq(17)).find('button').attr('data-item'));
-
-      agregarLiquidador(item);
-    });
-  });
-
-  $('#filtro2').keyup(function () {
-    const filtro = this.value.toLowerCase();
-    filtrar(filtro);
-  });
-
-  $('#liBancos').click(function () {
-    ConsultarMulticashBanco();
-  });
-});
+let ArrayMulticash = [];
+let ArrayMulticashBanco = [];
+let ArrCli = [];
+let ArrDctos = [];
+let arrayLiquidador = [];
 
 // DECLARACIÓN DE FUNCIONES GENERALES
+// FUNCIÓN MOSTRAR LOADING
+function LoadImg(texto = "Cargando...") {
+  let n = 0;
+
+  const html = `
+    <img src="../resources/icons/preloader.gif" alt="Cargando..." />
+    <figcaption style="font-size: 25px; margin-bottom: 5px; font-weight: bold;">${texto}</figcaption>
+    <figcaption id="txtTimer" style="font-weight: bold;">0</figcaption>`;
+
+  const loader = document.getElementById("loaderOverlayRecibo");
+  loader.innerHTML = html;
+  loader.style.display = "flex";
+
+  window.timerInterval = setInterval(() => {
+    if (document.getElementById("txtTimer")) document.getElementById("txtTimer").textContent = ++n;
+  }, 1000);
+}
+// FUNCIÓN DESMONTAR LOADING
+function UnloadImg() {
+  clearInterval(window.timerInterval);
+  const loader = document.getElementById("loaderOverlayRecibo");
+  loader.style.display = "none";
+  loader.innerHTML = "";
+}
+// FUNCIÓN CONFIRMAR ALERTA
 const confirmAlert = async (title, text, icon = 'warning') => {
   const result = await Swal.fire({
     title: `${title}`,
@@ -429,7 +44,7 @@ const confirmAlert = async (title, text, icon = 'warning') => {
 
   return result;
 }
-
+// FUNCIÓN PARA FILTRAR TABLAS
 const filtrar = (filtro) => {
   const filas = document.querySelectorAll('#tdPlanillas2 tbody tr');
 
@@ -440,7 +55,7 @@ const filtrar = (filtro) => {
     fila.style.display = coincide ? '' : 'none';
   });
 }
-
+// FUNCIÓN PARA REALIZAR LIMPIEZA
 const limpiarDatos = () => {
   ArrDctos.length = 0;
   arrayLiquidador.length = 0;
@@ -452,7 +67,6 @@ const limpiarDatos = () => {
   $('#tdPlanillas tbody').html("");
   $('#contenedorTablasLiquidador').html("");
 }
-
 // FUNCIÓN AGREGAR DIAS FECHA BASE
 function agregarDias(fechaBase, diasAgregar) {
   const [anio, mes, dia] = fechaBase.split('-').map(Number);
@@ -466,7 +80,6 @@ function agregarDias(fechaBase, diasAgregar) {
 
   return `${nuevoDia}/${nuevoMes}/${nuevoAnio}`;
 }
-
 // FUNCIÓN VERIFICAR VIGENCIA FECHA
 function verificarVencimientoDescuento(fechaVencimientoFactura) {
   const [d1, m1, y1] = fechaVencimientoFactura.split('/').map(Number);
@@ -477,7 +90,6 @@ function verificarVencimientoDescuento(fechaVencimientoFactura) {
 
   return fechaVencimiento < fechaReferencia;
 }
-
 // FUNCIÓN GENERAR PDF LIQUIDADOR
 async function generarPDF(idTabla) {
   const { jsPDF } = window.jspdf;
@@ -616,7 +228,6 @@ async function generarPDF(idTabla) {
 
   doc.save('liquidacion.pdf');
 }
-
 // FUNCIÓN PARA REALIZAR LOS CÁLCULOS DE DESCUENTO
 const calcularDescuento = (basePP, importe, porcentaje, claseDoc, fechaVencimiento) => {
   if (claseDoc !== "DA") {
@@ -639,7 +250,6 @@ const calcularDescuento = (basePP, importe, porcentaje, claseDoc, fechaVencimien
     return { porcentaje, descuento, pagar };
   }
 };
-
 // CREACIÓN DE LAS TABLAS DEL LIQUIDADOR
 function crearTablasPorDias(datos) {
   const agrupadoPorDias = {};
@@ -803,7 +413,6 @@ function crearTablasPorDias(datos) {
     // });
   }
 }
-
 // FUNCIÓN AGREGAR ITEM AL LIQUIDADOR
 const agregarLiquidador = (item) => {
   const { 
@@ -859,7 +468,7 @@ const agregarLiquidador = (item) => {
   crearTablasPorDias(arrayLiquidador);
 }
 
-//-------Permisos de accesos directos
+// FUNCIÓN PERMISOS DE ACCESOS DIRECTOS
 function obtenerPermisos(modulo) {
   return new Promise((resolve, reject) => {
     $.ajax({
@@ -885,7 +494,7 @@ function obtenerPermisos(modulo) {
     });
   });
 }
-
+// FUNCIÓN PARA ACTUALIZAR ELEMENTOS SEGÚN PERMISOS
 function actualizarElementoSegunPermisos(modulo, elementoId) {
   obtenerPermisos(modulo).then((tienePermisos) => {
     const $elemento = $(elementoId);
@@ -896,16 +505,12 @@ function actualizarElementoSegunPermisos(modulo, elementoId) {
     }
   });
 }
-//-------Permisos de accesos directos
-
-
-//---nuevo array de clientes
+// FUNCIÓN PARA FILTRAR EL ARRAY DE CLIENTES
 function FiltrarCli(expr, ArrayCli, op) {
-  expresion = new RegExp(expr, "i"); //
+  expresion = new RegExp(expr, "i");
   switch (parseInt(op)) {
-    //por codigo
     case 1:
-      filtro = ArrayCli.filter(ArrayCli => expresion.test(ArrayCli.codigo_sap)); //
+      filtro = ArrayCli.filter(ArrayCli => expresion.test(ArrayCli.codigo_sap));
       if (filtro.length == 0) {
         filtro = ArrayCli.filter(ArrayCli => expresion.test(ArrayCli.nit));
       }
@@ -913,7 +518,6 @@ function FiltrarCli(expr, ArrayCli, op) {
         filtro = ArrayCli.filter(ArrayCli => expresion.test(ArrayCli.telefonos));
       }
       break;
-    //por descripcion 
     case 2:
       filtro = ArrayCli.filter(ArrayCli => expresion.test(ArrayCli.nombres));
       if (filtro.length == 0) {
@@ -923,7 +527,7 @@ function FiltrarCli(expr, ArrayCli, op) {
   }
   return filtro;
 }
-
+// FUNCIÓN PARA VALIDAR DOCUMENTO
 function ValidarDocumento(valor) {
   $.ajax({
     type: "POST",
@@ -932,7 +536,7 @@ function ValidarDocumento(valor) {
     dataType: "json",
     async: true,
     beforeSend: function () {
-      LoadImg('CONSULTANDO INFORMACIÓN...');
+      LoadImg('Consultanto información...');
     },
     data: {
       op: "B_DOCUMENTO_RC",
@@ -952,7 +556,7 @@ function ValidarDocumento(valor) {
     console.error(data);
   });
 }
-
+// FUNCIÓN PARA CARGAR LOS CLIENTES
 function LoadArrayCli() {
   $.ajax({
     type: "POST",
@@ -961,7 +565,7 @@ function LoadArrayCli() {
     dataType: "json",
     async: true,
     beforeSend: function () {
-      LoadImg('CARGANDO CLIENTES...');
+      LoadImg('Cargando clientes...');
     },
     data: {
       op: "B_CLIENTE_RC"
@@ -1005,7 +609,7 @@ function LoadArrayCli() {
     console.error(data);
   });
 }
-
+// FUNCIÓN CONDICIONES DE DESCUENTOS
 function CondicionesDcto() {
   $.ajax({
     type: "POST",
@@ -1057,7 +661,7 @@ function CondicionesDcto() {
     console.error(data);
   });
 }
-
+// FUNCIÓN PARA LISTAR LAS ZONAS EMAIL
 function ListarZonasEmail() {
   $.ajax({
     type: "POST",
@@ -1101,7 +705,7 @@ function ListarZonasEmail() {
     console.error(data);
   });
 }
-
+// FUNCIÓN CONSULTAR ZONAS
 function ConsultarZonas() {
   $.ajax({
     type: "POST",
@@ -1124,7 +728,7 @@ function ConsultarZonas() {
     console.error(data);
   });
 }
-
+// FUNCIÓN PARA ELIMINAR UNA ZONA EMAIL
 function DelZonaEmail(zona) {
   Swal.fire({
     title: 'Eliminar email de zona',
@@ -1161,7 +765,7 @@ function DelZonaEmail(zona) {
     }
   });
 }
-
+// FUNCIÓN PARA AGREGAR UNA ZONA EMAIL
 function AddZonaEmail() {
   var email = $("#txtZonaEmail").val();
   var zona = $("#slcZonaEmail").val();
@@ -1236,23 +840,25 @@ function AddZonaEmail() {
     Swal.fire('Error', 'Debe ingresar un mail válido', 'error');
   }
 }
-
+// FUNCIÓN PARA SUBIR CASH
 function SubirCash() {
   $("#tdImportCash tr:gt(0)").each(function (index, element) {
-    var Cuenta = $.trim($(this).find('td').eq(0).html());
-    var Numero = $.trim($(this).find('td').eq(1).html());
-    var Importe = unformatNum($.trim($(this).find('td').eq(2).html()));
-    var Texto = $.trim($(this).find('td').eq(3).html());
-    var FechaC = $.trim($(this).find('td').eq(4).html());
-    var FechaV = $.trim($(this).find('td').eq(5).html());
-    var Ref = $.trim($(this).find('td').eq(6).html());
-    //alert(Importe+' # '+Texto+' # '+FechaC+' # '+FechaV);
+    const objTD = $(this).find('td');
+
+    const Cuenta = objTD.eq(0).text();
+    const Numero = objTD.eq(1).text();
+    const Importe = unformatNum(objTD.eq(2).text());
+    const Texto = objTD.eq(3).text();
+    const FechaC = objTD.eq(4).text();
+    const FechaV = objTD.eq(5).text();
+    const Ref = objTD.eq(6).text();
+    
     $.ajax({
       type: "POST",
       url: "../models/RecibosCaja.php",
       global: false,
       beforeSend: function () {
-        LoadImg('SUBIENDO MULTICASH...');
+        LoadImg('Subiendo multicash...');
       },
       data: {
         op: 'G_MULTICASH',
@@ -1280,12 +886,12 @@ function SubirCash() {
       //console.log(data);
       UnloadImg();
     })
-      .fail(function (data) {
-        console.error(data)
-      });
+    .fail(function (data) {
+      console.error(data)
+    });
   });
 }
-
+// FUNCIÓN PARA CONSULTAR EL MULTICASH
 function ConsultarMulticash() {
   $.ajax({
     type: "POST",
@@ -1293,7 +899,7 @@ function ConsultarMulticash() {
     url: "../models/RecibosCaja.php",
     global: false,
     beforeSend: function () {
-      LoadImg('CONSULTANDO MULTICASH...');
+      LoadImg('Consultando multicash...');
     },
     data: {
       op: 'S_MULTICASH',
@@ -1306,7 +912,7 @@ function ConsultarMulticash() {
     async: true,
     success: function (data) {
       var det = '';
-      if (data.length > 0) {
+      if (data.length) {
         ArrayMulticash = [];
         for (var i = 0; i < data.length; i++) {
           d = data[i];
@@ -1337,7 +943,6 @@ function ConsultarMulticash() {
       console.error(data)
     });
 }
-
 // FUNCIÓN CONSULTAR MULTICASH BANCO
 function ConsultarMulticashBanco() {
   $.ajax({
@@ -1346,7 +951,7 @@ function ConsultarMulticashBanco() {
     url: "../models/RecibosCaja.php",
     global: false,
     beforeSend: function () {
-      LoadImg('CONSULTANDO MULTICASH...');
+      LoadImg('Consultando multicash...');
     },
     data: {
       op: 'S_MULTICASH',
@@ -1453,329 +1058,258 @@ function ConsultarMulticashBanco() {
             }, 2000);
           }
         });
-      } else $('#tdPlanillas2 tbody').html(`<td class="text-center lead fw-bold" colspan="14">Multicash no disponible</td>`);
+      } else $('#tdPlanillas2 tbody').html(`<td class="text-center lead" colspan="14">Multicash no disponible</td>`);
     }
   }).always(function (data) {
-    //console.log(data);
     UnloadImg();
   })
     .fail(function (data) {
       console.error(data)
     });
 }
-
-function FiltrarArray(expr, ArrayMulticash, op) {
-  expresion = new RegExp(expr, "i");
-  filtro = ArrayMulticash.filter(ArrayMulticash => expresion.test(ArrayMulticash.item_busqueda));
+// FUNCIÓN FILTRAR ARRAY
+function FiltrarArray(expr, ArrayMulticash) {
+  const expresion = new RegExp(expr, "i");
+  const filtro = ArrayMulticash.filter(ArrayMulticash => expresion.test(ArrayMulticash.item_busqueda));
   return filtro;
 }
-
+// FUNCIÓN VALIDAR NÚMERO
 function validarSiNumero(numero) {
-  x = 0;
-  if (/^([0-9])*$/.test(numero)) {
-    x = 1;
-  }
+  let x = 0;
+  if (/^([0-9])*$/.test(numero)) x = 1;
   return x;
 }
-
+// FUNCIÓN AGREGAR MULTICASH
 function AddMulticash(ob) {
-  var obj = $(ob);
-  var estado = $.trim(obj.find('td').eq(7).html());
-  var cuenta = $.trim(obj.find('td').eq(0).html());
-  var num = $.trim(obj.find('td').eq(2).html());
-  var valor = $.trim(obj.find('td').eq(3).html());
-  var fvalor = $.trim(obj.find('td').eq(6).html());
-  var id = $.trim(obj.find('td').eq(9).html());
-  var ref = $.trim(obj.find('td').eq(8).html());
+  let obj = $(ob).find('td');
+
+  let estado = obj.eq(7).text().trim();
+  let cuenta = obj.eq(0).text().trim();
+  let num = obj.eq(2).text().trim();
+  let valor = obj.eq(3).text().trim();
+  let fvalor = obj.eq(6).text().trim();
+  let id = obj.eq(9).text().trim();
+  let ref = obj.eq(8).text().trim();
 
   if (estado == 0) {
     AddAbonoCash(cuenta, fvalor, valor, num, id, ref);
-    obj.css('background', '#51F563');
-    obj.find('td').eq(7).html(1);
+    $(ob).find('td').css('background-color', '#51F563');
+    obj.eq(7).text(1);
   } else {
-    var total = unformatNum($("#VlrTotalAbono").val());
-    var valor = unformatNum(valor);
-    $("#VlrTotalAbono").val(formatNum(parseFloat(total - parseFloat(valor)), '$'));
-    var vasignado = parseFloat(unformatNum($("#VlrTotalAbono").val())) - parseFloat(unformatNum($("#VlrTotalFacturas").val()));
+    let total = unformatNum($("#VlrTotalAbono").val());
+    valor = unformatNum(valor);
+    const valorTotalAbono = formatNum(parseFloat(total - parseFloat(valor)), '$');
+    $("#VlrTotalAbono").val(valorTotalAbono);
+    const vasignado = parseFloat(unformatNum($("#VlrTotalAbono").val())) - parseFloat(unformatNum($("#VlrTotalFacturas").val()));
     $("#VlrSinAsignar").val(formatNum(vasignado, '$'));
     obj.css('background', '#fafafa');
-    obj.find('td').eq(7).html(0);
-    $("#tdBody tr").each(function (index, element) {
-      if ($.trim($(this).attr('id')) == id) {
-        $(this).remove();
-      }
+    $(ob).find('td').css('background-color', '#fafafa');
+    obj.eq(7).text(0);
+    $("#tdBody tr").each(function () {
+      if ($(this).attr('id').trim() == id) $(this).remove();
     });
   } 
 }
-
+// FUNCIÓN PRINT DIV
 function printDiv(nombreDiv) {
-  var contenido = document.getElementById(nombreDiv).innerHTML;
-  var contenidoOriginal = document.body.innerHTML;
+  let contenido = document.getElementById(nombreDiv).innerHTML;
+  let contenidoOriginal = document.body.innerHTML;
   document.body.innerHTML = contenido;
   window.print();
   document.body.innerHTML = contenidoOriginal;
 }
-
-function LoadImg(texto) {
-  const html = `
-  <center>
-    <figure>
-      <img 
-        src="../resources/icons/preloader.gif" 
-        class="img-responsive"
-      />
-    </figure>
-    <figcaption>${texto}</figcaption>
-  </center>`;
-  $(".centrado-porcentual").html(html);
-  $(".form-control").attr("disabled", true);
-  $(".centrado-porcentual").show();
-  $("#Bloquear").show();
-}
-
-function UnloadImg() {
-  $("#Bloquear").hide();
-  $(".centrado-porcentual").hide();
-  $(".form-control").attr("disabled", false);
-}
-
+// FUNCIÓN ACTIVAR TAB
 function activaTab(btnTab) {
-  $('.nav-tabs a[href="#' + tab + '"]').tab('show');
+  $(`#${btnTab}`).click();
 };
-
+// FUNCIÓN TECLA ENTER
 function Enter(ob, tipo) {
-  tecla = (document.all) ? ob.keyCode : ob.which;
+  const tecla = ob.keyCode || ob.which;
   if (tecla == 13) {
     switch (tipo) {
       case 'AddAbono':
-        {
-          AddAbono();
-        }
+        AddAbono();
         break;
     }
   }
 }
-
+// FUNCIÓN LIMPIAR
 function Limpiar() {
-  var rol = $("#RolId").val();
-
+  const rol = $("#RolId").val();
   limpiarDatos();
 
-  $("#CodigoSAP").val('');
-  $("#Cliente").val('');
-  $("#Referencia").val('');
-  $("#TextoCabecera").val('');
-  $("#TextoCompensacion").val('');
-  $("#ValorAbono").val('');
-  $("#Email").val('');
-  $("#EmailZona").val('');
-  $("#VlrTotalAbono").val(formatNum(0, '$'));
-  $("#VlrTotalFacturas").val(formatNum(0, '$'));
-  $("#VlrSinAsignar").val(formatNum(0, '$'));
+  const camposTexto = [
+    "#CodigoSAP", "#Cliente", "#Referencia", "#TextoCabecera", "#TextoCompensacion",
+    "#ValorAbono", "#Email", "#EmailZona", "#Grupo", "#DescGrupo", "#Lista", "#Oficina"
+  ];
+  camposTexto.forEach(id => $(id).val(''));
+
+  const camposFormato = [
+    "#VlrTotalAbono", "#VlrTotalFacturas", "#VlrSinAsignar"
+  ];
+  camposFormato.forEach(id => $(id).val(formatNum(0, '$')));
+
   $("#tdBody").html('');
-  $("#liAbonos").addClass('disabled disabledTab');
-  $("#liFacturas").addClass('disabled disabledTab');
-  $("#liMulticash").addClass('disabled disabledTab');
-  $("#btnMulticash").attr("data-toggle", "");
-  $("#btnAbonos").attr("disabled", true);
-  $("#btnFacturas").attr("data-toggle", "");
   $("#tdDetalleMulticash").html('');
 
-  $("#Grupo").val('');
-  $("#DescGrupo").val('');
-  $("#Lista").val('');
-  $("#Oficina").val('');
-  //Nuevo para vendedores 14
+  ["#btnMulticash", "#btnAbonos", "#btnFacturas"].forEach(btn => {
+    $(btn).attr("disabled", true);
+  });
+
   if (rol == 14) {
     $("#dvTotalAbono").hide();
-    activaTab('dvPlanilla');
-    // $("#liCliente").addClass('disabled disabledTab');
-    $("#btnEliminarRC").hide();
-    $("#btnEliminarPDF").hide();
+    activaTab('btnPlanilla');
+    $("#btnEliminarRC, #btnEliminarPDF").hide();
   } else {
-    activaTab('dvClientes');
+    activaTab('btnCliente');
     $("#Cliente").focus();
-    $("#btnEliminarRC").show();
-    $("#btnEliminarPDF").show();
+    $("#btnEliminarRC, #btnEliminarPDF").show();
   }
 }
-
-function AddAbonoCash(pcuenta, pfecha, pvalor, num, id, ref) {
-  var cuenta = pcuenta;
-  var valor = pvalor;
-  var desc = '';
-  var fecha = pfecha;
-  var total = $("#VlrTotalAbono").val();
-  var sw = 0;
+// FUNCIÓN AGREGAR ABONO DESDE CASH
+function AddAbonoCash(pcuenta, pfecha, pvalor, id, ref) {
+  let cuenta = pcuenta;
+  let valor = pvalor;
+  let desc = '';
+  let fecha = pfecha;
+  let total = $("#VlrTotalAbono").val();
+  let sw = 0;
 
   switch (cuenta) {
     case '1105050100':
-      {
-        desc = 'CAJA VIAJERO';
-      }
-      break
+      desc = 'CAJA VIAJERO';
+      break;
     case '1105050108':
-      {
-        desc = 'CAJA EFECTIVO';
-      }
-      break
+      desc = 'CAJA EFECTIVO';
+      break;
     case '1105050103':
-      {
-        desc = 'CHEQUES';
-      }
-      break
+      desc = 'CHEQUES';
+      break;
     case '1110050101':
-      {
-        desc = 'BANCOLOMBIA';
-      }
-      break
+      desc = 'BANCOLOMBIA';
+      break;
     case '1110050501':
-      {
-        desc = 'BANCO BOGOTA';
-      }
-      break
+      desc = 'BANCO BOGOTA';
+      break;
     case '1110050501':
-      {
-        desc = 'BANCO AGRARIO';
-      }
-      break
+      desc = 'BANCO AGRARIO';
+      break;
     case '1110050501':
-      {
-        desc = 'BANCO BBVA';
-      }
-      break
+      desc = 'BANCO BBVA';
+      break;
     case '2815050503':
-      {
-        desc = 'AJUSTE AL PESO';
-      }
-      break
+      desc = 'AJUSTE AL PESO';
+      break;
     case '1355180501':
-      {
-        desc = 'IMPUESTO DE INDUSTRIA Y COMERCIO RETENIDO';
-      }
-      break
+      desc = 'IMPUESTO DE INDUSTRIA Y COMERCIO RETENIDO';
+      break;
     case '5305350501':
-      {
-        desc = 'DESCUENTOS COMERCIALES';
-      }
-      break
+      desc = 'DESCUENTOS COMERCIALES';
+      break;
     case '1110050201':
-      {
-        desc = 'BANCOLOMBIA CORRIENTE';
-      }
-      break
+      desc = 'BANCOLOMBIA CORRIENTE';
+      break;
   }
-  if (cuenta == '2815050503' && parseFloat(unformatNum(valor)) > 1000) {
-    sw = 2;
-  }
-  if (parseFloat(unformatNum(valor)) > 0) {
-    $("#tdBody tr").each(function (index, element) {
-      var c = $(this).find('td').eq(0).html();
-      if ((c == '1105050108' || c == '1105050100') && (cuenta == '1105050108' || cuenta == '1105050100')) {
-        sw = 1;
-      }
-      if (c == '2815050503' && cuenta == '2815050503') {
-        sw = 1;
-      }
 
+  if (cuenta == '2815050503' && parseFloat(unformatNum(valor)) > 1000) sw = 2;
+
+  if (parseFloat(unformatNum(valor)) > 0) {
+    $("#tdBody tr").each(function () {
+      let c = $(this).find('td').eq(0).html();
+
+      if ((c == '1105050108' || c == '1105050100') && (cuenta == '1105050108' || cuenta == '1105050100')) sw = 1;
+      if (c == '2815050503' && cuenta == '2815050503') sw = 1;
     });
+
     if (sw == 0) {
-      $("#tdBody").append('<tr id="' + id + '">'
-        + '<td>' + cuenta + '</td>'
-        + '<td>' + desc + '</td>'
-        + '<td>' + valor + '</td>'
-        + '<td>' + fecha + '</td>'
-        + '<td>' + ref + '</td>'
-        + '<td width="5%" align="center" onclick="QuitarAbonoCash(this)">'
-        + '<button type="button" class="btn btn-default" aria-label="Left Align">'
-        + '<span class="glyphicon glyphicon-remove-sign" aria-hidden="true"></span>'
-        + '</button>'
-        + '</td>'
-        + '<td style="display:none">$0</td>'
-        + '<td style="display:none">$0</td>'
-        + '</tr>');
-      $("#VlrTotalAbono").val(formatNum(parseFloat(unformatNum(valor)) + parseFloat(unformatNum(total)), '$'));
+      let tdBodyHTML = `
+      <tr id="${id}">
+        <td class="size-text vertical">${cuenta}</td>
+        <td class="size-td vertical">${desc}</td>
+        <td class="size-text vertical">${valor}</td>
+        <td class="size-text vertical">${fecha}</td>
+        <td class="size-text vertical">${ref}</td>
+        <td class="text-center" onclick="QuitarAbonoCash(this)">
+          <button type="button" class="btn btn-outline-danger btn-sm">
+            <i class="fa-solid fa-trash-can"></i>
+          </button>
+        </td>
+        <td style="display: none;">$0</td>
+        <td style="display: none;">$0</td>
+      </tr>`;
+
+      $("#tdBody").append(tdBodyHTML);
+      const valorTotalAbono = formatNum(parseFloat(unformatNum(valor)) + parseFloat(unformatNum(total)), '$');
+      $("#VlrTotalAbono").val(valorTotalAbono);
       $("#ValorAbono").val('');
       $("#ValorAbono").focus();
-      var vasignado = parseFloat(unformatNum($("#VlrTotalAbono").val())) - parseFloat(unformatNum($("#VlrTotalFacturas").val()));
+      let vasignado = parseFloat(unformatNum($("#VlrTotalAbono").val())) - parseFloat(unformatNum($("#VlrTotalFacturas").val()));
       $("#VlrSinAsignar").val(formatNum(vasignado, '$'));
     } else {
-      if (sw == 1) {
-        Swal.fire('Operacion no permitida!', 'Ya se encuentra asignada la cuenta efectivo,viajero o ajuste al peso', 'error');
-      } else {
-        Swal.fire('Operacion no permitida!', 'El valor de ajuste al peso no puede superar los $1.000', 'error');
-      }
+      if (sw == 1) Swal.fire('Operacion no permitida!', 'Ya se encuentra asignada la cuenta efectivo,viajero o ajuste al peso', 'error');
+      else Swal.fire('Operacion no permitida!', 'El valor de ajuste al peso no puede superar los $1.000', 'error');
       $("#ValorAbono").val('');
       $("#ValorAbono").focus();
     }
   }
-
 }
-
+// FUNCIÓN AGREGAR ABONO
 function AddAbono() {
-  var cuenta = $("#Cuenta").val();
-  var valor = $("#ValorAbono").val();
-  var desc = $("#Cuenta option:selected").text();
-  var fecha = $("#FechaValor").val();
-  var total = $("#VlrTotalAbono").val();
-  var sw = 0;
-  var tipov = $("#TipoValor").val();
+  let cuenta = $("#Cuenta").val();
+  let valor = $("#ValorAbono").val();
+  let desc = $("#Cuenta option:selected").text();
+  let fecha = $("#FechaValor").val();
+  let total = $("#VlrTotalAbono").val();
+  let sw = 0;
+  let tipov = $("#TipoValor").val();
 
   if (cuenta == '2815050503' && parseFloat(unformatNum(valor)) > 1000) sw = 2;
 
   if (parseFloat(unformatNum(valor)) <= 1000) {
-    $("#tdBody tr").each(function (index, element) {
-      var c = $(this).find('td').eq(0).html();
+    $("#tdBody tr").each(function () {
+      let c = $(this).find('td').eq(0).html();
 
-      if ((c == '1105050108' || c == '1105050100') && (cuenta == '1105050108' || cuenta == '1105050100')) {
-        sw = 1;
-      }
-
-      if (c == '2815050503' && cuenta == '2815050503') {
-        sw = 1;
-      }
-
+      if ((c == '1105050108' || c == '1105050100') && (cuenta == '1105050108' || cuenta == '1105050100')) sw = 1;
+      if (c == '2815050503' && cuenta == '2815050503') sw = 1;
     });
 
     if (sw == 0) {
+      if (tipov == 'N') valor = formatNum((parseFloat(unformatNum(valor)) * (-1)), '$');
 
-      if (tipov == 'N') {
-        valor = formatNum((parseFloat(unformatNum(valor)) * (-1)), '$')
-      }
-      // console.log(valor+' - '+tipov)
-      $("#tdBody").append('<tr>'
-        + '<td>' + cuenta + '</td>'
-        + '<td>' + desc + '</td>'
-        + '<td>' + valor + '</td>'
-        + '<td>' + fecha + '</td>'
-        + '<td>' + cuenta + '</td>'
-        + '<td width="5%" align="center" onclick="QuitarAbono(this)">'
-        + '<button type="button" class="btn btn-default" aria-label="Left Align">'
-        + '<span class="glyphicon glyphicon-remove-sign" aria-hidden="true"></span>'
-        + '</button>'
-        + '</td>'
-        + '<td style="display:none">$0</td>'
-        + '<td style="display:none">$0</td>'
-        + '</tr>');
+      let tdBodyHTML = `
+      <tr>
+        <td class="size-text vertical">${cuenta}</td>
+        <td class="size-td vertical">${desc}</td>
+        <td class="size-text vertical">${valor}</td>
+        <td class="size-text vertical">${fecha}</td>
+        <td class="size-text vertical">${cuenta}</td>
+        <td class="text-center" onclick="QuitarAbono(this)">
+          <button type="button" class="btn btn-outline-danger btn-sm" title="Quitar abono">
+            <i class="fa-solid fa-trash-can"></i>
+          </button>
+        </td>
+        <td style="display: none;">$0</td>
+        <td style="display: none;">$0</td>
+      </tr>`;
+      
+      $("#tdBody").append(tdBodyHTML);
 
-      $("#VlrTotalAbono").val(formatNum(parseFloat(unformatNum(valor)) + parseFloat(unformatNum(total)), '$'));
+      const valorTotalAbono = formatNum(parseFloat(unformatNum(valor)) + parseFloat(unformatNum(total)), "$");
+
+      $("#VlrTotalAbono").val(valorTotalAbono);
       $("#ValorAbono").val('');
       $("#ValorAbono").focus();
-      var vasignado = parseFloat(unformatNum($("#VlrTotalAbono").val())) - parseFloat(unformatNum($("#VlrTotalFacturas").val()));
+      let vasignado = parseFloat(unformatNum($("#VlrTotalAbono").val())) - parseFloat(unformatNum($("#VlrTotalFacturas").val()));
       $("#VlrSinAsignar").val(formatNum(vasignado, '$'));
     } else {
-      if (sw == 1) {
-        Swal.fire('Operacion no permitida!', 'Ya se encuentra asignada la cuenta efectivo,viajero o ajuste al peso', 'error');
-      } else {
-        Swal.fire('Operacion no permitida!', 'El valor de ajuste al peso no puede superar los $1.000', 'error');
-      }
-      $("#ValorAbono").val('');
+      if (sw == 1) Swal.fire("Operación no permitida", "Ya se encuentra asignada la cuenta efectivo, viajero o ajuste al peso", "error");
+      else Swal.fire("Operación no permitida", "El valor de ajuste al peso no puede superar los $1.000", "error");
+      $("#ValorAbono").val("");
       $("#ValorAbono").focus();
     }
   } else {
-    Swal.fire("Oops..!", "El valor excede el limite permitido", "error");
+    Swal.fire("Oops!!!", "El valor excede el limite permitido", "error");
   }
-
 }
 
 function QuitarAbonoCash(ob) {
@@ -1805,7 +1339,6 @@ function QuitarAbono(ob) {
   $("#VlrSinAsignar").val(formatNum(vasignado, '$'));
   $(ob).parent().remove();
 }
-
 
 function NofificacionDescuento(pcjDesc) {
   $.notify({ // options
@@ -2006,8 +1539,7 @@ function AddFactura(ob, valor, cumple_pres) {
   }
 
 }
-
-// DOCUMENTOS
+// FUNCIÓN PARA OBTENER LOS DOCUMENTOS
 function Documentos() {
   $.ajax({
     type: "POST",
@@ -2015,7 +1547,7 @@ function Documentos() {
     url: "../models/CRM.php",
     global: false,
     beforeSend: function () {
-      LoadImg('CARGANDO DOCUMENTOS...');
+      LoadImg('Cargando documentos...');
     },
     data: {
       op: 'B_CARTERA_RC',
@@ -2041,7 +1573,7 @@ function Documentos() {
             mora = 'style="background-color:#75F7A8"';
           }
           if ($.trim(data[i].CLASE_DOCUMENTO) == 'RV') {
-            ver = '<img src="../resources/icons/eye.png" align="absmiddle" onclick="VisualizarDocumento(\'' + $.trim(data[i].REFERENCIA) + '\',\'F\')">';
+            ver = `<img src="../resources/icons/eye.png" style="width: 20px; cursor: pointer;" onclick="VisualizarDocumento('${data[i].REFERENCIA.trim()}', 'F')">`;
           } else {
             ver = '';
           }
@@ -2049,32 +1581,32 @@ function Documentos() {
           let cumple_img = '';
           let cumple_pres = 'N';
           if (parseFloat(data[i].CUMP_PRESUPUESTO) > 0) {
-            cumple_img = `<span class="glyphicon glyphicon-flag" aria-hidden="true" style="color:green"></span>`;
+            cumple_img = `<i class="fa-solid fa-flag text-success"></i>`;
             cumple_pres = 'S';
           }
           detalle +=
             `<tr>
-              <td>${data[i].NUMERO_DOCUMENTO.trim()}</td>
-              <td>${data[i].REFERENCIA.trim()}</td>
-              <td>${data[i].CLASE_DOCUMENTO}</td>
-              <td>${ver}</td>
-              <td>${data[i].FECHA_BASE}</td>
-              <td>${data[i].FECHA_PAGO_GRACIA}</td>
-              <td>${data[i].CONDICION_PAGO}</td>
-              <td ${mora}>${data[i].DEMORA_GRACIA}</td>
-              <td>${data[i].DIAS}</td>
-              <td>${formatNum(data[i].IMPORTE, '$')}</td>
-              <td>${data[i].TEXTO.trim()}</td>
+              <td class="no-wrap size-text vertical">${data[i].NUMERO_DOCUMENTO.trim()}</td>
+              <td class="no-wrap size-text vertical">${data[i].REFERENCIA.trim()}</td>
+              <td class="no-wrap size-text vertical">${data[i].CLASE_DOCUMENTO}</td>
+              <td class="no-wrap size-text vertical">${ver}</td>
+              <td class="no-wrap size-text vertical">${data[i].FECHA_BASE}</td>
+              <td class="no-wrap size-text vertical">${data[i].FECHA_PAGO_GRACIA}</td>
+              <td class="no-wrap size-text vertical">${data[i].CONDICION_PAGO}</td>
+              <td class="no-wrap size-text vertical" ${mora}>${data[i].DEMORA_GRACIA}</td>
+              <td class="no-wrap size-text vertical">${data[i].DIAS}</td>
+              <td class="no-wrap size-text vertical">${formatNum(data[i].IMPORTE, '$')}</td>
+              <td class="no-wrap size-text vertical">${data[i].TEXTO.trim()}</td>
               <td>
                 <input type="text" onKeyPress="return vnumeros(event)" onDblClick="AsignarValor(this);" size="15" class="form-control ClassNumero" onBlur="AddFactura(this, this.value, '${cumple_pres}')" value="$0">
               </td>
               <td>
                 <input type="text" onKeyPress="return vnumeros(event)"  size="15" class="form-control ClassNumero" onBlur="AddFactura(this, this.value,  '${cumple_pres}')" disabled value="$0">
               </td>
-              <td>${formatNum(parseFloat(data[i].BASE_PP), '$')}</td>
+              <td class="size-text vertical">${formatNum(parseFloat(data[i].BASE_PP), '$')}</td>
               <td style="display:none;">${data[i].DESCUENTO}</td>
-              <td>${data[i].REFERENCIA_FACTURA}</td>
-              <td class="text-center">${cumple_img}</td>
+              <td class="size-text vertical">${data[i].REFERENCIA_FACTURA}</td>
+              <td class="text-center vertical">${cumple_img}</td>
               <td class="text-center">
                 <button class="btn btn-primary btn-sm agregar-liquidacion" data-item='${JSON.stringify(data[i])}'>
                   <i class="fa-solid fa-plus"></i>
@@ -2090,30 +1622,30 @@ function Documentos() {
         $('#valorMora').text(formatNum(vlrMora, '$'));
 
         let tabla =
-          `<table class="form" width="100%" id="tdFacturas">
-          <thead>            
+        `<table class="table table-bordered table-hover table-sm" style="width: 100%;" id="tdFacturas">
+          <thead class="table-info">            
             <tr>
-              <th>DOCUMENTO</th>
-              <th>REF DOC</th>
-              <th>CLASE</th>
-              <th>VER</th>
-              <th>FH BASE</th>
-              <th>FH PAGO</th>
-              <th>CONDICION</th>
-              <th>DEMORA</th>
-              <th>DIA</th>
-              <th>IMPORTE</th>
-              <th>TEXTO</th>
-              <th>VALOR</th>
-              <th>DCTO</th>
-              <th>BASE PP</th>
-              <th>REF FACT</th>
-              <th>CUMP.PRES</th>
-              <th>AGR. FAC.</th>
+              <th class="size-th no-wrap">DOCUMENTO</th>
+              <th class="size-th no-wrap">REF DOC</th>
+              <th class="size-th no-wrap">CLASE</th>
+              <th class="size-th no-wrap">VER</th>
+              <th class="size-th no-wrap">FH BASE</th>
+              <th class="size-th no-wrap">FH PAGO</th>
+              <th class="size-th no-wrap">CONDICION</th>
+              <th class="size-th no-wrap">DEMORA</th>
+              <th class="size-th no-wrap">DIA</th>
+              <th class="size-th no-wrap">IMPORTE</th>
+              <th class="size-th no-wrap">TEXTO</th>
+              <th class="size-th no-wrap">VALOR</th>
+              <th class="size-th no-wrap">DCTO</th>
+              <th class="size-th no-wrap">BASE PP</th>
+              <th class="size-th no-wrap">REF FACT</th>
+              <th class="size-th no-wrap">CUMP.PRES</th>
+              <th class="size-th no-wrap">AGR. FAC.</th>
             </tr>
           </thead>
           <tbody>
-           ${detalle}
+          ${detalle}
           </tbody>
         </table>`;
         $("#dvResultCartera").html(tabla);
@@ -2166,21 +1698,20 @@ function AsignarValor(ob) {
 }
 
 function VisualizarDocumento(num, tipo) {
-  var rol = $("#RolId").val();
+  let rol = $("#RolId").val();
+
   if (num != 0) {
-    if (tipo == 'R') { //recibos de caja
+    if (tipo == 'R') { // Recibos de caja
       if (rol != 14) {
         $("#btnEliminarPDF").show();
       }
-      /*$("#ModalPDFTittle").html('Comprobante de pago - RECIBO DE CAJA');*/
-      $("#ContainerPDF").html('<embed src="../../RecibosCaja/' + num + '.pdf" frameborder="0" width="100%" height="400px">');
-    } else if (tipo == 'F') { //Facturas
+      $("#ContainerPDF").html(`<embed src="../../RecibosCaja/${num}.pdf" frameborder="0" width="100%" height="400px">`);
+    } else if (tipo == 'F') { // Facturas
       $("#btnEliminarPDF").hide();
       $("#ModalPDFTittle").html('FACTURA DE VENTA');
-      $("#ContenidoPDF").html('<embed src="../resources/tcpdf/Factura.php?num=' + parseInt(num) + '" frameborder="0" width="100%" height="400px">');
+      $("#ContenidoPDF").html(`<embed src="../resources/tcpdf/Factura.php?num=${parseInt(num)}" frameborder="0" width="100%" height="400px">`);
       $("#ModalPDF").modal("show");
     }
-
   } else {
     Swal.fire('error', 'El pedido seleccionado no posee factura', 'error');
   }
@@ -2218,7 +1749,7 @@ function EliminarPDF() {
           success: function (data) {
             if (data == 1) {
               Swal.fire('Excelente', 'El documento ha sido eliminado', 'success');
-              ConsultarPlanilla();
+              // ConsultarPlanilla();
               $("#ModalPDF").modal("hide");
               $("#dvReciboCaja").modal("hide");
             } else {
@@ -2360,7 +1891,6 @@ function VerificarDocumento(doc) {
 
     },
     beforeSend: function () {
-      // LoadImg('Creando Preliminar...');  
     },
     data: {
       op: 'S_VALIDA_DOC',
@@ -2379,8 +1909,6 @@ function VerificarDocumento(doc) {
 }
 
 function EnviarTMP(cuentas, documentos, asignados, cliente) {
-
-
   //verificacion de facturas en recibos ya creados
   var sw = 0;
   documentos.forEach(function (data) {
@@ -2400,7 +1928,7 @@ function EnviarTMP(cuentas, documentos, asignados, cliente) {
 
       },
       beforeSend: function () {
-        LoadImg('Creando Preliminar...');
+        LoadImg('Creando preliminar...');
       },
       data: {
         op: 'I_CARTERA_RC',
@@ -2461,7 +1989,7 @@ function AutorizarRC(version) {
           dataType: "html",
           error: function (OBJ, ERROR, JQERROR) { },
           beforeSend: function () {
-            LoadImg('GUARDANDO...');
+            LoadImg('Guardando...');
           },
           data: {
             id: id,
@@ -2476,7 +2004,7 @@ function AutorizarRC(version) {
             } else {
               Swal.fire('Oops...', 'No fue posible enviar el RC, ' + data, 'error');
             }
-            ConsultarPlanilla();
+            // ConsultarPlanilla();
             $("#dvReciboCaja").modal("hide");
           }
         }).fail(function (data) {
@@ -2782,7 +2310,7 @@ function EliminarRC() {
             } else {
               Swal.fire('Oops...', 'No fue posible eliminar el RC.', 'error');
             }
-            ConsultarPlanilla();
+            // ConsultarPlanilla();
             $("#dvReciboCaja").modal("hide");
           }
         }).fail(function (data) {
@@ -3052,9 +2580,7 @@ function AutorizarTodoCondicion() {
 
 }
 
-
 function ConsultarCondicionLista() {
-
   var lista = $("#Lista").val();
   let oficina = $("#Oficina").val();
 
@@ -3201,9 +2727,6 @@ function filtroEstado(valor) {
   });
 }
 
-
-//*****PARA INFORMES
-
 function ConsultarInformes() {
   $.ajax({
     type: "POST",
@@ -3213,7 +2736,7 @@ function ConsultarInformes() {
     dataType: "json",
     error: function (OBJ, ERROR, JQERROR) { },
     beforeSend: function () {
-      LoadImg('CONSULTANDO INFORMACIÓN...');
+      LoadImg('Consultando información...');
     },
     data: {
       op: 'S_INFORME_RC',
@@ -3327,34 +2850,17 @@ function ConsultarInformes() {
 }
 
 function GenerarGrafico(titulo, jsonArray) {
-  // Create the chart
   Highcharts.chart('DivGrafico', {
-    chart: {
-      type: 'column'
-    },
-    title: {
-      text: titulo
-    },
-    /*subtitle: {
-      text: 'Frecuencia de compra mensual '
-    },*/
+    chart: {type: 'column'},
+    title: {text: titulo},
     accessibility: {
-      announceNewData: {
-        enabled: true
-      }
+      announceNewData: {enabled: true}
     },
-    xAxis: {
-      type: 'category'
-    },
+    xAxis: {type: 'category'},
     yAxis: {
-      title: {
-        text: 'Numero de recibos'
-      }
-
+      title: {text: 'Numero de recibos'}
     },
-    legend: {
-      enabled: false
-    },
+    legend: {enabled: false},
     plotOptions: {
       series: {
         borderWidth: 0,
@@ -3364,20 +2870,16 @@ function GenerarGrafico(titulo, jsonArray) {
         }
       }
     },
-
     tooltip: {
       headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
       pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:f}</b> <br/>'
     },
-
     series: [{
       name: "Browsers",
       colorByPoint: true,
       data: jsonArray
     }]
-
   });
-
 }
 
 const limpiarCompensar = () => {
@@ -3443,3 +2945,405 @@ const compensarDocumentos = async () => {
     console.log(e);
   }
 }
+
+// EJECUCIÓN DE FUNCIONALIDADES
+$(function () {
+  carga_anios('MultiAnio');
+  carga_mes('MultiMes');
+  carga_dias('MultiDay', $("#MultiMes").val(), $("#MultiAnio").val());
+
+  carga_anios('MultiAnio2');
+  carga_mes('MultiMes2');
+  carga_dias('MultiDay2', $("#MultiMes2").val(), $("#MultiAnio2").val());
+
+  LoadArrayCli();
+
+  $("#MultiMes,#MultiAnio").change(function () {
+    carga_dias('MultiDay', $("#MultiMes").val(), $("#MultiAnio").val());
+    ConsultarMulticash();
+  });
+
+  $("#MultiMes2, #MultiAnio2").change(function () {
+    carga_dias('MultiDay2', $("#MultiMes2").val(), $("#MultiAnio2").val());
+    ConsultarMulticashBanco();
+  });
+
+  $("#MultiDay").change(function () {
+    ConsultarMulticash();
+  });
+
+  $("#MultiDay2").change(function () {
+    ConsultarMulticashBanco();
+  });
+
+  $("#FiltroPlanilla").keyup(function () {
+    theTable = $("#tablePlanillas > tbody > tr");
+    var value = $(this).val().toLowerCase();
+    theTable.filter(function () {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+  });
+
+  $("#filtro").autocomplete({
+    source: function (request, response) {
+      Array_Cash = ArrayMulticash;
+      valor = $.trim($("#filtro").val());
+      div_cadena = valor;
+      div_cadena = div_cadena.split(" ");
+
+      for (var x = 0; x < div_cadena.length; x++) {
+        expr = $.trim(div_cadena[x]);
+        Array_Cash = FiltrarArray(expr, Array_Cash, 2);
+      }
+      response(Array_Cash.slice(0, 40));
+    },
+    maxResults: 40,
+    minLength: 3,
+    search: function () { },
+    open: function (event, ui) { },
+    select: function (event, ui) {
+      var sw = 0;
+      $("#tdDetalleMulticash tr").each(function (index, element) {
+        var id = $(this).find('td').eq(9).html();
+        if (ui.item.id == id) {
+          sw = 1;
+        }
+      });
+      if (sw == 0) {
+        if (ui.item.estado == 0) {
+          $("#tdDetalleMulticash").append('<tr onDblClick="AddMulticash(this)">'
+            + '<td class="size-text">' + ui.item.cuenta + '</td>'
+            + '<td class="size-td">' + ui.item.descripcion + '</td>'
+            + '<td class="size-text">' + ui.item.numero + '</td>'
+            + '<td class="size-text">' + formatNum(ui.item.valor, '$') + '</td>'
+            + '<td class="size-text">' + ui.item.texto + '</td>'
+            + '<td class="size-text">' + ui.item.fecha_cont + '</td>'
+            + '<td class="size-text">' + ui.item.fecha_val + '</td>'
+            + '<td class="size-text">' + ui.item.estado + '</td>'
+            + '<td class="size-text">' + ui.item.referencia + '</td>'
+            + '<td class="size-text">' + ui.item.id + '</td>'
+            + '</tr>');
+        } else {
+          Swal.fire('Oops', 'Ya el valor se aplico en el recibo :' + ui.item.id_rc, 'error');
+        }
+      } else {
+        Swal.fire('Oops', 'Valor ya agregado', 'error');
+      }
+    }
+  }).focusout(function () {
+    $('#filtro').val('');
+  });
+
+  //Carga de archivo PDF
+  $("#DocPDF").change(function () {
+    uploadAjax();
+  })
+  var idRol = parseInt($("#RolId").val());
+  //Boton de autorizacion 
+  if (idRol == 1 || idRol == 26) { //Administrador & contabilidad
+    $("#btnAutorizar").show();
+    $("#btnCompensaciones").show();
+  } else {
+    $("#btnAutorizar").hide();
+    $("#btnCompensaciones").hide();
+  }
+  //Cuentas 
+  var sociedad = $("#Sociedad").val();
+  if (sociedad == 1000) {
+    $("#Cuenta").html('<option value="2815050503">2815050503 - AJUSTE AL PESO CM</option>');
+  } else {
+    $("#Cuenta").html('<option value="2815051601">2815051601 - AJUSTE AL PESO ROMA</option>');
+  }
+  //Cargue de multicash
+  if (idRol == 1 || idRol == 4) { //Tesoreria & administrador
+    $("#btnSubirMulticash").attr('disabled', false);
+  } else {
+    $("#btnSubirMulticash").attr('disabled', true);
+  }
+
+  const cssDeshabilatar = {
+    "pointer-events": "none",
+    "color": "#aaa !important",
+    "background-color": "#f5f5f5",
+    "cursor": "not-allowed",
+    "text-decoration": "none"
+  }
+
+  // RESTRICCIÓN DE ACCESO A LA PESTAÑA DE BANCOS 
+  if (idRol !== 17 && idRol !== 48 && idRol !== 72 && idRol !== 73 && idRol !== 1) {
+    document.getElementById('btnBancos').removeAttribute('data-toggle');
+    $('#btnBancos').css(cssDeshabilatar);
+  }
+
+  // RESTRICCIÓN DE ACCESO A LA PESTAÑA DE LIQUIDADOR 
+  if (idRol !== 17 && idRol !== 48 && idRol !== 72 && idRol && idRol !== 44 && idRol !== 3 && idRol !== 14 && idRol !== 13 && idRol !== 73 && idRol !== 1) {
+    document.getElementById('btnLiquidador').removeAttribute('data-toggle');
+    $('#btnLiquidador').css(cssDeshabilatar);
+  }
+
+  $("#FechaDocumento").datepicker({
+    changeMonth: true,
+    changeYear: true,
+    monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+    monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+    dateFormat: 'yy-mm-dd',
+    width: 100,
+    heigth: 100,
+    minDate: -5
+  }).datepicker("setDate", new Date());
+
+  $("#FechaValor,#RptFhFin,#RptFhIni, #InfoFhIni,#InfoFhFin,#fhCompenIni,#fhCompenFin").datepicker({
+    changeMonth: true,
+    changeYear: true,
+    monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+    monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+    dateFormat: 'yy-mm-dd',
+    width: 100,
+    heigth: 100
+  }).datepicker("setDate", new Date());
+
+  Limpiar();
+
+  $(document).keyup(function (e) {
+    tecla = e.keyCode;
+    if (tecla == 115) { //F4 para guardar documento
+      Guardar();
+    }
+  });
+
+  $("#txtValidaDocumento").keyup(function (e) {
+    var tecla = e.keyCode;
+    var valor = $(this).val();
+    if (tecla == 13) { //Enter para consultar
+      if (valor != '') {
+        ValidarDocumento(valor);
+      } else {
+        Swal.fire('Error', 'Debe ingresar un número de documento válido.', 'error');
+      }
+
+    }
+  });
+
+  $('#Cliente').autocomplete({
+    source: function (request, response) {
+      Arr_cli = ArrCli;
+      valor = $.trim($("#Cliente").val());
+      if (validarSiNumero(valor) == 1) {
+        Arr_cli = FiltrarCli(valor, Arr_cli, 1);
+      } else {
+        div_cadena = valor;
+        div_cadena = div_cadena.split(" ");
+        for (var x = 0; x < div_cadena.length; x++) {
+          expr = $.trim(div_cadena[x]);
+          Arr_cli = FiltrarCli(expr, Arr_cli, 2);
+        }
+      }
+      response(Arr_cli.slice(0, 10));
+    },
+    maxResults: 10,
+    minLength: 3,
+    search: function () { },
+    open: function (event, ui) { },
+    select: function (event, ui) {
+      limpiarDatos();
+
+      $("#tdBody").html("");
+
+      $("#CodigoSAP").val(ui.item.codigo_sap);
+      $("#Email").val(ui.item.email);
+      $("#EmailZona").val(ui.item.email_zona);
+      $("#Grupo").val(ui.item.grupo);
+      $("#DescGrupo").val(ui.item.desc_grupo);
+      $("#Lista").val(ui.item.lista);
+      $("#Oficina").val(ui.item.bodega);
+
+      $("#btnAbonos").attr("disabled", false);
+      $("#btnFacturas").attr("disabled", false);
+      $("#btnMulticash").attr("disabled", false);
+
+      if (idRol !== 14) {
+        $("#btnMulticash").attr("data-toggle", "tab");
+      }
+      CondicionesDcto();
+      Documentos();
+      ConsultarCondicionLista();
+    }
+  });
+  //-------------------------------------------------------------------------------
+  $('#txt_CondCliente').autocomplete({
+    source: function (request, response) {
+      Arr_cli = ArrCli;
+      valor = $.trim($("#txt_CondCliente").val());
+      if (validarSiNumero(valor) == 1) {
+        Arr_cli = FiltrarCli(valor, Arr_cli, 1);
+      } else {
+        div_cadena = valor;
+        div_cadena = div_cadena.split(" ");
+        for (var x = 0; x < div_cadena.length; x++) {
+          expr = $.trim(div_cadena[x]);
+          Arr_cli = FiltrarCli(expr, Arr_cli, 2);
+        }
+      }
+      response(Arr_cli.slice(0, 10));
+    },
+    maxResults: 10,
+    minLength: 3,
+    search: function () { },
+    open: function (event, ui) { },
+    select: function (event, ui) {
+      $("#txt_CondCodigo").val(ui.item.codigo_sap);
+    }
+  });
+  //-------------------------------------------------------------------------------  
+  $(".ClassNumero").maskMoney({
+    selectAllOnFocus: true, //evento onkeyup 
+    prefix: '$',
+    thousands: '.',
+    decimal: ',',
+    precision: 0
+  });
+
+  // ConsultarPlanilla();
+  $("#RptFhFin,#RptFhIni").change(function () {
+    // ConsultarPlanilla();
+  });
+  //Nuevo 29-04-2020
+  $("#btnSubirMulticash").click(function () {
+    $("#tr_det_cash").html('');
+    $("#filename").val('');
+    $("#dvSubirCash").modal('show');
+  })
+  //Cargue de plano Multicash
+  $("#filename").val('');
+  $("#filename").change(function (e) {
+    var ext = $("input#filename").val().split(".").pop().toLowerCase();
+    if ($.inArray(ext, ["csv"]) == -1) {
+      alert('Solo se permiten archivos CSV');
+      $("#filename").val('');
+      return false;
+    }
+    if (e.target.files != undefined) {
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        var csvval = e.target.result.split("\n");
+        var detalle = '';
+        var vtotal = 0;
+        for (var i = 0; i < csvval.length; i++) { //for 1		
+          var row = csvval[i];
+          if (row != '') {
+            var col = row.split(',');
+            vtotal += parseFloat(col[1]);
+            detalle += '<tr>'
+              + '<td>' + $.trim(col[0]) + '</td>'
+              + '<td>' + $.trim(col[1]) + '</td>'
+              + '<td>' + formatNum(parseFloat($.trim(col[2])) * -1, '$') + '</td>'
+              + '<td>' + $.trim(col[3]) + '</td>'
+              + '<td>' + $.trim(col[4]) + '</td>'
+              + '<td>' + $.trim(col[5]) + '</td>'
+              + '<td>' + $.trim(col[6]) + '</td>'
+              + '</tr>';
+          }
+
+        } //fin for
+        if (detalle != '') {
+          //Importe,Texto,Fecha contabilización,Fecha valor
+          var tb = '<table class="form" width="100%" id="tdImportCash">'
+            + '<thead>'
+            + '<tr>'
+            + '<th>Cuenta</th>'
+            + '<th>Documento</th>'
+            + '<th>Importe</th>'
+            + '<th>Texto</th>'
+            + '<th>Fecha Conta.</th>'
+            + '<th>Fecha Valor.</th>'
+            + '<th>Referencia</th>'
+            + '</tr>'
+            + '</thead>'
+            + '<tbody>'
+            +
+
+            detalle
+            + '</tbody>'
+            + '</table>';
+          $("#tr_det_cash").html(tb);
+        }
+
+      };
+      reader.readAsText(e.target.files.item(0));
+    }
+    return false;
+  });
+  //------------------------------------------------------------
+  $("#btnEmailZona").click(function () {
+    ConsultarZonas();
+    ListarZonasEmail();
+    $("#dvEmailZonas").modal("show");
+  });
+  //------------------------------------------------------------
+  $("#btnCondicionDcto").click(function () {
+    if ($("#CodigoSAP").val() != '') {
+      $("#dvCondiciones").modal("show");
+    } else {
+      Swal.fire('Error', 'Debe seleccionar un cliente!.', 'error');
+    }
+  });
+  //----Botones de hipervinculos
+  actualizarElementoSegunPermisos("0401", "#0401");
+  actualizarElementoSegunPermisos("0102", "#0102");
+
+  $("#0401,#0102").click(function () {
+    let id = $(this).attr('id')
+    let url = '';
+    let title = '';
+
+    switch (id) {
+      case '0401':
+        url = 'CRM.php';
+        title = '0401 - CRM';
+        break;
+      case '0102':
+        url = 'ProgramacionCliente.php';
+        title = '0102 - PROGRAMACION DE CLIENTE';
+        break;
+    }
+    $("#ModalHipervinculo").modal("show")
+    $("#span-titulo-modulo").text(title);
+    $(".iframe").attr('src', url).show();
+  });
+
+  $("#btnCompensaciones").click(() => {
+    $("#modalCompensaciones").modal('show');
+  })
+
+  $("#btnCompensar").click(() => {
+    compensarDocumentos();
+  })
+
+  $('#btnSeleccionarTodas').click(async function () {
+    arrayLiquidador.length = 0;
+
+    if (!$("#tdFacturas tbody tr").length) {
+      Swal.fire("Agregar documentos", "No hay documentos para agregar al liquidador", "warning");
+      return;
+    }
+
+    const result = await confirmAlert("Agregar documentos", "Se agregarán todos los documentos disponibles al liquidador", "info");
+    if (!result.isConfirmed) return;
+
+    $("#tdFacturas tbody tr").each(function () {
+      let fila = $(this).find('td');
+      let item = JSON.parse($(fila.eq(17)).find('button').attr('data-item'));
+
+      agregarLiquidador(item);
+    });
+  });
+
+  $('#filtro2').keyup(function () {
+    const filtro = this.value.toLowerCase();
+    filtrar(filtro);
+  });
+
+  $('#liBancos').click(function () {
+    ConsultarMulticashBanco();
+  });
+});

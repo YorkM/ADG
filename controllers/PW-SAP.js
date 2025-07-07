@@ -2450,6 +2450,8 @@ async function Entregas() {
           Swal.fire("Excelente", data.Msj, "success");
         }
 
+        // await Promise.allSettled() 
+
         setTimeout(function () {
           Temporales(); // Temporales propios
           GestionPedidos(); // Temporales de terceros 

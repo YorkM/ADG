@@ -22,8 +22,6 @@ $sociedad = (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : "";
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="../lib/SweetAlert2_V10/dist/sweetalert2.css">
   <link type="text/css" rel="stylesheet" href="../resources/css/Animate.css?<?php echo (rand()); ?>">
-  <link type="text/css" rel="stylesheet" href="../resources/css/BootstrapTabs.css?<?php echo (rand()); ?>">
-  <link type="text/css" rel="stylesheet" href="../resources/css/Animate.css?<?php echo (rand()); ?>">
   <link type="text/css" rel="stylesheet" href="../resources/fontawesome/css/all.css">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
   <style>
@@ -124,11 +122,6 @@ $sociedad = (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : "";
       margin: 0;
     }
 
-    .span-valores {
-      font-weight: 600;
-      color: #337ab7;
-    }
-
     .custom-card {
       border: 1.5px solid #ccc;
       padding: 5px;
@@ -199,6 +192,62 @@ $sociedad = (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : "";
     .text-green {
       color: #055160;
     }
+
+    .size-th {
+      font-size: 14px !important;
+      color: #055160 !important;
+    }
+
+    .bg-info {
+      background-color: #cff4fc !important;
+    }
+
+    .vertical {
+      vertical-align: middle;
+    }
+
+    .fw-500 {
+      font-weight: 500;
+    }
+
+    .container-fixed {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      border: 1px solid #CCC;
+      border-radius: 3px;
+      background-color: #cff4fc;
+      width: 99.5%;
+    }
+
+    #loaderOverlayRecibo {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background-color: rgba(255, 255, 255, 0.8);
+      display: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    #loaderOverlayRecibo img {
+      max-width: 500px;
+      height: 300px;
+      margin-bottom: 10px;
+    }
+
+    .overflow {
+      overflow-x: auto;
+    }
+
+    #ui-id-1,
+    #ui-id-2 {
+      font-size: 13px !important;
+    }
   </style>
 </head>
 
@@ -224,12 +273,17 @@ $sociedad = (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : "";
             <i class="fa-solid fa-cash-register"></i>&nbsp;Abonos
           </button>
         </li>
-        <!-- <li class="nav-item" role="presentation">
-          <button class="nav-link" id="btnPedidos" data-bs-toggle="tab" data-bs-target="#dvPedidos" type="button" role="tab" aria-controls="dvPedidos" aria-selected="false">
-            <i class="fa-solid fa-file-invoice"></i>&nbsp;Pedido
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="btnFacturas" data-bs-toggle="tab" data-bs-target="#dvFacturas" type="button" role="tab" aria-controls="dvFacturas" aria-selected="false">
+            <i class="fa-solid fa-file-invoice"></i>&nbsp;Facturas
           </button>
         </li>
-        <li class="nav-item dropdown" role="presentation">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="btnMulticash" data-bs-toggle="tab" data-bs-target="#dvMulticash" type="button" role="tab" aria-controls="dvMulticash" aria-selected="false">
+            <i class="fa-solid fa-sack-dollar"></i>&nbsp;Multicash
+          </button>
+        </li>
+        <!--<li class="nav-item dropdown" role="presentation">
           <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
             <i class="fa-solid fa-list-check"></i>
             &nbsp;Gestión
@@ -290,7 +344,6 @@ $sociedad = (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : "";
       <!-- TAB CLIENTE -->
       <div class="tab-pane fade show active p-2" id="dvClientes" role="tabpanel" aria-labelledby="nav-home-tab">
         <div class="div-container" style="min-height: 100vh; overflow: auto;">
-          <!-- <div style="overflow-y: scroll; overflow-x: hidden; max-height: 460px;"> -->
           <table style="width: 100%;">
             <thead>
               <tr class="custom-tr">
@@ -375,53 +428,110 @@ $sociedad = (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : "";
       </div>
       <!-- TAB ABONOS -->
       <div class="tab-pane fade p-2" id="dvAbonos" role="tabpanel" aria-labelledby="nav-profile-tab">
-        <table class="form" width="100%" id="TablaAbonos">
-          <tr>
-            <td>Cuenta</td>
-            <td><select id="Cuenta" class="form-control">
-              </select></td>
-          </tr>
-          <tr>
-            <td>Tipo Valor</td>
-            <td><select id="TipoValor" class="form-control">
-                <option value="P">POSITIVO (+)</option>
-                <option value="N">NEGATIVO (-)</option>
-              </select></td>
-          </tr>
-          <tr>
-            <td>Valor</td>
-            <td><input type="text" id="ValorAbono" class="form-control ClassNumero" onKeyPress="return vnumeros(event)" onKeyUp="Enter(event,'AddAbono')"></td>
-          </tr>
-          <tr>
-            <td>Fecha Valor</td>
-            <td><input type="text" id="FechaValor" class="form-control" onKeyUp="Enter(event,'AddAbono')"></td>
-          </tr>
-        </table>
-        <div id="DetalleAbonos" style="overflow-y:scroll; overflow-x:hidden; height:500px;">
-          <table class="form" width="100%">
-            <thead>
+        <div class="div-container mb-3">
+          <table style="width: 100%;" id="TablaAbonos">
+            <tr class="custom-tr">
+              <td class="size-text">Cuenta</td>
+              <td><select id="Cuenta" class="form-control size-td shadow-sm"></select></td>
+            </tr>
+            <tr class="custom-tr">
+              <td class="size-text">Tipo Valor</td>
+              <td><select id="TipoValor" class="form-control size-td shadow-sm">
+                  <option value="P">POSITIVO (+)</option>
+                  <option value="N">NEGATIVO (-)</option>
+                </select></td>
+            </tr>
+            <tr class="custom-tr">
+              <td class="size-text">Valor</td>
+              <td><input type="text" id="ValorAbono" class="form-control ClassNumero size-td shadow-sm" onKeyPress="return vnumeros(event)" onKeyUp="Enter(event,'AddAbono')"></td>
+            </tr>
+            <tr class="custom-tr">
+              <td class="size-text">Fecha Valor</td>
+              <td><input type="text" id="FechaValor" class="form-control size-td shadow-sm" onKeyUp="Enter(event,'AddAbono')"></td>
+            </tr>
+          </table>
+        </div>
+        <div id="DetalleAbonos">
+          <table class="table table-bordered table-hover table-sm" style="width: 100%;">
+            <thead class="table-info">
               <tr>
-                <th>Cuenta</th>
-                <th>Descripción</th>
-                <th>Valor</th>
-                <th>Fecha Valor</th>
-                <th>Referencia</th>
-                <th>Eliminar</th>
+                <th class="size-th">CUENTA</th>
+                <th class="size-th">DESCRIPCIÓN</th>
+                <th class="size-th">VALOR</th>
+                <th class="size-th">FECHA VALOR</th>
+                <th class="size-th">REFERENCIA</th>
+                <th class="size-th text-center">ELIMINAR</th>
               </tr>
             </thead>
             <tbody id="tdBody">
+
             </tbody>
           </table>
         </div>
       </div>
-      <!-- TAB PEDIDO -->
-      <div class="tab-pane fade p-2" id="dvPedidos" role="tabpanel" aria-labelledby="nav-profile-tab">
-
+      <!-- TAB FACTURAS -->
+      <div class="tab-pane fade p-2" id="dvFacturas" role="tabpanel" aria-labelledby="nav-profile-tab">
+        <div class="contenedor-val-todas">
+          <div class="contenedor-valores">
+            <p class="p-valores">Valor Total: <span class="fw-bold text-primary" id="valorTotal">$0</span></p>
+            <p class="p-valores">Partidas: <span class="fw-bold text-primary" id="partidas">0</span></p>
+            <p class="p-valores">Valor Mora: <span class="fw-bold text-primary" id="valorMora">$0</span></p>
+          </div>
+          <div style="display: flex; justify-content: flex-end;">
+            <button class="btn btn-primary btn-sm" id="btnSeleccionarTodas">Seleccionar todas</button>
+          </div>
+        </div>
+        <div class="overflow mt-2" id="dvResultCartera"></div>
       </div>
-      <!-- TAB GESTIÓN -->
-      <!-- RECUPERAR PEDIDDOS PROPIOS -->
-      <div class="tab-pane fade" id="dvRecuperar" role="tabpanel">
+      <!-- TAB MULTICASH -->
+      <div class="tab-pane fade" id="dvMulticash" role="tabpanel">
+        <div class="container-fluid mt-2">
+          <div class="row">
+            <div class="col-md-6">
+              <input type="text" placeholder="Filtro de búsqueda" class="form-control shadow-sm" id="filtro" name="filtro">
+            </div>
+            <div class="col-md-1">
+              <select id="MultiDay" class="form-control shadow-sm">
+              </select>
+            </div>
+            <div class="col-md-2">
+              <select id="MultiMes" class="form-control shadow-sm">
+              </select>
+            </div>
+            <div class="col-md-1">
+              <select id="MultiAnio" class="form-control shadow-sm">
+              </select>
+            </div>
+            <div class="col-md-2">
+              <div class="input-group flex-nowrap">
+                <input type="text" class="form-control shadow-sm" id="txtValidaDocumento" placeholder="Validar Multicash" onKeyPress="return vnumeros(event)" aria-label="Username" aria-describedby="addon-wrapping">
+                <span class="input-group-text shadow-sm" id="addon-wrapping"><i class="fa-solid fa-magnifying-glass"></i></span>
+              </div>
+            </div>
+          </div>
+          <hr>
+          <div id="dvResultMulticash" style="overflow: auto; height: 100vh;">
+            <table class="table table-bordered table-hover table-sm" style="width: 100%;" id="tdPlanillas">
+              <thead class="table-info">
+                <tr>
+                  <th class="size-th">CUENTA</th>
+                  <th class="size-th">DESCRIPCION</th>
+                  <th class="size-th">NUMERO</th>
+                  <th class="size-th">VALOR</th>
+                  <th class="size-th">TEXTO</th>
+                  <th class="size-th">FECHA CONT.</th>
+                  <th class="size-th">FECHA VALOR.</th>
+                  <th class="size-th">ESTADO</th>
+                  <th class="size-th">REFERENCIA</th>
+                  <th class="size-th">ID</th>
+                </tr>
+              </thead>
+              <tbody id="tdDetalleMulticash">
 
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
       <!-- RECUPERAR PEDIDOS TERCEROS -->
       <div class="tab-pane fade p-2" id="dvRecuperarTerceros" role="tabpanel">
@@ -441,36 +551,62 @@ $sociedad = (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : "";
       </div>
     </div>
   </div>
-  <div class="container-fluid" style="position: fixed; bottom: 0; border: 1px solid #CCC; border-radius: 3px; background-color: #cff4fc;">
+  <div class="container-fluid container-fixed">
     <div class="row">
       <div class="col-md-4">
-        <label for="VlrTotalAbono" class="text-green">Total Abonado:</label>
+        <label for="VlrTotalAbono" class="text-green fw-500">Total Abonado:</label>
         <input type="text" id="VlrTotalAbono" class="form-control shadow-sm mb-1" size="10" readonly>
       </div>
       <div class="col-md-4">
-        <label for="VlrTotalFacturas" class="text-green">Total Facturas:</label>
+        <label for="VlrTotalFacturas" class="text-green fw-500">Total Facturas:</label>
         <input type="text" id="VlrTotalFacturas" class="form-control shadow-sm mb-1" size="10" readonly>
       </div>
       <div class="col-md-4">
-        <label for="VlrSinAsignar" class="text-green">Sin Asignar:</label>
+        <label for="VlrSinAsignar" class="text-green fw-500">Sin Asignar:</label>
         <input type="text" id="VlrSinAsignar" class="form-control shadow-sm mb-1" size="10" readonly>
       </div>
     </div>
   </div>
   <!-- FIN CONTENIDO PRINCIPAL -->
 
+  <!-- DIV'S PARA RENDERIZAR EL LOADING -->
+  <div id="Bloquear" style="display: none;"></div>
+  <div id="loaderOverlayRecibo" class="" style="display: none;"></div>
+
+  <!-- MODAL VER PDF -->
+  <div class="modal fade" id="ModalPDF" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="min-width: 60%;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="ModalPDFTittle"></h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="ContenidoPDF">
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" onClick="EliminarPDF()" id="btnEliminarPDF">Eliminar</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- <div class="alert alert-info"><i class="fa-solid fa-star fa-flip"></i>&nbsp;0405 - RECIBOS DE PAGO</div>
   <div class="panel with-nav-tabs panel-info">
     <div class="panel-heading">
       <ul class="nav nav-tabs">
-
         <li class="active" id="liCliente"> <a href="#dvClientes" id="btnCliente" data-toggle="tab">Cliente</a></li>
-
-
         <li class="disabled disabledTab" id="liAbonos"> <a href="#dvAbonos" id="btnAbonos">Abonos</a></li>
-
         <li class="disabled disabledTab" id="liFacturas"> <a href="#dvFacturas" id="btnFacturas">Facturas</a></li>
+
+
+
         <li class="disabled disabledTab" id="liMulticash"><a href="#dvMulticash" id="btnMulticash" data-toggle="tab">Multicash</a></li>
+
+
+        
+        
         <li class="" id="liPlanilla"><a href="#dvPlanilla" onClick="ConsultarPlanilla();" data-toggle="tab" id="btnPlanilla">Planilla</a></li>
         <li class="" id="liInformes"><a href="#dvInformes" data-toggle="tab" id="btnInformes">Informes</a></li>
         <li class="" id="liLiquidador"><a href="#dvLiquidador" data-toggle="tab" id="btnLiquidador">Liquidador</a></li>
@@ -1145,27 +1281,8 @@ $sociedad = (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : "";
         </div>
       </div>
     </div>
-  </div>
+  </div>  
 
-  <div id="Bloquear" style="display:none;"></div>
-  <div class="centrado-porcentual" style="display:none;background-color:transparent; width:30%; height:250px"></div> 
-  
-  <div id="ModalPDF" class="modal fade bd-example-modal-lg" role="dialog">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title" id="ModalPDFTittle"></h4>
-        </div>
-        <div class="modal-body" id="ContenidoPDF">
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-danger" onClick="EliminarPDF()" id="btnEliminarPDF">Eliminar</button>
-          <button type="button" class="btn btn-info" data-dismiss="modal">Cerrar</button>
-        </div>
-      </div>
-    </div>
-  </div>
   
   <div id="ModalHipervinculo" class="modal" role="dialog" style="z-index: 99999; margin-top: 0; background-color: #C0C0C0; padding: 0"
     aria-hidden="true"
@@ -1201,7 +1318,6 @@ $sociedad = (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : "";
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
   <script type="text/javascript" src="../lib/js/funciones.js?<?php echo (rand()); ?>"></script>
   <script type="text/javascript" src="../lib/js/servicios.js?<?php echo (rand()); ?>"></script>
-  <script type="text/javascript" src="../lib/bootstrap-notify/bootstrap-notify.min.js"></script>
   <script type="text/javascript" src="../lib/js/jquery.keyz.js?<?php echo (rand()); ?>"></script>
   <script type="text/javascript" src="../lib/MaskMoney/jquery.maskMoney.js?<?php echo (rand()); ?>"></script>
   <script type="text/javascript" src="../resources/HighCharts/code/highcharts.js?1991462313"></script>
