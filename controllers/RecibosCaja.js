@@ -272,21 +272,25 @@ function crearTablasPorDias(datos) {
 
     count++;
 
-    const titulo = document.createElement("h3");
+    const titulo = document.createElement("h5");
     titulo.classList.add('text-center');
-    titulo.textContent = `Liquidación a ${dias} días`;
+    titulo.classList.add('text-green');
+    titulo.textContent = `LIQUIDACIÓN A ${dias} DÍAS`;
     contenedor.appendChild(titulo);
 
     const tabla = document.createElement("table");
     tabla.setAttribute('id', `tabla${count}`);
     tabla.classList.add('table');
+    tabla.classList.add('table-bordered');
+    tabla.classList.add('table-hover');
+    tabla.classList.add('table-sm');
     tabla.classList.add('table-liquidador');
     tabla.style.width = "100%";
 
     const cardContenedor = document.createElement('div');
     cardContenedor.classList.add('custom-card');
     cardContenedor.style.width = '98%';
-    cardContenedor.style.margin = '20px auto';
+    cardContenedor.style.margin = '12px auto';
 
     const btnContenedor = document.createElement('div');
     btnContenedor.classList.add('btn-pdf');
@@ -310,21 +314,22 @@ function crearTablasPorDias(datos) {
     btnContenedor.appendChild(btnDescargarPDF);
 
     const thead = document.createElement("thead");
+    thead.classList.add('table-info');
     const encabezado = `
       <tr>
-        <th>Doc</th>
-        <th>Referencia</th>
-        <th>Clase</th>
-        <th>Fecha</th>
-        <th>Fecha Venc.</th>
-        <th>V Fact.</th>
-        <th>Base PP</th>
-        <th>Días</th>
-        <th>% Desc.</th>
-        <th>V Desc.</th>
-        <th>V Pagar</th>
-        <th>Observación</th>
-        <th>Eliminar</th>
+        <th class="size-th">DOC</th>
+        <th class="size-th">REFERENCIA</th>
+        <th class="size-th">CLASE</th>
+        <th class="size-th">FECHA</th>
+        <th class="size-th">FECHA VENC.</th>
+        <th class="size-th">V FACT.</th>
+        <th class="size-th">BASE PP</th>
+        <th class="size-th">DÍAS</th>
+        <th class="size-th">% DESC.</th>
+        <th class="size-th">V DESC.</th>
+        <th class="size-th">V PAGAR</th>
+        <th class="size-th">OBSER.</th>
+        <th class="size-th">ELIMINAR</th>
       </tr>`;
     thead.innerHTML = encabezado;
     tabla.appendChild(thead);
@@ -333,28 +338,21 @@ function crearTablasPorDias(datos) {
     grupo.forEach(item => {
       const fila = document.createElement("tr");
       fila.innerHTML = `
-        <td class="font-size">${item.numeroDoc}</td>
-        <td class="font-size">${item.referencia}</td>
-        <td class="font-size">${item.claseDoc}</td>
-        <td class="font-size">${item.fechaFactura}</td>
-        <td class="font-size">${item.fechaVencimientoFactura}</td>
-        <td class="font-size">${formatNum(item.importe, "$")}</td>
-        <td class="font-size">${formatNum(item.basePP, "$")}</td>
-        <td class="font-size">${item.dias}</td>
-        <td class="font-size">${item.porcentajeDescuento}%</td>
-        <td class="font-size">${formatNum(item.valorDescuento, "$")}</td>
-        <td class="font-size">${formatNum(item.valorPagar, "$")}</td>
-        <td class="font-size td-text">
-          <input 
-            type="text" 
-            maxlength="25" 
-            class="form-control input-sm input-obser">
-          </td>
+        <td class="size-text vertical">${item.numeroDoc}</td>
+        <td class="size-text vertical">${item.referencia}</td>
+        <td class="size-text vertical">${item.claseDoc}</td>
+        <td class="size-text vertical">${item.fechaFactura}</td>
+        <td class="size-text vertical">${item.fechaVencimientoFactura}</td>
+        <td class="size-text vertical">${formatNum(item.importe, "$")}</td>
+        <td class="size-text vertical">${formatNum(item.basePP, "$")}</td>
+        <td class="size-text vertical">${item.dias}</td>
+        <td class="size-text vertical">${item.porcentajeDescuento}%</td>
+        <td class="size-text vertical">${formatNum(item.valorDescuento, "$")}</td>
+        <td class="size-text vertical">${formatNum(item.valorPagar, "$")}</td>
+        <td class="size-text vertical td-text"><input type="text" maxlength="25" class="form-control input-sm input-obser"></td>
         <td class="text-center">
-          <button 
-            class="btn btn-danger btn-sm eliminar-liquidacion" 
-            data-item='${item.numeroDoc}'>
-              <i class="fa-solid fa-trash-can"></i>
+          <button class="btn btn-danger btn-sm eliminar-liquidacion" data-item='${item.numeroDoc}'>
+            <i class="fa-solid fa-trash-can"></i>
           </button>
         </td>`;
       tbody.appendChild(fila);
@@ -367,17 +365,18 @@ function crearTablasPorDias(datos) {
     const totalPagar = grupo.reduce((sum, item) => sum + item.valorPagar, 0);
 
     const tfoot = document.createElement("tfoot");
+    tfoot.classList.add('table-info')
     const totales = `
       <tr>
-        <td colspan="5" class="font-size-tf" style="text-align: center;">Totales</td>
-        <td class="font-size-tf">${formatNum(totalImporte, "$")}</td>
-        <td class="font-size-tf">${formatNum(totalBasePP, "$")}</td>
-        <td class="font-size-tf"></td>
-        <td class="font-size-tf"></td>
-        <td class="font-size-tf">${formatNum(totalDescuento, "$")}</td>
-        <td class="font-size-tf">${formatNum(totalPagar, "$")}</td>
-        <td class="font-size-tf"></td>
-        <td class="font-size-tf"></td>
+        <th colspan="5" class="size-th" style="text-align: center;">TOTALES</th>
+        <th class="size-th">${formatNum(totalImporte, "$")}</th>
+        <th class="size-th">${formatNum(totalBasePP, "$")}</th>
+        <th class="size-th"></th>
+        <th class="size-th"></th>
+        <th class="size-th">${formatNum(totalDescuento, "$")}</th>
+        <th class="size-th">${formatNum(totalPagar, "$")}</th>
+        <th class="size-th"></th>
+        <th class="size-th"></th>
       </tr>`;
 
     tfoot.innerHTML = totales;
@@ -399,6 +398,7 @@ function crearTablasPorDias(datos) {
       const numeroDoc = $(this).attr('data-item');
       arrayLiquidador = arrayLiquidador.filter(item => item.numeroDoc !== numeroDoc);
       crearTablasPorDias(arrayLiquidador);
+      if (!arrayLiquidador.length) $('#contenedorTablasLiquidador').html(`<p class="lead text-center">No hay documentos agregados al liquidador</p>`);
     });
 
     $('.btn-pdf').off().on('click', '.custom-padding', function (e) {
@@ -1598,10 +1598,10 @@ function Documentos() {
               <td class="no-wrap size-text vertical">${formatNum(data[i].IMPORTE, '$')}</td>
               <td class="no-wrap size-text vertical">${data[i].TEXTO.trim()}</td>
               <td>
-                <input type="text" onKeyPress="return vnumeros(event)" onDblClick="AsignarValor(this);" size="15" class="form-control ClassNumero" onBlur="AddFactura(this, this.value, '${cumple_pres}')" value="$0">
+                <input type="text" onKeyPress="return vnumeros(event)" onDblClick="AsignarValor(this);" size="15" class="form-control ClassNumero form-control-sm shadow-sm" onBlur="AddFactura(this, this.value, '${cumple_pres}')" value="$0">
               </td>
               <td>
-                <input type="text" onKeyPress="return vnumeros(event)"  size="15" class="form-control ClassNumero" onBlur="AddFactura(this, this.value,  '${cumple_pres}')" disabled value="$0">
+                <input type="text" onKeyPress="return vnumeros(event)"  size="15" class="form-control ClassNumero form-control-sm shadow-sm" onBlur="AddFactura(this, this.value,  '${cumple_pres}')" disabled value="$0">
               </td>
               <td class="size-text vertical">${formatNum(parseFloat(data[i].BASE_PP), '$')}</td>
               <td style="display:none;">${data[i].DESCUENTO}</td>
@@ -1749,7 +1749,7 @@ function EliminarPDF() {
           success: function (data) {
             if (data == 1) {
               Swal.fire('Excelente', 'El documento ha sido eliminado', 'success');
-              // ConsultarPlanilla();
+              ConsultarPlanilla();
               $("#ModalPDF").modal("hide");
               $("#dvReciboCaja").modal("hide");
             } else {
@@ -2004,7 +2004,7 @@ function AutorizarRC(version) {
             } else {
               Swal.fire('Oops...', 'No fue posible enviar el RC, ' + data, 'error');
             }
-            // ConsultarPlanilla();
+            ConsultarPlanilla();
             $("#dvReciboCaja").modal("hide");
           }
         }).fail(function (data) {
@@ -2081,40 +2081,41 @@ function ConsultarPlanilla() {
           var estado = '';
           var color = '';
           if (data[i].ESTADO == 'T') {
-            estado = '<span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span>';
+            estado = '<i class="fa-solid fa-thumbs-down"></i>';
             color = 'danger';
           } else {
-            estado = '<span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span>';
+            estado = '<i class="fa-solid fa-thumbs-up"></i>';
             color = 'success';
           }
-          detalle += '<tr >'
-            + '<td>' + data[i].FECHA_HORA + '</td>'
-            + '<td>' + data[i].USUARIO + '</td>'
-            + '<td>' + data[i].CODIGO_SAP + '</td>'
-            + '<td>' + data[i].NOMBRES + '</td>'
-            + '<td>' + data[i].RAZON_COMERCIAL + '</td>'
-            + '<td>' + data[i].NUMERO + '</td>'
-            + '<td>' + formatNum(data[i].VALOR, '$') + '</td>'
-            + '<td>' + formatNum(data[i].DESCUENTO, '$') + '</td>'
-            + '<td align="center">'
+          detalle += '<tr>'
+            + '<td class="size-text no-wrap vertical">' + (i + 1) + '</td>'
+            + '<td class="size-text no-wrap vertical">' + data[i].FECHA_HORA + '</td>'
+            + '<td class="size-td no-wrap vertical">' + data[i].USUARIO + '</td>'
+            + '<td class="size-text no-wrap vertical">' + data[i].CODIGO_SAP + '</td>'
+            + '<td class="size-td no-wrap vertical">' + data[i].NOMBRES + '</td>'
+            + '<td class="size-td no-wrap vertical">' + data[i].RAZON_COMERCIAL + '</td>'
+            + '<td class="size-text no-wrap vertical">' + data[i].NUMERO + '</td>'
+            + '<td class="size-text no-wrap vertical">' + formatNum(data[i].VALOR, '$') + '</td>'
+            + '<td class="size-text no-wrap vertical">' + formatNum(data[i].DESCUENTO, '$') + '</td>'
+            + '<td class="text-center">'
             + '<button class="btn btn-' + color + ' btn-sm" type="button">' + estado + '</button>'
             + '</td>'
-            + '<td align="center">'
+            + '<td class="text-center">'
             + '<button type="button" class="btn btn-warning btn-sm" onclick="AbrirRecibo(\'' + data[i].ID_RC + '\',this)">'
-            + '<span class="glyphicon glyphicon-flash" aria-hidden="true"></span>'
+            + '<i class="fa-solid fa-bolt"></i>'
             + '</button>'
             + '</td>'
             + '<td style="display:none;">' + data[i].TEXTO_CABECERA + '</td>'
             + '<td style="display:none;">' + data[i].TEXTO_COMPENSACION + '</td>'
             + '<td style="display:none;">' + data[i].TEXTO_REFERENCIA + '</td>'
-            + '<td align="center">'
+            + '<td class="text-center">'
             + '<button type="button" class="btn btn-primary btn-sm" onclick="PDFRecibo(\'' + data[i].ID_RC + '\',this)">'
-            + '<span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>'
+            + '<i class="fa-solid fa-file-pdf"></i>'
             + '</button>'
             + '</td>'
             + '<td style="display:none;">' + data[i].ADJUNTO + '</td>'
-            + '<td style="display:;">' + data[i].ZONA_VENTAS + '</td>'
-            + '<td style="display:;">' + data[i].ID_RC + '</td>'
+            + '<td class="size-td no-wrap vertical">' + data[i].ZONA_VENTAS + '</td>'
+            + '<td class="size-text no-wrap vertical">' + data[i].ID_RC + '</td>'
             + '<td style="display:none;">' + data[i].EMAIL + '</td>'
             + '<td style="display:none;">' + data[i].EMAIL_ZONA + '</td>'
             + '<td style="display:none;">' + data[i].USUARIO_APRUEBA + '</td>'
@@ -2125,22 +2126,23 @@ function ConsultarPlanilla() {
           cont++;
 
         }
-        var tabla = '<table class="table" width="100%" id="tablePlanillas">'
-          + '<thead>'
+        var tabla = '<table class="table table-bordered table-hover table-sm" width="100%" id="tablePlanillas">'
+          + '<thead class="table-info">'
           + '<tr>'
-          + '<th>FECHA/HORA</th>'
-          + '<th>USUARIO</th>'
-          + '<th>CODIGO</th>'
-          + '<th>NOMBRES</th>'
-          + '<th>RAZON</th>'
-          + '<th>NUMERO</th>'
-          + '<th>VALOR</th>'
-          + '<th>DESCUENTO</th>'
-          + '<th>ESTADO</th>'
-          + '<th>GESTIONAR</th>'
-          + '<th>PDF</th>'
-          + '<th>ZONA VENTAS</th>'
-          + '<th>ID</th>'
+          + '<th class="size-th nowrap">N°</th>'
+          + '<th class="size-th nowrap">FECHA/HORA</th>'
+          + '<th class="size-th nowrap">USUARIO</th>'
+          + '<th class="size-th nowrap">CODIGO</th>'
+          + '<th class="size-th nowrap">NOMBRES</th>'
+          + '<th class="size-th nowrap">RAZON</th>'
+          + '<th class="size-th nowrap">NUMERO</th>'
+          + '<th class="size-th nowrap">VALOR</th>'
+          + '<th class="size-th nowrap">DESCUENTO</th>'
+          + '<th class="size-th nowrap">ESTADO</th>'
+          + '<th class="size-th nowrap">GESTIONAR</th>'
+          + '<th class="size-th nowrap">PDF</th>'
+          + '<th class="size-th nowrap">ZONA VENTAS</th>'
+          + '<th class="size-th nowrap">ID</th>'
           + '</tr>'
           + '</thead>'
           + '<tbody>'
@@ -2310,7 +2312,7 @@ function EliminarRC() {
             } else {
               Swal.fire('Oops...', 'No fue posible eliminar el RC.', 'error');
             }
-            // ConsultarPlanilla();
+            ConsultarPlanilla();
             $("#dvReciboCaja").modal("hide");
           }
         }).fail(function (data) {
@@ -2727,159 +2729,173 @@ function filtroEstado(valor) {
   });
 }
 
-function ConsultarInformes() {
-  $.ajax({
-    type: "POST",
-    encoding: "UTF-8",
-    url: "../models/RecibosCaja.php",
-    async: true,
-    dataType: "json",
-    error: function (OBJ, ERROR, JQERROR) { },
-    beforeSend: function () {
-      LoadImg('Consultando información...');
-    },
-    data: {
-      op: 'S_INFORME_RC',
+async function ConsultarInformes() {
+  try {
+    LoadImg('Consultando información...');
+    const resp = await enviarPeticion({
+      op: "S_INFORME_RC",
+      link: "../models/RecibosCaja.php",
       fhIni: $("#InfoFhIni").val(),
       fhFin: $("#InfoFhFin").val()
-    },
-    success: function (resp) {
-      console.log({
-        resp
-      })
-      var data = resp['detalle'];
-      var data2 = resp['consolidado'];
-      if (data.length > 0) {
-        //Detalle
-        var tabla = `<table class="form" width="100%" id="">
-						<thead>
-							<tr>
-								<th>APRUEBA</th>
-								<th>ID_RC</th>
-								<th>FECHA/HORA RECIBO</th>
-								<th>FECHA/HORA APRUEBA</th>
-								<th>EXTEMPORANEO</th>
-							</tr>
-						</thead>
-						<tbody>`;
-        for (var i = 0; i <= data.length - 1; i++) {
-          var estado = '';
-          if (data[i].recibos_extemporaneos == 0) {
-            estado = '<button class="btn btn-success btn-sm" type="button"><span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span></button>';
-          } else {
-            estado = '<button class="btn btn-danger btn-sm" type="button"><span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span></button>';
-          }
-          tabla += `<tr>
-                       <td>${data[i].usuario_aprueba}</td>
-                       <td>${data[i].id_rc}</td>
-                       <td>${data[i].fecha_hora}</td>
-                       <td>${data[i].fecha_hora_aprobacion}</td>
-                       <td>${estado}</td>
-                    </tr>`;
+    });
+
+    let data = resp.detalle;
+    let data2 = resp.consolidado;
+
+    if (data.length) {
+      let tabla = `
+      <table class="table table-bordered table-hover table-sm" style="width: 49%;">
+        <thead class="table-info">
+          <tr>
+            <th class="size-th">APRUEBA</th>
+            <th class="size-th">ID_RC</th>
+            <th class="size-th">FECHA/HORA RECIBO</th>
+            <th class="size-th">FECHA/HORA APRUEBA</th>
+            <th class="size-th">EXTEMPORANEO</th>
+          </tr>
+        </thead>
+        <tbody>`;
+
+      data.forEach(item => {
+        let estado = '';
+        if (item.recibos_extemporaneos == 0) {
+          estado = '<button class="btn btn-success btn-sm" type="button"><i class="fa-solid fa-thumbs-up"></i></button>';
+        } else {
+          estado = '<button class="btn btn-danger btn-sm" type="button"><i class="fa-solid fa-thumbs-down"></i></button>';
         }
-        tabla += `</tbody></table>`;
-        //Consolidado
-        var tabla2 = `<table class="form" width="100%" id="">
-						<thead>
-                            <tr>
-                              <th colspan="4">CONSOLIDADO APLICACIÓN DE RECIBOS</th>
-                            </tr>
-							<tr>
-								<th>APRUEBA</th>
-								<th>TOTAL RECIBOS</th>
-								<th>TOTAL EXTEMPORANEOS</th>
-								<th>% INCUMPLIMIENTO</th>
-							</tr>
-						</thead>
-						<tbody>`;
-        var RcTotales = 0;
-        var RcExtemporaneos = 0;
-        var pluginArrayArg = new Array();
-        for (var i = 0; i <= data2.length - 1; i++) {
-          var cump = parseInt(data2[i].recibos_extemporaneos) / parseInt(data2[i].recibos_totales) * 100;
-          tabla2 += `<tr>
-                       <td>${data2[i].usuario_aprueba}</td>
-                       <td>${data2[i].recibos_totales}</td>
-                       <td>${data2[i].recibos_extemporaneos}</td>
-                       <td>${formatNumberES(cump, 2, '%')}</td>
-                      </tr>`;
-          RcTotales += parseInt(data2[i].recibos_totales);
-          RcExtemporaneos += parseInt(data2[i].recibos_extemporaneos);
-          //---Para el grafico---------------------------------
-          if (data2[i].usuario_aprueba != 'N/A') {
-            var dato = new Object();
-            dato.name = data2[i].usuario_aprueba;
-            dato.y = Math.round(data2[i].recibos_totales);
-            pluginArrayArg.push(dato);
-          }
-          //---Para el grafico---------------------------------
 
+        tabla += `
+        <tr>
+          <td class="size-text vertical">${item.usuario_aprueba}</td>
+          <td class="size-text vertical">${item.id_rc}</td>
+          <td class="size-text vertical">${(item.fecha_hora) && formatDate(item.fecha_hora)}</td>
+          <td class="size-text vertical">${(item.fecha_hora_aprobacion) && formatDate(item.fecha_hora_aprobacion)}</td>
+          <td class="size-text vertical text-center">${estado}</td>
+        </tr>`;
+      });
+      tabla += `</tbody></table>`;
+
+      let tabla2 = `
+      <h5 class="text-center text-green" style="font-weight: 400;">CONSOLIDADO APLICACIÓN DE RECIBOS</h5>
+      <table class="table table-bordered table-hover table-sm" style="width: 100%;">
+        <thead class="table-info">
+          <tr>
+            <th class="size-th">APRUEBA</th>
+            <th class="size-th">TOTAL RECIBOS</th>
+            <th class="size-th">TOTAL EXTEMPORANEOS</th>
+            <th class="size-th">% INCUMPLIMIENTO</th>
+          </tr>
+        </thead>
+        <tbody>`;
+
+      let RcTotales = 0;
+      let RcExtemporaneos = 0;
+      let pluginArrayArg = [];
+
+      data2.forEach(item => {
+        const cump = parseInt(item.recibos_extemporaneos) / parseInt(item.recibos_totales) * 100;
+        tabla2 += `
+        <tr>
+          <td class="size-td vertical">${item.usuario_aprueba}</td>
+          <td class="size-text vertical">${item.recibos_totales}</td>
+          <td class="size-text vertical">${item.recibos_extemporaneos}</td>
+          <td class="size-text vertical">${formatNumberES(cump, 2, '%')}</td>
+        </tr>`;
+
+        RcTotales += parseInt(item.recibos_totales);
+        RcExtemporaneos += parseInt(item.recibos_extemporaneos);
+
+        if (item.usuario_aprueba != 'N/A') {
+          let dato = {};
+          dato.name = item.usuario_aprueba;
+          dato.y = Math.round(item.recibos_totales);
+          pluginArrayArg.push(dato);
         }
-        var cumpTotal = parseInt(RcExtemporaneos) / parseInt(RcTotales) * 100;
-        tabla2 += `</tbody>
-                     <tfoot>
-                      <tr>
-						<th></th>
-						<th>${RcTotales}</th>
-						<th>${RcExtemporaneos}</th>
-						<th>${formatNumberES(cumpTotal, 2, '%')}</th>
-					  </tr>
-                     </tfoot>
-                     </table>`;
+      });
 
+      const cumpTotal = parseInt(RcExtemporaneos) / parseInt(RcTotales) * 100;
+        tabla2 += `
+        </tbody>
+        <tfoot class="table-info">
+          <tr>
+						<th class="size-th">TOTALES</th>
+						<th class="size-th">${RcTotales}</th>
+						<th class="size-th">${RcExtemporaneos}</th>
+						<th class="size-th">${formatNumberES(cumpTotal, 2, '%')}</th>
+          </tr>
+        </tfoot>
+      </table>`;
 
-        var jsonArray = JSON.parse(JSON.stringify(pluginArrayArg));
+      const jsonArray = JSON.parse(JSON.stringify(pluginArrayArg));
 
-        $("#dvResultInformes").html(tabla);
-        $("#dvResultConsolidado").html(tabla2);
-        GenerarGrafico('RECIBOS APROBADOS POR USUARIO', jsonArray);
-      } else {
-        $("#dvResultInformes").html(`<div class="alert alert-danger" role="alert">
-											<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>'
-											<span class="sr-only">Error:</span>  No hay información para las condiciones seleccionadas.
-										</div>`);
-      }
+      $("#dvResultInformes").html(tabla);
+      $("#dvResultConsolidado").html(tabla2);
+      GenerarGrafico('RECIBOS APROBADOS POR USUARIO', jsonArray);
+    } else {
+      const msgHtml = `
+      <div class="alert alert-danger" role="alert">
+        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+        <span class="sr-only">Error:</span>  No hay información para las condiciones seleccionadas.
+      </div>`;
+      $("#dvResultInformes").html(msgHtml);
     }
-  }).fail(function (data) {
+  } catch (error) {
+    console.error(error);
+  } finally {
     UnloadImg();
-    console.error(data);
-  }).done(function () {
-    UnloadImg();
-  })
+  }
+}
 
+const formatDate = (dateString) => {
+  const processedDateString = dateString.replace(/:(\d{3})([AP]M)/, " $2");
+  const date = new Date(processedDateString);
+  const options = {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    hour12: true
+  };
+  return new Intl.DateTimeFormat("es-ES", options).format(date);
 }
 
 function GenerarGrafico(titulo, jsonArray) {
-  Highcharts.chart('DivGrafico', {
-    chart: {type: 'column'},
-    title: {text: titulo},
-    accessibility: {
-      announceNewData: {enabled: true}
-    },
-    xAxis: {type: 'category'},
-    yAxis: {
-      title: {text: 'Numero de recibos'}
-    },
-    legend: {enabled: false},
-    plotOptions: {
-      series: {
-        borderWidth: 0,
-        dataLabels: {
-          enabled: true,
-          format: '{point.y:f}'
+  if (jsonArray.length) {
+    Highcharts.chart('DivGrafico', {
+      chart: {type: 'column'},
+      title: {text: titulo},
+      accessibility: {
+        announceNewData: {enabled: true}
+      },
+      xAxis: {type: 'category'},
+      yAxis: {
+        title: {text: 'Numero de recibos'}
+      },
+      legend: {enabled: false},
+      plotOptions: {
+        series: {
+          borderWidth: 0,
+          dataLabels: {
+            enabled: true,
+            format: '{point.y:f}'
+          }
         }
-      }
-    },
-    tooltip: {
-      headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
-      pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:f}</b> <br/>'
-    },
-    series: [{
-      name: "Browsers",
-      colorByPoint: true,
-      data: jsonArray
-    }]
-  });
+      },
+      tooltip: {
+        headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+        pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:f}</b> <br/>'
+      },
+      series: [{
+        name: "Browsers",
+        colorByPoint: true,
+        data: jsonArray
+      }]
+    });
+  } else {
+    let msgHtml = `<p class="lead text-center">No hay datos para la fecha seleccionada!!!</p>`;
+    $('#DivGrafico').html(msgHtml);
+  }
 }
 
 const limpiarCompensar = () => {
@@ -3037,15 +3053,15 @@ $(function () {
   //Carga de archivo PDF
   $("#DocPDF").change(function () {
     uploadAjax();
-  })
-  var idRol = parseInt($("#RolId").val());
-  //Boton de autorizacion 
-  if (idRol == 1 || idRol == 26) { //Administrador & contabilidad
+  });
+
+  const idRol = parseInt($("#RolId").val());
+  if (idRol == 1 || idRol == 26) { // Administrador & contabilidad
     $("#btnAutorizar").show();
-    $("#btnCompensaciones").show();
+    $("#btnCompensaciones").attr("disabled", false);
   } else {
     $("#btnAutorizar").hide();
-    $("#btnCompensaciones").hide();
+    $("#btnCompensaciones").attr("disabled", true);
   }
   //Cuentas 
   var sociedad = $("#Sociedad").val();
@@ -3070,15 +3086,13 @@ $(function () {
   }
 
   // RESTRICCIÓN DE ACCESO A LA PESTAÑA DE BANCOS 
-  if (idRol !== 17 && idRol !== 48 && idRol !== 72 && idRol !== 73 && idRol !== 1) {
-    document.getElementById('btnBancos').removeAttribute('data-toggle');
-    $('#btnBancos').css(cssDeshabilatar);
+  if (![17, 48, 72, 73, 1].includes(idRol)) {
+    $('#btnBancos').attr("disabled", true);
   }
 
-  // RESTRICCIÓN DE ACCESO A LA PESTAÑA DE LIQUIDADOR 
-  if (idRol !== 17 && idRol !== 48 && idRol !== 72 && idRol && idRol !== 44 && idRol !== 3 && idRol !== 14 && idRol !== 13 && idRol !== 73 && idRol !== 1) {
-    document.getElementById('btnLiquidador').removeAttribute('data-toggle');
-    $('#btnLiquidador').css(cssDeshabilatar);
+  // RESTRICCIÓN DE ACCESO A LA PESTAÑA DE LIQUIDADOR
+  if (![17, 48, 72, 44, 3, 14, 13, 73, 1].includes(idRol)) {
+    $('#btnLiquidador').attr("disabled", true);
   }
 
   $("#FechaDocumento").datepicker({
@@ -3203,9 +3217,9 @@ $(function () {
     precision: 0
   });
 
-  // ConsultarPlanilla();
+  ConsultarPlanilla();
   $("#RptFhFin,#RptFhIni").change(function () {
-    // ConsultarPlanilla();
+    ConsultarPlanilla();
   });
   //Nuevo 29-04-2020
   $("#btnSubirMulticash").click(function () {
@@ -3345,5 +3359,11 @@ $(function () {
 
   $('#liBancos').click(function () {
     ConsultarMulticashBanco();
+  });
+
+  if (!arrayLiquidador.length) $('#contenedorTablasLiquidador').html(`<p class="lead text-center">No hay documentos agregados al liquidador</p>`);
+  
+  $("#Cliente").on("input", function () {
+    this.value = this.value.toUpperCase();
   });
 });

@@ -122,12 +122,6 @@ $sociedad = (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : "";
       margin: 0;
     }
 
-    .custom-card {
-      border: 1.5px solid #ccc;
-      padding: 5px;
-      border-radius: 5px;
-    }
-
     .custom-padding {
       padding: 3px 8px;
       font-size: 12px;
@@ -190,7 +184,7 @@ $sociedad = (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : "";
     }
 
     .text-green {
-      color: #055160;
+      color: #055160 !important;
     }
 
     .size-th {
@@ -207,7 +201,7 @@ $sociedad = (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : "";
     }
 
     .fw-500 {
-      font-weight: 500;
+      font-weight: 500 !important;
     }
 
     .container-fixed {
@@ -248,6 +242,15 @@ $sociedad = (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : "";
     #ui-id-2 {
       font-size: 13px !important;
     }
+
+    .btn-micro {
+      border: 1px solid #dee2e6;
+      border-radius: 0 3px 3px 0;
+    }
+
+    .w-btn {
+      width: 50px;
+    }
   </style>
 </head>
 
@@ -281,6 +284,26 @@ $sociedad = (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : "";
         <li class="nav-item" role="presentation">
           <button class="nav-link" id="btnMulticash" data-bs-toggle="tab" data-bs-target="#dvMulticash" type="button" role="tab" aria-controls="dvMulticash" aria-selected="false">
             <i class="fa-solid fa-sack-dollar"></i>&nbsp;Multicash
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="btnPlanilla" data-bs-toggle="tab" data-bs-target="#dvPlanilla" type="button" role="tab" aria-controls="dvPlanilla" aria-selected="false">
+            <i class="fa-solid fa-clipboard-list"></i>&nbsp;Planilla
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="btnInformes" data-bs-toggle="tab" data-bs-target="#dvInformes" type="button" role="tab" aria-controls="dvInformes" aria-selected="false">
+            <i class="fa-solid fa-chart-simple"></i>&nbsp;Informes
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="btnLiquidador" data-bs-toggle="tab" data-bs-target="#dvLiquidador" type="button" role="tab" aria-controls="dvLiquidador" aria-selected="false">
+            <i class="fa-solid fa-calculator"></i>&nbsp;Liquidador
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="btnBancos" data-bs-toggle="tab" data-bs-target="#dvBancos" type="button" role="tab" aria-controls="dvBancos" aria-selected="false">
+            <i class="fa-solid fa-calculator"></i>&nbsp;Bancos
           </button>
         </li>
         <!--<li class="nav-item dropdown" role="presentation">
@@ -337,6 +360,17 @@ $sociedad = (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : "";
             </li>
           </ul>
         </li> -->
+        <li class="nav-item" style="flex: 1;">
+
+        </li>
+        <li class="nav-item align-self-center" role="presentation">
+          <div class="d-flex gap-2">
+            <button class="btn btn-success btn-sm w-btn" id="btnContinuar" onClick="Guardar();" title="Preliminar"><i class="fa-solid fa-floppy-disk"></i></button>
+            <button class="btn btn-primary btn-sm w-btn" id="btnLimpiar" onClick="Limpiar();" title="Nuevo RC"><i class="fa-solid fa-arrows-rotate"></i></button>
+            <button class="btn btn-light btn-sm btn-micro w-btn text-primary" id="btnEmailZona" title="Email Zonas"><i class="fa-solid fa-gear"></i></button>
+            <button class="btn btn-danger btn-sm w-btn" id="btnCondicionDcto" title="Condiciones cliente"><i class="fa-solid fa-piggy-bank"></i></button>
+          </div>
+        </li>
       </ul>
     </div>
     <!-- CONTENIDO DE CADA TAB -->
@@ -533,20 +567,148 @@ $sociedad = (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : "";
           </div>
         </div>
       </div>
-      <!-- RECUPERAR PEDIDOS TERCEROS -->
-      <div class="tab-pane fade p-2" id="dvRecuperarTerceros" role="tabpanel">
-
+      <!-- TAB PLANILLAS -->
+      <div class="tab-pane fade" id="dvPlanilla" role="tabpanel">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-md-3 align-self-end">
+              <label class="size-text" for="FiltroPlanilla">Filtrado</label>
+              <input type="text" id="FiltroPlanilla" placeholder="Filtro de búsqueda RC" class="form-control form-control-sm shadow-sm" size="25">
+            </div>
+            <div class="col-md-2">
+              <label class="size-text" for="RptFhIni">Fecha Inicial</label>
+              <input type="text" id="RptFhIni" class="form-control form-control-sm shadow-sm" size="12" readonly>
+            </div>
+            <div class="col-md-2">
+              <label class="size-text" for="RptFhFin">Fecha Final</label>
+              <input type="text" id="RptFhFin" class="form-control form-control-sm shadow-sm" size="12" readonly>
+            </div>
+            <div class="col-md-1">
+              <label class="size-text" for="TotalRC">Total RC</label>
+              <input type="text" id="TotalRC" class="form-control form-control-sm shadow-sm" size="8" readonly>
+            </div>
+            <div class="col-md-2 align-self-end">
+              <div class="d-flex gap-3 justify-content-around align-items-center">
+                <button class="btn btn-success shadow-sm btn-sm w-btn" type="button" onClick="filtroEstado('A')"><i class="fa-solid fa-thumbs-up"></i></button>
+                <button class="btn btn-danger shadow-sm btn-sm w-btn" type="button" onClick="filtroEstado('S')"><i class="fa-solid fa-thumbs-down"></i></button>
+                <button class="btn btn-light btn-micro text-primary shadow-sm btn-sm w-btn" type="button" onClick="filtroEstado('T')"><i class="fa-solid fa-hand-point-right"></i></button>
+              </div>
+            </div>
+            <div class="col-md-2 align-self-end">
+              <button class="btn btn-light btn-micro w-100 text-primary shadow-sm btn-sm" id="btnCompensaciones">
+                <i class="fa-solid fa-hand-holding-dollar"></i>
+                Compensaciones
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="mt-2" id="dvResultPlanilla" style="overflow: auto; height: 70vh;"></div>
       </div>
-      <div class="tab-pane fade p-2" id="dvAddEntregas" role="tabpanel">
-
+      <!-- TAB INFORMES -->
+      <div class="tab-pane fade p-2" id="dvInformes" role="tabpanel">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-md-5">
+              <label class="size-text" for="InfoFhIni">Fecha Inicial</label>
+              <div class="input-group">
+                <span class="input-group-text" id="visible-addon"><i class="fa-solid fa-calendar-days"></i></span>
+                <input type="text" class="form-control form-control-sm shadow-sm" id="InfoFhIni" aria-label="Username" aria-describedby="visible-addon" readonly>
+              </div>
+            </div>
+            <div class="col-md-5">
+              <label class="size-text" for="InfoFhFin">Fecha Final</label>
+              <div class="input-group">
+                <span class="input-group-text" id="visible-addon"><i class="fa-solid fa-calendar-days"></i></span>
+                <input type="text" class="form-control form-control-sm shadow-sm" id="InfoFhFin" aria-label="Username" aria-describedby="visible-addon" readonly>
+              </div>
+            </div>
+            <div class="col-md-2 align-self-end">
+              <button type="button" class="btn btn-success btn-sm w-100 shadow-sm" onclick="ConsultarInformes();">
+                <i class="fa-solid fa-search"></i>
+                Consultar
+              </button>
+            </div>
+          </div>
+          <div class="row mt-2">
+            <div class="col-md-6 align-self-center">
+              <div id="dvResultConsolidado"></div>
+            </div>
+            <div class="col-md-6">
+              <figure class="highcharts-figure">
+                <div id="DivGrafico"></div>
+                <p class="highcharts-description"></p>
+              </figure>
+            </div>
+          </div>
+          <div class="row mt-2">
+            <div class="col-md-12">
+              <div id="dvResultInformes"></div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="tab-pane fade p-2" id="dvFaltantes" role="tabpanel">
+      <!-- TAB LIQUIDADOR -->
+      <div class="tab-pane fade pt-3" id="dvLiquidador" role="tabpanel">
+        <img id="logoEmpresa" src="../resources/images/LogoRoma.png" style="display: none;" />
+        <img id="logoEmpresa2" src="../resources/images/LogoCM.png" style="display: none;" />
+        <div style="overflow: auto; height: 67vh;" id="contenedorTablasLiquidador">
 
+        </div>
       </div>
-      <div class="tab-pane fade p-2" id="dvListaFacts" role="tabpanel">
+      <!-- TAB BANCOS -->
+      <div class="tab-pane fade" id="dvBancos" role="tabpanel">
+        <div class="row">
+          <div class="col-md-4">
+            <input type="text" placeholder="Filtro de búsqueda" class="form-control" id="filtro2" name="filtro2">
+          </div>
+          <div class="col-md-2">
+            <select id="MultiDay2" class="form-control">
+            </select>
+          </div>
+          <div class="col-md-2">
+            <select id="MultiMes2" class="form-control">
+            </select>
+          </div>
+          <div class="col-md-2">
+            <select id="MultiAnio2" class="form-control">
+            </select>
+          </div>
+          <div class="col-md-2">
+            <p class="cantBan">
+              Cantidad:
+              <span id="cantBancos" style="color: #337ab7; font-size: 1.24rem;"></span>
+            </p>
+          </div>
+        </div>
+        <div id="dvResultMulticash2" style="overflow: auto; max-height: 60vh;">
+          <hr>
+          <table class="table" width="100%" id="tdPlanillas2">
+            <thead>
+              <tr>
+                <th class="no-wrap">N°</th>
+                <th class="no-wrap">CUENTA</th>
+                <th class="no-wrap">CLAVE REF.</th>
+                <th class="no-wrap">N° DOC.</th>
+                <th class="no-wrap">VALOR</th>
+                <th class="no-wrap">FECHA DOC.</th>
+                <th class="no-wrap">REFERENCIA</th>
+                <th class="no-wrap">SAP</th>
+                <th class="no-wrap">CLIENTE</th>
+                <th class="no-wrap">OFICINA</th>
+                <th class="no-wrap">ZONA</th>
+                <th class="no-wrap">NOMBRE</th>
+                <th class="no-wrap">CONDICIÓN</th>
+                <th class="no-wrap">OBSER.</th>
+              </tr>
+            </thead>
+            <tbody id="tdDetalleMulticash2">
 
+            </tbody>
+          </table>
+        </div>
       </div>
-      <div class="tab-pane fade p-2" id="dvEventos" role="tabpanel">
+      <!--  -->
+      <div class="tab-pane fade" id="dvEventos" role="tabpanel">
 
       </div>
     </div>
@@ -554,15 +716,15 @@ $sociedad = (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : "";
   <div class="container-fluid container-fixed">
     <div class="row">
       <div class="col-md-4">
-        <label for="VlrTotalAbono" class="text-green fw-500">Total Abonado:</label>
+        <label for="VlrTotalAbono" class="size-text text-green fw-500">Total Abonado:</label>
         <input type="text" id="VlrTotalAbono" class="form-control shadow-sm mb-1" size="10" readonly>
       </div>
       <div class="col-md-4">
-        <label for="VlrTotalFacturas" class="text-green fw-500">Total Facturas:</label>
+        <label for="VlrTotalFacturas" class="size-text text-green fw-500">Total Facturas:</label>
         <input type="text" id="VlrTotalFacturas" class="form-control shadow-sm mb-1" size="10" readonly>
       </div>
       <div class="col-md-4">
-        <label for="VlrSinAsignar" class="text-green fw-500">Sin Asignar:</label>
+        <label for="VlrSinAsignar" class="size-text text-green fw-500">Sin Asignar:</label>
         <input type="text" id="VlrSinAsignar" class="form-control shadow-sm mb-1" size="10" readonly>
       </div>
     </div>
@@ -599,18 +761,18 @@ $sociedad = (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : "";
         <li class="active" id="liCliente"> <a href="#dvClientes" id="btnCliente" data-toggle="tab">Cliente</a></li>
         <li class="disabled disabledTab" id="liAbonos"> <a href="#dvAbonos" id="btnAbonos">Abonos</a></li>
         <li class="disabled disabledTab" id="liFacturas"> <a href="#dvFacturas" id="btnFacturas">Facturas</a></li>
-
-
-
         <li class="disabled disabledTab" id="liMulticash"><a href="#dvMulticash" id="btnMulticash" data-toggle="tab">Multicash</a></li>
-
-
-        
-        
         <li class="" id="liPlanilla"><a href="#dvPlanilla" onClick="ConsultarPlanilla();" data-toggle="tab" id="btnPlanilla">Planilla</a></li>
         <li class="" id="liInformes"><a href="#dvInformes" data-toggle="tab" id="btnInformes">Informes</a></li>
         <li class="" id="liLiquidador"><a href="#dvLiquidador" data-toggle="tab" id="btnLiquidador">Liquidador</a></li>
+
+
         <li class="" id="liBancos"><a href="#dvBancos" data-toggle="tab" id="btnBancos">Bancos</a></li>
+        
+
+
+        
+        
         <li class="dropdown"> <a href="#" data-toggle="dropdown">Ir a <span class="caret"></span></a>
           <ul class="dropdown-menu" role="menu">
             <li> <a href="#" id="0401" data-toggle="tab"><span class="glyphicon glyphicon-menu-right"></span>0401 - CRM</a></li>
