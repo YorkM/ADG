@@ -83,14 +83,6 @@ $sociedad = (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : "";
       border: none;
     }
 
-    .font-size {
-      font-size: 13px !important;
-    }
-
-    .font-size-tf {
-      font-size: 14px !important;
-    }
-
     .contenedor-valores {
       display: flex;
       flex: 1;
@@ -136,9 +128,8 @@ $sociedad = (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : "";
       margin: 0;
       font-size: 1.1rem;
       border: 1px solid #ccc;
-      padding: 2px 5px;
+      padding: 4px 5px;
       border-radius: 4px;
-      box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
       text-align: center;
     }
 
@@ -196,10 +187,6 @@ $sociedad = (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : "";
       background-color: #cff4fc !important;
     }
 
-    .vertical {
-      vertical-align: middle;
-    }
-
     .fw-500 {
       font-weight: 500 !important;
     }
@@ -235,7 +222,7 @@ $sociedad = (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : "";
     }
 
     .overflow {
-      overflow-x: auto;
+      overflow: auto;
     }
 
     #ui-id-1,
@@ -250,6 +237,41 @@ $sociedad = (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : "";
 
     .w-btn {
       width: 50px;
+    }
+
+    .size-10 {
+      font-size: 10px;
+    }
+
+    .margin-hr {
+      margin: 0px 0px 16px 0 !important;
+    }
+
+    .custom-alert-one {
+      padding: 8px;
+      border-top: 1px solid #CCC;
+      border-right: 1px solid #CCC;
+      border-bottom: 1px solid #CCC;
+      border-left: 5px solid #5bc0de;
+      border-radius: 3px;
+    }
+
+    .custom-alert-two {
+      padding: 8px;
+      border-top: 1px solid #CCC;
+      border-right: 1px solid #CCC;
+      border-bottom: 1px solid #CCC;
+      border-left: 5px solid #5cb85c;
+      border-radius: 3px;
+    }
+
+    .custom-alert-three {
+      padding: 8px;
+      border-top: 1px solid #CCC;
+      border-right: 1px solid #CCC;
+      border-bottom: 1px solid #CCC;
+      border-left: 5px solid #f0ad4e;
+      border-radius: 3px;
     }
   </style>
 </head>
@@ -303,63 +325,27 @@ $sociedad = (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : "";
         </li>
         <li class="nav-item" role="presentation">
           <button class="nav-link" id="btnBancos" data-bs-toggle="tab" data-bs-target="#dvBancos" type="button" role="tab" aria-controls="dvBancos" aria-selected="false">
-            <i class="fa-solid fa-calculator"></i>&nbsp;Bancos
+            <i class="fa-solid fa-building-columns"></i>&nbsp;Bancos
           </button>
         </li>
-        <!--<li class="nav-item dropdown" role="presentation">
+        <li class="nav-item dropdown" role="presentation">
           <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
-            <i class="fa-solid fa-list-check"></i>
-            &nbsp;Gestión
-          </a>
+            <i class="fa-solid fa-plane-up"></i>
+            &nbsp;Ir a</a>
           <ul class="dropdown-menu">
             <li>
-              <p class="separador"><strong>Pedidos</strong></p>
-            </li>
-            <li>
-              <a class="dropdown-item size-a" id="btnTemporales" data-bs-toggle="tab" href="#dvRecuperar" role="tab" aria-controls="dvRecuperar" aria-selected="false">
+              <a class="dropdown-item size-a" id="0401" data-bs-toggle="tab" href="#dvRecuperar" role="tab" aria-controls="dvRecuperar" aria-selected="false">
                 <i class="fa-solid fa-chevron-right"></i>
-                &nbsp;Propios
+                &nbsp;0401 - CRM
               </a>
             </li>
             <li>
-              <a class="dropdown-item size-a" id="btnTempTerceros" data-bs-toggle="tab" href="#dvRecuperarTerceros" role="tab" aria-controls="dvRecuperarTerceros" aria-selected="false">
-                <i class="fa-solid fa-chevron-right"></i>&nbsp;Terceros</a>
-            </li>
-            <li>
-              <p class="separador"><strong>Entregas</strong></p>
-            </li>
-            <li>
-              <a class="dropdown-item size-a" id="btnAddEntregas" data-bs-toggle="tab" href="#dvAddEntregas" role="tab" aria-controls="dvAddEntregas" aria-selected="false">
+              <a class="dropdown-item size-a" id="0102" data-bs-toggle="tab" href="#dvRecuperarTerceros" role="tab" aria-controls="dvRecuperarTerceros" aria-selected="false">
                 <i class="fa-solid fa-chevron-right"></i>
-                &nbsp;Unificar
-              </a>
-            </li>
-            <li>
-              <a class="dropdown-item size-a" id="btnFaltantes" data-bs-toggle="tab" href="#dvFaltantes" role="tab" aria-controls="dvFaltantes" aria-selected="false">
-                <i class="fa-solid fa-chevron-right"></i>
-                &nbsp;Faltantes
-              </a>
-            </li>
-            <li>
-              <p class="separador"><strong>Facturas</strong></p>
-            </li>
-            <li>
-              <a class="dropdown-item size-a" id="btListaFacts" data-bs-toggle="tab" href="#dvListaFacts" role="tab" aria-controls="dvListaFacts" aria-selected="false">
-                <i class="fa-solid fa-chevron-right"></i>
-                &nbsp;Facturación
-              </a>
-            </li>
-            <li>
-              <p class="separador" id="separadorEventos"><strong>Eventos</strong></p>
-            </li>
-            <li>
-              <a class="dropdown-item size-a" id="btnEventos" data-bs-toggle="tab" href="#dvEventos" role="tab" aria-controls="dvEventos" aria-selected="false">
-                <i class="fa-solid fa-chevron-right"></i>
-                &nbsp;Ofertas
-              </a>
+                &nbsp;0102 - Programación de clientes</a>
             </li>
           </ul>
-        </li> -->
+        </li>
         <li class="nav-item" style="flex: 1;">
 
         </li>
@@ -515,14 +501,15 @@ $sociedad = (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : "";
             <button class="btn btn-primary btn-sm" id="btnSeleccionarTodas">Seleccionar todas</button>
           </div>
         </div>
-        <div class="overflow mt-2" id="dvResultCartera"></div>
+        <hr class="margin-hr">
+        <div class="overflow mt-2" id="dvResultCartera" style="height: 70vh;"></div>
       </div>
       <!-- TAB MULTICASH -->
       <div class="tab-pane fade" id="dvMulticash" role="tabpanel">
         <div class="container-fluid mt-2">
           <div class="row">
             <div class="col-md-6">
-              <input type="text" placeholder="Filtro de búsqueda" class="form-control shadow-sm" id="filtro" name="filtro">
+              <input type="text" placeholder="Filtro de búsqueda" class="form-control shadow-sm size-td" id="filtro" name="filtro">
             </div>
             <div class="col-md-1">
               <select id="MultiDay" class="form-control shadow-sm">
@@ -656,63 +643,64 @@ $sociedad = (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : "";
         </div>
       </div>
       <!-- TAB BANCOS -->
-      <div class="tab-pane fade" id="dvBancos" role="tabpanel">
-        <div class="row">
-          <div class="col-md-4">
-            <input type="text" placeholder="Filtro de búsqueda" class="form-control" id="filtro2" name="filtro2">
+      <div class="tab-pane fade p-2" id="dvBancos" role="tabpanel">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-md-4">
+              <input type="text" placeholder="Filtro de búsqueda" class="form-control shadow-sm" id="filtro2" name="filtro2">
+            </div>
+            <div class="col-md-2">
+              <select id="MultiDay2" class="form-select shadow-sm">
+
+              </select>
+            </div>
+            <div class="col-md-2">
+              <select id="MultiMes2" class="form-select shadow-sm">
+
+              </select>
+            </div>
+            <div class="col-md-2">
+              <select id="MultiAnio2" class="form-select shadow-sm">
+
+              </select>
+            </div>
+            <div class="col-md-2">
+              <p class="cantBan shadow-sm">
+                Cantidad:
+                <span class="text-primary" id="cantBancos"></span>
+              </p>
+            </div>
           </div>
-          <div class="col-md-2">
-            <select id="MultiDay2" class="form-control">
-            </select>
-          </div>
-          <div class="col-md-2">
-            <select id="MultiMes2" class="form-control">
-            </select>
-          </div>
-          <div class="col-md-2">
-            <select id="MultiAnio2" class="form-control">
-            </select>
-          </div>
-          <div class="col-md-2">
-            <p class="cantBan">
-              Cantidad:
-              <span id="cantBancos" style="color: #337ab7; font-size: 1.24rem;"></span>
-            </p>
+          <div class="mt-2" id="dvResultMulticash2" style="overflow: auto; max-height: 70vh;">
+            <table class="table table-bordered table-hover table-sm" style="width: 100%;" id="tdPlanillas2">
+              <thead class="table-info">
+                <tr>
+                  <th class="size-th no-wrap">N°</th>
+                  <th class="size-th no-wrap">CUENTA</th>
+                  <th class="size-th no-wrap">CLAVE REF.</th>
+                  <th class="size-th no-wrap">N° DOC.</th>
+                  <th class="size-th no-wrap">VALOR</th>
+                  <th class="size-th no-wrap">FECHA DOC.</th>
+                  <th class="size-th no-wrap">REFERENCIA</th>
+                  <th class="size-th no-wrap">SAP</th>
+                  <th class="size-th no-wrap">CLIENTE</th>
+                  <th class="size-th no-wrap">OFICINA</th>
+                  <th class="size-th no-wrap">ZONA</th>
+                  <th class="size-th no-wrap">NOMBRE</th>
+                  <th class="size-th no-wrap">CONDICIÓN</th>
+                  <th class="size-th no-wrap">OBSER.</th>
+                </tr>
+              </thead>
+              <tbody id="tdDetalleMulticash2">
+
+              </tbody>
+            </table>
           </div>
         </div>
-        <div id="dvResultMulticash2" style="overflow: auto; max-height: 60vh;">
-          <hr>
-          <table class="table" width="100%" id="tdPlanillas2">
-            <thead>
-              <tr>
-                <th class="no-wrap">N°</th>
-                <th class="no-wrap">CUENTA</th>
-                <th class="no-wrap">CLAVE REF.</th>
-                <th class="no-wrap">N° DOC.</th>
-                <th class="no-wrap">VALOR</th>
-                <th class="no-wrap">FECHA DOC.</th>
-                <th class="no-wrap">REFERENCIA</th>
-                <th class="no-wrap">SAP</th>
-                <th class="no-wrap">CLIENTE</th>
-                <th class="no-wrap">OFICINA</th>
-                <th class="no-wrap">ZONA</th>
-                <th class="no-wrap">NOMBRE</th>
-                <th class="no-wrap">CONDICIÓN</th>
-                <th class="no-wrap">OBSER.</th>
-              </tr>
-            </thead>
-            <tbody id="tdDetalleMulticash2">
-
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <!--  -->
-      <div class="tab-pane fade" id="dvEventos" role="tabpanel">
-
       </div>
     </div>
   </div>
+  <!-- DIV FIXED CON LOS CAMPOS PARA VER LOS ABONADOS -->
   <div class="container-fluid container-fixed">
     <div class="row">
       <div class="col-md-4">
@@ -748,565 +736,154 @@ $sociedad = (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : "";
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-danger" onClick="EliminarPDF()" id="btnEliminarPDF">Eliminar</button>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+          <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cerrar</button>
         </div>
       </div>
     </div>
   </div>
-
-  <!-- <div class="alert alert-info"><i class="fa-solid fa-star fa-flip"></i>&nbsp;0405 - RECIBOS DE PAGO</div>
-  <div class="panel with-nav-tabs panel-info">
-    <div class="panel-heading">
-      <ul class="nav nav-tabs">
-        <li class="active" id="liCliente"> <a href="#dvClientes" id="btnCliente" data-toggle="tab">Cliente</a></li>
-        <li class="disabled disabledTab" id="liAbonos"> <a href="#dvAbonos" id="btnAbonos">Abonos</a></li>
-        <li class="disabled disabledTab" id="liFacturas"> <a href="#dvFacturas" id="btnFacturas">Facturas</a></li>
-        <li class="disabled disabledTab" id="liMulticash"><a href="#dvMulticash" id="btnMulticash" data-toggle="tab">Multicash</a></li>
-        <li class="" id="liPlanilla"><a href="#dvPlanilla" onClick="ConsultarPlanilla();" data-toggle="tab" id="btnPlanilla">Planilla</a></li>
-        <li class="" id="liInformes"><a href="#dvInformes" data-toggle="tab" id="btnInformes">Informes</a></li>
-        <li class="" id="liLiquidador"><a href="#dvLiquidador" data-toggle="tab" id="btnLiquidador">Liquidador</a></li>
-
-
-        <li class="" id="liBancos"><a href="#dvBancos" data-toggle="tab" id="btnBancos">Bancos</a></li>
-        
-
-
-        
-        
-        <li class="dropdown"> <a href="#" data-toggle="dropdown">Ir a <span class="caret"></span></a>
-          <ul class="dropdown-menu" role="menu">
-            <li> <a href="#" id="0401" data-toggle="tab"><span class="glyphicon glyphicon-menu-right"></span>0401 - CRM</a></li>
-            <li> <a href="#" id="0102" data-toggle="tab"><span class="glyphicon glyphicon-menu-right"></span>0102 - Programación de clientes</a> </li>
-          </ul>
-        </li>
-        <li style=" float:right">
-          <div class="btn-group" role="group" aria-label="...">
-            <button class="btn btn-success" id="btnContinuar" onClick="Guardar();" title="Preliminar"> <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span> </button>
-            <button class="btn btn-info" id="btnLimpiar" onClick="Limpiar();" title="Nuevo RC"> <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> </button>
-            <button class="btn btn-default" id="btnEmailZona" title="Email Zonas"> <span class="glyphicon glyphicon-cog" aria-hidden="true"></span> </button>
-            <button class="btn btn-danger" id="btnCondicionDcto" title="Condiciones cliente"> <span class="glyphicon glyphicon-piggy-bank" aria-hidden="true"></span> </button>
-          </div>
-        </li>
-      </ul>
-    </div>
-    <div class="panel-body">
-      <div class="tab-content">
-
-        <div class="tab-pane fade in active" id="dvClientes">
-          <div style="overflow-y: scroll; overflow-x: hidden; max-height: 460px;">
-            <table class="form" width="100%">
-              <tr>
-                <td>Fecha Documento</td>
-                <td><input type="text" class="form-control" id="FechaDocumento"></td>
-              </tr>
-              <tr>
-                <td>Cliente</td>
-                <td><input type="text" class="form-control" id="Cliente" size="60"></td>
-              </tr>
-              <tr>
-                <td>Desactiva Descuentos</td>
-                <td style="float: left;">
-                  <div class="material-switch">
-                    <input id="ActivaDcto" name="" type="checkbox" />
-                    <label for="ActivaDcto" class="label-success"></label>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td>Codigo SAP</td>
-                <td><input type="text" class="form-control" id="CodigoSAP" readonly disabled></td>
-              </tr>
-              <tr>
-                <td>Sociedad / Oficina</td>
-                <td>
-                  <div class="form-group row">
-                    <div class="col-xs-2">
-                      <input type="text" class="form-control" id="Sociedad" value="<?php /*echo (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : "" */ ?>" readonly disabled>
-                    </div>
-                    <div class="col-xs-10">
-                      <input type="text" class="form-control" id="Oficina" readonly disabled>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td>Grupo Cliente</td>
-                <td>
-                  <div class="form-group row">
-                    <div class="col-xs-2">
-                      <input class="form-control" id="Grupo" type="text" readonly disabled>
-                    </div>
-                    <div class="col-xs-10">
-                      <input class="form-control" id="DescGrupo" type="text" readonly disabled>
-                    </div>
-                  </div>
-              </tr>
-              <tr>
-                <td>Lista</td>
-                <td><input type="text" class="form-control" id="Lista" readonly disabled></td>
-              </tr>
-              <tr>
-                <td>Email</td>
-                <td><input type="text" class="form-control" id="Email" readonly disabled></td>
-              </tr>
-              <tr>
-                <td>Email Zona</td>
-                <td><input type="text" class="form-control" id="EmailZona" readonly disabled></td>
-              </tr>
-              <tr>
-                <td>Referencia</td>
-                <td><textarea maxlength="25" class="notas form-control" id="Referencia" onKeyPress="return vletras_numeros(event)" placeholder="Solo letras y numeros, maximo 25 caracteres"></textarea></td>
-              </tr>
-              <tr>
-                <td>Texto Cabecera</td>
-                <td><textarea maxlength="25" class="notas form-control" id="TextoCabecera" onKeyPress="return vletras_numeros(event)" placeholder="Solo letras y numeros, maximo 25 caracteres"></textarea></td>
-              </tr>
-              <tr>
-                <td>Texto Compensación</td>
-                <td><textarea maxlength="25" class="notas form-control" id="TextoCompensacion" onKeyPress="return vletras_numeros(event)" placeholder="Solo letras y numeros, maximo 25 caracteres"></textarea></td>
-              </tr>
-            </table>
-          </div>
-        </div>
-
-        <div class="tab-pane fade in" id="dvAbonos">
-          <table class="form" width="100%" id="TablaAbonos">
-            <tr>
-              <td>Cuenta</td>
-              <td><select id="Cuenta" class="form-control">
-                </select></td>
-            </tr>
-            <tr>
-              <td>Tipo Valor</td>
-              <td><select id="TipoValor" class="form-control">
-                  <option value="P">POSITIVO (+)</option>
-                  <option value="N">NEGATIVO (-)</option>
-                </select></td>
-            </tr>
-            <tr>
-              <td>Valor</td>
-              <td><input type="text" id="ValorAbono" class="form-control ClassNumero" onKeyPress="return vnumeros(event)" onKeyUp="Enter(event,'AddAbono')"></td>
-            </tr>
-            <tr>
-              <td>Fecha Valor</td>
-              <td><input type="text" id="FechaValor" class="form-control" onKeyUp="Enter(event,'AddAbono')"></td>
-            </tr>
-          </table>
-          <div id="DetalleAbonos" style="overflow-y:scroll; overflow-x:hidden; height:500px;">
-            <table class="form" width="100%">
-              <thead>
-                <tr>
-                  <th>Cuenta</th>
-                  <th>Descripción</th>
-                  <th>Valor</th>
-                  <th>Fecha Valor</th>
-                  <th>Referencia</th>
-                  <th>Eliminar</th>
-                </tr>
-              </thead>
-              <tbody id="tdBody">
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="tab-pane fade in" id="dvFacturas">
-          <div class="contenedor-val-todas">
-            <div class="contenedor-valores">
-              <p class="p-valores">Valor Total: <span class="span-valores" id="valorTotal">$0</span></p>
-              <p class="p-valores">Partidas: <span class="span-valores" id="partidas">0</span></p>
-              <p class="p-valores">Valor Mora: <span class="span-valores" id="valorMora">$0</span></p>
-            </div>
-            <div style="display: flex; justify-content: flex-end;">
-              <button class="btn btn-primary" id="btnSeleccionarTodas">Seleccionar todas</button>
-            </div>
-          </div>
-          <div id="dvResultCartera" style="overflow: auto; height: 60vh;"></div>
-        </div>
-
-        <div class="tab-pane fade in" id="dvPlanilla">
-          <table width="100%" class="form" id="tb_filtros_planilla">
-            <tr>
-              <td>Filtrado</td>
-              <td><input type="text" id="FiltroPlanilla" class="form-control" size="25"></td>
-              <td>Fecha Inicial</td>
-              <td><input type="text" id="RptFhIni" class="form-control" size="12" readonly></td>
-              <td>Fecha Final</td>
-              <td><input type="text" id="RptFhFin" class="form-control" size="12" readonly></td>
-              <td>Total RC</td>
-              <td><input type="text" id="TotalRC" class="form-control" size="8" readonly></td>
-              <td>
-                <div class="btn-group" role="group" aria-label="...">
-                  <button class="btn btn-success btn-sm" type="button" onClick="filtroEstado('A')"> <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> </button>
-                  <button class="btn btn-danger btn-sm" type="button" onClick="filtroEstado('S')"> <span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span> </button>
-                  <button class="btn btn-default btn-sm" type="button" onClick="filtroEstado('T')"> <span class="glyphicon glyphicon-hand-right" aria-hidden="true"></span> </button>
-                </div>
-              </td>
-              <td>
-                <button class="btn btn-default" id="btnCompensaciones" style="display:none;">
-                  <i class="fa-solid fa-faucet"></i>
-                  Compensaciones
-                </button>
-              </td>
-            </tr>
-          </table>
-          <div id="dvResultPlanilla" style="overflow: auto; height: 60vh;"></div>
-        </div>
-
-        <div class="tab-pane fade in" id="dvInformes">
-          <table width="100%" class="form" id="">
-            <tr>
-              <td>Fecha Inicial</td>
-              <td>
-                <div class="input-group"> <span class="input-group-addon" id="basic-addon1"><i class="fa-solid fa-calendar-days" style="width: 30px;"></i></span>
-                  <input type="text" class="form-control" id="InfoFhIni" readonly>
-                </div>
-              </td>
-              <td>Fecha Final</td>
-              <td>
-                <div class="input-group"> <span class="input-group-addon" id="basic-addon1"><i class="fa-solid fa-calendar-days" style="width: 30px;"></i></span>
-                  <input type="text" class="form-control" id="InfoFhFin" readonly>
-                </div>
-              </td>
-              <td><button type="button" class="btn btn-success" onclick="ConsultarInformes();"><i class="fa-solid fa-search"></i> Consultar</button></td>
-            </tr>
-          </table>
-          </br>
-          <div class="row">
-            <div class="col-md-6">
-              <div id="dvResultConsolidado"></div>
-            </div>
-            <div class="col-md-6">
-              <figure class="highcharts-figure">
-                <div id="DivGrafico"></div>
-                <p class="highcharts-description"></p>
-              </figure>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-12">
-              <div id="dvResultInformes"></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="tab-pane fade in" id="dvMulticash">
-          <div class="row">
-            <div class="col-md-6">
-              <input type="text" placeholder="Filtro de búsqueda" class="form-control" id="filtro" name="filtro">
-            </div>
-            <div class="col-md-1">
-              <select id="MultiDay" class="form-control">
-              </select>
-            </div>
-            <div class="col-md-2">
-              <select id="MultiMes" class="form-control">
-              </select>
-            </div>
-            <div class="col-md-1">
-              <select id="MultiAnio" class="form-control">
-              </select>
-            </div>
-            <div class="col-md-2">
-              <div class="input-group">
-                <input type="text" class="form-control" placeholder="Validar Multicash" id="txtValidaDocumento" onKeyPress="return vnumeros(event)">
-                <span class="input-group-addon"> <span class="glyphicon glyphicon-search" aria-hidden="true"></span></span>
-              </div>
-            </div>
-          </div>
-          <div id="dvResultMulticash" style="overflow: auto; height: 50vh;">
-            <hr>
-            <table class="table" width="100%" id="tdPlanillas">
-              <thead>
-                <tr>
-                  <th>CUENTA</th>
-                  <th>DESCRIPCION</th>
-                  <th>NUMERO</th>
-                  <th>VALOR</th>
-                  <th>TEXTO</th>
-                  <th>FECHA CONT.</th>
-                  <th>FECHA VALOR.</th>
-                  <th>ESTADO</th>
-                  <th>REFERENCIA</th>
-                  <th>ID</th>
-                </tr>
-              </thead>
-              <tbody id="tdDetalleMulticash">
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="tab-pane fade in" id="dvLiquidador">
-          <img id="logoEmpresa" src="../resources/images/LogoRoma.png" style="display: none;" />
-          <img id="logoEmpresa2" src="../resources/images/LogoCM.png" style="display: none;" />
-          <div style="overflow: auto; height: 67vh;" id="contenedorTablasLiquidador">
-
-          </div>
-        </div>
-
-        <div class="tab-pane fade in" id="dvBancos">
-          <div class="row">
-            <div class="col-md-4">
-              <input type="text" placeholder="Filtro de búsqueda" class="form-control" id="filtro2" name="filtro2">
-            </div>
-            <div class="col-md-2">
-              <select id="MultiDay2" class="form-control">
-              </select>
-            </div>
-            <div class="col-md-2">
-              <select id="MultiMes2" class="form-control">
-              </select>
-            </div>
-            <div class="col-md-2">
-              <select id="MultiAnio2" class="form-control">
-              </select>
-            </div>
-            <div class="col-md-2">
-              <p class="cantBan">
-                Cantidad:
-                <span id="cantBancos" style="color: #337ab7; font-size: 1.24rem;"></span>
-              </p>
-            </div>
-          </div>
-          <div id="dvResultMulticash2" style="overflow: auto; max-height: 60vh;">
-            <hr>
-            <table class="table" width="100%" id="tdPlanillas2">
-              <thead>
-                <tr>
-                  <th class="no-wrap">N°</th>
-                  <th class="no-wrap">CUENTA</th>
-                  <th class="no-wrap">CLAVE REF.</th>
-                  <th class="no-wrap">N° DOC.</th>
-                  <th class="no-wrap">VALOR</th>
-                  <th class="no-wrap">FECHA DOC.</th>
-                  <th class="no-wrap">REFERENCIA</th>
-                  <th class="no-wrap">SAP</th>
-                  <th class="no-wrap">CLIENTE</th>
-                  <th class="no-wrap">OFICINA</th>
-                  <th class="no-wrap">ZONA</th>
-                  <th class="no-wrap">NOMBRE</th>
-                  <th class="no-wrap">CONDICIÓN</th>
-                  <th class="no-wrap">OBSER.</th>
-                </tr>
-              </thead>
-              <tbody id="tdDetalleMulticash2">
-
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div> 
-
-  <div id="dvCondiciones" class="modal fade bd-example-modal-lg" role="dialog">
-    <div class="modal-dialog modal-lg">
+  <!-- MODAL HIPERVINCULO -->
+  <div class="modal fade" id="ModalHipervinculo" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="min-width: 100%; height: 100vh; margin: 0;">
       <div class="modal-content">
         <div class="modal-header">
-          <h4 class="modal-title">CONDICIONES DE DESCUENTO</h4>
+          <h1 class="modal-title fs-5" id="span-titulo-modulo"></h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <div class="bs-callout bs-callout-info" id="callout-alerts-dismiss-plugin">
-            <h4>Condiciones propias del cliente</h4>
-            <p>Estan asociadas al cliente especificamente y pueden depender o no del cumplimiento del presupuesto</p>
+          <div class="row row_iframe">
+            <div class="col-md-12 col-iframe-left">
+              <iframe class="iframe" src="" style="display: none; font-size: 1rem"></iframe>
+            </div>
           </div>
-          <div id="dvCondicionesDetalle"></div>
-          </br>
-          <div class="bs-callout bs-callout-success" id="callout-alerts-dismiss-plugin">
-            <h4>Condiciones por lista de precio </h4>
-            <p>Estan asociadas a la lista de precio del cliente y para ser aplicadas dependen del plazo de pago especial</p>
-          </div>
-          <div id="dvCondicionesDetalleListaPlazo"></div>
-          </br>
-          <div class="bs-callout bs-callout-warning" id="callout-alerts-dismiss-plugin">
-            <h4>Condiciones por lista de precio sujetos a cumplimiento de presupuesto de ventas</h4>
-            <p>Estan asociadas a la lista de precio del cliente y para ser aplicadas dependen del cumplimiento del presupuesto de ventas correspondiente al periodo del documento</p>
-          </div>
-          <div id="dvCondicionesDetalleLista"></div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-info" data-dismiss="modal">Cerrar</button>
+          <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cerrar</button>
         </div>
       </div>
     </div>
   </div>
-
-  <div id="dvSclAbono" class="modal fade bd-example-modal-lg" role="dialog">
-    <div class="modal-dialog modal-lg">
+  <!-- MODAL CONDICIONES DEL CLIENTE -->
+  <div class="modal fade" id="dvCondiciones" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="min-width: 70%;">
       <div class="modal-content">
         <div class="modal-header">
-          <h4 class="modal-title">SELECIÓN DE ABONO</h4>
+          <h1 class="modal-title fs-5">CONDICIONES DE DESCUENTO</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="custom-alert-one mb-4">
+            <h5 style="color: #5bc0de;">Condiciones propias del cliente</h5>
+            <p class="m-0">Estan asociadas al cliente especificamente y pueden depender o no del cumplimiento del presupuesto</p>
+          </div>
+          <div class="mb-4" id="dvCondicionesDetalle">
+
+          </div>
+          <div class="custom-alert-two mb-4">
+            <h5 style="color: #5cb85c;">Condiciones por lista de precio </h5>
+            <p class="m-0">Estan asociadas a la lista de precio del cliente y para ser aplicadas dependen del plazo de pago especial</p>
+          </div>
+          <div class="mb-4" id="dvCondicionesDetalleListaPlazo">
+
+          </div>
+          <div class="custom-alert-three mb-4">
+            <h5 style="color: #f0ad4e;">Condiciones por lista de precio sujetos a cumplimiento de presupuesto de ventas</h5>
+            <p class="m-0">Estan asociadas a la lista de precio del cliente y para ser aplicadas dependen del cumplimiento del presupuesto de ventas correspondiente al periodo del documento</p>
+          </div>
+          <div id="dvCondicionesDetalleLista">
+
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- MODAL SELECCIÓN DE ABONO -->
+  <div class="modal fade" id="dvSclAbono" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="min-width: 60%;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5">SELECCIÓN DE ABONO</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <div id="dvSclAbonoDetalle"></div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-info" data-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cerrar</button>
         </div>
       </div>
     </div>
   </div>
-
-  <div id="modalCompensaciones" class="modal fade bd-example-modal-lg" role="dialog">
-    <div class="modal-dialog modal-lg">
+  <!-- MODAL COMPENSACIONES -->
+  <div class="modal fade" id="modalCompensaciones" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="min-width: 60%;">
       <div class="modal-content">
         <div class="modal-header">
-          <h4 class="modal-title">Compensación de partidas.</h4>
+          <h1 class="modal-title fs-5">COMPENSACIÓN DE PARTIDAS</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <table class="form" width="100%">
-            <thead>
-              <tr>
-                <th colspan="2">COMPENSACIÓN DE DOCUMENTOS</th>
-              </tr>
-            </thead>
+          <h5>Compensación de Documentos</h5>
+          <div class="alert alert-warning">
+            <i class="fa-solid fa-circle-info"></i>
+            <span>La compensación de documentos, desactiva del multichash las partidas de banco por aprovechamiento.</span>
+          </div>
+          <table style="width: 100%;">
             <tbody>
-              <tr>
-                <td colspan="2">
-                  <div class="alert alert-warning"><i class="fa-solid fa-circle-info"></i><span> La compensacion de documentos, desactiva de multichash las partidas de banco por aprovechamiento.</span></div>
-                </td>
-              </tr>
-              <tr>
+              <tr class="custom-tr">
                 <td>Fecha Inicial</td>
-                <td><input type="text" class="form form-control" id="fhCompenIni"></td>
+                <td><input type="text" class="form form-control size-text shadow-sm" id="fhCompenIni"></td>
               </tr>
-              <tr>
+              <tr class="custom-tr">
                 <td>Fecha Final</td>
-                <td><input type="text" class="form form-control" id="fhCompenFin"></td>
+                <td><input type="text" class="form form-control size-text shadow-sm" id="fhCompenFin"></td>
               </tr>
-              <tr>
+              <tr class="custom-tr">
                 <td>Número de documento (Opcional)</td>
-                <td><input type="text" class="form form-control" id="idCompenDoc" onKeyPress="return vnumeros(event)"></td>
+                <td><input type="text" class="form form-control size-text shadow-sm" id="idCompenDoc" onKeyPress="return vnumeros(event)"></td>
               </tr>
             </tbody>
           </table>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-success" id="btnCompensar">Compensar</button>
-          <button type="button" class="btn btn-info" data-dismiss="modal">Cerrar</button>
+          <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cerrar</button>
         </div>
       </div>
     </div>
   </div>
-
-  <div id="dvEmailZonas" class="modal fade bd-example-modal-lg" role="dialog">
-    <div class="modal-dialog modal-lg">
+  <!-- MODAL PDF RECIBO -->
+  <div class="modal fade" id="dvPDFRecibo" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="min-width: 60%;">
       <div class="modal-content">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">CONFIGURACIÓN</h4>
-        </div>
-        <div class="modal-body">
-          <div class="panel with-nav-tabs panel-info">
-            <div class="panel-heading">
-              <ul class="nav nav-tabs">
-                <li class="active"><a href="#dvCorreos" data-toggle="tab">Correos</a></li>
-                <li class=""><a href="#dvCondicionesEspeciales" data-toggle="tab" onClick="ConsultarCondicionEspecial();">Condiciones Especiales</a></li>
-                <li class=""><a href="#dvCondicionesListas" data-toggle="tab" onClick="ConsultarCondicionLista();">Condiciones Listas</a></li>
-              </ul>
-            </div>
-            <div class="panel-body">
-              <div class="tab-content">
-                <div class="tab-pane fade in active" id="dvCorreos">
-                  <table class="form" width="100%">
-                    <tr>
-                      <td>ZONA</td>
-                      <td><select id="slcZonaEmail" class="form-control"></select></td>
-                    <tr>
-                    <tr>
-                      <td>EMAIL</td>
-                      <td><input type="text" id="txtZonaEmail" class="form-control"></td>
-                    <tr>
-                    <tr>
-                      <td colspan="2">
-                        <button type="button" class="btn btn-sm btn-success" onClick="AddZonaEmail()">Agregar</button>
-                      </td>
-                    <tr>
-                  </table>
-                  <div id="dvResultZonasEmail"></div>
-                </div>
-                <div class="tab-pane fade in" id="dvCondicionesEspeciales">
-                  <div class="alert alert-warning" role="alert">
-                    <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
-                    Tener en cuenta que al autorizar las condiciones solicitadas se eliminaran las que se encuentran vigentes en ADG.
-                  </div>
-                  <table class="form" width="100%">
-                    <tr>
-                      <td>Cliente</td>
-                      <td><input type="text" id="txt_CondCliente" class="form-control"></td>
-                      <td><input type="text" id="txt_CondCodigo" class="form-control" placeholder="Codigo SAP" readonly disabled></td>
-                      <td>Sujeto Cumplimiento</td>
-                      <td>
-                        <select id="txtSujetoCumplimiento" class="form-control">
-                          <option value="S">SI</option>
-                          <option value="N">NO</option>
-                        </select>
-                      </td>
-                    <tr>
-                    <tr>
-                      <td>Dias Pago</td>
-                      <td><input type="text" id="txt_CondDias" onKeyPress="return vnumeros(event)" class="form-control"></td>
-                      <td>Descuento %</td>
-                      <td colspan="2"><input type="text" id="txt_CondDcto" onKeyPress="return vnumeros(event)" class="form-control"></td>
-                    <tr>
-                    <tr>
-                      <td colspan="5">
-                        <button type="button" class="btn btn-sm btn-success" onClick="AgregarCondicionEspecial()">Agregar</button>
-                        <button type="button" class="btn btn-sm btn-info" onClick="AutorizarTodoCondicion()">Autorizar Todo</button>
-                      </td>
-                    <tr>
-                  </table>
-                  <div id="dvResultCondicionesEspeciales"></div>
-                </div>
-                <div class="tab-pane fade in" id="dvCondicionesListas">
-                  <div class="alert alert-warning" role="alert">
-                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-                    <span class="sr-only"></span> <b>PLAN ESPECIAL DE CLIENTES DE TIPO DROGUERIA Y QUE CUMPLAN PRESUPUESTO DE VENTAS</b>
-                  </div>
-                  <div id="dvResultCondicionesEspecialesListas"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-info" data-dismiss="modal">Cancelar</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div id="dvPDFRecibo" class="modal fade bd-example-modal-lg" role="dialog">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">PDF RECIBO</h4>
+          <h1 class="modal-title fs-5">PDF RECIBO</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <div id="dvReciboCajaPDF"></div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-info" data-dismiss="modal">Cerrar</button>
+          <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cerrar</button>
         </div>
       </div>
     </div>
   </div>
-
-  <div id="dvSubirCash" class="modal fade bd-example-modal-lg" role="dialog">
-    <div class="modal-dialog modal-lg">
+  <!-- MODAL SUBIR CASH -->
+  <div class="modal fade" id="dvSubirCash" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="min-width: 60%;">
       <div class="modal-content">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">Subir Planilla de multicash</h4>
+          <h1 class="modal-title fs-5">SUBIR PLANILLA DE MULTICASH</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <table width="100%" class="form" id="">
+          <table width="100%" class="form">
             <tbody>
               <tr>
-                <td>CSV [Cuenta,Documento,Importe,Texto,Fecha cont,Fecha valor,Referencia]</td>
+                <td>CSV [Cuenta, Documento, Importe, Texto, Fecha cont, Fecha valor, Referencia]</td>
                 <td><input type="file" id="filename" name="filename" class="form-control" readonly></td>
               </tr>
             </tbody>
@@ -1315,13 +892,104 @@ $sociedad = (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : "";
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-success" onClick="SubirCash()">Subir</button>
-          <button type="button" class="btn btn-info" data-dismiss="modal">Cerrar</button>
+          <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- MODAL EMAIL ZONAS -->
+  <div class="modal fade" id="dvEmailZonas" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="min-width: 70%;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5">CONFIGURACIÓN</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="container-fluid">
+            <ul class="nav nav-tabs" id="nav-tab" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#dvCorreos" type="button" role="tab" aria-controls="dvCorreos" aria-selected="true">&nbsp;Correos</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" onClick="ConsultarCondicionEspecial();" data-bs-toggle="tab" data-bs-target="#dvCondicionesEspeciales" type="button" role="tab" aria-controls="dvCondicionesEspeciales" aria-selected="false">&nbsp;Condiciones Especiales</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" onClick="ConsultarCondicionLista();" data-bs-toggle="tab" data-bs-target="#dvCondicionesListas" type="button" role="tab" aria-controls="dvFacturas" aria-selected="false">&nbsp;Condiciones Listas</button>
+              </li>
+            </ul>
+          </div>
+          <div class="tab-content" id="nav-tabContent">
+            <!-- TAB DIV CORREOS -->
+            <div class="tab-pane fade show active p-2" id="dvCorreos" role="tabpanel" aria-labelledby="nav-home-tab">
+              <table width="100%">
+                <tr class="custom-tr">
+                  <td class="size-text">ZONA</td>
+                  <td><select id="slcZonaEmail" class="form-select size-text shadow-sm"></select></td>
+                <tr>
+                <tr class="custom-tr">
+                  <td class="size-text">EMAIL</td>
+                  <td><input type="text" id="txtZonaEmail" class="form-control size-text shadow-sm"></td>
+                <tr>
+              </table>
+              <div class="d-flex justify-content-end mb-3">
+                <button type="button" class="btn btn-sm btn-success" onClick="AddZonaEmail()">Agregar</button>
+              </div>
+              <div id="dvResultZonasEmail"></div>
+            </div>
+            <!-- TAB DIV CONDICIONES ESPECIALES -->
+            <div class="tab-pane fade p-2" id="dvCondicionesEspeciales" role="tabpanel" aria-labelledby="nav-home-tab">
+              <div class="alert alert-warning" role="alert">
+                <i class="fa-solid fa-circle-info"></i>
+                Tener en cuenta que al autorizar las condiciones solicitadas se eliminaran las que se encuentran vigentes en ADG.
+              </div>
+              <table class="form" width="100%">
+                <tr>
+                  <td>Cliente</td>
+                  <td><input type="text" id="txt_CondCliente" class="form-control"></td>
+                  <td><input type="text" id="txt_CondCodigo" class="form-control" placeholder="Codigo SAP" readonly disabled></td>
+                  <td>Sujeto Cumplimiento</td>
+                  <td>
+                    <select id="txtSujetoCumplimiento" class="form-control">
+                      <option value="S">SI</option>
+                      <option value="N">NO</option>
+                    </select>
+                  </td>
+                <tr>
+                <tr>
+                  <td>Dias Pago</td>
+                  <td><input type="text" id="txt_CondDias" onKeyPress="return vnumeros(event)" class="form-control"></td>
+                  <td>Descuento %</td>
+                  <td colspan="2"><input type="text" id="txt_CondDcto" onKeyPress="return vnumeros(event)" class="form-control"></td>
+                <tr>
+                <tr>
+                  <td colspan="5">
+                    <button type="button" class="btn btn-sm btn-success" onClick="AgregarCondicionEspecial()">Agregar</button>
+                    <button type="button" class="btn btn-sm btn-info" onClick="AutorizarTodoCondicion()">Autorizar Todo</button>
+                  </td>
+                <tr>
+              </table>
+              <div id="dvResultCondicionesEspeciales"></div>
+            </div>
+            <!-- TAB DIV CONDICIONES LISTAS -->
+            <div class="tab-pane fade p-2" id="dvCondicionesListas" role="tabpanel" aria-labelledby="nav-home-tab">
+              <div class="alert alert-warning" role="alert">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <span class="sr-only"></span> <b>PLAN ESPECIAL DE CLIENTES DE TIPO DROGUERIA Y QUE CUMPLAN PRESUPUESTO DE VENTAS</b>
+              </div>
+              <div id="dvResultCondicionesEspecialesListas"></div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cerrar</button>
         </div>
       </div>
     </div>
   </div>
 
-  <div id="dvReciboCaja" class="modal fade bd-example-modal-lg" role="dialog">
+
+  <!-- <div id="dvReciboCaja" class="modal fade bd-example-modal-lg" role="dialog">
     <div class="modal-dialog modal-lg" style="width: 95%">
       <div class="modal-content">
         <div class="modal-header">
@@ -1440,32 +1108,6 @@ $sociedad = (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : "";
               </div>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
-  </div>  
-
-  
-  <div id="ModalHipervinculo" class="modal" role="dialog" style="z-index: 99999; margin-top: 0; background-color: #C0C0C0; padding: 0"
-    aria-hidden="true"
-    data-keyboard="false"
-    data-backdrop="static">
-    <div class="modal-dialog modal-lg" style="width: 100%;height: 99vh; margin:0; ">
-      <div class="modal-content">
-        <div class="modal-header" style="padding: 1px; margin: 1px; font-size: 12px">
-          <h4 class="modal-title">
-            <span id="span-titulo-modulo"></span>
-          </h4>
-        </div>
-        <div class="modal-body">
-          <div class="row row_iframe">
-            <div class="col-md-12 col-iframe-left">
-              <iframe class="iframe" src="" style="display: none; font-size: 1rem"></iframe>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer" style="padding: 3px;">
-          <button type="button" class="btn btn-danger btn-sm " style="margin-right: 10px" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp;Cerrar</button>
         </div>
       </div>
     </div>

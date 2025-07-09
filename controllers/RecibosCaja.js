@@ -4,6 +4,8 @@ let ArrCli = [];
 let ArrDctos = [];
 let arrayLiquidador = [];
 
+// TODO: CONTINUAR AJUSTANDO EL CONTENIDO DE LA MODAL EMAIL ZONAS
+
 // DECLARACIÓN DE FUNCIONES GENERALES
 // FUNCIÓN MOSTRAR LOADING
 function LoadImg(texto = "Cargando...") {
@@ -625,26 +627,26 @@ function CondicionesDcto() {
       sociedad: $("#Sociedad").val()
     },
     success: function (data) {
-      var tabla = '<table class="form" width="100%" id="tableCondicionesDcto">'
-        + '<thead>'
-        + '<tr>'
-        + '<th>CODIGO</th>'
-        + '<th>SOCIEDAD</th>'
-        + '<th>DIAS</th>'
-        + '<th>DESCUENTO</th>'
-        + '<th>TIPO</th>'
-        + '<th>SUJETO CUMPLIMIENTO</th>'
+      var tabla = '<table class="table table-bordered table-hover table-sm" style="width: 100%;" id="tableCondicionesDcto">'
+        + '<thead class="table-info">'
+        + '<tr class="size-th">'
+        + '<th class="size-th">CODIGO</th>'
+        + '<th class="size-th">SOCIEDAD</th>'
+        + '<th class="size-th">DIAS</th>'
+        + '<th class="size-th">DESCUENTO</th>'
+        + '<th class="size-th">TIPO</th>'
+        + '<th class="size-th">SUJETO CUMPLIMIENTO</th>'
         + '</tr>'
         + '</thead>'
         + '<tbody>';
       for (var i = 0; i <= data.length - 1; i++) {
         tabla += '<tr>'
-          + '<td>' + data[i].codigo_sap + '</td>'
-          + '<td>' + data[i].sociedad + '</td>'
-          + '<td>' + data[i].dias + '</td>'
-          + '<td>' + data[i].descuento + '</td>'
-          + '<td>' + data[i].tipo + '</td>'
-          + '<td>' + data[i].sujeto_cump + '</td>'
+          + '<td class="size-text vertical">' + data[i].codigo_sap + '</td>'
+          + '<td class="size-text vertical">' + data[i].sociedad + '</td>'
+          + '<td class="size-text vertical">' + data[i].dias + '</td>'
+          + '<td class="size-text vertical">' + data[i].descuento + '</td>'
+          + '<td class="size-td vertical">' + data[i].tipo + '</td>'
+          + '<td class="size-td vertical">' + data[i].sujeto_cump + '</td>'
           + '</tr>';
         ArrDctos.push({
           dias: data[i].dias,
@@ -675,24 +677,24 @@ function ListarZonasEmail() {
     },
     success: function (data) {
       //console.log(data);
-      var tabla = '<table class="form" width="100%" id="tableZonaEmail">'
-        + '<thead>'
+      var tabla = '<table class="table table-bordered table-hover table-sm" width="100%" id="tableZonaEmail">'
+        + '<thead class="table-info">'
         + '<tr>'
-        + '<th>ZONA</th>'
-        + '<th>DESCRIPCION</th>'
-        + '<th>EMAIL</th>'
-        + '<th>ELIMINAR</th>'
+        + '<th class="size-th">ZONA</th>'
+        + '<th class="size-th">DESCRIPCION</th>'
+        + '<th class="size-th">EMAIL</th>'
+        + '<th class="size-th text-center">ELIMINAR</th>'
         + '</tr>'
         + '</thead>'
         + '<tbody>';
       for (var i = 0; i <= data.length - 1; i++) {
         tabla += '<tr>'
-          + '<td>' + data[i].ZONA_VENTAS + '</td>'
-          + '<td>' + data[i].ZONA_DESCRIPCION + '</td>'
-          + '<td>' + data[i].EMAIL + '</td>'
-          + '<td>'
-          + '<button class="btn btn-default" onclick="DelZonaEmail(\'' + data[i].ZONA_VENTAS + '\')">'
-          + '<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>'
+          + '<td class="size-text vertical">' + data[i].ZONA_VENTAS + '</td>'
+          + '<td class="size-td vertical">' + data[i].ZONA_DESCRIPCION + '</td>'
+          + '<td class="size-text vertical">' + data[i].EMAIL + '</td>'
+          + '<td class="text-center">'
+          + '<button class="btn btn-outline-danger btn-sm" onclick="DelZonaEmail(\'' + data[i].ZONA_VENTAS + '\')">'
+          + '<i class="fa-solid fa-trash-can"></i>'
           + '</button>'
           + '</td>'
           + '</tr>';
@@ -1004,22 +1006,22 @@ function ConsultarMulticashBanco() {
         resultado.forEach((item, index) => {
           elementos += `
             <tr>
-              <td class="vertical">${index + 1}</td>
-              <td class="vertical">${item.cuenta}</td>
-              <td class="vertical">${item.descripcion}</td>
-              <td class="vertical">${item.numero}</td>
-              <td class="vertical">${formatNum(item.valor, "$")}</td>
-              <td class="vertical">${item.fecha_cont}</td>
-              <td class="vertical">${item.referencia}</td>
-              <td class="vertical">${item.codigo_sap}</td>
-              <td class="vertical">
-                <p>${item.nombres}</p>
-                <small class="text-primary">${item.razon_comercial}</small>
+              <td class="size-text no-wrap vertical">${index + 1}</td>
+              <td class="size-text no-wrap vertical">${item.cuenta}</td>
+              <td class="size-td no-wrap vertical">${item.descripcion}</td>
+              <td class="size-text no-wrap vertical">${item.numero}</td>
+              <td class="size-text no-wrap vertical">${formatNum(item.valor, "$")}</td>
+              <td class="size-text no-wrap vertical">${item.fecha_cont}</td>
+              <td class="size-text no-wrap vertical">${item.referencia}</td>
+              <td class="size-text no-wrap vertical">${item.codigo_sap}</td>
+              <td class="size-td no-wrap vertical">
+                <p class="m-0">${item.nombres}</p>
+                <p class="size-10 text-primary m-0">${item.razon_comercial}</p>
               </td>
-              <td class="vertical">${item.bodega_desc.split(' ')[1]}</td>
-              <td class="vertical">${item.zona_ventas}</td>
-              <td class="vertical">${item.zona_descripcion}</td>
-              <td class="vertical">${item.condicion_pago}</td>
+              <td class="size-td no-wrap vertical">${item.bodega_desc.split(' ')[1]}</td>
+              <td class="size-text no-wrap vertical">${item.zona_ventas}</td>
+              <td class="size-td no-wrap vertical">${item.zona_descripcion}</td>
+              <td class="size-td no-wrap vertical">${item.condicion_pago}</td>
               <td class="text-center vertical">
                 <button class="btn btn-primary btn-sm observacion" data-id='${JSON.stringify(item)}'>
                   <i class="fa-solid fa-paper-plane"></i>                                                                     
@@ -1587,8 +1589,8 @@ function Documentos() {
           detalle +=
             `<tr>
               <td class="no-wrap size-text vertical">${data[i].NUMERO_DOCUMENTO.trim()}</td>
-              <td class="no-wrap size-text vertical">${data[i].REFERENCIA.trim()}</td>
-              <td class="no-wrap size-text vertical">${data[i].CLASE_DOCUMENTO}</td>
+              <td class="no-wrap size-td vertical">${data[i].REFERENCIA.trim()}</td>
+              <td class="no-wrap size-td vertical">${data[i].CLASE_DOCUMENTO}</td>
               <td class="no-wrap size-text vertical">${ver}</td>
               <td class="no-wrap size-text vertical">${data[i].FECHA_BASE}</td>
               <td class="no-wrap size-text vertical">${data[i].FECHA_PAGO_GRACIA}</td>
@@ -1596,12 +1598,12 @@ function Documentos() {
               <td class="no-wrap size-text vertical" ${mora}>${data[i].DEMORA_GRACIA}</td>
               <td class="no-wrap size-text vertical">${data[i].DIAS}</td>
               <td class="no-wrap size-text vertical">${formatNum(data[i].IMPORTE, '$')}</td>
-              <td class="no-wrap size-text vertical">${data[i].TEXTO.trim()}</td>
+              <td class="no-wrap size-td vertical">${data[i].TEXTO.trim()}</td>
               <td>
-                <input type="text" onKeyPress="return vnumeros(event)" onDblClick="AsignarValor(this);" size="15" class="form-control ClassNumero form-control-sm shadow-sm" onBlur="AddFactura(this, this.value, '${cumple_pres}')" value="$0">
+                <input type="text" onKeyPress="return vnumeros(event)" onDblClick="AsignarValor(this);" size="15" class="form-control ClassNumero shadow-sm" onBlur="AddFactura(this, this.value, '${cumple_pres}')" value="$0">
               </td>
               <td>
-                <input type="text" onKeyPress="return vnumeros(event)"  size="15" class="form-control ClassNumero form-control-sm shadow-sm" onBlur="AddFactura(this, this.value,  '${cumple_pres}')" disabled value="$0">
+                <input type="text" onKeyPress="return vnumeros(event)"  size="15" class="form-control ClassNumero shadow-sm" onBlur="AddFactura(this, this.value,  '${cumple_pres}')" disabled value="$0">
               </td>
               <td class="size-text vertical">${formatNum(parseFloat(data[i].BASE_PP), '$')}</td>
               <td style="display:none;">${data[i].DESCUENTO}</td>
@@ -2092,8 +2094,8 @@ function ConsultarPlanilla() {
             + '<td class="size-text no-wrap vertical">' + data[i].FECHA_HORA + '</td>'
             + '<td class="size-td no-wrap vertical">' + data[i].USUARIO + '</td>'
             + '<td class="size-text no-wrap vertical">' + data[i].CODIGO_SAP + '</td>'
-            + '<td class="size-td no-wrap vertical">' + data[i].NOMBRES + '</td>'
-            + '<td class="size-td no-wrap vertical">' + data[i].RAZON_COMERCIAL + '</td>'
+            + '<td class="size-td no-wrap vertical">' + cortarTexto(data[i].NOMBRES, 30) + '</td>'
+            + '<td class="size-td no-wrap vertical">' + cortarTexto(data[i].RAZON_COMERCIAL, 30) + '</td>'
             + '<td class="size-text no-wrap vertical">' + data[i].NUMERO + '</td>'
             + '<td class="size-text no-wrap vertical">' + formatNum(data[i].VALOR, '$') + '</td>'
             + '<td class="size-text no-wrap vertical">' + formatNum(data[i].DESCUENTO, '$') + '</td>'
@@ -2153,7 +2155,7 @@ function ConsultarPlanilla() {
         $("#TotalRC").val(cont);
       } else {
         $("#dvResultPlanilla").html('<div class="alert alert-danger" role="alert">'
-          + '<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>'
+          + '<i class="fa-solid fa-circle-exclamation"></i>'
           + '<span class="sr-only">Error:</span>NO EXISTEN RESULTADOS PARA LAS CONDICIONES SELECCIONADAS' + '</div>');
       }
     }
@@ -2328,8 +2330,8 @@ function EliminarRC() {
 }
 
 function PDFRecibo(num) {
-  $('#dvReciboCajaPDF').html('<embed src="../resources/tcpdf/Recibos.php?numero=' + num + '&email=sistemas@multidrogas.com&tipo=R" frameborder="0" width="100%" height="400px">');
-  $("#dvPDFRecibo").modal();
+  $('#dvReciboCajaPDF').html(`<embed src="../resources/tcpdf/Recibos.php?numero=${num}&email=sistemas@multidrogas.com&tipo=R" frameborder="0" width="100%" height="400px">`);
+  $("#dvPDFRecibo").modal("show");
 }
 
 function EnviarMail(numero) {
@@ -2477,7 +2479,7 @@ function ConsultarCondicionEspecial() {
         $("#dvResultCondicionesEspeciales").html(tabla);
       } else {
         $("#dvResultCondicionesEspeciales").html('<div class="alert alert-danger" role="alert">'
-          + '<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>'
+          + '<i class="fa-solid fa-circle-exclamation"></i>'
           + '<span class="sr-only">Error:</span>  No hay solicitudes pendientes.' + '</div>');
       }
     }
@@ -2600,34 +2602,34 @@ function ConsultarCondicionLista() {
     },
     success: function (data) { //console.log(data);
       if (data.length > 0) {
-        var tabla = '<table class="form" width="100%" id="">'
-          + '<thead>'
+        var tabla = '<table class="table table-bordered table-hover table-sm" width="100%" id="">'
+          + '<thead class="table-info">'
           + '<tr>'
-          + '<th>LISTA</th>'
-          + '<th>DIAS</th>'
-          + '<th>%DESCUENTO</th>'
-          + '<th>SUJETO PPTO</th>'
-          + '<th>OFICINA</th>'
+          + '<th class="size-th">LISTA</th>'
+          + '<th class="size-th">DIAS</th>'
+          + '<th class="size-th">% DESCUENTO</th>'
+          + '<th class="size-th">SUJETO PPTO</th>'
+          + '<th class="size-th">OFICINA</th>'
           + '</tr>'
           + '</thead>'
           + '<tbody>';
-        var tabla2 = '<table class="form" width="100%" id="tableCondicionesLista">'
-          + '<thead>'
+        var tabla2 = '<table class="table table-bordered table-hover table-sm" width="100%" id="tableCondicionesLista">'
+          + '<thead class="table-info">'
           + '<tr>'
-          + '<th>LISTA</th>'
-          + '<th>DIAS</th>'
-          + '<th>%DESCUENTO</th>'
-          + '<th>OFICINA</th>'
+          + '<th class="size-th">LISTA</th>'
+          + '<th class="size-th">DIAS</th>'
+          + '<th class="size-th">% DESCUENTO</th>'
+          + '<th class="size-th">OFICINA</th>'
           + '</tr>'
           + '</thead>'
           + '<tbody>';
-        var tabla3 = '<table class="form" width="100%" id="tableCondicionesListaPlazo">'
-          + '<thead>'
+        var tabla3 = '<table class="table table-bordered table-hover table-sm" width="100%" id="tableCondicionesListaPlazo">'
+          + '<thead class="table-info">'
           + '<tr>'
-          + '<th>LISTA</th>'
-          + '<th>DIAS</th>'
-          + '<th>%DESCUENTO</th>'
-          + '<th>OFICINA</th>'
+          + '<th class="size-th">LISTA</th>'
+          + '<th class="size-th">DIAS</th>'
+          + '<th class="size-th">% DESCUENTO</th>'
+          + '<th class="size-th">OFICINA</th>'
           + '</tr>'
           + '</thead>'
           + '<tbody>';
@@ -2644,28 +2646,28 @@ function ConsultarCondicionLista() {
             if (data[i].sujeto_ppto == 'S') {
               cont++;
               tabla2 += '<tr>'
-                + '<td>' + data[i].lista + '</td>'
-                + '<td>' + data[i].dias + '</td>'
-                + '<td>' + data[i].descuento + '</td>'
-                + '<td>' + data[i].oficina_ventas + '</td>'
+                + '<td class="size-text vertical">' + data[i].lista + '</td>'
+                + '<td class="size-text vertical">' + data[i].dias + '</td>'
+                + '<td class="size-text vertical">' + data[i].descuento + '</td>'
+                + '<td class="size-text vertical">' + data[i].oficina_ventas + '</td>'
                 + '</tr>';
             } else {
               cont2++;
               tabla3 += '<tr>'
-                + '<td>' + data[i].lista + '</td>'
-                + '<td>' + data[i].dias + '</td>'
-                + '<td>' + data[i].descuento + '</td>'
-                + '<td>' + data[i].oficina_ventas + '</td>'
+                + '<td class="size-text vertical">' + data[i].lista + '</td>'
+                + '<td class="size-text vertical">' + data[i].dias + '</td>'
+                + '<td class="size-text vertical">' + data[i].descuento + '</td>'
+                + '<td class="size-text vertical">' + data[i].oficina_ventas + '</td>'
                 + '</tr>';
             }
 
           }
           tabla += '<tr>'
-            + '<td>' + data[i].lista + '</td>'
-            + '<td>' + data[i].dias + '</td>'
-            + '<td>' + data[i].descuento + '</td>'
-            + '<td>' + data[i].sujeto_ppto + '</td>'
-            + '<td>' + data[i].oficina_ventas + '</td>'
+            + '<td class="size-text vertical">' + data[i].lista + '</td>'
+            + '<td class="size-text vertical">' + data[i].dias + '</td>'
+            + '<td class="size-text vertical">' + data[i].descuento + '</td>'
+            + '<td class="size-text vertical">' + data[i].sujeto_ppto + '</td>'
+            + '<td class="size-text vertical">' + data[i].oficina_ventas + '</td>'
             + '</tr>';
 
 
@@ -2681,7 +2683,7 @@ function ConsultarCondicionLista() {
           $("#dvCondicionesDetalleLista").html(tabla2);
         } else {
           $("#dvCondicionesDetalleLista").html(`<div class="alert alert-danger" role="alert">
-                                                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                                                    <i class="fa-solid fa-circle-exclamation"></i>
                                                     <span class="sr-only">Error:</span> No tiene condiciones especiales asociadas.
                                                    </div>`);
         }
@@ -2691,13 +2693,13 @@ function ConsultarCondicionLista() {
           $("#dvCondicionesDetalleListaPlazo").html(tabla3);
         } else {
           $("#dvCondicionesDetalleListaPlazo").html(`<div class="alert alert-danger" role="alert">
-														<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+														<i class="fa-solid fa-circle-exclamation"></i>
 														<span class="sr-only">Error:</span> No tiene condiciones especiales asociadas.
 													   </div>`);
         }
       } else {
         $("#dvResultCondicionesEspecialesListas, #dvCondicionesDetalleLista").html(`<div class="alert alert-danger" role="alert">
-																							<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+																							<i class="fa-solid fa-circle-exclamation"></i>
 																							<span class="sr-only">Error:</span> No hay resultados o no ha seleccionado un cliente.
 																					   </div>`);
       }
@@ -2962,6 +2964,10 @@ const compensarDocumentos = async () => {
   }
 }
 
+function cortarTexto(texto, maxLongitud) {
+  return texto.length > maxLongitud ? texto.slice(0, maxLongitud) + '...' : texto;
+}
+
 // EJECUCIÓN DE FUNCIONALIDADES
 $(function () {
   carga_anios('MultiAnio');
@@ -3075,14 +3081,6 @@ $(function () {
     $("#btnSubirMulticash").attr('disabled', false);
   } else {
     $("#btnSubirMulticash").attr('disabled', true);
-  }
-
-  const cssDeshabilatar = {
-    "pointer-events": "none",
-    "color": "#aaa !important",
-    "background-color": "#f5f5f5",
-    "cursor": "not-allowed",
-    "text-decoration": "none"
   }
 
   // RESTRICCIÓN DE ACCESO A LA PESTAÑA DE BANCOS 
@@ -3287,26 +3285,23 @@ $(function () {
     }
     return false;
   });
-  //------------------------------------------------------------
+  
   $("#btnEmailZona").click(function () {
     ConsultarZonas();
     ListarZonasEmail();
     $("#dvEmailZonas").modal("show");
   });
-  //------------------------------------------------------------
+  
   $("#btnCondicionDcto").click(function () {
-    if ($("#CodigoSAP").val() != '') {
-      $("#dvCondiciones").modal("show");
-    } else {
-      Swal.fire('Error', 'Debe seleccionar un cliente!.', 'error');
-    }
+    if ($("#CodigoSAP").val() != '') $("#dvCondiciones").modal("show");
+    else Swal.fire("Error", "Debe seleccionar un cliente!.", "error");
   });
-  //----Botones de hipervinculos
+  // BOTONES DE HIPERVINCULO
   actualizarElementoSegunPermisos("0401", "#0401");
   actualizarElementoSegunPermisos("0102", "#0102");
 
-  $("#0401,#0102").click(function () {
-    let id = $(this).attr('id')
+  $("#0401, #0102").click(function () {
+    let id = $(this).attr('id');
     let url = '';
     let title = '';
 
@@ -3317,9 +3312,10 @@ $(function () {
         break;
       case '0102':
         url = 'ProgramacionCliente.php';
-        title = '0102 - PROGRAMACION DE CLIENTE';
+        title = '0102 - PROGRAMACIÓN DE CLIENTE';
         break;
     }
+
     $("#ModalHipervinculo").modal("show")
     $("#span-titulo-modulo").text(title);
     $(".iframe").attr('src', url).show();
@@ -3357,7 +3353,7 @@ $(function () {
     filtrar(filtro);
   });
 
-  $('#liBancos').click(function () {
+  $('#btnBancos').click(function () {
     ConsultarMulticashBanco();
   });
 
