@@ -66,16 +66,17 @@ $sociedad = (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : "";
       transition: all 0.3s ease-in-out;
       width: 24px;
     }
-
+    
     .material-switch>input[type="checkbox"]:checked+label::before {
-      background: inherit;
+      background: #28a745;
       opacity: 0.5;
     }
 
     .material-switch>input[type="checkbox"]:checked+label::after {
-      background: inherit;
+      background: #28a745;
       left: 20px;
     }
+
 
     .iframe {
       width: 99%;
@@ -116,12 +117,12 @@ $sociedad = (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : "";
 
     .custom-padding {
       padding: 3px 8px;
-      font-size: 12px;
+      font-size: 14px;
     }
 
     .custom-padding-two {
       padding: 3px 8px;
-      font-size: 12px;
+      font-size: 14px;
     }
 
     .cantBan {
@@ -131,6 +132,13 @@ $sociedad = (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : "";
       padding: 4px 5px;
       border-radius: 4px;
       text-align: center;
+    }
+
+    .cantBan2 {
+      margin: 0;
+      border: 1px solid #ccc;
+      padding: 0px 5px;
+      border-radius: 3px;
     }
 
     .no-wrap {
@@ -166,6 +174,10 @@ $sociedad = (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : "";
       line-height: 3;
     }
 
+    .custom-td {
+      line-height: 2.3;
+    }
+
     .size-text {
       font-size: 14px !important;
     }
@@ -180,6 +192,11 @@ $sociedad = (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : "";
 
     .size-th {
       font-size: 14px !important;
+      color: #055160 !important;
+    }
+
+    .size-th-2 {
+      font-size: 15px !important;
       color: #055160 !important;
     }
 
@@ -272,6 +289,11 @@ $sociedad = (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : "";
       border-bottom: 1px solid #CCC;
       border-left: 5px solid #f0ad4e;
       border-radius: 3px;
+    }
+
+    .td-data {
+      border-bottom: 1px solid #CCC;
+      padding: 0px 0px 0px 8px;
     }
   </style>
 </head>
@@ -943,32 +965,34 @@ $sociedad = (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : "";
                 <i class="fa-solid fa-circle-info"></i>
                 Tener en cuenta que al autorizar las condiciones solicitadas se eliminaran las que se encuentran vigentes en ADG.
               </div>
-              <table class="form" width="100%">
-                <tr>
-                  <td>Cliente</td>
-                  <td><input type="text" id="txt_CondCliente" class="form-control"></td>
-                  <td><input type="text" id="txt_CondCodigo" class="form-control" placeholder="Codigo SAP" readonly disabled></td>
-                  <td>Sujeto Cumplimiento</td>
-                  <td>
-                    <select id="txtSujetoCumplimiento" class="form-control">
+              <table width="100%">
+                <tr class="custom-tr">
+                  <td class="size-text">Cliente</td>
+                  <td><input type="text" id="txt_CondCliente" class="form-control shadow-sm size-text"></td>
+                  <td><input type="text" id="txt_CondCodigo" class="form-control shadow-sm size-text" placeholder="Codigo SAP" readonly disabled></td>
+                </tr>
+                <tr class="custom-tr">
+                  <td class="size-text">Sujeto Cumplimiento</td>
+                  <td colspan="2">
+                    <select id="txtSujetoCumplimiento" class="form-select shadow-sm size-text">
                       <option value="S">SI</option>
                       <option value="N">NO</option>
                     </select>
                   </td>
-                <tr>
-                <tr>
-                  <td>Dias Pago</td>
-                  <td><input type="text" id="txt_CondDias" onKeyPress="return vnumeros(event)" class="form-control"></td>
-                  <td>Descuento %</td>
-                  <td colspan="2"><input type="text" id="txt_CondDcto" onKeyPress="return vnumeros(event)" class="form-control"></td>
-                <tr>
-                <tr>
-                  <td colspan="5">
-                    <button type="button" class="btn btn-sm btn-success" onClick="AgregarCondicionEspecial()">Agregar</button>
-                    <button type="button" class="btn btn-sm btn-info" onClick="AutorizarTodoCondicion()">Autorizar Todo</button>
-                  </td>
-                <tr>
+                </tr>
+                <tr class="custom-tr">
+                  <td class="size-text">Días Pago</td>
+                  <td colspan="2"><input type="text" id="txt_CondDias" onKeyPress="return vnumeros(event)" class="form-control shadow-sm size-text"></td>
+                </tr>
+                <tr class="custom-tr">
+                  <td class="size-text">Descuento %</td>
+                  <td colspan="2"><input type="text" id="txt_CondDcto" onKeyPress="return vnumeros(event)" class="form-control shadow-sm size-text"></td>
+                </tr>
               </table>
+              <div class="d-flex gap-2 justify-content-end mb-3">
+                <button type="button" class="btn btn-sm btn-success" onClick="AgregarCondicionEspecial()">Agregar</button>
+                <button type="button" class="btn btn-sm btn-primary" onClick="AutorizarTodoCondicion()">Autorizar Todo</button>
+              </div>
               <div id="dvResultCondicionesEspeciales"></div>
             </div>
             <!-- TAB DIV CONDICIONES LISTAS -->
@@ -987,123 +1011,161 @@ $sociedad = (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : "";
       </div>
     </div>
   </div>
-
-
-  <!-- <div id="dvReciboCaja" class="modal fade bd-example-modal-lg" role="dialog">
-    <div class="modal-dialog modal-lg" style="width: 95%">
+  <!-- MODAL DIV RECIBO DE CAJA -->
+  <div class="modal fade" id="dvReciboCaja" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="min-width: 95%;">
       <div class="modal-content">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">RECIBO DE CAJA</h4>
+          <h1 class="modal-title fs-5">RECIBO DE CAJA</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <div class="modal-footer">
-            <div class="btn-group" id="btnAutorizar">
-              <button class="btn btn-success dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <span class="glyphicon glyphicon-check" aria-hidden="true"></span> Autorizar <span class="caret"></span>
+          <div class="container-fluid d-flex justify-content-between align-items-center mb-3">
+            <div style="flex: 1;">
+              <button class="btn btn-primary btn-sm w-50" type="button" data-bs-toggle="collapse" data-bs-target="#BodyCliente" aria-expanded="false" aria-controls="BodyCliente">
+                DATOS DEL CLIENTE
               </button>
-              <ul class="dropdown-menu">
-                <li><a onClick="AutorizarRC(1)" style="cursor: pointer">Version 1</a></li>
-                <<li><a onClick="AutorizarRC(2)" style="cursor: pointer">Version 2</a></li>
-              </ul>
             </div>
-            <button type="button" class="btn btn-danger" id="btnEliminarRC" onClick="EliminarRC()">
-              <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Eliminar
-            </button>
-            <button type="button" class="btn btn-info" data-dismiss="modal">
-              <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Cerrar
-            </button>
+            <div>
+              <div class="btn-group" id="btnAutorizar">
+                <button type="button" class="btn btn-success btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="fa-solid fa-check"></i> Autorizar
+                </button>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" onClick="AutorizarRC(1)" style="cursor: pointer">Versión 1</a></li>
+                  <li><a class="dropdown-item" onClick="AutorizarRC(2)" style="cursor: pointer">Versión 2</a></li>
+                </ul>
+              </div>
+              <button type="button" class="btn btn-danger btn-sm" id="btnEliminarRC" onClick="EliminarRC()">
+                <i class="fa-solid fa-trash-can"></i> Eliminar
+              </button>
+              <button type="button" class="btn btn-outline-danger btn-sm" data-bs-dismiss="modal">
+                <i class="fa-solid fa-xmark"></i> Cerrar
+              </button>
+            </div>
           </div>
-          <div class="row">
-            <div class="col-md-12">
-              <div class="panel panel-info">
-                <div class="panel-heading"> <a data-toggle="collapse" href="#BodyCliente">DATOS DE CLIENTE</a></div>
-                <div class="panel-body collapse in" id="BodyCliente">
-                  <div class="row">
-                    <div class="col-md-6">
-                      <table class="form" width="100%">
-                        <tbody>
-                          <tr>
-                            <td width="30%"><b>ID</b></td>
-                            <td id="txt_id_rc"></td>
-                          </tr>
-                          <tr>
-                            <td><b>NUMERO</b></td>
-                            <td id="txt_num"></td>
-                          </tr>
-                          <td><b>CODIGO</b></td>
-                          <td id="txt_codigo"></td>
-                          </tr>
-                          </tr>
-                          <td><b>CLIENTE</b></td>
-                          <td id="txt_cliente"></td>
-                          </tr>
-                          </tr>
-                          <td><b>RAZÓN</b></td>
-                          <td id="txt_razon"></td>
-                          </tr>
-                          <tr>
-                            <td><b>EMAIL</b></td>
-                            <td id="txt_mail"></td>
-                          </tr>
-                          <tr>
-                            <td><b>EMAIL ZONA</b></td>
-                            <td id="txt_mail_zona"></td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                    <div class="col-md-6">
-                      <table class="form" width="100%">
-                        <tbody>
-                          <tr>
-                            <td width="30%"><b>VALOR</b></td>
-                            <td id="txt_valor"></td>
-                          </tr>
-                          <tr>
-                            <td><b>TEXTO CABECERA</b></td>
-                            <td id="txt_cabecera"></td>
-                          </tr>
-                          <tr>
-                            <td><b>TEXTO COMPENSACION</b></td>
-                            <td id="txt_compesacion"></td>
-                          </tr>
-                          <tr>
-                            <td><b>TEXTO REFERENCIA</b></td>
-                            <td id="txt_referencia"></td>
-                          </tr>
-                          <tr>
-                            <td><b>FECHA APROBACIÓN</b></td>
-                            <td id="txt_fh_aprueba"></td>
-                          </tr>
-                          <tr>
-                            <td><b>USUARIO APROBACIÓN</b></td>
-                            <td id="txt_user_aprueba"></td>
-                          </tr>
-                          <tr>
-                            <td><b>ARCHIVO</b></td>
-                            <td id="tdDocPDF"><input type="file" id="DocPDF" name="DocPDF" class="form-control" accept="application/pdf"></td>
-                          </tr>
-                        </tbody>
-                      </table>
+          <div class="container-fluid">
+            <div class="row mb-5">
+              <div class="col-md-12">
+                <div class="collapse show" id="BodyCliente">
+                  <div class="card p-3 shadow-sm">
+                    <div class="row">
+                      <div class="col-md-6">
+                        <table width="100%">
+                          <tbody>
+                            <tr class="custom-tr">
+                              <td class="size-td text-secondary" width="30%"><b>ID</b></td>
+                              <td class="custom-td">
+                                <p class="cantBan2 size-text text-green fw-500" id="txt_id_rc"></p>
+                              </td>
+                            </tr>
+                            <tr class="custom-tr">
+                              <td class="size-td text-secondary"><b>NÚMERO</b></td>
+                              <td class="custom-td">
+                                <p class="cantBan2 size-text text-green fw-500" id="txt_num"></p>
+                              </td>
+                            </tr>
+                            <tr class="custom-tr">
+                              <td class="size-td text-secondary"><b>CÓDIGO</b></td>
+                              <td class="custom-td">
+                                <p class="cantBan2 size-text text-green fw-500" id="txt_codigo"></p>
+                              </td>
+                            </tr>
+                            <tr class="custom-tr">
+                              <td class="size-td text-secondary"><b>CLIENTE</b></td>
+                              <td class="custom-td">
+                                <p class="cantBan2 size-td text-green fw-500" id="txt_cliente"></p>
+                              </td>
+                            </tr>
+                            <tr class="custom-tr">
+                              <td class="size-td text-secondary"><b>RAZÓN</b></td>
+                              <td class="custom-td">
+                                <p class="cantBan2 size-td text-green fw-500" id="txt_razon"></p>
+                              </td>
+                            </tr>
+                            <tr class="custom-tr">
+                              <td class="size-td text-secondary"><b>EMAIL</b></td>
+                              <td class="custom-td">
+                                <p class="cantBan2 size-text text-green fw-500" id="txt_mail"></p>
+                              </td>
+                            </tr>
+                            <tr class="custom-tr">
+                              <td class="size-td text-secondary"><b>EMAIL ZONA</b></td>
+                              <td class="custom-td">
+                                <p class="cantBan2 size-text text-green fw-500" id="txt_mail_zona"></p>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div class="col-md-6">
+                        <table width="100%">
+                          <tbody>
+                            <tr class="custom-tr">
+                              <td class="size-td text-secondary" width="30%"><b>VALOR</b></td>
+                              <td class="custom-td">
+                                <p class="cantBan2 size-text text-green fw-500" id="txt_valor"></p>
+                              </td>
+                            </tr>
+                            <tr class="custom-tr">
+                              <td class="size-td text-secondary"><b>TEXTO CABECERA</b></td>
+                              <td class="custom-td">
+                                <p class="cantBan2 size-text text-green fw-500" id="txt_cabecera"></p>
+                              </td>
+                            </tr>
+                            <tr class="custom-tr">
+                              <td class="size-td text-secondary"><b>TEXTO COMPENSACION</b></td>
+                              <td class="custom-td">
+                                <p class="cantBan2 size-text text-green fw-500" id="txt_compesacion"></p>
+                              </td>
+                            </tr>
+                            <tr class="custom-tr">
+                              <td class="size-td text-secondary"><b>TEXTO REFERENCIA</b></td>
+                              <td class="custom-td">
+                                <p class="cantBan2 size-text text-green fw-500" id="txt_referencia"></p>
+                              </td>
+                            </tr>
+                            <tr class="custom-tr">
+                              <td class="size-td text-secondary"><b>FECHA APROBACIÓN</b></td>
+                              <td class="custom-td">
+                                <p class="cantBan2 size-text text-green fw-500" id="txt_fh_aprueba"></p>
+                              </td>
+                            </tr>
+                            <tr class="custom-tr">
+                              <td class="size-td text-secondary"><b>USUARIO APROBACIÓN</b></td>
+                              <td class="custom-td">
+                                <p class="cantBan2 size-text text-green fw-500" id="txt_user_aprueba"></p>
+                              </td>
+                            </tr>
+                            <tr class="custom-tr">
+                              <td class="size-td text-secondary"><b>ARCHIVO</b></td>
+                              <td class="size-text" id="tdDocPDF"><input type="file" id="DocPDF" name="DocPDF" class="form-control" accept="application/pdf"></td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-          <div class="row">
-            <div class="col-md-6" id="panel_2">
-              <div class="panel panel-info">
-                <div class="panel-heading"> <a data-toggle="collapse" href="#">DETALLE DE PAGO</a></div>
-                <div class="panel-body collapse in  " style="overflow:auto" id="tr_det">
+            <div class="card p-3 shadow-sm">
+              <div class="row">
+                <div class="col-md-6" id="panel_2">
+                  <div class="">
+                    <h6 class="bg-info text-green p-2">DETALLE DE PAGO</h6>
+                    <div class="overflow" id="tr_det">
+
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-            <div class="col-md-6" id="panel_3">
-              <div class="panel panel-info">
-                <div class="panel-heading"> <a data-toggle="collapse" href="#">DOCUMENTO</a></div>
-                <div class="panel-body collapse in" id="ContainerPDF">
+                <div class="col-md-6" id="panel_3">
+                  <div class="panel panel-info">
+                    <h6 class="bg-info text-green p-2">DOCUMENTO</h6>
+                    <div id="ContainerPDF">
+
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1111,8 +1173,8 @@ $sociedad = (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : "";
         </div>
       </div>
     </div>
-  </div> -->
-
+  </div>
+  <!-- SCRIPT'S PARA DINAMISMO DE LA PÁGINA -->
   <script type="text/javascript" src="../lib/js/jquery-2.1.1.min.js?<?php echo (rand()); ?>"></script>
   <script type="text/javascript" src="../lib/js/jquery-ui-1.9.2.custom.js?<?php echo (rand()); ?>"></script>
   <script type="text/javascript" src="../lib/SweetAlert2_V10/dist/sweetalert2.min.js"></script>

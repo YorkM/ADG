@@ -3,9 +3,6 @@ let ArrayMulticashBanco = [];
 let ArrCli = [];
 let ArrDctos = [];
 let arrayLiquidador = [];
-
-// TODO: CONTINUAR AJUSTANDO EL CONTENIDO DE LA MODAL EMAIL ZONAS
-
 // DECLARACIÓN DE FUNCIONES GENERALES
 // FUNCIÓN MOSTRAR LOADING
 function LoadImg(texto = "Cargando...") {
@@ -67,7 +64,7 @@ const limpiarDatos = () => {
   $("#VlrSinAsignar").val(formatNum(0, '$'));
 
   $('#tdPlanillas tbody').html("");
-  $('#contenedorTablasLiquidador').html("");
+  $('#contenedorTablasLiquidador').html(`<p class="lead text-center">No hay documentos agregados al liquidador</p>`);
 }
 // FUNCIÓN AGREGAR DIAS FECHA BASE
 function agregarDias(fechaBase, diasAgregar) {
@@ -274,7 +271,7 @@ function crearTablasPorDias(datos) {
 
     count++;
 
-    const titulo = document.createElement("h5");
+    const titulo = document.createElement("h6");
     titulo.classList.add('text-center');
     titulo.classList.add('text-green');
     titulo.textContent = `LIQUIDACIÓN A ${dias} DÍAS`;
@@ -288,6 +285,7 @@ function crearTablasPorDias(datos) {
     tabla.classList.add('table-sm');
     tabla.classList.add('table-liquidador');
     tabla.style.width = "100%";
+    tabla.style.marginBottom = "5px";
 
     const cardContenedor = document.createElement('div');
     cardContenedor.classList.add('custom-card');
@@ -301,7 +299,7 @@ function crearTablasPorDias(datos) {
     btnContenedor.style.justifyContent = 'flex-end';
 
     const btnDescargarPDF = document.createElement('button');
-    btnDescargarPDF.textContent = "Descargar PDF";
+    btnDescargarPDF.innerHTML = 'Descargar PDF';
     btnDescargarPDF.classList.add('btn');
     btnDescargarPDF.classList.add('btn-primary');
     btnDescargarPDF.classList.add('custom-padding');
@@ -370,13 +368,13 @@ function crearTablasPorDias(datos) {
     tfoot.classList.add('table-info')
     const totales = `
       <tr>
-        <th colspan="5" class="size-th" style="text-align: center;">TOTALES</th>
-        <th class="size-th">${formatNum(totalImporte, "$")}</th>
-        <th class="size-th">${formatNum(totalBasePP, "$")}</th>
+        <th colspan="5" class="size-th-2" style="text-align: center;">TOTALES</th>
+        <th class="size-th-2">${formatNum(totalImporte, "$")}</th>
+        <th class="size-th-2">${formatNum(totalBasePP, "$")}</th>
         <th class="size-th"></th>
         <th class="size-th"></th>
-        <th class="size-th">${formatNum(totalDescuento, "$")}</th>
-        <th class="size-th">${formatNum(totalPagar, "$")}</th>
+        <th class="size-th-2">${formatNum(totalDescuento, "$")}</th>
+        <th class="size-th-2">${formatNum(totalPagar, "$")}</th>
         <th class="size-th"></th>
         <th class="size-th"></th>
       </tr>`;
@@ -469,7 +467,6 @@ const agregarLiquidador = (item) => {
 
   crearTablasPorDias(arrayLiquidador);
 }
-
 // FUNCIÓN PERMISOS DE ACCESOS DIRECTOS
 function obtenerPermisos(modulo) {
   return new Promise((resolve, reject) => {
@@ -500,31 +497,23 @@ function obtenerPermisos(modulo) {
 function actualizarElementoSegunPermisos(modulo, elementoId) {
   obtenerPermisos(modulo).then((tienePermisos) => {
     const $elemento = $(elementoId);
-    if (tienePermisos) {
-      $elemento.show();
-    } else {
-      $elemento.hide();
-    }
+    if (tienePermisos) $elemento.show();
+    else $elemento.hide();
   });
 }
 // FUNCIÓN PARA FILTRAR EL ARRAY DE CLIENTES
 function FiltrarCli(expr, ArrayCli, op) {
-  expresion = new RegExp(expr, "i");
+  const expresion = new RegExp(expr, "i");
+  let filtro = "";
   switch (parseInt(op)) {
     case 1:
       filtro = ArrayCli.filter(ArrayCli => expresion.test(ArrayCli.codigo_sap));
-      if (filtro.length == 0) {
-        filtro = ArrayCli.filter(ArrayCli => expresion.test(ArrayCli.nit));
-      }
-      if (filtro.length == 0) {
-        filtro = ArrayCli.filter(ArrayCli => expresion.test(ArrayCli.telefonos));
-      }
+      if (filtro.length == 0) filtro = ArrayCli.filter(ArrayCli => expresion.test(ArrayCli.nit));
+      if (filtro.length == 0) filtro = ArrayCli.filter(ArrayCli => expresion.test(ArrayCli.telefonos));
       break;
     case 2:
       filtro = ArrayCli.filter(ArrayCli => expresion.test(ArrayCli.nombres));
-      if (filtro.length == 0) {
-        filtro = ArrayCli.filter(ArrayCli => expresion.test(ArrayCli.razon_comercial));
-      }
+      if (filtro.length == 0) filtro = ArrayCli.filter(ArrayCli => expresion.test(ArrayCli.razon_comercial));
       break;
   }
   return filtro;
@@ -2166,25 +2155,24 @@ function ConsultarPlanilla() {
 }
 
 function AbrirRecibo(id, ob) {
-  //Encabezado
   var obj = $(ob).parent().parent().find("td");
-  $("#txt_id_rc").html(id);
-  $("#txt_num").html(obj.eq(5).html());
-  $("#txt_codigo").html(obj.eq(2).html());
-  $("#txt_cliente").html(obj.eq(3).html());
-  $("#txt_razon").html(obj.eq(4).html());
-  $("#txt_valor").html(obj.eq(6).html());
-  $("#txt_cabecera").html(obj.eq(10).html());
-  $("#txt_compesacion").html(obj.eq(11).html());
-  $("#txt_referencia").html(obj.eq(12).html());
+  $("#txt_id_rc").text(id);
+  $("#txt_num").text((obj.eq(6).text().trim() !== "") ? obj.eq(6).text() : "-");
+  $("#txt_codigo").text((obj.eq(3).text().trim() !== "") ? obj.eq(3).text() : "-");
+  $("#txt_cliente").text((obj.eq(4).text().trim() !== "") ? obj.eq(4).text() : "-");
+  $("#txt_razon").text((obj.eq(5).text().trim() !== "") ? obj.eq(5).text() : "-");
+  $("#txt_valor").text((obj.eq(7).text().trim() !== "") ? obj.eq(7).text() : "-");
+  $("#txt_cabecera").text((obj.eq(11).text().trim() !== "") ? obj.eq(11).text() : "-");
+  $("#txt_compesacion").text((obj.eq(12).text().trim() !== "") ? obj.eq(12).text() : "-");
+  $("#txt_referencia").text((obj.eq(13).text().trim() !== "") ? obj.eq(13).text() : "-");
 
-  $("#txt_mail").html(obj.eq(17).html());
-  $("#txt_mail_zona").html(obj.eq(18).html());
-  $("#txt_user_aprueba").html(obj.eq(19).html());
-  $("#txt_fh_aprueba").html(obj.eq(20).html());
-  var adj = obj.eq(14).html();
+  $("#txt_mail").text((obj.eq(18).text().trim() !== "") ? obj.eq(18).text() : "-");
+  $("#txt_mail_zona").text((obj.eq(19).text().trim() !== "") ? obj.eq(19).text() : "-");
+  $("#txt_user_aprueba").text((obj.eq(20).text().trim() !== "") ? obj.eq(20).text() : "-");
+  $("#txt_fh_aprueba").text((obj.eq(21).text().trim() !== "") ? obj.eq(21).text() : "-");
+  var adj = obj.eq(15).text();
   if (adj == 1) {
-    $("#tdDocPDF").html('<img src="../resources/icons/eye.png" align="absmiddle" onclick="VisualizarDocumento(\'' + $.trim(id) + '\',\'R\')">');
+    $("#tdDocPDF").html('<img src="../resources/icons/eye.png" style="cursor: pointer;" align="absmiddle" onclick="VisualizarDocumento(\'' + $.trim(id) + '\',\'R\')">');
   } else {
     $("#tdDocPDF").html('<input type="file" id="DocPDF" name="DocPDF" class="form-control" accept="application/pdf">');
     $("#DocPDF").change(function () {
@@ -2205,20 +2193,20 @@ function AbrirRecibo(id, ob) {
       id: id
     },
     success: function (data) {
-      var table = '<table class="form" width="100%">'
-        + '<thead>'
+      var table = '<table class="table table-bordered table-hover table-sm" width="100%">'
+        + '<thead class="table-info">'
         + '<tr>'
-        + '<th>ID</th>'
-        + '<th>IMPORTE</th>'
-        + '<th>DESCUENTO</th>'
-        + '<th>CUENTA</th>'
-        + '<th>FECHA VALOR</th>'
-        + '<th>DOCUMENTO</th>'
-        + '<th>DOC REF</th>'
-        + '<th>FAC REF</th>'
-        + '<th  style="display:none;">C. BENEFICIO</th>'
-        + '<th>TIPO</th>'
-        + '<th>TEXTO</th>'
+        + '<th class="size-th no-wrap">ID</th>'
+        + '<th class="size-th no-wrap">IMPORTE</th>'
+        + '<th class="size-th no-wrap">DESCUENTO</th>'
+        + '<th class="size-th no-wrap">CUENTA</th>'
+        + '<th class="size-th no-wrap">FECHA VALOR</th>'
+        + '<th class="size-th no-wrap">DOCUMENTO</th>'
+        + '<th class="size-th no-wrap">DOC REF</th>'
+        + '<th class="size-th no-wrap">FAC REF</th>'
+        + '<th style="display: none;">C. BENEFICIO</th>'
+        + '<th class="size-th no-wrap">TIPO</th>'
+        + '<th class="size-th no-wrap">TEXTO</th>'
         + '</tr>'
         + '</thead>'
         + '<tbody>';
@@ -2228,44 +2216,44 @@ function AbrirRecibo(id, ob) {
       for (var i = 0; i <= data.length - 1; i++) {
         var valor = 0;
         if (data[i].TIPO == 'C') {
-          valor = '<td style="color:#FF1519;">(' + formatNum(parseFloat(data[i].IMPORTE), '$') + ')</td>';
+          valor = '<td class="size-text vertical" style="color:#FF1519;">(' + formatNum(parseFloat(data[i].IMPORTE), '$') + ')</td>';
           vtotal += parseFloat(data[i].IMPORTE) * -1;
         } else {
           if ($.trim(data[i].TIPO_DOC) == 'DA' || $.trim(data[i].TIPO_VALOR) == 'N') {
-            valor = '<td style="color:#FF1519;">(' + formatNum(parseFloat(data[i].IMPORTE), '$') + ')</td>';
+            valor = '<td class="size-text vertical" style="color:#FF1519;">(' + formatNum(parseFloat(data[i].IMPORTE), '$') + ')</td>';
             vtotal += parseFloat(data[i].IMPORTE) * -1;
           } else {
-            valor = '<td>' + formatNum(data[i].IMPORTE, '$') + '</td>';
+            valor = '<td class="size-text vertical">' + formatNum(data[i].IMPORTE, '$') + '</td>';
             vtotal += parseFloat(data[i].IMPORTE);
           }
         }
         dtotal += parseFloat(data[i].DESCUENTO);
         table += '<tr>'
-          + '<td>' + data[i].ID_RC + '</td>' + valor
-          + '<td style="color:#FF1519;">(' + formatNum(data[i].DESCUENTO, '$') + ')</td>'
-          + '<td>' + data[i].CUENTA + '</td>'
-          + '<td>' + data[i].FECHA_VALOR + '</td>'
-          + '<td>' + data[i].DOCUMENTO + '</td>'
-          + '<td>' + data[i].REF_DOC + '</td>'
-          + '<td>' + data[i].REF_FACT + '</td>'
-          + '<td style="display:none;">' + data[i].CENTRO_BENEFICIO + '</td>'
-          + '<td>' + data[i].TIPO + '</td>'
-          + '<td>' + data[i].TEXTO + '</td>'
+          + '<td class="size-text vertical no-wrap">' + data[i].ID_RC + '</td>' + valor
+          + '<td class="size-text vertical no-wrap" style="color: #FF1519;">(' + formatNum(data[i].DESCUENTO, '$') + ')</td>'
+          + '<td class="size-text vertical no-wrap">' + data[i].CUENTA + '</td>'
+          + '<td class="size-text vertical no-wrap">' + data[i].FECHA_VALOR + '</td>'
+          + '<td class="size-text vertical no-wrap">' + data[i].DOCUMENTO + '</td>'
+          + '<td class="size-text vertical no-wrap">' + data[i].REF_DOC + '</td>'
+          + '<td class="size-text vertical no-wrap">' + data[i].REF_FACT + '</td>'
+          + '<td class="size-text vertical no-wrap" style="display: none;">' + data[i].CENTRO_BENEFICIO + '</td>'
+          + '<td class="size-text vertical no-wrap">' + data[i].TIPO + '</td>'
+          + '<td class="size-text vertical no-wrap">' + data[i].TEXTO + '</td>'
           + '</tr>';
       }
       diferencia = vtotal - dtotal;
       table += '<tr>'
-        + '<td><b>TOTALES</b></td>'
-        + '<td>' + formatNum(vtotal, '$') + '</td>'
-        + '<td>' + formatNum(dtotal, '$') + '</td>'
+        + '<td class="size-th"><b>TOTALES</b></td>'
+        + '<td class="size-text vertical">' + formatNum(vtotal, '$') + '</td>'
+        + '<td class="size-text vertical">' + formatNum(dtotal, '$') + '</td>'
         + '<td colspan="8"></td>'
         + '</tr>'
         +
 
         '<tr>'
-        + '<td><b>DIFERENCIA</b></td>'
-        + '<td>' + formatNum(diferencia, '$') + '</td>'
-        + '<td colspan="9"></td>'
+        + '<td class="size-th"><b>DIFERENCIA</b></td>'
+        + '<td class="size-text vertical" colspan="2">' + formatNum(diferencia, '$') + '</td>'
+        + '<td colspan="7"></td>'
         + '</tr>'
         + '</tbody>'
         + '</table>';
@@ -2276,7 +2264,7 @@ function AbrirRecibo(id, ob) {
   });
   //Abrir modal
   $("#ContainerPDF").html('');
-  $("#dvReciboCaja").modal();
+  $("#dvReciboCaja").modal("show");
 }
 
 
@@ -2445,32 +2433,32 @@ function ConsultarCondicionEspecial() {
     },
     success: function (data) {
       if (data.length > 0) {
-        var tabla = '<table class="form" width="100%" id="tableCondicionesEspeciales">'
-          + '<thead>'
+        var tabla = '<table class="table table-bordered table-hover table-sm" width="100%" id="tableCondicionesEspeciales">'
+          + '<thead class="table-info">'
           + '<tr>'
-          + '<th>ID</th>'
-          + '<th>CODIGO</th>'
-          + '<th>NOMBRES</th>'
-          + '<th>RAZON</th>'
-          + '<th>DIAS</th>'
-          + '<th>SUJETO.CUMPLI.</th>'
-          + '<th>DESCUENTO</th>'
-          + '<th>AUTORIZAR</th>'
+          + '<th class="size-th">ID</th>'
+          + '<th class="size-th">CODIGO</th>'
+          + '<th class="size-th">NOMBRES</th>'
+          + '<th class="size-th">RAZON</th>'
+          + '<th class="size-th">DIAS</th>'
+          + '<th class="size-th">SUJETO.CUMPLI.</th>'
+          + '<th class="size-th">DESCUENTO</th>'
+          + '<th class="size-th">AUTORIZAR</th>'
           + '</tr>'
           + '</thead>'
           + '<tbody>';
         for (var i = 0; i <= data.length - 1; i++) {
           tabla += '<tr>'
-            + '<td>' + data[i].id + '</td>'
-            + '<td>' + data[i].codigo_sap + '</td>'
-            + '<td>' + data[i].nombres + '</td>'
-            + '<td>' + data[i].razon_comercial + '</td>'
-            + '<td>' + data[i].dias + '</td>'
-            + '<td>' + data[i].sujeto_cump + '</td>'
-            + '<td>' + data[i].descuento + '</td>'
-            + '<td align="center">'
-            + '<button class="btn btn-sm btn-default" onclick="AutorizarCondicionEspecial(\'' + data[i].id + '\')">'
-            + '<span class="glyphicon glyphicon-check" aria-hidden="true" ></span>'
+            + '<td class="size-text vertical">' + data[i].id + '</td>'
+            + '<td class="size-text vertical">' + data[i].codigo_sap + '</td>'
+            + '<td class="size-td vertical">' + data[i].nombres + '</td>'
+            + '<td class="size-td vertical">' + data[i].razon_comercial + '</td>'
+            + '<td class="size-td vertical">' + data[i].dias + '</td>'
+            + '<td class="size-td vertical">' + data[i].sujeto_cump + '</td>'
+            + '<td class="size-td vertical">' + data[i].descuento + '</td>'
+            + '<td class="text-center">'
+            + '<button class="btn btn-sm btn-light btn-micro text-primary" onclick="AutorizarCondicionEspecial(\'' + data[i].id + '\')">'
+            + '<i class="fa-solid fa-square-check"></i>'
             + '</button>'
             + '</td>'
             + '</tr>';
