@@ -243,7 +243,8 @@ $sociedad = (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : "";
     }
 
     #ui-id-1,
-    #ui-id-2 {
+    #ui-id-2,
+    #ui-id-3 {
       font-size: 13px !important;
     }
 
@@ -1182,6 +1183,7 @@ $sociedad = (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : "";
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
   <script type="text/javascript" src="../lib/js/funciones.js?<?php echo (rand()); ?>"></script>
   <script type="text/javascript" src="../lib/js/servicios.js?<?php echo (rand()); ?>"></script>
   <script type="text/javascript" src="../lib/js/jquery.keyz.js?<?php echo (rand()); ?>"></script>

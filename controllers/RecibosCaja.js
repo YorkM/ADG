@@ -468,38 +468,21 @@ const agregarLiquidador = (item) => {
   crearTablasPorDias(arrayLiquidador);
 }
 // FUNCIÓN PERMISOS DE ACCESOS DIRECTOS
-function obtenerPermisos(modulo) {
-  return new Promise((resolve, reject) => {
-    $.ajax({
-      type: "POST",
-      url: "../models/Notas.php",
-      dataType: "json",
-      data: {
-        op: "S_PERMISOS",
-        rol: $("#RolId").val(),
-        modulo: modulo,
-      },
-      success: function (data) {
-        if (Array.isArray(data) && data.some((d) => d.chck === 'S')) {
-          resolve(true);
-        } else {
-          resolve(false);
-        }
-      },
-      error: function (xhr, textStatus, errorThrown) {
-        console.error("Error en la solicitud AJAX:", errorThrown);
-        reject(errorThrown);
-      },
-    });
-  });
+async function obtenerPermisos(modulo) {
+  const rol = $("#RolId").val();
+  try {
+    const data = await enviarPeticion({op: "S_PERMISOS", link: "../models/Notas.php", rol, modulo});
+    return (Array.isArray(data) && data.some((d) => d.chck === 'S'));
+  } catch (error) {
+    console.error(error);
+  }
 }
 // FUNCIÓN PARA ACTUALIZAR ELEMENTOS SEGÚN PERMISOS
-function actualizarElementoSegunPermisos(modulo, elementoId) {
-  obtenerPermisos(modulo).then((tienePermisos) => {
-    const $elemento = $(elementoId);
-    if (tienePermisos) $elemento.show();
-    else $elemento.hide();
-  });
+async function actualizarElementoSegunPermisos(modulo, elementoId) {
+  const tienePermisos = await obtenerPermisos(modulo);
+  const $elemento = $(elementoId);
+  if (tienePermisos) $elemento.show();
+  else $elemento.hide();
 }
 // FUNCIÓN PARA FILTRAR EL ARRAY DE CLIENTES
 function FiltrarCli(expr, ArrayCli, op) {
@@ -519,321 +502,215 @@ function FiltrarCli(expr, ArrayCli, op) {
   return filtro;
 }
 // FUNCIÓN PARA VALIDAR DOCUMENTO
-function ValidarDocumento(valor) {
-  $.ajax({
-    type: "POST",
-    encoding: "UTF-8",
-    url: "../models/RecibosCaja.php",
-    dataType: "json",
-    async: true,
-    beforeSend: function () {
-      LoadImg('Consultanto información...');
-    },
-    data: {
-      op: "B_DOCUMENTO_RC",
-      documento: valor
-    },
-    success: function (data) {
-      if (data.length > 0) {
-        Swal.fire('Oops', 'El documento esta comprometido en el recibo #' + data[0].ID_RC + ', tomado por el usuario ' + data[0].USUARIO, 'error');
-      } else {
-        Swal.fire('Excelente!', 'El documento se encuentra disponible', 'info');
-      }
+async function ValidarDocumento(valor) {
+  if (valor.substring(0, 3) === "000") {
+    Swal.fire("Oops!!!", "El valor ingresado no es válido", "error");
+    return;
+  }
 
+  try {
+    LoadImg("Consultanto información...");
+    const data = await enviarPeticion({ op: "B_DOCUMENTO_RC", link: "../models/RecibosCaja.php", documento: valor });
+    if (data.length) {
+      Swal.fire("Oops", `El documento esta comprometido en el recibo # ${data[0].ID_RC}, tomado por el usuario ${data[0].USUARIO}`, "error");
+    } else {
+      Swal.fire("Excelente!", "El documento se encuentra disponible", "info");
     }
-  }).done(function () {
+  } catch (error) {
+    console.error(error);
+  } finally {
     UnloadImg();
-  }).fail(function (data) {
-    console.error(data);
-  });
+  }
 }
 // FUNCIÓN PARA CARGAR LOS CLIENTES
-function LoadArrayCli() {
-  $.ajax({
-    type: "POST",
-    encoding: "UTF-8",
-    url: "../models/RecibosCaja.php",
-    dataType: "json",
-    async: true,
-    beforeSend: function () {
-      LoadImg('Cargando clientes...');
-    },
-    data: {
-      op: "B_CLIENTE_RC"
-    },
-    success: function (data) {
-      if (data.length > 0) {
-        for (var i = 0; i < data.length; i++) {
-          d = data[i];
-          det = {
-            'value': d.nombres + '|' + d.razon_comercial,
-            'nombres': d.nombres,
-            'razon_comercial': d.razon_comercial,
-            'codigo_sap': $.trim(d.codigo_sap),
-            'nit': $.trim(d.nit),
-            'email': d.email,
-            'telefonos': d.telefonos,
-            'cupo_credito': d.cupo_credito,
-            'direccion': d.direccion,
-            'ciudad': d.ciudad,
-            'bodega': d.bodega,
-            'bodega_desc': d.bodega_desc,
-            'lista': d.lista,
-            'condicion_pago': d.condicion_pago,
-            'vendedor': d.vendedor,
-            'televendedor': d.televendedor,
-            'institucional': d.institucional,
-            'email_zona': d.email_zona,
-            'grupo': d.grupo,
-            'desc_grupo': d.desc_grupo,
-            'zona_ventas': d.zona_ventas,
-            'zona_descripcion': d.zona_descripcion
-          } //det
-          ArrCli.push(det);
-        } //for   for(var i=0;i<data.length;i++){				
-
-      } //				
+async function LoadArrayCli() {
+  try {
+    LoadImg('Cargando clientes...');
+    const data = await enviarPeticion({op: "B_CLIENTE_RC", link: "../models/RecibosCaja.php"});
+    if (data.length) {
+      data.forEach(item => {
+        let obj = {
+            value: `${item.nombres} | ${item.razon_comercial}`,
+            nombres: item.nombres,
+            razon_comercial: item.razon_comercial,
+            codigo_sap: item.codigo_sap.trim(),
+            nit: item.nit.trim(),
+            email: item.email,
+            telefonos: item.telefonos,
+            cupo_credito: item.cupo_credito,
+            direccion: item.direccion,
+            ciudad: item.ciudad,
+            bodega: item.bodega,
+            bodega_desc: item.bodega_desc,
+            lista: item.lista,
+            condicion_pago: item.condicion_pago,
+            vendedor: item.vendedor,
+            televendedor: item.televendedor,
+            institucional: item.institucional,
+            email_zona: item.email_zona,
+            grupo: item.grupo,
+            desc_grupo: item.desc_grupo,
+            zona_ventas: item.zona_ventas,
+            zona_descripcion: item.zona_descripcion
+          }
+          ArrCli.push(obj);
+      });
     }
-  }).done(function () {
+  } catch (error) {
+    console.error(error);
+  } finally {
     UnloadImg();
-  }).fail(function (data) {
-    console.error(data);
-  });
+  }
 }
 // FUNCIÓN CONDICIONES DE DESCUENTOS
-function CondicionesDcto() {
-  $.ajax({
-    type: "POST",
-    url: "../models/RecibosCaja.php",
-    async: false,
-    dataType: "json",
-    beforeSend: function () {
+async function CondicionesDcto() {
+  const codigo = $("#CodigoSAP").val();
+  const sociedad = $("#Sociedad").val();
+  try {
+    const data = await enviarPeticion({op: "S_COND_DCTO", link: "../models/RecibosCaja.php", codigo, sociedad});
+    if (data.length) {
+      let tabla = `
+      <table class="table table-bordered table-hover table-sm" style="width: 100%;" id="tableCondicionesDcto">
+        <thead class="table-info">
+          <tr class="size-th">
+            <th class="size-th">CODIGO</th>
+            <th class="size-th">SOCIEDAD</th>
+            <th class="size-th">DIAS</th>
+            <th class="size-th">DESCUENTO</th>
+            <th class="size-th">TIPO</th>
+            <th class="size-th">SUJETO CUMPLIMIENTO</th>
+          </tr>
+        </thead>
+        <tbody>`;
 
-    },
-    data: {
-      op: "S_COND_DCTO",
-      codigo: $("#CodigoSAP").val(),
-      sociedad: $("#Sociedad").val()
-    },
-    success: function (data) {
-      var tabla = '<table class="table table-bordered table-hover table-sm" style="width: 100%;" id="tableCondicionesDcto">'
-        + '<thead class="table-info">'
-        + '<tr class="size-th">'
-        + '<th class="size-th">CODIGO</th>'
-        + '<th class="size-th">SOCIEDAD</th>'
-        + '<th class="size-th">DIAS</th>'
-        + '<th class="size-th">DESCUENTO</th>'
-        + '<th class="size-th">TIPO</th>'
-        + '<th class="size-th">SUJETO CUMPLIMIENTO</th>'
-        + '</tr>'
-        + '</thead>'
-        + '<tbody>';
-      for (var i = 0; i <= data.length - 1; i++) {
-        tabla += '<tr>'
-          + '<td class="size-text vertical">' + data[i].codigo_sap + '</td>'
-          + '<td class="size-text vertical">' + data[i].sociedad + '</td>'
-          + '<td class="size-text vertical">' + data[i].dias + '</td>'
-          + '<td class="size-text vertical">' + data[i].descuento + '</td>'
-          + '<td class="size-td vertical">' + data[i].tipo + '</td>'
-          + '<td class="size-td vertical">' + data[i].sujeto_cump + '</td>'
-          + '</tr>';
-        ArrDctos.push({
-          dias: data[i].dias,
-          descuento: data[i].descuento,
-          tipo: data[i].tipo
-        })
-      }
-      tabla += '</tbody></table>';
+      data.forEach(item => {
+        tabla += `
+        <tr>
+          <td class="size-text vertical">${item.codigo_sap}</td>
+          <td class="size-text vertical">${item.sociedad}</td>
+          <td class="size-text vertical">${item.dias}</td>
+          <td class="size-text vertical">${item.descuento}</td>
+          <td class="size-td vertical">${item.tipo}</td>
+          <td class="size-td vertical">${item.sujeto_cump}</td>
+        </tr>`;
+      });
 
+      ArrDctos.push({
+        dias: item.dias,
+        descuento: item.descuento,
+        tipo: item.tipo
+      });
+
+      tabla += `</tbody></table>`;
       $("#dvCondicionesDetalle").html(tabla);
-
     }
-  }).fail(function (data) {
-    console.error(data);
-  });
+  } catch (error) {
+    console.error(error);
+  } 
 }
 // FUNCIÓN PARA LISTAR LAS ZONAS EMAIL
-function ListarZonasEmail() {
-  $.ajax({
-    type: "POST",
-    url: "../models/RecibosCaja.php",
-    async: false,
-    dataType: "json",
-    error: function (OBJ, ERROR, JQERROR) { },
-    beforeSend: function () { },
-    data: {
-      op: "S_ZONAS_EMAIL"
-    },
-    success: function (data) {
-      //console.log(data);
-      var tabla = '<table class="table table-bordered table-hover table-sm" width="100%" id="tableZonaEmail">'
-        + '<thead class="table-info">'
-        + '<tr>'
-        + '<th class="size-th">ZONA</th>'
-        + '<th class="size-th">DESCRIPCION</th>'
-        + '<th class="size-th">EMAIL</th>'
-        + '<th class="size-th text-center">ELIMINAR</th>'
-        + '</tr>'
-        + '</thead>'
-        + '<tbody>';
-      for (var i = 0; i <= data.length - 1; i++) {
-        tabla += '<tr>'
-          + '<td class="size-text vertical">' + data[i].ZONA_VENTAS + '</td>'
-          + '<td class="size-td vertical">' + data[i].ZONA_DESCRIPCION + '</td>'
-          + '<td class="size-text vertical">' + data[i].EMAIL + '</td>'
-          + '<td class="text-center">'
-          + '<button class="btn btn-outline-danger btn-sm" onclick="DelZonaEmail(\'' + data[i].ZONA_VENTAS + '\')">'
-          + '<i class="fa-solid fa-trash-can"></i>'
-          + '</button>'
-          + '</td>'
-          + '</tr>';
-      }
-      tabla += '</tbody></table>';
+async function ListarZonasEmail() {
+  try {
+    const data = await enviarPeticion({op: "S_ZONAS_EMAIL", link: "../models/RecibosCaja.php"});
+    if (data.length) {
+      let tabla = `
+      <table class="table table-bordered table-hover table-sm" width="100%" id="tableZonaEmail">
+        <thead class="table-info">
+          <tr>
+            <th class="size-th">ZONA</th>
+            <th class="size-th">DESCRIPCIÓN</th>
+            <th class="size-th">EMAIL</th>
+            <th class="size-th text-center">ELIMINAR</th>
+          </tr>
+        </thead>
+        <tbody>`;
 
+      data.forEach(item => {
+        tabla += `
+        <tr>
+          <td class="size-text vertical">${item.ZONA_VENTAS}</td>
+          <td class="size-td vertical">${item.ZONA_DESCRIPCION}</td>
+          <td class="size-text vertical">${item.EMAIL}</td>
+          <td class="text-center">
+            <button class="btn btn-outline-danger btn-sm" onclick="DelZonaEmail('${item.ZONA_VENTAS}')">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </td>
+        </tr>`;
+      });
+
+      tabla += `</tbody></table>`;
       $("#dvResultZonasEmail").html(tabla);
     }
-  }).fail(function (data) {
-    console.error(data);
-  });
+  } catch (error) {
+    console.error(error);
+  }
 }
 // FUNCIÓN CONSULTAR ZONAS
-function ConsultarZonas() {
-  $.ajax({
-    type: "POST",
-    url: "../models/PW-SAP.php",
-    async: false,
-    dataType: "json",
-    beforeSend: function () { },
-    data: {
-      op: "S_ZONAS_VENTA",
-      sw: 1
-    },
-    success: function (data) {
-      var zonas = '';
-      for (var i = 0; i < data.length; i++) {
-        zonas += '<option value="' + data[i].zona + '">' + data[i].zona + ' - ' + data[i].descripcion + '</option>';
-      } //for	
+async function ConsultarZonas() {
+  try {
+    const data = await enviarPeticion({op: "S_ZONAS_VENTA", link: "../models/PW-SAP.php", sw: 1});
+    if (data.length) {
+      let zonas = "";
+      data.forEach(item => zonas += `<option value="${item.zona}">${item.zona} - ${item.descripcion}</option>`);
       $("#slcZonaEmail").html(zonas);
     }
-  }).fail(function (data) {
-    console.error(data);
-  });
+  } catch (error) {
+    console.log(error);
+  }
 }
 // FUNCIÓN PARA ELIMINAR UNA ZONA EMAIL
-function DelZonaEmail(zona) {
-  Swal.fire({
-    title: 'Eliminar email de zona',
-    text: "realmente desea eliminar la zona : " + zona + "'?",
-    type: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#82ED81",
-    cancelButtonColor: "#FFA3A4",
-    confirmButtonText: "SI",
-    cancelButtonText: "NO",
-    closeOnConfirm: false,
-    closeOnCancel: false
-  }).then((result) => {
-    if (result.value) {
-      $.ajax({
-        type: "POST",
-        encoding: "UTF-8",
-        url: "../models/RecibosCaja.php",
-        async: false,
-        dataType: "html",
-        error: function (OBJ, ERROR, JQERROR) { },
-        beforeSend: function () { },
-        data: {
-          op: "D_ZONA_EMAIL",
-          zona: zona
-        },
-        success: function (data) { //console.log(data);
-          Swal.fire('Excelente', 'Zona eliminada con éxito', 'success');
-          ListarZonasEmail();
-        }
-      }).fail(function (data) {
-        console.error(data);
-      });
+async function DelZonaEmail(zona) {
+  const result = await confirmAlert("Eliminar email de zona", `¿Realmente desea eliminar la zona: ${zona}?`);
+  if (result.isConfirmed) {
+    try {
+      await enviarPeticion({op: "D_ZONA_EMAIL", link: "../models/RecibosCaja.php", zona});
+      Swal.fire('Excelente', 'Zona eliminada con éxito', 'success');
+      ListarZonasEmail();
+    } catch (error) {
+      console.error(error);
     }
-  });
+  }
 }
 // FUNCIÓN PARA AGREGAR UNA ZONA EMAIL
-function AddZonaEmail() {
-  var email = $("#txtZonaEmail").val();
-  var zona = $("#slcZonaEmail").val();
-  var sw = 0;
-  if (email != '') {
-    $("#tableZonaEmail tr:gt(0)").each(function (index, element) {
-      var tdzona = $.trim($(this).find('td').eq(0).html());
-      if (zona == tdzona) {
-        sw = 1;
-      }
+async function AddZonaEmail() {
+  let email = $("#txtZonaEmail").val();
+  let zona = $("#slcZonaEmail").val();
+  let sw = 0;
+  
+  if (email !== "") {
+    $("#tableZonaEmail tr:gt(0)").each(function () {
+      let tdzona = $(this).find('td').eq(0).text().trim();
+      if (zona == tdzona) sw = 1;
     });
-    if (sw == 1) {
-      Swal.fire({
-        title: 'Actualización de zona',
-        text: "Esta zona ya tiene un correo asociado, desea actualizarlo?",
-        type: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#82ED81",
-        cancelButtonColor: "#FFA3A4",
-        confirmButtonText: "SI",
-        cancelButtonText: "NO",
-        closeOnConfirm: false,
-        closeOnCancel: false
-      }).then((result) => {
-        if (result.value) {
-          ////actualizacion
-          $.ajax({
-            type: "POST",
-            encoding: "UTF-8",
-            url: "../models/RecibosCaja.php",
-            async: false,
-            dataType: "html",
-            error: function (OBJ, ERROR, JQERROR) { },
-            beforeSend: function () { },
-            data: {
-              op: "U_ZONA_EMAIL",
-              email: email,
-              zona: zona
-            },
-            success: function (data) {
-              Swal.fire('Excelente', 'Zona actualizada con éxito', 'success');
-              ListarZonasEmail();
-            }
-          }).fail(function (data) {
-            console.error(data);
-          });
+
+    if (sw === 1) {
+      const result = await confirmAlert("Actualización de zona", "Ésta zona ya tiene un correo asociado... ¿Desea actualizarlo?");
+      if (result.isConfirmed) {
+        try {
+          await enviarPeticion({op: "U_ZONA_EMAIL", link: "../models/RecibosCaja.php", email, zona});
+          Swal.fire("Excelente", "Zona actualizada con éxito", "success");
+          ListarZonasEmail();          
+        } catch (error) {
+          console.error(error);
         }
-      });
+      }    
     } else {
-      $.ajax({
-        type: "POST",
-        encoding: "UTF-8",
-        url: "../models/RecibosCaja.php",
-        async: false,
-        dataType: "html",
-        error: function (OBJ, ERROR, JQERROR) { },
-        beforeSend: function () { },
-        data: {
-          op: "I_ZONA_EMAIL",
-          email: email,
-          zona: zona
-        },
-        success: function (data) {
-          Swal.fire('Excelente', 'Zona actualizada con éxito', 'success');
-          ListarZonasEmail();
-        }
-      }).fail(function (data) {
-        console.error(data);
-      });
+      try {
+        const data = await enviarPeticion({op: "I_ZONA_EMAIL", link: "../models/RecibosCaja.php", email, zona});
+        Swal.fire("Excelente", "Zona agregada con éxito", "success");
+        ListarZonasEmail();
+      } catch (error) {
+        console.error(error);
+      }
     }
   } else {
     Swal.fire('Error', 'Debe ingresar un mail válido', 'error');
   }
 }
 // FUNCIÓN PARA SUBIR CASH
-function SubirCash() {
-  $("#tdImportCash tr:gt(0)").each(function (index, element) {
+async function SubirCash() {
+  $("#tdImportCash tr:gt(0)").each(async function () {
     const objTD = $(this).find('td');
 
     const Cuenta = objTD.eq(0).text();
@@ -843,140 +720,104 @@ function SubirCash() {
     const FechaC = objTD.eq(4).text();
     const FechaV = objTD.eq(5).text();
     const Ref = objTD.eq(6).text();
-    
-    $.ajax({
-      type: "POST",
-      url: "../models/RecibosCaja.php",
-      global: false,
-      beforeSend: function () {
-        LoadImg('Subiendo multicash...');
-      },
-      data: {
+
+    try {
+      LoadImg("Subiendo multicash...");
+      const data = await enviarPeticion({
         op: 'G_MULTICASH',
-        Cuenta: Cuenta,
-        Numero: Numero,
-        Importe: Importe,
-        Texto: Texto,
-        FechaC: FechaC,
-        FechaV: FechaV,
-        Ref: Ref
-      },
-      dataType: "html",
-      async: false,
-      success: function (data) {
-        if (data == 0) {
-          Swal.fire('Carga Completa', 'La informacion ha sido subida.', 'success');
-        } else {
-          Swal.fire('Oops', 'Error al subir datos por favor verificar.', 'error');
-        }
-        $("#tr_det_cash").html('');
-        $("#filename").val('');
-        $("#dvSubirCash").modal('hide');
+        link: "../models/RecibosCaja.php",
+        Cuenta,
+        Numero,
+        Importe,
+        Texto,
+        FechaC,
+        FechaV,
+        Ref
+      });
+      
+      if (data == 0) {
+        Swal.fire("Carga Completa", "La información ha sido subida", "success");
+      } else {
+        Swal.fire("Oops", "Error al subir datos por favor verificar.", "error");
       }
-    }).always(function (data) {
-      //console.log(data);
+
+      $("#tr_det_cash").html("");
+      $("#filename").val("");
+      $("#dvSubirCash").modal("hide");
+    } catch (error) {
+      console.error(error);
+    } finally {
       UnloadImg();
-    })
-    .fail(function (data) {
-      console.error(data)
-    });
+    }  
   });
 }
 // FUNCIÓN PARA CONSULTAR EL MULTICASH
-function ConsultarMulticash() {
-  $.ajax({
-    type: "POST",
-    encoding: "UTF-8",
-    url: "../models/RecibosCaja.php",
-    global: false,
-    beforeSend: function () {
-      LoadImg('Consultando multicash...');
-    },
-    data: {
-      op: 'S_MULTICASH',
-      Estado: 0,
-      mes: $("#MultiMes").val(),
-      anio: $("#MultiAnio").val(),
-      dia: $("#MultiDay").val()
-    },
-    dataType: "json",
-    async: true,
-    success: function (data) {
-      var det = '';
-      if (data.length) {
-        ArrayMulticash = [];
-        for (var i = 0; i < data.length; i++) {
-          d = data[i];
-          det = {
-            'value': 'CUENTA :' + d.CUENTA + ' | ' + $.trim(d.DESCRIPCION) + ' | REF : ' + d.REFERENCIA + ' | VALOR :' + formatNum(d.VALOR, '$') + ' | FECHA : ' + d.FECHA_VALOR,
-            'cuenta': d.CUENTA,
-            'descripcion': $.trim(d.DESCRIPCION),
-            'numero': d.NUMERO,
-            'valor': d.VALOR,
-            'texto': d.TEXTO,
-            'fecha_cont': d.FECHA_CONTABILIZACION,
-            'fecha_val': d.FECHA_VALOR,
-            'estado': d.ESTADO,
-            'referencia': d.REFERENCIA,
-            'id': d.ID,
-            'id_rc': d.ID_RC,
-            'item_busqueda': d.CUENTA + '' + $.trim(d.DESCRIPCION) + '' + d.NUMERO + ' ' + d.VALOR + '' + d.TEXTO + ' ' + d.FECHA_CONTABILIZACION + '' + d.FECHA_VALOR + ' ' + d.ESTADO + '' + d.REFERENCIA
-          } //det={
-          ArrayMulticash.push(det);
-        } //for
-      }
+async function ConsultarMulticash() {
+  const mes = $("#MultiMes").val();
+  const anio = $("#MultiAnio").val();
+  const dia = $("#MultiDay").val();
+  try {
+    LoadImg("Consultando multicash...");
+    const data = await enviarPeticion({op: 'S_MULTICASH', link: "../models/RecibosCaja.php", Estado: 0, mes, anio, dia});
+    if (data.length) {
+      ArrayMulticash = [];
+      data.forEach(item => {
+        let value = `CUENTA: ${item.CUENTA} | ${item.DESCRIPCION.trim()} | REF: ${item.REFERENCIA} | VALOR: ${formatNum(item.VALOR, '$')} | FECHA: ${item.FECHA_VALOR}`;
+        let item_busqueda = `${item.CUENTA} ${item.DESCRIPCION.trim()} ${item.NUMERO} ${item.VALOR} ${item.TEXTO} ${item.FECHA_CONTABILIZACION} ${item.FECHA_VALOR} ${item.ESTADO} ${item.REFERENCIA}`;
+        let obj = {
+          value,
+          cuenta: item.CUENTA,
+          descripcion: item.DESCRIPCION.trim(),
+          numero: item.NUMERO,
+          valor: item.VALOR,
+          texto: item.TEXTO,
+          fecha_cont: item.FECHA_CONTABILIZACION,
+          fecha_val: item.FECHA_VALOR,
+          estado: item.ESTADO,
+          referencia: item.REFERENCIA,
+          id: item.ID,
+          id_rc: item.ID_RC,
+          item_busqueda
+        }
+        ArrayMulticash.push(obj);
+      });
     }
-  }).always(function (data) {
-    //console.log(data);
+  } catch (error) {
+    console.error(error);
+  } finally {
     UnloadImg();
-  })
-    .fail(function (data) {
-      console.error(data)
-    });
+  }
 }
 // FUNCIÓN CONSULTAR MULTICASH BANCO
-function ConsultarMulticashBanco() {
-  $.ajax({
-    type: "POST",
-    encoding: "UTF-8",
-    url: "../models/RecibosCaja.php",
-    global: false,
-    beforeSend: function () {
-      LoadImg('Consultando multicash...');
-    },
-    data: {
-      op: 'S_MULTICASH',
-      Estado: 0,
-      mes: $("#MultiMes2").val(),
-      anio: $("#MultiAnio2").val(),
-      dia: $("#MultiDay2").val()
-    },
-    dataType: "json",
-    async: true,
-    success: function (data) {
-      var det = '';
+async function ConsultarMulticashBanco() {
+  const mes = $("#MultiMes2").val();
+  const anio = $("#MultiAnio2").val();
+  const dia = $("#MultiDay2").val();
+  try {
+    LoadImg('Consultando multicash...');
+    const data = await enviarPeticion({ op: 'S_MULTICASH', link: "../models/RecibosCaja.php", Estado: 0, mes, anio, dia });
+    if (data.length) {
       ArrayMulticashBanco = [];
-      if (data.length > 0) {
-        for (var i = 0; i < data.length; i++) {
-          d = data[i];
-          det = {
-            'value': `CUENTA : ${d.CUENTA} | ${$.trim(d.DESCRIPCION)} | REF : ${d.REFERENCIA} | VALOR : ${formatNum(d.VALOR, '$')} | FECHA : ${d.FECHA_VALOR}`,
-            'cuenta': d.CUENTA,
-            'descripcion': $.trim(d.DESCRIPCION),
-            'numero': d.NUMERO,
-            'valor': d.VALOR,
-            'texto': d.TEXTO,
-            'fecha_cont': d.FECHA_CONTABILIZACION,
-            'fecha_val': d.FECHA_VALOR,
-            'estado': d.ESTADO,
-            'referencia': d.REFERENCIA,
-            'id': d.ID,
-            'id_rc': d.ID_RC,
-            'item_busqueda': d.CUENTA + '' + $.trim(d.DESCRIPCION) + '' + d.NUMERO + ' ' + d.VALOR + '' + d.TEXTO + ' ' + d.FECHA_CONTABILIZACION + '' + d.FECHA_VALOR + ' ' + d.ESTADO + '' + d.REFERENCIA
-          } //det={
-          ArrayMulticashBanco.push(det);
-        } //for
-      }
+      data.forEach(item => {
+        let value = `CUENTA: ${item.CUENTA} | ${item.DESCRIPCION.trim()} | REF: ${item.REFERENCIA} | VALOR: ${formatNum(item.VALOR, '$')} | FECHA: ${item.FECHA_VALOR}`;
+        let item_busqueda = `${item.CUENTA} ${item.DESCRIPCION.trim()} ${item.NUMERO} ${item.VALOR} ${item.TEXTO} ${item.FECHA_CONTABILIZACION} ${item.FECHA_VALOR} ${item.ESTADO} ${item.REFERENCIA}`;
+        let obj = {
+          value,
+          cuenta: item.CUENTA,
+          descripcion: $.trim(item.DESCRIPCION),
+          numero: item.NUMERO,
+          valor: item.VALOR,
+          texto: item.TEXTO,
+          fecha_cont: item.FECHA_CONTABILIZACION,
+          fecha_val: item.FECHA_VALOR,
+          estado: item.ESTADO,
+          referencia: item.REFERENCIA,
+          id: item.ID,
+          id_rc: item.ID_RC,
+          item_busqueda
+        }
+        ArrayMulticashBanco.push(obj);
+      });
 
       const resultado = ArrayMulticashBanco.map(mc => {
         const cliente = ArrCli.find(c => c.nit.trim() === mc.referencia.trim());
@@ -1051,12 +892,11 @@ function ConsultarMulticashBanco() {
         });
       } else $('#tdPlanillas2 tbody').html(`<td class="text-center lead" colspan="14">Multicash no disponible</td>`);
     }
-  }).always(function (data) {
+  } catch (error) {
+    console.error(error);
+  } finally {
     UnloadImg();
-  })
-    .fail(function (data) {
-      console.error(data)
-    });
+  }
 }
 // FUNCIÓN FILTRAR ARRAY
 function FiltrarArray(expr, ArrayMulticash) {
@@ -1302,68 +1142,54 @@ function AddAbono() {
     Swal.fire("Oops!!!", "El valor excede el limite permitido", "error");
   }
 }
-
+// FUNCIÓN QUITAR ABONO CASH
 function QuitarAbonoCash(ob) {
-  var total = unformatNum($("#VlrTotalAbono").val());
-  var valor = unformatNum($(ob).parent().find('td').eq(2).html());
-  var id = $(ob).parent().attr('id');
-  //Lo quita de la tabla de abonos
+  let total = unformatNum($("#VlrTotalAbono").val());
+  let valor = unformatNum($(ob).parent().find('td').eq(2).html());
+  let id = $(ob).parent().attr('id');
+  
   $("#VlrTotalAbono").val(formatNum(parseFloat(total - parseFloat(valor)), '$'));
-  var vasignado = parseFloat(unformatNum($("#VlrTotalAbono").val())) - parseFloat(unformatNum($("#VlrTotalFacturas").val()));
+  const vasignado = parseFloat(unformatNum($("#VlrTotalAbono").val())) - parseFloat(unformatNum($("#VlrTotalFacturas").val()));
   $("#VlrSinAsignar").val(formatNum(vasignado, '$'));
   $(ob).parent().remove();
-  //Lo desmarca del multicash
-  $("#tdPlanillas tr").each(function (index, element) {
-    //console.log($.trim($(this).find('td').eq(9).html()) +'=='+ id);		
+  
+  $("#tdPlanillas tr").each(function () {
     if ($.trim($(this).find('td').eq(9).html()) == id) {
-      $(this).css('background', '#fafafa');
+      $(this).css('background-color', '#fafafa');
       $(this).find('td').eq(7).html(0);
     }
   });
 }
-
+// FUNCIÓN QUITAR ABONO
 function QuitarAbono(ob) {
-  var total = unformatNum($("#VlrTotalAbono").val());
-  var valor = unformatNum($(ob).parent().find('td').eq(2).html());
+  let total = unformatNum($("#VlrTotalAbono").val());
+  let valor = unformatNum($(ob).parent().find('td').eq(2).html());
   $("#VlrTotalAbono").val(formatNum(parseFloat(total - parseFloat(valor)), '$'));
-  var vasignado = parseFloat(unformatNum($("#VlrTotalAbono").val())) - parseFloat(unformatNum($("#VlrTotalFacturas").val()));
+  const vasignado = parseFloat(unformatNum($("#VlrTotalAbono").val())) - parseFloat(unformatNum($("#VlrTotalFacturas").val()));
   $("#VlrSinAsignar").val(formatNum(vasignado, '$'));
   $(ob).parent().remove();
 }
-
+// FUNCIÓN NOTIFICACIÓN DESCUENTO
 function NofificacionDescuento(pcjDesc) {
-  $.notify({ // options
-    icon: 'glyphicon glyphicon-warning-sign',
-    title: '<strong>DESCUENTOS</strong></br>',
-    message: 'Descuento de este documento ' + pcjDesc + '%'
-  }, { // settings	
-    delay: 7000,
-    type: 'success',
-    animate: {
-      enter: 'animated fadeInDown',
-      exit: 'animated fadeOutUp'
-    },
-  });
+  showToastr("success", `Descuento de este documento ${pcjDesc}%`, "<strong>DESCUENTOS</strong>");  
 }
-
+// FUNCIÓN AGREGAR FACTURA
 function AddFactura(ob, valor, cumple_pres) {
-  var NumDoc = $.trim($(ob).parent().parent().find('td').eq(0).html());
-  var total = unformatNum($("#VlrTotalFacturas").val());
-  var tipoDoc = $.trim($(ob).parent().parent().find('td').eq(2).html());
-  var fechaCrea = $.trim($(ob).parent().parent().find('td').eq(4).html());
-  var fechaDoc = $.trim($(ob).parent().parent().find('td').eq(5).html());
-  var vlrDoc = unformatNum($(ob).parent().parent().find('td').eq(9).html());
-  var numAbonos = 0;
-  var vlrAbonos = 0;
-  var fechaAbono = '';
-  var recibeDescuento = 0;
-  var vtotalFact = parseFloat(unformatNum($("#VlrTotalFacturas").val())) + parseFloat(unformatNum(valor));
+  const objTD = $(ob).closest('tr').find('td');
 
+  let NumDoc = objTD.eq(0).text().trim();
+  let fechaCrea = objTD.eq(4).text().trim();
+  let fechaDoc = objTD.eq(5).text().trim();
+  let vlrDoc = unformatNum(objTD.eq(9).text());
+  let numAbonos = 0;
+  let vlrAbonos = 0;
+  let fechaAbono = '';
+  let recibeDescuento = 0;
 
-  $("#tdBody tr").each(function (index, element) {
-    numAbonos++;
-    vlrAbonos = vlrAbonos + parseFloat(unformatNum($.trim($(this).find('td').eq(2).html())));
-    var fecha = $.trim($(this).find('td').eq(3).html());
+  $("#tdBody tr").each(function () {
+    numAbonos ++;
+    vlrAbonos = vlrAbonos + parseFloat(unformatNum($(this).find('td').eq(2).text().trim()));
+    let fecha = $(this).find('td').eq(3).text().trim();
 
     fecha = fecha.split("-");
     fecha = new Date(parseInt(fecha[0]), parseInt(fecha[1] - 1), parseInt(fecha[2]));
@@ -1378,7 +1204,7 @@ function AddFactura(ob, valor, cumple_pres) {
   });
 
   if (numAbonos > 0) {
-    /*nuevo codigo para condiciones de descuentos especiales*/
+    // CÓDIGO PARA CONDICIONES DE DESCUENTOS ESPECIALES
     fechaDoc = fechaDoc.split("-");
     fechaDoc = new Date(parseInt(fechaDoc[0]), parseInt(fechaDoc[1] - 1), parseInt(fechaDoc[2]));
 
@@ -1388,17 +1214,19 @@ function AddFactura(ob, valor, cumple_pres) {
     dias = fechaAbono.getTime() - fechaCrea.getTime();
     dias = (dias / (1000 * 60 * 60 * 24));
 
-    var pcjDesc = 0;
-    /* PARAMETROS DE CONDICIONES DE DESCUENTOS ADICIONALES  */
-    /*   1.CLIENTE TIPO DROGUERIA GRUPO 100                 */
-    /*   2.CUMPLIMIENTO DE PRESUPUESTO DE VENTA EN MES FAC  */
-    /*   3.DESCUENTO HABILITADO EN PLATAFORMA CON TIPO S    */
-    /*   4.SI EL CHECK ESTA ACTIVADO NO SE CALCULA DCTO     */
+    let pcjDesc = 0;
+
+    // PARAMETROS DE CONDICIONES DE DESCUENTOS ADICIONALES
+    // 1. CLIENTE TIPO DROGUERIA GRUPO 100
+    // 2. CUMPLIMIENTO DE PRESUPUESTO DE VENTA EN MES FAC
+    // 3. DESCUENTO HABILITADO EN PLATAFORMA CON TIPO S
+    // 4. SI EL CHECK ESTA ACTIVADO NO SE CALCULA DCTO
+
     if (!$("#ActivaDcto").is(':checked')) {
-      //Condiciones sujetas a cumplimiento de ventas
+      // CONDICIONES SUJETAS A CUMPLIMIENTO DE VENTAS
       $("#tableCondicionesLista tr:gt(0)").each(function () {
-        var diasDcto = $(this).find('td').eq(1).html();
-        if ($.trim($("#Grupo").val()) == '100' && cumple_pres == 'S') {
+        let diasDcto = $(this).find('td').eq(1).text();
+        if ($("#Grupo").val().trim() == '100' && cumple_pres == 'S') {
           if (parseInt(dias) <= parseInt(diasDcto)) {
             pcjDesc = parseInt($(this).find('td').eq(2).html());
             recibeDescuento = 1;
@@ -1407,14 +1235,13 @@ function AddFactura(ob, valor, cumple_pres) {
           }
         }
       });
-
-      //Condiciones especiales sujetas a plazo
+      // CONDICIONES ESPECIALES SUJETAS A PLAZO
       if (pcjDesc == 0) {
         $("#tableCondicionesListaPlazo tr:gt(0)").each(function () {
-          var diasDcto = $(this).find('td').eq(1).html();
-          if ($.trim($("#Grupo").val()) == '100') {
+          let diasDcto = $(this).find('td').eq(1).text();
+          if ($("#Grupo").val().trim() == '100') {
             if (parseInt(dias) <= parseInt(diasDcto)) {
-              pcjDesc = parseInt($(this).find('td').eq(2).html());
+              pcjDesc = parseInt($(this).find('td').eq(2).text());
               recibeDescuento = 1;
               NofificacionDescuento(pcjDesc);
               return false;
@@ -1422,17 +1249,16 @@ function AddFactura(ob, valor, cumple_pres) {
           }
         });
       }
-
-      //Condiciones propias del cliente 
+      // CONDICIONES PROPIAS DEL CLIENTE
       if (pcjDesc == 0) {
         $("#tableCondicionesDcto tr:gt(0)").each(function () {
-          var diasDcto = $(this).find('td').eq(2).html();
-          var SujPres = $(this).find('td').eq(5).html(); //Sujeto a cumplimiento de presupuesto
+          let diasDcto = $(this).find('td').eq(2).text();
+          let SujPres = $(this).find('td').eq(5).text(); // Sujeto a cumplimiento de presupuesto
           if (SujPres == 'S') {
-            if ($.trim($("#Grupo").val()) == '100' && cumple_pres == 'S') {
+            if ($("#Grupo").val().trim() == '100' && cumple_pres == 'S') {
               if (parseInt(dias) <= parseInt(diasDcto)) {
-                if (pcjDesc < parseInt($(this).find('td').eq(3).html())) {
-                  pcjDesc = parseInt($(this).find('td').eq(3).html());
+                if (pcjDesc < parseInt($(this).find('td').eq(3).text())) {
+                  pcjDesc = parseInt($(this).find('td').eq(3).text());
                   recibeDescuento = 1;
                   NofificacionDescuento(pcjDesc);
                   return false;
@@ -1441,84 +1267,67 @@ function AddFactura(ob, valor, cumple_pres) {
             }
           } else {
             if (parseInt(dias) <= parseInt(diasDcto)) {
-              if (pcjDesc < parseInt($(this).find('td').eq(3).html())) {
-                pcjDesc = $(this).find('td').eq(3).html();
+              if (pcjDesc < parseInt($(this).find('td').eq(3).text())) {
+                pcjDesc = $(this).find('td').eq(3).text();
                 recibeDescuento = 1;
                 NofificacionDescuento(pcjDesc);
                 return false;
               }
             }
           }
-
         });
       }
     } else {
       console.warn('No se calcula descuento por estar desactivado');
     }
 
-    /*nuevo codigo para condiciones de descuentos especiales*/
-    if (parseInt(vlrDoc) < 0) {
-      vlrDoc = vlrDoc * -1;
-    }
+    // AJUSTES MAS RECIENTES PARA CONDICIONES DE DESCUENTOS ESPECIALES
+    if (parseInt(vlrDoc) < 0) vlrDoc = vlrDoc * -1;
 
     if (valor == '') {
       valor = 0;
       $(ob).val(0);
     }
 
-    var valor = parseInt(unformatNum(valor));
+    valor = parseInt(unformatNum(valor));
     if (vlrDoc >= valor || valor == 0 || valor == '') {
-      var vtotal = 0;
-      $("#tdFacturas tbody tr").each(function (index, element) {
-        var IdDoc = parseInt(unformatNum($(this).find('td').eq(0).html()));
-        var vlrFila = parseInt(unformatNum($(this).find('td').eq(11).find('input').val()));
-        var vlrFact = parseInt(unformatNum($(this).find('td').eq(9).html()));
-        var TipoDoc = $.trim($(this).find('td').eq(2).html());
-        //INICIO 
+      let vtotal = 0;
+      $("#tdFacturas tbody tr").each(function () {
+        let IdDoc = parseInt(unformatNum($(this).find('td').eq(0).text()));
+        let vlrFila = parseInt(unformatNum($(this).find('td').eq(11).find('input').val()));
+        let vlrFact = parseInt(unformatNum($(this).find('td').eq(9).text()));
+        let TipoDoc = $(this).find('td').eq(2).text().trim();
+
         if (IdDoc == NumDoc) {
           if ((vlrFact == vlrFila) && (TipoDoc == 'RV' || TipoDoc == 'DZ' || TipoDoc == 'AB')) {
             $(this).find('td').eq(12).find('input').attr('disabled', false);
-            //NUEVO CODIGO
             if (recibeDescuento == 1) {
-              var demora = $.trim($(this).find('td').eq(7).html());
-              var basePP = unformatNum($.trim($(this).find('td').eq(13).html()));
-              var vlrDesc = 0;
-              if (basePP > 0) {
-                vlrDesc = Math.round(parseFloat(basePP) * (parseFloat(pcjDesc) / 100));
-              }
+              let basePP = unformatNum($(this).find('td').eq(13).text().trim());
+              let vlrDesc = 0;
+              if (basePP > 0) vlrDesc = Math.round(parseFloat(basePP) * (parseFloat(pcjDesc) / 100));
               $(this).find('td').eq(12).find('input').val(formatNum(vlrDesc, '$'));
-
             } else {
               $(this).find('td').eq(12).find('input').attr('disabled', true);
               $(this).find('td').eq(12).find('input').val('$0');
             }
-            //FIN NUEVO CODIGO
           } else {
             $(this).find('td').eq(12).find('input').attr('disabled', true);
             $(this).find('td').eq(12).find('input').val('$0');
           }
         }
-        //FIN
-        if (vlrFila > 0) {
-          $(this).css('background', '#8BF4C4');
-        } else {
-          $(this).css('background', '');
-        }
-        var vlrDesc = parseInt(unformatNum($(this).find('td').eq(12).find('input').val()));
-        //alert(vlrFact);
-        if (vlrFact < 0) {
-          vlrFila = (vlrFila - vlrDesc) * -1;
-        } else {
-          vlrFila = (vlrFila - vlrDesc);
-        }
+
+        if (vlrFila > 0) $(this).css('background-color', '#8BF4C4');
+        else $(this).css('background-color', '');
+
+        let vlrDesc = parseInt(unformatNum($(this).find('td').eq(12).find('input').val()));
+        if (vlrFact < 0) vlrFila = (vlrFila - vlrDesc) * -1;
+        else vlrFila = (vlrFila - vlrDesc);
         vtotal = vtotal + parseFloat(vlrFila);
-
       });
-      $("#VlrTotalFacturas").val(formatNum(vtotal, '$'));
-      //Actualiza
-      var vasignado = parseFloat(unformatNum($("#VlrTotalAbono").val())) - parseFloat(unformatNum($("#VlrTotalFacturas").val()));
-      $("#VlrSinAsignar").val(formatNum(vasignado, '$'));
 
+      $("#VlrTotalFacturas").val(formatNum(vtotal, '$'));
+      const vasignado = parseFloat(unformatNum($("#VlrTotalAbono").val())) - parseFloat(unformatNum($("#VlrTotalFacturas").val()));
+      $("#VlrSinAsignar").val(formatNum(vasignado, '$'));
     } else {
       $(ob).val('$0');
       $(ob).focus();
@@ -1528,92 +1337,79 @@ function AddFactura(ob, valor, cumple_pres) {
     Swal.fire('Error', 'Primero se debe agregar un abono desde la pestaña de multicash.', 'error');
     $(ob).val('$0');
   }
-
 }
 // FUNCIÓN PARA OBTENER LOS DOCUMENTOS
-function Documentos() {
-  $.ajax({
-    type: "POST",
-    encoding: "UTF-8",
-    url: "../models/CRM.php",
-    global: false,
-    beforeSend: function () {
-      LoadImg('Cargando documentos...');
-    },
-    data: {
-      op: 'B_CARTERA_RC',
-      codigo: $.trim($("#CodigoSAP").val()),
-      org: $.trim($("#Sociedad").val()),
-      tipo: 'S'
-    },
-    dataType: "json",
-    async: true,
-    success: function (data) {
-      if (data !== '' && data !== null) {
-        let detalle = '';
-        let total = 0;
-        let mora = '';
-        let ver = '';
-        let cont = 0;
-        let vlrMora = 0;
-        for (let i = 0; i <= data.length - 1; i++) {
-          if (parseInt(data[i].DEMORA_GRACIA) > 0) {
-            mora = 'style="background-color:#F77577"';
-            vlrMora = vlrMora + parseFloat(data[i].IMPORTE);
-          } else {
-            mora = 'style="background-color:#75F7A8"';
-          }
-          if ($.trim(data[i].CLASE_DOCUMENTO) == 'RV') {
-            ver = `<img src="../resources/icons/eye.png" style="width: 20px; cursor: pointer;" onclick="VisualizarDocumento('${data[i].REFERENCIA.trim()}', 'F')">`;
-          } else {
-            ver = '';
-          }
+async function Documentos() {
+  const codigo = $("#CodigoSAP").val().trim();
+  const org = $("#Sociedad").val();
+  try {
+    LoadImg('Cargando documentos...');
+    const data = await enviarPeticion({op: 'B_CARTERA_RC', link: "../models/CRM.php", codigo, org, tipo: 'S'});
+    if (data.length) {
+      let detalle = '';
+      let total = 0;
+      let mora = '';
+      let ver = '';
+      let cont = 0;
+      let vlrMora = 0;
 
-          let cumple_img = '';
-          let cumple_pres = 'N';
-          if (parseFloat(data[i].CUMP_PRESUPUESTO) > 0) {
-            cumple_img = `<i class="fa-solid fa-flag text-success"></i>`;
-            cumple_pres = 'S';
-          }
-          detalle +=
-            `<tr>
-              <td class="no-wrap size-text vertical">${data[i].NUMERO_DOCUMENTO.trim()}</td>
-              <td class="no-wrap size-td vertical">${data[i].REFERENCIA.trim()}</td>
-              <td class="no-wrap size-td vertical">${data[i].CLASE_DOCUMENTO}</td>
-              <td class="no-wrap size-text vertical">${ver}</td>
-              <td class="no-wrap size-text vertical">${data[i].FECHA_BASE}</td>
-              <td class="no-wrap size-text vertical">${data[i].FECHA_PAGO_GRACIA}</td>
-              <td class="no-wrap size-text vertical">${data[i].CONDICION_PAGO}</td>
-              <td class="no-wrap size-text vertical" ${mora}>${data[i].DEMORA_GRACIA}</td>
-              <td class="no-wrap size-text vertical">${data[i].DIAS}</td>
-              <td class="no-wrap size-text vertical">${formatNum(data[i].IMPORTE, '$')}</td>
-              <td class="no-wrap size-td vertical">${data[i].TEXTO.trim()}</td>
-              <td>
-                <input type="text" onKeyPress="return vnumeros(event)" onDblClick="AsignarValor(this);" size="15" class="form-control ClassNumero shadow-sm" onBlur="AddFactura(this, this.value, '${cumple_pres}')" value="$0">
-              </td>
-              <td>
-                <input type="text" onKeyPress="return vnumeros(event)"  size="15" class="form-control ClassNumero shadow-sm" onBlur="AddFactura(this, this.value,  '${cumple_pres}')" disabled value="$0">
-              </td>
-              <td class="size-text vertical">${formatNum(parseFloat(data[i].BASE_PP), '$')}</td>
-              <td style="display:none;">${data[i].DESCUENTO}</td>
-              <td class="size-text vertical">${data[i].REFERENCIA_FACTURA}</td>
-              <td class="text-center vertical">${cumple_img}</td>
-              <td class="text-center">
-                <button class="btn btn-primary btn-sm agregar-liquidacion" data-item='${JSON.stringify(data[i])}'>
-                  <i class="fa-solid fa-plus"></i>
-                </button>
-              </td>
-            </tr>`;
-          total += parseFloat(data[i].IMPORTE);
-          cont++;
+      data.forEach(item => {
+        if (parseInt(item.DEMORA_GRACIA) > 0) {
+          mora = 'style="background-color: #F77577;"';
+          vlrMora = vlrMora + parseFloat(item.IMPORTE);
+        } else {
+          mora = 'style="background-color: #75F7A8;"';
         }
 
-        $('#valorTotal').text(formatNum(total, '$'));
-        $('#partidas').text(cont);
-        $('#valorMora').text(formatNum(vlrMora, '$'));
+        if ($.trim(item.CLASE_DOCUMENTO) == 'RV') {
+          ver = `<img src="../resources/icons/eye.png" style="width: 20px; cursor: pointer;" onclick="VisualizarDocumento('${item.REFERENCIA.trim()}', 'F')">`;
+        } else {
+          ver = '';
+        }
 
-        let tabla =
-        `<table class="table table-bordered table-hover table-sm" style="width: 100%;" id="tdFacturas">
+        let cumple_img = '';
+        let cumple_pres = 'N';
+        if (parseFloat(item.CUMP_PRESUPUESTO) > 0) {
+          cumple_img = `<i class="fa-solid fa-flag text-success"></i>`;
+          cumple_pres = 'S';
+        }
+
+        detalle +=`
+        <tr>
+          <td class="no-wrap size-text vertical">${item.NUMERO_DOCUMENTO.trim()}</td>
+          <td class="no-wrap size-td vertical">${item.REFERENCIA.trim()}</td>
+          <td class="no-wrap size-td vertical">${item.CLASE_DOCUMENTO}</td>
+          <td class="no-wrap size-text vertical">${ver}</td>
+          <td class="no-wrap size-text vertical">${item.FECHA_BASE}</td>
+          <td class="no-wrap size-text vertical">${item.FECHA_PAGO_GRACIA}</td>
+          <td class="no-wrap size-text vertical">${item.CONDICION_PAGO}</td>
+          <td class="no-wrap size-text vertical" ${mora}>${item.DEMORA_GRACIA}</td>
+          <td class="no-wrap size-text vertical">${item.DIAS}</td>
+          <td class="no-wrap size-text vertical">${formatNum(item.IMPORTE, '$')}</td>
+          <td class="no-wrap size-td vertical" title="${item.TEXTO.trim()}">${cortarTexto(item.TEXTO.trim(), 10)}</td>
+          <td><input type="text" onKeyPress="return vnumeros(event)" onDblClick="AsignarValor(this);" size="15" class="form-control ClassNumero shadow-sm" onBlur="AddFactura(this, this.value, '${cumple_pres}')" value="$0"></td>
+          <td><input type="text" onKeyPress="return vnumeros(event)"  size="15" class="form-control ClassNumero shadow-sm" onBlur="AddFactura(this, this.value,  '${cumple_pres}')" disabled value="$0"></td>
+          <td class="size-text vertical">${formatNum(parseFloat(item.BASE_PP), '$')}</td>
+          <td style="display:none;">${item.DESCUENTO}</td>
+          <td class="size-text vertical">${item.REFERENCIA_FACTURA}</td>
+          <td class="text-center vertical">${cumple_img}</td>
+          <td class="text-center">
+            <button class="btn btn-primary btn-sm agregar-liquidacion" data-item='${JSON.stringify(item)}'>
+              <i class="fa-solid fa-plus"></i>
+            </button>
+          </td>
+        </tr>`;
+
+        total += parseFloat(item.IMPORTE);
+        cont++;
+      });
+
+      $('#valorTotal').text(formatNum(total, '$'));
+      $('#partidas').text(cont);
+      $('#valorMora').text(formatNum(vlrMora, '$'));
+
+       let tabla =`
+       <table class="table table-bordered table-hover table-sm" style="width: 100%;" id="tdFacturas">
           <thead class="table-info">            
             <tr>
               <th class="size-th no-wrap">DOCUMENTO</th>
@@ -1639,63 +1435,62 @@ function Documentos() {
           ${detalle}
           </tbody>
         </table>`;
-        $("#dvResultCartera").html(tabla);
-        $(".ClassNumero").maskMoney({
-          selectAllOnFocus: true, //evento onkeyup 
-          prefix: '$',
-          thousands: '.',
-          decimal: ',',
-          allowZero: true,
-          precision: 0
-        });
+      
+      $("#dvResultCartera").html(tabla);
+      $(".ClassNumero").maskMoney({
+        selectAllOnFocus: true,
+        prefix: '$',
+        thousands: '.',
+        decimal: ',',
+        allowZero: true,
+        precision: 0
+      });
 
-        $('#tdFacturas').on('click', '.agregar-liquidacion', async function () {
-          const item = JSON.parse($(this).attr('data-item'));
+      $('#tdFacturas').on('click', '.agregar-liquidacion', async function () {
+        const item = JSON.parse($(this).attr('data-item'));
+        const existeDocumento = arrayLiquidador.find(itemArray => itemArray.numeroDoc === item.NUMERO_DOCUMENTO.trim());
 
-          const existeDocumento = arrayLiquidador.find(itemArray => itemArray.numeroDoc === item.NUMERO_DOCUMENTO.trim());
-          if (existeDocumento) {
-            Swal.fire("Agregar documento", "El documento ya existe en el liquidador", "warning");
-            return;
-          }
+        if (existeDocumento) {
+          Swal.fire("Agregar documento", "El documento ya existe en el liquidador", "warning");
+          return;
+        }
 
-          const result = await confirmAlert("Agregar documento", "Se agregará el documento al liquidador... ¿Desea continuar?");
-          if (!result.isConfirmed) return;
-          agregarLiquidador(item);
-        });
-
-      } else {
-        $("#dvResultCartera").html(`<div class="alert alert-danger" role="alert">
-          <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-          <span class="sr-only">Error:</span>NO EXISTEN DOCUMENTOS PARA EL CLIENTE SELECCIONADO</div>`);
-      }
+        const result = await confirmAlert("Agregar documento", "Se agregará el documento al liquidador... ¿Desea continuar?");
+        if (!result.isConfirmed) return;
+        agregarLiquidador(item);
+      });
+    } else {
+      const msgHtml = `
+      <div class="alert alert-danger" role="alert">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span class="sr-only">Error:</span>NO EXISTEN DOCUMENTOS PARA EL CLIENTE SELECCIONADO
+      </div>`;
+      $("#dvResultCartera").html(msgHtml);
     }
-  }).always(function (data) {
+  } catch (error) {
+    console.error(error);
+  } finally {
     UnloadImg();
     ConsultarMulticash();
-  });
+  }
 }
-
+// FUNCIÓN ASIGNAR VALOR
 function AsignarValor(ob) {
-  var vlrDoc = unformatNum($(ob).parent().parent().find('td').eq(9).html());
-  var vlrAct = unformatNum($(ob).val());
-  if (parseInt(vlrDoc) < 0) {
-    vlrDoc = parseInt(vlrDoc) * -1;
-  }
-  if (vlrAct > 0) {
-    $(ob).val('$0');
-  } else {
-    $(ob).val(formatNum(vlrDoc, '$'));
-  }
-}
+  let vlrDoc = unformatNum($(ob).closest('tr').find('td').eq(9).text());
+  let vlrAct = unformatNum($(ob).val());
 
+  if (parseInt(vlrDoc) < 0) vlrDoc = parseInt(vlrDoc) * -1;
+
+  if (vlrAct > 0) $(ob).val('$0');
+  else $(ob).val(formatNum(vlrDoc, '$'));
+}
+// FUNCIÓN VISUALIZAR DOCUMENTO
 function VisualizarDocumento(num, tipo) {
   let rol = $("#RolId").val();
 
   if (num != 0) {
     if (tipo == 'R') { // Recibos de caja
-      if (rol != 14) {
-        $("#btnEliminarPDF").show();
-      }
+      if (rol != 14) $("#btnEliminarPDF").show();
       $("#ContainerPDF").html(`<embed src="../../RecibosCaja/${num}.pdf" frameborder="0" width="100%" height="400px">`);
     } else if (tipo == 'F') { // Facturas
       $("#btnEliminarPDF").hide();
@@ -1707,159 +1502,115 @@ function VisualizarDocumento(num, tipo) {
     Swal.fire('error', 'El pedido seleccionado no posee factura', 'error');
   }
 }
+// FUNCIÓN ELIMINAR PDF
+async function EliminarPDF() {
+  let id = $("#txt_id_rc").text().trim();
+  let num = $("#txt_num").text().trim();
 
-function EliminarPDF() {
-  var id = $.trim($("#txt_id_rc").html());
-  var num = $.trim($("#txt_num").html());
   if (num == 0) {
-    Swal.fire({
-      title: 'Realmente desea eliminar el documento asociado al recibo #' + id,
-      text: "Despues de aceptar no podra reversar la operacion!",
-      type: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#82ED81",
-      cancelButtonColor: "#FFA3A4",
-      confirmButtonText: "Aceptar",
-      cancelButtonText: "Cancelar",
-      closeOnConfirm: false,
-      closeOnCancel: false
-    }).then((result) => {
-      if (result.value) {
-        $.ajax({
-          type: "POST",
-          encoding: "UTF-8",
-          url: "../models/RecibosCaja.php",
-          global: false,
-          error: function (OBJ, ERROR, JQERROR) { },
-          data: ({
-            op: 'U_RC',
-            id: id
-          }),
-          dataType: "html",
-          async: true,
-          success: function (data) {
-            if (data == 1) {
-              Swal.fire('Excelente', 'El documento ha sido eliminado', 'success');
-              ConsultarPlanilla();
-              $("#ModalPDF").modal("hide");
-              $("#dvReciboCaja").modal("hide");
-            } else {
-              Swal.fire('Error', 'No se pudo eliminar del documento', 'error');
-            }
-          }
-        }).always(function (data) {
-          //console.log(data);	
-        });
-      } else {
-        Swal.fire('Cancelado', 'No se ha realizado ninguna operacion', 'warning');
+    const result = await confirmAlert(`¿Realmente desea eliminar el documento asociado al recibo #${id}?`, "Después de aceptar no podrá reversar la operación");
+    if (result.isConfirmed) {
+      try {
+        const data = await enviarPeticion({op: 'U_RC', link: "../models/RecibosCaja.php", id});
+        if (data == 1) {
+          Swal.fire('Excelente', 'El documento ha sido eliminado', 'success');
+          ConsultarPlanilla();
+          $("#ModalPDF").modal("hide");
+          $("#dvReciboCaja").modal("hide");
+        } else {
+          Swal.fire('Error', 'No se pudo eliminar del documento', 'error');
+        }
+      } catch (error) {
+        console.error(error);
       }
-    })
+    } else {
+      Swal.fire('Cancelado', 'No se ha realizado ninguna operacion', 'warning');
+    }
   } else {
     Swal.fire('Oops', 'No es posible editar el documento de un recibo autorizado', 'error');
   }
-
 }
+// FUNCIÓN GUARDAR 
+async function Guardar() {
+  let codigoSap = $("#CodigoSAP").val().trim();
+  if (codigoSap !== '') {
+    let cont = 0;
+    let documen = [];
+    let cuentas = [];
+    let vlrAsignar = unformatNum($("#VlrSinAsignar").val());
+    let vlrFactura = unformatNum($("#VlrTotalFacturas").val());
 
-function Guardar() {
-  var codigoSap = $.trim($("#CodigoSAP").val());
-  var Organizacion = $.trim($("#Sociedad").val());
-  if (codigoSap != '') {
-    var cont = 0;
-    var documen = new Array();
-    var cuentas = new Array();
-    var vlrAbonado = unformatNum($("#VlrTotalAbono").val());
-    var vlrAsignar = unformatNum($("#VlrSinAsignar").val());
-    var vlrFactura = unformatNum($("#VlrTotalFacturas").val());
-    //Facturas--------------------------------------------------------------------------------------
-    $("#tdFacturas tbody tr").each(function (index, element) {
-      var vlrFila = parseInt(unformatNum($(this).find('td').eq(11).find('input').val()));
-      var vlrDesc = parseInt(unformatNum($(this).find('td').eq(12).find('input').val()));
-      var TipoDoc = $.trim($(this).find('td').eq(2).html());
-      var NumDoc = $.trim($(this).find('td').eq(0).html());
-      var RefDoc = $.trim($(this).find('td').eq(1).html());
-      var ReFact = $.trim($(this).find('td').eq(15).html());
-      var Vlr = parseInt(unformatNum($.trim($(this).find('td').eq(9).html())));
-      var TipoVal = '';
+    // FACTURAS
+    $("#tdFacturas tbody tr").each(function () {
+      let vlrFila = parseInt(unformatNum($(this).find('td').eq(11).find('input').val()));
+      let vlrDesc = parseInt(unformatNum($(this).find('td').eq(12).find('input').val()));
+      let Vlr = parseInt(unformatNum($(this).find('td').eq(9).text().trim()));
+      let TipoDoc = $(this).find('td').eq(2).text().trim();
+      let ReFact = $(this).find('td').eq(15).text().trim();
+      let NumDoc = $(this).find('td').eq(0).text().trim();
+      let RefDoc = $(this).find('td').eq(1).text().trim();
+      let TipoVal = '';
+
       if (vlrFila > 0) {
-        if (Vlr < 0) {
-          TipoVal = 'N';
-        } else {
-          TipoVal = 'P';
-        }
-
-
-        //  documen += NumDoc+'|'+vlrFila+'|'+vlrDesc+'|'+RefDoc+'|'+ReFact+'|'+TipoDoc+'|'+TipoVal+'#';
-
+        if (Vlr < 0) TipoVal = 'N';
+        else TipoVal = 'P';
 
         documen.push({
-          'NumDoc': NumDoc,
-          'vlrFila': vlrFila,
-          'vlrDesc': vlrDesc,
-          'RefDoc': RefDoc,
-          'ReFact': ReFact,
-          'TipoDoc': TipoDoc,
-          'TipoVal': TipoVal
+          NumDoc,
+          vlrFila,
+          vlrDesc,
+          RefDoc,
+          ReFact,
+          TipoDoc,
+          TipoVal
         });
 
         cont++;
-
       }
     });
-    //Abonos----------------------------------------------------------------------------------------
-    $("#tdBody tr").each(function (index, element) {
-      var Cuenta = $.trim($(this).find('td').eq(0).html());
-      var Valor = $.trim($(this).find('td').eq(2).html());
-      var FechaValor = $.trim($(this).find('td').eq(3).html());
-      var Referencia = $.trim($(this).find('td').eq(4).html());
-      var Id = $.trim($(this).attr('id'));
-      if (Cuenta != '') {
-        // cuentas += Cuenta+'|'+unformatNum(Valor)+'|'+FechaValor+'|'+Id+'|ABN|'+Referencia+'#';
+
+    // ABONOS
+    $("#tdBody tr").each(function () {
+      let Cuenta = $(this).find('td').eq(0).text().trim();
+      let Valor = $(this).find('td').eq(2).text().trim();
+      let FechaValor = $(this).find('td').eq(3).text().trim();
+      let Referencia = $(this).find('td').eq(4).text().trim();
+      let Id = $(this).attr('id').trim();
+
+      if (Cuenta !== '') {
         cuentas.push({
-          'Cuenta': Cuenta,
-          'Valor': unformatNum(Valor),
-          'FechaValor': FechaValor,
-          'Id': Id,
-          'Tipo': 'ABN',
-          'Referencia': Referencia
+          Cuenta,
+          Valor: unformatNum(Valor),
+          FechaValor,
+          Id,
+          Tipo: 'ABN',
+          Referencia
         });
       }
     });
-    //Validacion para agregar facturas---------------------------------------------------------------
-    if (cont > 0) { //Validacion de cantidad de documentos
-      if (parseFloat(vlrAsignar) >= -1000 && parseFloat(vlrFactura) > 0) { //Para probar
-        //El valor asignado es mayor a cero es porque se hizo abono
-        var titulo = '';
+
+    // VALIDACIÓN PARA AGREGAR FACTURAS
+    if (cont > 0) {
+      if (parseFloat(vlrAsignar) >= -1000 && parseFloat(vlrFactura) > 0) {
+        // El valor asignado es mayor a cero es porque se hizo abono
+        let titulo = '';
         if (parseFloat(vlrAsignar) >= -1000 && parseFloat(vlrAsignar) <= 1000) {
-          if (parseFloat(vlrAsignar) == 0) { //Recibo normal
-            titulo = 'Esta seguro de generar el recibo de caja?';
-          } else { //Con ajuste al peso
-            titulo = 'Se detecto ajuste al peso, esta seguro de continuar?';
+          if (parseFloat(vlrAsignar) == 0) { // Recibo normal
+            titulo = '¿Está seguro de generar el recibo de caja?';
+          } else { // Con ajuste al peso
+            titulo = 'Se detectó ajuste al peso... ¿Está seguro de continuar?';
           }
         } else {
-          titulo = 'Se generara saldo a favor, esta seguro de continuar?';
+          titulo = 'Se generará saldo a favor... ¿Está seguro de continuar?';
         }
-        Swal.fire({
-          title: titulo,
-          text: "Despues de aceptar no podra reversar la operacion!",
-          type: "warning",
-          showCancelButton: true,
-          confirmButtonColor: "#82ED81",
-          cancelButtonColor: "#FFA3A4",
-          confirmButtonText: "Guardar!",
-          cancelButtonText: "Cancelar",
-          closeOnConfirm: false,
-          closeOnCancel: false
-        }).then((result) => {
-          if (result.value) {
-            //Aqui se envia l web service de generacion de recibo de caja
-            EnviarTMP(cuentas, documen, vlrAsignar, codigoSap);
-          } else {
-            Swal.fire("Cancelado", "La operacion  ha sido cancelada!", "error");
-          }
-        });
 
+        const result = await confirmAlert(titulo, "Después de aceptar no podrá reversar la operación");
+        if (result.isConfirmed) {
+          EnviarTMP(cuentas, documen, vlrAsignar, codigoSap);
+        } else {
+          Swal.fire("Cancelado", "La operacion  ha sido cancelada!", "error");
+        }
       } else {
-        //No se hizo abono
         Swal.fire('Oops', 'La diferencia es demasiado grande para compensar!', 'warning')
       }
     } else {
@@ -1868,93 +1619,66 @@ function Guardar() {
   } else {
     Swal.fire('Error', 'Debe cargar un cliente!', 'error');
   }
-
 }
-
-function VerificarDocumento(doc) {
+// FUNCIÓN VERIFICAR DOCUMENTO
+async function VerificarDocumento(doc) {
   let id_rc = 0;
-  $.ajax({
-    type: "POST",
-    encoding: "UTF-8",
-    url: "../models/RecibosCaja.php",
-    global: false,
-    error: function (OBJ, ERROR, JQERROR) {
-
-    },
-    beforeSend: function () {
-    },
-    data: {
-      op: 'S_VALIDA_DOC',
-      doc: doc
-
-    },
-    dataType: "json",
-    async: false,
-    success: function (data) {
-      if (data.length > 0) {
-        id_rc = parseInt(data[0].id_rc);
-      }
-    }
-  });
-  return id_rc;
+  try {
+    const data = await enviarPeticion({op: 'S_VALIDA_DOC', link: "../models/RecibosCaja.php", doc});
+    if (data.length) id_rc = parseInt(data[0].id_rc);
+  } catch (error) {
+    console.error(error);
+  }
+  return id_rc; 
 }
-
-function EnviarTMP(cuentas, documentos, asignados, cliente) {
-  //verificacion de facturas en recibos ya creados
-  var sw = 0;
+// FUNCIÓN ENVIAR TMP
+async function EnviarTMP(cuentas, documentos, asignados, cliente) {
+  let sw = 0;
   documentos.forEach(function (data) {
     sw = VerificarDocumento(data.NumDoc);
-    if (sw > 0) {
-      console.log('Hay fue!!.');
-      return;
-    }
+    if (sw > 0) return;
   });
+
   if (sw == 0) {
-    $.ajax({
-      type: "POST",
-      encoding: "UTF-8",
-      url: "../models/RecibosCaja.php",
-      global: false,
-      error: function (OBJ, ERROR, JQERROR) {
+    const referencia = $.trim($("#Referencia").val());
+    const TextoCabecera = $.trim($("#TextoCabecera").val());
+    const TextoCompensa = $.trim($("#TextoCompensacion").val());
+    const FechaDoc = $.trim($("#FechaDocumento").val());
+    const Sociedad = $.trim($("#Sociedad").val());
+    try {
+      LoadImg('Creando preliminar...');
+      const data = await enviarPeticion({
+        op: "I_CARTERA_RC",
+        link: "../models/RecibosCaja.php",
+        cuentas,
+        documentos,
+        asignados,
+        cliente,
+        referencia,
+        TextoCabecera,
+        TextoCompensa,
+        FechaDoc,
+        Sociedad
+      });
 
-      },
-      beforeSend: function () {
-        LoadImg('Creando preliminar...');
-      },
-      data: {
-        op: 'I_CARTERA_RC',
-        cuentas: cuentas,
-        documentos: documentos,
-        asignados: asignados,
-        cliente: cliente,
-        referencia: $.trim($("#Referencia").val()),
-        TextoCabecera: $.trim($("#TextoCabecera").val()),
-        TextoCompensa: $.trim($("#TextoCompensacion").val()),
-        FechaDoc: $.trim($("#FechaDocumento").val()),
-        Sociedad: $.trim($("#Sociedad").val())
-
-      },
-      dataType: "html",
-      async: false,
-      success: function (data) {
-        if (data > 0) {
-          Swal.fire("Excelente!", "Recibo de caja temporal #" + data + " creado satisfactoriamente", "success");
-          Limpiar();
-          return false;
-        } else {
-          Swal.fire("Oops..!", "Error al recibir respuesta :\n" + data, "error");
-          return false;
-        }
+      if (data > 0) {
+        Swal.fire("Excelente!", `Recibo de caja temporal #${data} creado satisfactoriamente`, "success");
+        Limpiar();
+        return false;
+      } else {
+        Swal.fire("Oops!!!", `Error al recibir respuesta:\n ${data}`, "error");
+        return false;
       }
-    }).always(function (data) {
+    } catch (error) {
+      console.error(error);
+    } finally {
       UnloadImg();
-    });
+    }
   } else {
     Swal.fire('Oops :(', 'Uno de los documentos que intenta adicionar esta en el recibo #' + sw, 'error');
   }
-
 }
-
+// FUNCIÓN AUTORIZAR RC
 function AutorizarRC(version) {
   var id = $.trim($("#txt_id_rc").html());
   var num = $.trim($("#txt_num").html());
