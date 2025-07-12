@@ -250,7 +250,14 @@ $sociedad = (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : "";
 
     .btn-micro {
       border: 1px solid #dee2e6;
-      border-radius: 0 3px 3px 0;
+      border-radius: 3px;
+    }
+
+    .btn-micro-two {
+      border: 1px solid rgb(161 165 169);
+      border-radius: 3px;
+      cursor: pointer; 
+      padding: 3px;
     }
 
     .w-btn {

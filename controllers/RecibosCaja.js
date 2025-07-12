@@ -1675,216 +1675,180 @@ async function EnviarTMP(cuentas, documentos, asignados, cliente) {
       UnloadImg();
     }
   } else {
-    Swal.fire('Oops :(', 'Uno de los documentos que intenta adicionar esta en el recibo #' + sw, 'error');
+    Swal.fire('Oops!!!', `Uno de los documentos que intenta adicionar está en el recibo #${sw}`, 'error');
   }
 }
 // FUNCIÓN AUTORIZAR RC
-function AutorizarRC(version) {
-  var id = $.trim($("#txt_id_rc").html());
-  var num = $.trim($("#txt_num").html());
+async function AutorizarRC(version) {
+  let id = $("#txt_id_rc").text().trim();
   if (id != 0) {
-    // if(num == 0){
-    Swal.fire({
-      title: 'Realmente desea autorizar el recibo temporal #' + id,
-      text: "Despues de aceptar no podra reversar la operacion!",
-      type: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#82ED81",
-      cancelButtonColor: "#FFA3A4",
-      confirmButtonText: "Guardar!",
-      cancelButtonText: "Cancelar",
-      closeOnConfirm: false,
-      closeOnCancel: false
-    }).then((result) => {
-      if (result.value) {
-        $.ajax({
-          type: "POST",
-          url: "../models/WS-RCTMP.php",
-          async: true,
-          dataType: "html",
-          error: function (OBJ, ERROR, JQERROR) { },
-          beforeSend: function () {
-            LoadImg('Guardando...');
-          },
-          data: {
-            id: id,
-            version: version
-          },
-          success: function (data) {
-            console.log(data);
-            UnloadImg();
-            if (data > 0) {
-              Swal.fire("Excelente!", "Recibo de caja :" + data + " creado satisfactoriamente", "success");
-              EnviarMail($.trim(id));
-            } else {
-              Swal.fire('Oops...', 'No fue posible enviar el RC, ' + data, 'error');
-            }
-            ConsultarPlanilla();
-            $("#dvReciboCaja").modal("hide");
-          }
-        }).fail(function (data) {
-          console.error(data);
-          UnloadImg();
-        });
-      } else {
-        Swal.fire("Cancelado", "La operacion  ha sido cancelada!", "error");
+    const result = await confirmAlert(`Realmente desea autorizar el recibo temporal #${id}`, "Después de aceptar no podrá reversar la operación");
+    if (result.isConfirmed) {
+      try {
+        LoadImg('Guardando...');
+        const data = await enviarPeticion({link: "../models/WS-RCTMP.php", id, version}); 
+        if (data > 0) {
+          Swal.fire("Excelente!", `Recibo de caja: ${data} creado satisfactoriamente`, "success");
+          EnviarMail(id.trim());
+        } else {
+          Swal.fire('Oops!!!', `No fue posible enviar el RC... ${data}`, 'error');
+        }
+        ConsultarPlanilla();
+        $("#dvReciboCaja").modal("hide");      
+      } catch (error) {
+        console.error(error);
+      } finally {
+        UnloadImg();
       }
-    });
-    /* }else{	  
-       Swal.fire('Oops...','El recibo fue previamente autorizado!','error');
-     }*/
+    } else {
+      Swal.fire("Cancelado", "La operación  ha sido cancelada", "error");
+    }    
   } else {
-    Swal.fire('Oops...', 'No fue posible enviar el RC.', 'error');
+    Swal.fire('Oops!!!', 'No fue posible enviar el RC', 'error');
   }
 }
+// FUNCIÓN ENVIAR WS
+async function EnviarWS(cuentas, documen, asignados, cliente) {
+  const referencia = $("#Referencia").val().trim();
+  const TextoCabecera = $("#TextoCabecera").val().trim();
+  const TextoCompensa = $("#TextoCompensacion").val().trim();
+  const FechaDoc = $("#FechaDocumento").val().trim();
+  const Sociedad = $("#Sociedad").val().trim();
+  try {
+    const data = await enviarPeticion({
+      link: "../models/WS-RC.php",
+      cuentas,
+      documen,
+      asignados,
+      cliente,
+      referencia,
+      TextoCabecera,
+      TextoCompensa,
+      FechaDoc,
+      Sociedad
+    });
 
-function EnviarWS(cuentas, documen, asignados, cliente) {
-  $.ajax({
-    type: "POST",
-    url: "../models/WS-RC.php",
-    async: true,
-    dataType: "html",
-    error: function (OBJ, ERROR, JQERROR) { },
-    beforeSend: function () { },
-    data: {
-      cuentas: cuentas,
-      documen: documen,
-      asignados: asignados,
-      cliente: cliente,
-      referencia: $.trim($("#Referencia").val()),
-      TextoCabecera: $.trim($("#TextoCabecera").val()),
-      TextoCompensa: $.trim($("#TextoCompensacion").val()),
-      FechaDoc: $.trim($("#FechaDocumento").val()),
-      Sociedad: $.trim($("#Sociedad").val())
-    },
-    success: function (data) {
-      if (data > 0) {
-        Swal.fire("Excelente!", "Recibo de caja :" + data + " creado satisfactoriamente", "success");
-        Limpiar();
-        return false;
-      } else {
-        Swal.fire("Oops..!", "Error al recibir respuesta :\n" + data, "error");
-        return false;
-      }
+    if (data > 0) {
+      Swal.fire("Excelente!", `Recibo de caja: ${data} creado satisfactoriamente`, "success");
+      Limpiar();
+      return false;
+    } else {
+      Swal.fire("Oops!!!", `Error al recibir respuesta:\n ${data}`, "error");
+      return false;
     }
-  }).fail(function (data) {
-    console.error(data);
-  });
+  } catch (error) {
+    console.error(error);
+  }  
 }
+// FUNCIÓN CONSULTAR PLANILLA
+async function ConsultarPlanilla() {
+  const Usr = $("#UsrLogin").val();
+  const fhIni = $("#RptFhIni").val();
+  const fhFin = $("#RptFhFin").val();
+  try {
+    const data = await enviarPeticion({op: 'PLANILLA', link: "../models/RecibosCaja.php", fhIni, fhFin, Usr});
+    if (data.length) {
+      let detalle = '';
+      let total = 0;
+      let desc = 0;
+      let cont = 0;
+      let estado = '';
+      let color = '';
 
-function ConsultarPlanilla() {
-  var Usr = $("#UsrLogin").val();
-  $.ajax({
-    type: "POST",
-    url: "../models/RecibosCaja.php",
-    async: true,
-    dataType: "json",
-    beforeSend: function () { },
-    data: {
-      op: 'PLANILLA',
-      fhIni: $("#RptFhIni").val(),
-      fhFin: $("#RptFhFin").val(),
-      Usr: Usr
-    },
-    success: function (data) {
-      var detalle = '';
-      var total = 0;
-      var desc = 0;
-      var cont = 0;
-      if (data.length > 0) {
-        for (var i = 0; i <= data.length - 1; i++) {
-          var estado = '';
-          var color = '';
-          if (data[i].ESTADO == 'T') {
-            estado = '<i class="fa-solid fa-thumbs-down"></i>';
-            color = 'danger';
-          } else {
-            estado = '<i class="fa-solid fa-thumbs-up"></i>';
-            color = 'success';
-          }
-          detalle += '<tr>'
-            + '<td class="size-text no-wrap vertical">' + (i + 1) + '</td>'
-            + '<td class="size-text no-wrap vertical">' + data[i].FECHA_HORA + '</td>'
-            + '<td class="size-td no-wrap vertical">' + data[i].USUARIO + '</td>'
-            + '<td class="size-text no-wrap vertical">' + data[i].CODIGO_SAP + '</td>'
-            + '<td class="size-td no-wrap vertical">' + cortarTexto(data[i].NOMBRES, 30) + '</td>'
-            + '<td class="size-td no-wrap vertical">' + cortarTexto(data[i].RAZON_COMERCIAL, 30) + '</td>'
-            + '<td class="size-text no-wrap vertical">' + data[i].NUMERO + '</td>'
-            + '<td class="size-text no-wrap vertical">' + formatNum(data[i].VALOR, '$') + '</td>'
-            + '<td class="size-text no-wrap vertical">' + formatNum(data[i].DESCUENTO, '$') + '</td>'
-            + '<td class="text-center">'
-            + '<button class="btn btn-' + color + ' btn-sm" type="button">' + estado + '</button>'
-            + '</td>'
-            + '<td class="text-center">'
-            + '<button type="button" class="btn btn-warning btn-sm" onclick="AbrirRecibo(\'' + data[i].ID_RC + '\',this)">'
-            + '<i class="fa-solid fa-bolt"></i>'
-            + '</button>'
-            + '</td>'
-            + '<td style="display:none;">' + data[i].TEXTO_CABECERA + '</td>'
-            + '<td style="display:none;">' + data[i].TEXTO_COMPENSACION + '</td>'
-            + '<td style="display:none;">' + data[i].TEXTO_REFERENCIA + '</td>'
-            + '<td class="text-center">'
-            + '<button type="button" class="btn btn-primary btn-sm" onclick="PDFRecibo(\'' + data[i].ID_RC + '\',this)">'
-            + '<i class="fa-solid fa-file-pdf"></i>'
-            + '</button>'
-            + '</td>'
-            + '<td style="display:none;">' + data[i].ADJUNTO + '</td>'
-            + '<td class="size-td no-wrap vertical">' + data[i].ZONA_VENTAS + '</td>'
-            + '<td class="size-text no-wrap vertical">' + data[i].ID_RC + '</td>'
-            + '<td style="display:none;">' + data[i].EMAIL + '</td>'
-            + '<td style="display:none;">' + data[i].EMAIL_ZONA + '</td>'
-            + '<td style="display:none;">' + data[i].USUARIO_APRUEBA + '</td>'
-            + '<td style="display:none;">' + data[i].FECHA_HORA_APROBACION + '</td>'
-            + '</tr>';
-          total += parseFloat(data[i].VALOR);
-          desc += parseFloat(data[i].VALOR);
-          cont++;
-
+      data.forEach((item, index) => {
+        if (item.ESTADO == 'T') {
+          estado = '<i class="fa-solid fa-thumbs-down"></i>';
+          color = 'danger';
+        } else {
+          estado = '<i class="fa-solid fa-thumbs-up"></i>';
+          color = 'success';
         }
-        var tabla = '<table class="table table-bordered table-hover table-sm" width="100%" id="tablePlanillas">'
-          + '<thead class="table-info">'
-          + '<tr>'
-          + '<th class="size-th nowrap">N°</th>'
-          + '<th class="size-th nowrap">FECHA/HORA</th>'
-          + '<th class="size-th nowrap">USUARIO</th>'
-          + '<th class="size-th nowrap">CODIGO</th>'
-          + '<th class="size-th nowrap">NOMBRES</th>'
-          + '<th class="size-th nowrap">RAZON</th>'
-          + '<th class="size-th nowrap">NUMERO</th>'
-          + '<th class="size-th nowrap">VALOR</th>'
-          + '<th class="size-th nowrap">DESCUENTO</th>'
-          + '<th class="size-th nowrap">ESTADO</th>'
-          + '<th class="size-th nowrap">GESTIONAR</th>'
-          + '<th class="size-th nowrap">PDF</th>'
-          + '<th class="size-th nowrap">ZONA VENTAS</th>'
-          + '<th class="size-th nowrap">ID</th>'
-          + '</tr>'
-          + '</thead>'
-          + '<tbody>'
-          + detalle
-          + '</tbody>'
-          + '</table>';
-        $("#dvResultPlanilla").html(tabla);
-        $("#TotalRC").val(cont);
-      } else {
-        $("#dvResultPlanilla").html('<div class="alert alert-danger" role="alert">'
-          + '<i class="fa-solid fa-circle-exclamation"></i>'
-          + '<span class="sr-only">Error:</span>NO EXISTEN RESULTADOS PARA LAS CONDICIONES SELECCIONADAS' + '</div>');
-      }
-    }
-  }).fail(function (data) {
-    $("#FiltroPlanilla").trigger('keyup');
-    console.error(data);
-  });
-}
 
-function AbrirRecibo(id, ob) {
-  var obj = $(ob).parent().parent().find("td");
+        detalle += `
+        <tr>
+          <td class="size-text no-wrap vertical">${(index + 1)}</td>
+          <td class="size-text no-wrap vertical">${item.FECHA_HORA}</td>
+          <td class="size-td no-wrap vertical">${item.USUARIO}</td>
+          <td class="size-text no-wrap vertical">${item.CODIGO_SAP}</td>
+          <td class="size-td no-wrap vertical">${cortarTexto(item.NOMBRES, 30)}</td>
+          <td class="size-td no-wrap vertical">${cortarTexto(item.RAZON_COMERCIAL, 30)}</td>
+          <td class="size-text no-wrap vertical">${item.NUMERO}</td>
+          <td class="size-text no-wrap vertical">${formatNum(item.VALOR, '$')}</td>
+          <td class="size-text no-wrap vertical">${formatNum(item.DESCUENTO, '$')}</td>
+          <td class="text-center"><button class="btn btn-${color} btn-sm" type="button">${estado}</button></td>
+          <td class="text-center">
+            <button type="button" class="btn btn-warning btn-sm" onclick="AbrirRecibo('${item.ID_RC}', this)"><i class="fa-solid fa-bolt"></i></button>
+          </td>
+          <td style="display: none;">${item.TEXTO_CABECERA}</td>
+          <td style="display: none;">${item.TEXTO_COMPENSACION}</td>
+          <td style="display: none;">${item.TEXTO_REFERENCIA}</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-primary btn-sm" onclick="PDFRecibo('${item.ID_RC}', this)"><i class="fa-solid fa-file-pdf"></i></button>
+          </td>
+          <td style="display: none;">${item.ADJUNTO}</td>
+          <td class="size-td no-wrap vertical">${item.ZONA_VENTAS}</td>
+          <td class="size-text no-wrap vertical">${item.ID_RC}</td>
+          <td style="display: none;">${item.EMAIL}</td>
+          <td style="display: none;">${item.EMAIL_ZONA}</td>
+          <td style="display: none;">${item.USUARIO_APRUEBA}</td>
+          <td style="display: none;">${item.FECHA_HORA_APROBACION}</td>
+        </tr>`;
+
+        total += parseFloat(item.VALOR);
+        desc += parseFloat(item.VALOR);
+        cont++;
+      });
+
+      let tabla = `
+      <table class="table table-bordered table-hover table-sm" width="100%" id="tablePlanillas">
+        <thead class="table-info">
+          <tr>
+            <th class="size-th nowrap">N°</th>
+            <th class="size-th nowrap">FECHA/HORA</th>
+            <th class="size-th nowrap">USUARIO</th>
+            <th class="size-th nowrap">CODIGO</th>
+            <th class="size-th nowrap">NOMBRES</th>
+            <th class="size-th nowrap">RAZON</th>
+            <th class="size-th nowrap">NUMERO</th>
+            <th class="size-th nowrap">VALOR</th>
+            <th class="size-th nowrap">DESCUENTO</th>
+            <th class="size-th nowrap">ESTADO</th>
+            <th class="size-th nowrap">GESTIONAR</th>
+            <th class="size-th nowrap">PDF</th>
+            <th class="size-th nowrap">ZONA VENTAS</th>
+            <th class="size-th nowrap">ID</th>
+          </tr>
+        </thead>
+        <tbody>
+        ${detalle}
+        </tbody>
+      </table>`;
+      $("#dvResultPlanilla").html(tabla);
+      $("#TotalRC").val(cont);
+    } else {
+      const msgHtml = `
+      <div class="alert alert-danger" role="alert">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span class="sr-only">Error:</span>NO EXISTEN RESULTADOS PARA LAS CONDICIONES SELECCIONADAS
+      </div>`;
+      $("#dvResultPlanilla").html(msgHtml);
+    }
+    
+  } catch (error) {
+    console.error(error);
+    $("#FiltroPlanilla").trigger('keyup');
+  }
+}
+// FUNCIÓN ABRIR RECIBO
+async function AbrirRecibo(id, ob) {
+  let obj = $(ob).parent().parent().find("td");
+
   $("#txt_id_rc").text(id);
   $("#txt_num").text((obj.eq(6).text().trim() !== "") ? obj.eq(6).text() : "-");
   $("#txt_codigo").text((obj.eq(3).text().trim() !== "") ? obj.eq(3).text() : "-");
   $("#txt_cliente").text((obj.eq(4).text().trim() !== "") ? obj.eq(4).text() : "-");
   $("#txt_razon").text((obj.eq(5).text().trim() !== "") ? obj.eq(5).text() : "-");
+
   $("#txt_valor").text((obj.eq(7).text().trim() !== "") ? obj.eq(7).text() : "-");
   $("#txt_cabecera").text((obj.eq(11).text().trim() !== "") ? obj.eq(11).text() : "-");
   $("#txt_compesacion").text((obj.eq(12).text().trim() !== "") ? obj.eq(12).text() : "-");
@@ -1894,313 +1858,245 @@ function AbrirRecibo(id, ob) {
   $("#txt_mail_zona").text((obj.eq(19).text().trim() !== "") ? obj.eq(19).text() : "-");
   $("#txt_user_aprueba").text((obj.eq(20).text().trim() !== "") ? obj.eq(20).text() : "-");
   $("#txt_fh_aprueba").text((obj.eq(21).text().trim() !== "") ? obj.eq(21).text() : "-");
-  var adj = obj.eq(15).text();
+
+  let adj = obj.eq(15).text();
+
   if (adj == 1) {
-    $("#tdDocPDF").html('<img src="../resources/icons/eye.png" style="cursor: pointer;" align="absmiddle" onclick="VisualizarDocumento(\'' + $.trim(id) + '\',\'R\')">');
+    $("#tdDocPDF").html(`<img src="../resources/icons/eye.png" class="btn-micro-two" onclick="VisualizarDocumento('${id.trim()}', 'R')">`);
   } else {
     $("#tdDocPDF").html('<input type="file" id="DocPDF" name="DocPDF" class="form-control" accept="application/pdf">');
-    $("#DocPDF").change(function () {
-      uploadAjax();
-    })
+    $("#DocPDF").change(function () { uploadAjax(); });
   }
-  //Detalle
-  $.ajax({
-    type: "POST",
-    url: "../models/RecibosCaja.php",
-    async: true,
-    dataType: "json",
-    beforeSend: function () {
 
-    },
-    data: {
-      op: 'S_DETALLE_RC',
-      id: id
-    },
-    success: function (data) {
-      var table = '<table class="table table-bordered table-hover table-sm" width="100%">'
-        + '<thead class="table-info">'
-        + '<tr>'
-        + '<th class="size-th no-wrap">ID</th>'
-        + '<th class="size-th no-wrap">IMPORTE</th>'
-        + '<th class="size-th no-wrap">DESCUENTO</th>'
-        + '<th class="size-th no-wrap">CUENTA</th>'
-        + '<th class="size-th no-wrap">FECHA VALOR</th>'
-        + '<th class="size-th no-wrap">DOCUMENTO</th>'
-        + '<th class="size-th no-wrap">DOC REF</th>'
-        + '<th class="size-th no-wrap">FAC REF</th>'
-        + '<th style="display: none;">C. BENEFICIO</th>'
-        + '<th class="size-th no-wrap">TIPO</th>'
-        + '<th class="size-th no-wrap">TEXTO</th>'
-        + '</tr>'
-        + '</thead>'
-        + '<tbody>';
-      var dtotal = 0;
-      var vtotal = 0;
-      var diferencia = 0;
-      for (var i = 0; i <= data.length - 1; i++) {
-        var valor = 0;
-        if (data[i].TIPO == 'C') {
-          valor = '<td class="size-text vertical" style="color:#FF1519;">(' + formatNum(parseFloat(data[i].IMPORTE), '$') + ')</td>';
-          vtotal += parseFloat(data[i].IMPORTE) * -1;
+  try {
+    const data = await enviarPeticion({op: 'S_DETALLE_RC', link: "../models/RecibosCaja.php", id});
+    if (data.length) {
+      let table = `
+      <table class="table table-bordered table-hover table-sm" width="100%">
+        <thead class="table-info">
+          <tr>
+            <th class="size-th no-wrap">ID</th>
+            <th class="size-th no-wrap">IMPORTE</th>
+            <th class="size-th no-wrap">DESCUENTO</th>
+            <th class="size-th no-wrap">CUENTA</th>
+            <th class="size-th no-wrap">FECHA VALOR</th>
+            <th class="size-th no-wrap">DOCUMENTO</th>
+            <th class="size-th no-wrap">DOC REF</th>
+            <th class="size-th no-wrap">FAC REF</th>
+            <th style="display: none;">C. BENEFICIO</th>
+            <th class="size-th no-wrap">TIPO</th>
+            <th class="size-th no-wrap">TEXTO</th>
+          </tr>
+        </thead>
+        <tbody>`;
+
+      let dtotal = 0;
+      let vtotal = 0;
+      let diferencia = 0;
+
+      data.forEach(item => {
+        let valor = 0;
+        if (item.TIPO == 'C') {
+          valor = `<td class="size-text vertical text-danger">(${formatNum(parseFloat(item.IMPORTE), '$')})</td>`;
+          vtotal += parseFloat(item.IMPORTE) * -1;
         } else {
-          if ($.trim(data[i].TIPO_DOC) == 'DA' || $.trim(data[i].TIPO_VALOR) == 'N') {
-            valor = '<td class="size-text vertical" style="color:#FF1519;">(' + formatNum(parseFloat(data[i].IMPORTE), '$') + ')</td>';
-            vtotal += parseFloat(data[i].IMPORTE) * -1;
+          if (item.TIPO_DOC.trim() == 'DA' || item.TIPO_VALOR.trim() == 'N') {
+            valor = `<td class="size-text vertical text-danger">(${formatNum(parseFloat(item.IMPORTE), '$')})</td>`;
+            vtotal += parseFloat(item.IMPORTE) * -1;
           } else {
-            valor = '<td class="size-text vertical">' + formatNum(data[i].IMPORTE, '$') + '</td>';
-            vtotal += parseFloat(data[i].IMPORTE);
+            valor = `<td class="size-text vertical">${formatNum(item.IMPORTE, '$')}</td>`;
+            vtotal += parseFloat(item.IMPORTE);
           }
         }
-        dtotal += parseFloat(data[i].DESCUENTO);
-        table += '<tr>'
-          + '<td class="size-text vertical no-wrap">' + data[i].ID_RC + '</td>' + valor
-          + '<td class="size-text vertical no-wrap" style="color: #FF1519;">(' + formatNum(data[i].DESCUENTO, '$') + ')</td>'
-          + '<td class="size-text vertical no-wrap">' + data[i].CUENTA + '</td>'
-          + '<td class="size-text vertical no-wrap">' + data[i].FECHA_VALOR + '</td>'
-          + '<td class="size-text vertical no-wrap">' + data[i].DOCUMENTO + '</td>'
-          + '<td class="size-text vertical no-wrap">' + data[i].REF_DOC + '</td>'
-          + '<td class="size-text vertical no-wrap">' + data[i].REF_FACT + '</td>'
-          + '<td class="size-text vertical no-wrap" style="display: none;">' + data[i].CENTRO_BENEFICIO + '</td>'
-          + '<td class="size-text vertical no-wrap">' + data[i].TIPO + '</td>'
-          + '<td class="size-text vertical no-wrap">' + data[i].TEXTO + '</td>'
-          + '</tr>';
-      }
+        dtotal += parseFloat(item.DESCUENTO);
+
+        table += `
+        <tr>
+          <td class="size-text vertical no-wrap">${item.ID_RC}</td>${valor}
+          <td class="size-text vertical no-wrap text-danger">(${formatNum(item.DESCUENTO, '$')})</td>
+          <td class="size-text vertical no-wrap">${item.CUENTA}</td>
+          <td class="size-text vertical no-wrap">${item.FECHA_VALOR}</td>
+          <td class="size-text vertical no-wrap">${item.DOCUMENTO}</td>
+          <td class="size-text vertical no-wrap">${item.REF_DOC}</td>
+          <td class="size-text vertical no-wrap">${item.REF_FACT}</td>
+          <td class="size-text vertical no-wrap d-none">${item.CENTRO_BENEFICIO}</td>
+          <td class="size-text vertical no-wrap">${item.TIPO}</td>
+          <td class="size-text vertical no-wrap">${item.TEXTO}</td>
+        </tr>`;
+      });
+
       diferencia = vtotal - dtotal;
-      table += '<tr>'
-        + '<td class="size-th"><b>TOTALES</b></td>'
-        + '<td class="size-text vertical">' + formatNum(vtotal, '$') + '</td>'
-        + '<td class="size-text vertical">' + formatNum(dtotal, '$') + '</td>'
-        + '<td colspan="8"></td>'
-        + '</tr>'
-        +
 
-        '<tr>'
-        + '<td class="size-th"><b>DIFERENCIA</b></td>'
-        + '<td class="size-text vertical" colspan="2">' + formatNum(diferencia, '$') + '</td>'
-        + '<td colspan="7"></td>'
-        + '</tr>'
-        + '</tbody>'
-        + '</table>';
+      table += `
+      <tr>
+        <td class="size-th"><b>TOTALES</b></td>
+        <td class="size-text vertical">${formatNum(vtotal, '$')}</td>
+        <td class="size-text vertical">${formatNum(dtotal, '$')}</td>
+        <td colspan="8"></td>
+      </tr>
+
+      <tr>
+        <td class="size-th"><b>DIFERENCIA</b></td>
+        <td class="size-text vertical" colspan="2">${formatNum(diferencia, '$')}</td>
+        <td colspan="7"></td>
+      </tr>
+      
+      </tbody></table>`;        
+
       $("#tr_det").html(table);
+      $("#ContainerPDF").html('');
+      $("#dvReciboCaja").modal("show");
     }
-  }).error(function (data) {
-    console.error(data);
-  });
-  //Abrir modal
-  $("#ContainerPDF").html('');
-  $("#dvReciboCaja").modal("show");
+  } catch (error) {
+    console.error(error);
+  }  
 }
+// FUNCIÓN ELIMINAR RC
+async function EliminarRC() {
+  let id = parseInt($("#txt_id_rc").text()).trim();
+  let num = parseInt($("#txt_num").text()).trim();
 
-
-function EliminarRC() {
-  var id = parseInt($.trim($("#txt_id_rc").html()));
-  var num = parseInt($.trim($("#txt_num").html()));
-  Swal.fire({
-    title: 'Realmente desea eliminar el recibo temporal #' + id,
-    text: "Despues de aceptar no podra reversar la operacion!",
-    type: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#82ED81",
-    cancelButtonColor: "#FFA3A4",
-    confirmButtonText: "Eliminar!",
-    cancelButtonText: "Cancelar",
-    closeOnConfirm: false,
-    closeOnCancel: false
-  }).then((result) => {
-    if (result.value) {
-      if (num == 0) {
-        $.ajax({
-          type: "POST",
-          url: "../models/RecibosCaja.php",
-          async: true,
-          dataType: "json",
-          error: function (OBJ, ERROR, JQERROR) { },
-          beforeSend: function () { },
-          data: {
-            op: 'D_RC',
-            id: id
-          },
-          success: function (data) {
-            if (data == 0) {
-              Swal.fire('Excelente', 'Recibo temporal eliminado', 'success');
-            } else {
-              Swal.fire('Oops...', 'No fue posible eliminar el RC.', 'error');
-            }
-            ConsultarPlanilla();
-            $("#dvReciboCaja").modal("hide");
-          }
-        }).fail(function (data) {
-          console.error(data);
-        });
-      } else {
-        Swal.fire('Oops...', 'No es posible eliminar un RC ya aplicado.', 'error');
+  const result = await confirmAlert(`Realmente desea eliminar el recibo temporal #${id}`, "Después de aceptar no podrá reversar la operación");
+  if (result.isConfirmed) {
+    if (num == 0) {
+      try {
+        const data = await enviarPeticion({op: "D_RC", link: "../models/RecibosCaja.php", id});
+        if (data == 0) {
+          Swal.fire('Excelente', 'Recibo temporal eliminado', 'success');
+        } else {
+          Swal.fire('Oops!!!', 'No fue posible eliminar el RC', 'error');
+        }
+        ConsultarPlanilla();
+        $("#dvReciboCaja").modal("hide");
+      } catch (error) {
+        console.error(error);
       }
     } else {
-
+      Swal.fire('Oops...', 'No es posible eliminar un RC ya aplicado.', 'error');
     }
-  })
+  }
 }
-
+// FUNCIÓN VER PDF RECIBO
 function PDFRecibo(num) {
-  $('#dvReciboCajaPDF').html(`<embed src="../resources/tcpdf/Recibos.php?numero=${num}&email=sistemas@multidrogas.com&tipo=R" frameborder="0" width="100%" height="400px">`);
+  const src = "../resources/tcpdf/Recibos.php";
+  const email = "sistemas@multidrogas.com";
+  const urlTemplate = `<embed src="${src}?numero=${num}&email=${email}&tipo=R" frameborder="0" width="100%" height="400px">`;
+  $('#dvReciboCajaPDF').html(urlTemplate);
   $("#dvPDFRecibo").modal("show");
 }
+// FUNCIÓN ENVIAR EMAIL
+async function EnviarMail(numero) {
+  let email = '';
+  if ($("#txt_mail_zona").text().trim() !== '') email = $("#txt_mail_zona").text().trim();
 
-function EnviarMail(numero) {
-  var email = '';
-  if ($.trim($("#txt_mail_zona").html()) != '') {
-    email = $.trim($("#txt_mail_zona").html());
+  if ($("#txt_mail").text().trim() !== '') {
+    if (email != '') email += ';' + $("#txt_mail").text().trim();
+    else email = $("#txt_mail").html().trim();
   }
-  if ($.trim($("#txt_mail").html()) != '') {
-    if (email != '') {
-      email += ';' + $.trim($("#txt_mail").html());
+
+  try {
+    const data = await enviarPeticion({link: "../resources/tcpdf/Recibos.php", numero, tipo: 'P', email});
+  } catch (error) {
+    console.error(error);
+  }
+}
+// FUNCIÓN CARGAR AJAX
+async function uploadAjax() {
+  let inputFile = document.getElementById('DocPDF');
+  let file = inputFile.files[0];
+  let id = $("#txt_id_rc").text().trim();
+
+  try {
+    const data = await enviarPeticion({op: "SUBIR_FILE", link: "../models/RecibosCaja.php", archivo: file, id});
+    if (data == "true") {
+      Swal.fire('Documento Cargado!', 'Se han cargado los archivos correctamente', 'success');
+      $("#tdDocPDF").html(`<img src="../resources/icons/eye.png" align="absmiddle" onclick="VisualizarDocumento('${id.trim()}', 'R')">`);
     } else {
-      email = $.trim($("#txt_mail").html());
+      Swal.fire('Error!', 'Se han producido un error cargado los archivos', 'error');
     }
+  } catch (error) {
+    console.error(error);
   }
-  $.ajax({
-    type: "GET",
-    url: "../resources/tcpdf/Recibos.php",
-    global: false,
-    error: function (OBJ, ERROR, JQERROR) { },
-    data: ({
-      numero: numero,
-      tipo: 'P',
-      email: email
-    }),
-    dataType: "html",
-    async: true,
-    success: function (data) { }
-  }).fail(function (data) {
-    console.error(data);
-  });
 }
+// FUNCIÓN AGREGAR CONDICIÓN ESPECIAL
+async function AgregarCondicionEspecial() {
+  let codigo = $("#txt_CondCodigo").val().trim();
+  let dias = parseInt($("#txt_CondDias").val()).trim();
+  let dcto = parseInt($("#txt_CondDcto").val().trim());
 
-function uploadAjax() {
-  var inputFile = document.getElementById('DocPDF');
-  var file = inputFile.files[0];
-  var data = new FormData();
-  var id = $.trim($("#txt_id_rc").html());
-  data.append('archivo', file);
-  data.append('id', id);
-  data.append('op', 'SUBIR_FILE');
-  var url = "../models/RecibosCaja.php";
-  $.ajax({
-    url: url,
-    type: "POST",
-    contentType: false,
-    data: data,
-    processData: false,
-    cache: false,
-    success: function (data) {
-      if (data == "true") {
-        Swal.fire('Documento Cargado!', 'Se han cargado los archivos correctamente', 'success');
-        $("#tdDocPDF").html('<img src="../resources/icons/eye.png" align="absmiddle" onclick="VisualizarDocumento(\'' + $.trim(id) + '\',\'R\')">');
-      } else {
-        Swal.fire('Error!', 'Se han producido un error cargado los archivos', 'error')
-      }
+  if (codigo !== '' && dias > 0 && dcto > 0) {
+    try {
+      const data = await enviarPeticion({op: 'I_CONDICION_ESPECIAL', link: "../models/RecibosCaja.php", codigo, dias, dcto});
+      if (data > 0) Swal.fire('Excelente', 'Condicion especial guardada y en espera de autorización.', 'success');
+      else Swal.fire('Oops!!!', 'No fue posible crear la solicitud.', 'error');
+
+      ConsultarCondicionEspecial();
+
+      $("#txt_CondCodigo").val('');
+      $("#txt_CondDias").val('');
+      $("#txt_CondDcto").val('');
+      $("#txt_CondCliente").val('');
+    } catch (error) {
+      console.error(error);
     }
-  }).fail(function (data) {
-    console.error(data);
-  });
-}
-
-function AgregarCondicionEspecial() {
-  var codigo = $.trim($("#txt_CondCodigo").val());
-  var dias = parseInt($.trim($("#txt_CondDias").val()));
-  var dcto = parseInt($.trim($("#txt_CondDcto").val()));
-  if (codigo != '' && dias > 0 && dcto > 0) {
-    $.ajax({
-      type: "POST",
-      url: "../models/RecibosCaja.php",
-      async: true,
-      dataType: "json",
-      error: function (OBJ, ERROR, JQERROR) { },
-      beforeSend: function () { },
-      data: {
-        op: 'I_CONDICION_ESPECIAL',
-        codigo: codigo,
-        dias: dias,
-        dcto: dcto
-      },
-      success: function (data) {
-        if (data > 0) {
-          Swal.fire('Excelente', 'Condicion especial guardada y en espera de autorización.', 'success');
-        } else {
-          Swal.fire('Oops...', 'No fue posible crear la solicitud.', 'error');
-        }
-        ConsultarCondicionEspecial();
-        $("#txt_CondCodigo").val('');
-        $("#txt_CondDias").val('');
-        $("#txt_CondDcto").val('');
-        $("#txt_CondCliente").val('');
-      }
-    }).fail(function (data) {
-      console.error(data);
-    });
   } else {
     Swal.fire('Error!', 'Campos vacios o inválidos, verifique e intente nuevamente', 'error');
   }
 }
+// FUNCIÓN CONSULTAR CONDICIÓN ESPECIAL
+async function ConsultarCondicionEspecial() {
+  try {
+    const data = await enviarPeticion({op: "S_CONDICION_ESPECIAL", link: "../models/RecibosCaja.php"});
+    if (data.length) {
+      let tabla = `
+      <table class="table table-bordered table-hover table-sm" width="100%" id="tableCondicionesEspeciales">
+        <thead class="table-info">
+          <tr>
+            <th class="size-th">ID</th>
+            <th class="size-th">CODIGO</th>
+            <th class="size-th">NOMBRES</th>
+            <th class="size-th">RAZON</th>
+            <th class="size-th">DIAS</th>
+            <th class="size-th">SUJETO.CUMPLI.</th>
+            <th class="size-th">DESCUENTO</th>
+            <th class="size-th">AUTORIZAR</th>
+          </tr>
+        </thead>
+        <tbody>`;
 
-function ConsultarCondicionEspecial() {
-  $.ajax({
-    type: "POST",
-    encoding: "UTF-8",
-    url: "../models/RecibosCaja.php",
-    async: true,
-    dataType: "json",
-    error: function (OBJ, ERROR, JQERROR) { },
-    beforeSend: function () { },
-    data: {
-      op: 'S_CONDICION_ESPECIAL'
-    },
-    success: function (data) {
-      if (data.length > 0) {
-        var tabla = '<table class="table table-bordered table-hover table-sm" width="100%" id="tableCondicionesEspeciales">'
-          + '<thead class="table-info">'
-          + '<tr>'
-          + '<th class="size-th">ID</th>'
-          + '<th class="size-th">CODIGO</th>'
-          + '<th class="size-th">NOMBRES</th>'
-          + '<th class="size-th">RAZON</th>'
-          + '<th class="size-th">DIAS</th>'
-          + '<th class="size-th">SUJETO.CUMPLI.</th>'
-          + '<th class="size-th">DESCUENTO</th>'
-          + '<th class="size-th">AUTORIZAR</th>'
-          + '</tr>'
-          + '</thead>'
-          + '<tbody>';
-        for (var i = 0; i <= data.length - 1; i++) {
-          tabla += '<tr>'
-            + '<td class="size-text vertical">' + data[i].id + '</td>'
-            + '<td class="size-text vertical">' + data[i].codigo_sap + '</td>'
-            + '<td class="size-td vertical">' + data[i].nombres + '</td>'
-            + '<td class="size-td vertical">' + data[i].razon_comercial + '</td>'
-            + '<td class="size-td vertical">' + data[i].dias + '</td>'
-            + '<td class="size-td vertical">' + data[i].sujeto_cump + '</td>'
-            + '<td class="size-td vertical">' + data[i].descuento + '</td>'
-            + '<td class="text-center">'
-            + '<button class="btn btn-sm btn-light btn-micro text-primary" onclick="AutorizarCondicionEspecial(\'' + data[i].id + '\')">'
-            + '<i class="fa-solid fa-square-check"></i>'
-            + '</button>'
-            + '</td>'
-            + '</tr>';
-        }
-        tabla += '</tbody></table>';
-        $("#dvResultCondicionesEspeciales").html(tabla);
-      } else {
-        $("#dvResultCondicionesEspeciales").html('<div class="alert alert-danger" role="alert">'
-          + '<i class="fa-solid fa-circle-exclamation"></i>'
-          + '<span class="sr-only">Error:</span>  No hay solicitudes pendientes.' + '</div>');
-      }
+      data.forEach(item => {
+        tabla += `
+        <tr>
+          <td class="size-text vertical">${item.id}</td>
+          <td class="size-text vertical">${item.codigo_sap}</td>
+          <td class="size-td vertical">${item.nombres}</td>
+          <td class="size-td vertical">${item.razon_comercial}</td>
+          <td class="size-td vertical">${item.dias}</td>
+          <td class="size-td vertical">${item.sujeto_cump}</td>
+          <td class="size-td vertical">${item.descuento}</td>
+          <td class="text-center">
+            <button class="btn btn-sm btn-light btn-micro text-primary" onclick="AutorizarCondicionEspecial('${item.id}')">
+              <i class="fa-solid fa-square-check"></i>
+            </button>
+          </td>
+        </tr>`;
+      });
+
+      tabla += `</tbody></table>`;
+      $("#dvResultCondicionesEspeciales").html(tabla);
+    } else {
+      const msgHtml = `
+      <div class="alert alert-danger" role="alert">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span class="sr-only">Error:</span>No hay solicitudes pendientes
+      </div>`;
+      $("#dvResultCondicionesEspeciales").html(msgHtml);
     }
-  }).fail(function (data) {
-    console.error(data);
-  });
-
+  } catch (error) {
+    console.error(error);
+  }
 }
-
+// FUNCIÓN AUTORIZAR CONDICIÓN ESPECIAL
 function AutorizarCondicionEspecial(id) {
   var rol = $("#RolId").val();
   if (rol == 1 || rol == 18) { //Administrador - gerencia administrativa
@@ -2245,7 +2141,7 @@ function AutorizarCondicionEspecial(id) {
     Swal.fire('Error', 'Usted no cuenta con los permisos para autorizar, este tipo de solicitudes.', 'error');
   }
 }
-
+// FUNCIÓN AUTORIZAR TODA CONDICIÓN
 function AutorizarTodoCondicion() {
   var nFilas = $("#tableCondicionesEspeciales tr").length;
   var rol = $("#RolId").val();
@@ -2295,7 +2191,7 @@ function AutorizarTodoCondicion() {
   }
 
 }
-
+// FUNCIÓN CONSULTAR CONDICIÓN LISTA
 function ConsultarCondicionLista() {
   var lista = $("#Lista").val();
   let oficina = $("#Oficina").val();
@@ -2420,7 +2316,7 @@ function ConsultarCondicionLista() {
     console.error(data);
   });
 }
-
+// FUNCIÓN PARA FILTRAR ESTADOS
 function filtroEstado(valor) {
   theTable = $("#tablePlanillas tr:gt(0)");
   theTable.each(function () {
@@ -2442,7 +2338,7 @@ function filtroEstado(valor) {
 
   });
 }
-
+// FUNCIÓN CONSULTAR INFORMES
 async function ConsultarInformes() {
   try {
     LoadImg('Consultando información...');
@@ -2559,7 +2455,7 @@ async function ConsultarInformes() {
     UnloadImg();
   }
 }
-
+// FUNCIÓN PARA FORMATEAR FECHAS SQL
 const formatDate = (dateString) => {
   const processedDateString = dateString.replace(/:(\d{3})([AP]M)/, " $2");
   const date = new Date(processedDateString);
@@ -2573,7 +2469,7 @@ const formatDate = (dateString) => {
   };
   return new Intl.DateTimeFormat("es-ES", options).format(date);
 }
-
+// FUNCIÓN GENERAR GRÁFICO
 function GenerarGrafico(titulo, jsonArray) {
   if (jsonArray.length) {
     Highcharts.chart('DivGrafico', {
@@ -2611,7 +2507,7 @@ function GenerarGrafico(titulo, jsonArray) {
     $('#DivGrafico').html(msgHtml);
   }
 }
-
+// FUNCIÓN PARA RESET DE CAMPOS
 const limpiarCompensar = () => {
   $("#fhCompenIni,#fhCompenFin").datepicker({
     changeMonth: true,
@@ -2624,7 +2520,7 @@ const limpiarCompensar = () => {
   }).datepicker("setDate", new Date());
   $("#idCompenDoc").val('');
 }
-
+// FUNCIÓN COMPENSAR DOCUMENTOS
 const compensarDocumentos = async () => {
   let fhIni = $("#fhCompenIni").val();
   let fhFin = $("#fhCompenFin").val();
@@ -2675,7 +2571,7 @@ const compensarDocumentos = async () => {
     console.log(e);
   }
 }
-
+// FUNCIÓN PARA CORTAR TEXTOS
 function cortarTexto(texto, maxLongitud) {
   return texto.length > maxLongitud ? texto.slice(0, maxLongitud) + '...' : texto;
 }
