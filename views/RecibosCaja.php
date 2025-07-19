@@ -186,6 +186,10 @@ $sociedad = (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : "";
       font-size: 13px;
     }
 
+    .size-12 {
+      font-size: 12px;
+    }
+
     .text-green {
       color: #055160 !important;
     }

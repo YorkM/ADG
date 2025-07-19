@@ -3,6 +3,8 @@ let ArrayMulticashBanco = [];
 let ArrCli = [];
 let ArrDctos = [];
 let arrayLiquidador = [];
+const arrayMeses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+const arrayMesesAbrev = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
 // DECLARACIÓN DE FUNCIONES GENERALES
 // FUNCIÓN MOSTRAR LOADING
 function LoadImg(texto = "Cargando...") {
@@ -512,7 +514,7 @@ async function ValidarDocumento(valor) {
     LoadImg("Consultanto información...");
     const data = await enviarPeticion({ op: "B_DOCUMENTO_RC", link: "../models/RecibosCaja.php", documento: valor });
     if (data.length) {
-      Swal.fire("Oops", `El documento esta comprometido en el recibo # ${data[0].ID_RC}, tomado por el usuario ${data[0].USUARIO}`, "error");
+      Swal.fire("Oops", `El documento esta comprometido en el recibo #${data[0].ID_RC}, tomado por el usuario ${data[0].USUARIO}`, "error");
     } else {
       Swal.fire("Excelente!", "El documento se encuentra disponible", "info");
     }
@@ -593,12 +595,8 @@ async function CondicionesDcto() {
           <td class="size-td vertical">${item.tipo}</td>
           <td class="size-td vertical">${item.sujeto_cump}</td>
         </tr>`;
-      });
 
-      ArrDctos.push({
-        dias: item.dias,
-        descuento: item.descuento,
-        tipo: item.tipo
+        ArrDctos.push({ dias: item.dias, descuento: item.descuento, tipo: item.tipo });
       });
 
       tabla += `</tbody></table>`;
@@ -1766,28 +1764,24 @@ async function ConsultarPlanilla() {
 
         detalle += `
         <tr>
-          <td class="size-text no-wrap vertical">${(index + 1)}</td>
-          <td class="size-text no-wrap vertical">${item.FECHA_HORA}</td>
-          <td class="size-td no-wrap vertical">${item.USUARIO}</td>
-          <td class="size-text no-wrap vertical">${item.CODIGO_SAP}</td>
-          <td class="size-td no-wrap vertical">${cortarTexto(item.NOMBRES, 30)}</td>
-          <td class="size-td no-wrap vertical">${cortarTexto(item.RAZON_COMERCIAL, 30)}</td>
-          <td class="size-text no-wrap vertical">${item.NUMERO}</td>
-          <td class="size-text no-wrap vertical">${formatNum(item.VALOR, '$')}</td>
-          <td class="size-text no-wrap vertical">${formatNum(item.DESCUENTO, '$')}</td>
+          <td class="size-td no-wrap vertical">${(index + 1)}</td>
+          <td class="size-td no-wrap vertical">${item.FECHA_HORA}</td>
+          <td class="size-12 no-wrap vertical">${item.USUARIO}</td>
+          <td class="size-td no-wrap vertical">${item.CODIGO_SAP}</td>
+          <td class="size-12 no-wrap vertical">${cortarTexto(item.NOMBRES, 30)}</td>
+          <td class="size-12 no-wrap vertical">${cortarTexto(item.RAZON_COMERCIAL, 30)}</td>
+          <td class="size-td no-wrap vertical">${item.NUMERO}</td>
+          <td class="size-td no-wrap vertical">${formatNum(item.VALOR, '$')}</td>
+          <td class="size-td no-wrap vertical">${formatNum(item.DESCUENTO, '$')}</td>
           <td class="text-center"><button class="btn btn-${color} btn-sm" type="button">${estado}</button></td>
-          <td class="text-center">
-            <button type="button" class="btn btn-warning btn-sm" onclick="AbrirRecibo('${item.ID_RC}', this)"><i class="fa-solid fa-bolt"></i></button>
-          </td>
+          <td class="text-center"><button type="button" class="btn btn-warning btn-sm" onclick="AbrirRecibo('${item.ID_RC}', this)"><i class="fa-solid fa-bolt"></i></button></td>
           <td style="display: none;">${item.TEXTO_CABECERA}</td>
           <td style="display: none;">${item.TEXTO_COMPENSACION}</td>
           <td style="display: none;">${item.TEXTO_REFERENCIA}</td>
-          <td class="text-center">
-            <button type="button" class="btn btn-primary btn-sm" onclick="PDFRecibo('${item.ID_RC}', this)"><i class="fa-solid fa-file-pdf"></i></button>
-          </td>
+          <td class="text-center"><button type="button" class="btn btn-primary btn-sm" onclick="PDFRecibo('${item.ID_RC}', this)"><i class="fa-solid fa-file-pdf"></i></button></td>
           <td style="display: none;">${item.ADJUNTO}</td>
-          <td class="size-td no-wrap vertical">${item.ZONA_VENTAS}</td>
-          <td class="size-text no-wrap vertical">${item.ID_RC}</td>
+          <td class="size-12 no-wrap vertical">${item.ZONA_VENTAS}</td>
+          <td class="size-td no-wrap vertical">${item.ID_RC}</td>
           <td style="display: none;">${item.EMAIL}</td>
           <td style="display: none;">${item.EMAIL_ZONA}</td>
           <td style="display: none;">${item.USUARIO_APRUEBA}</td>
@@ -2097,228 +2091,178 @@ async function ConsultarCondicionEspecial() {
   }
 }
 // FUNCIÓN AUTORIZAR CONDICIÓN ESPECIAL
-function AutorizarCondicionEspecial(id) {
-  var rol = $("#RolId").val();
-  if (rol == 1 || rol == 18) { //Administrador - gerencia administrativa
-    Swal.fire({
-      title: 'Autorizar condición de descuento #' + id,
-      text: "Esta seguro?",
-      type: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#82ED81",
-      cancelButtonColor: "#FFA3A4",
-      confirmButtonText: "SI",
-      cancelButtonText: "NO",
-      closeOnConfirm: false,
-      closeOnCancel: false
-    }).then((result) => {
-      if (result.value) {
-        $.ajax({
-          type: "POST",
-          url: "../models/RecibosCaja.php",
-          async: false,
-          dataType: "html",
-          error: function (OBJ, ERROR, JQERROR) { },
-          beforeSend: function () { },
-          data: {
-            op: "A_CONDICION_ESPECIAL",
-            id: id
-          },
-          success: function (data) {
-            if (data == 1) {
-              Swal.fire('Excelente', 'Condicion autorizada con exito', 'success');
-            } else {
-              Swal.fire('Error', 'No fue posible autorizar!' + data, 'error');
-            }
-            ConsultarCondicionEspecial();
-          }
-        }).fail(function (data) {
-          console.error(data);
-        });
+async function AutorizarCondicionEspecial(id) {
+  let rol = $("#RolId").val();  
+  if (rol == 1 || rol == 73) { // Administrador - gerencia administrativa
+    const result = await confirmAlert(`Autorizar condición de descuento #${id}`, "¿Está seguro?");
+    if (result.isConfirmed) {
+      try {
+        const data = await enviarPeticion({op: "A_CONDICION_ESPECIAL", link: "../models/RecibosCaja.php", id});
+        if (data == 1) {
+          Swal.fire('Excelente', 'Condicion autorizada con exito', 'success');
+        } else {
+          Swal.fire('Error', 'No fue posible autorizar!' + data, 'error');
+        }
+        ConsultarCondicionEspecial();        
+      } catch (error) {
+        console.error(error);
       }
-    });
+    }
   } else {
     Swal.fire('Error', 'Usted no cuenta con los permisos para autorizar, este tipo de solicitudes.', 'error');
   }
 }
 // FUNCIÓN AUTORIZAR TODA CONDICIÓN
-function AutorizarTodoCondicion() {
-  var nFilas = $("#tableCondicionesEspeciales tr").length;
-  var rol = $("#RolId").val();
-  if (rol == 1 || rol == 18) { //Administrador - gerencia administrativa
+async function AutorizarTodoCondicion() {
+  let nFilas = $("#tableCondicionesEspeciales tr").length;
+  let rol = $("#RolId").val();
+  if (rol == 1 || rol == 73) { // Administrador - gerencia administrativa
     if (nFilas > 0) {
-      Swal.fire({
-        title: 'Se autorizarán todas las condiciones',
-        text: "Esta seguro de autorizar todo?",
-        type: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#82ED81",
-        cancelButtonColor: "#FFA3A4",
-        confirmButtonText: "SI",
-        cancelButtonText: "NO",
-        closeOnConfirm: false,
-        closeOnCancel: false
-      }).then((result) => {
-        if (result.value) {
-          $("#tableCondicionesEspeciales tr:gt(0)").each(function (index, element) {
-            var id = $(this).find('td').eq(0).html();
-            $.ajax({
-              type: "POST",
-              encoding: "UTF-8",
-              url: "../models/RecibosCaja.php",
-              async: false,
-              dataType: "html",
-              error: function (OBJ, ERROR, JQERROR) { },
-              beforeSend: function () { },
-              data: {
-                op: "A_CONDICION_ESPECIAL",
-                id: id
-              },
-              success: function (data) {
-
-              }
-            }).fail(function (data) {
-              console.log(data);
-            });
+      const result = await confirmAlert("Se autorizarán todas las condiciones", "¿Está seguro de autorizar todo?");
+      if (result.isConfirmed) {
+        try {
+          $("#tableCondicionesEspeciales tr:gt(0)").each(async function () {
+            let id = $(this).find('td').eq(0).html();
+            await enviarPeticion({op: "A_CONDICION_ESPECIAL", link: "../models/RecibosCaja.php", id});           
           });
-          Swal.fire('Excelente', 'Condiciones autorizadas con exito', 'success');
+          Swal.fire("Excelente", "Condiciones autorizadas con éxito", "success");
           ConsultarCondicionEspecial();
+        } catch (error) {
+          console.error(error);
         }
-      });
+      }
     } else {
-      Swal.fire('Oops', 'No hay nada que autorizar', 'error');
+      Swal.fire("Oops!!!", "No hay nada que autorizar", "error");
     }
   }
-
 }
 // FUNCIÓN CONSULTAR CONDICIÓN LISTA
-function ConsultarCondicionLista() {
-  var lista = $("#Lista").val();
+async function ConsultarCondicionLista() {
+  let lista = $("#Lista").val();
   let oficina = $("#Oficina").val();
+  try {
+    const data = await enviarPeticion({op: "S_CONDICION_LISTAS", link: "../models/RecibosCaja.php", oficina});
+    if (data.length) {
+      let tabla = `
+      <table class="table table-bordered table-hover table-sm" width="100%" id="">
+        <thead class="table-info">
+          <tr>
+            <th class="size-th">LISTA</th>
+            <th class="size-th">DIAS</th>
+            <th class="size-th">% DESCUENTO</th>
+            <th class="size-th">SUJETO PPTO</th>
+            <th class="size-th">OFICINA</th>
+          </tr>
+        </thead>
+        <tbody>`;
 
-  $.ajax({
-    type: "POST",
-    encoding: "UTF-8",
-    url: "../models/RecibosCaja.php",
-    async: true,
-    dataType: "json",
-    error: function (OBJ, ERROR, JQERROR) { },
-    beforeSend: function () { },
-    data: {
-      op: 'S_CONDICION_LISTAS',
-      oficina: oficina
-    },
-    success: function (data) { //console.log(data);
-      if (data.length > 0) {
-        var tabla = '<table class="table table-bordered table-hover table-sm" width="100%" id="">'
-          + '<thead class="table-info">'
-          + '<tr>'
-          + '<th class="size-th">LISTA</th>'
-          + '<th class="size-th">DIAS</th>'
-          + '<th class="size-th">% DESCUENTO</th>'
-          + '<th class="size-th">SUJETO PPTO</th>'
-          + '<th class="size-th">OFICINA</th>'
-          + '</tr>'
-          + '</thead>'
-          + '<tbody>';
-        var tabla2 = '<table class="table table-bordered table-hover table-sm" width="100%" id="tableCondicionesLista">'
-          + '<thead class="table-info">'
-          + '<tr>'
-          + '<th class="size-th">LISTA</th>'
-          + '<th class="size-th">DIAS</th>'
-          + '<th class="size-th">% DESCUENTO</th>'
-          + '<th class="size-th">OFICINA</th>'
-          + '</tr>'
-          + '</thead>'
-          + '<tbody>';
-        var tabla3 = '<table class="table table-bordered table-hover table-sm" width="100%" id="tableCondicionesListaPlazo">'
-          + '<thead class="table-info">'
-          + '<tr>'
-          + '<th class="size-th">LISTA</th>'
-          + '<th class="size-th">DIAS</th>'
-          + '<th class="size-th">% DESCUENTO</th>'
-          + '<th class="size-th">OFICINA</th>'
-          + '</tr>'
-          + '</thead>'
-          + '<tbody>';
-        var cont = 0;
-        var cont2 = 0;
-        for (var i = 0; i <= data.length - 1; i++) {
+      let tabla2 = `
+       <table class="table table-bordered table-hover table-sm" width="100%" id="tableCondicionesLista">
+          <thead class="table-info">
+            <tr>
+              <th class="size-th">LISTA</th>
+              <th class="size-th">DIAS</th>
+              <th class="size-th">% DESCUENTO</th>
+              <th class="size-th">OFICINA</th>
+            </tr>
+          </thead>
+          <tbody>`;
 
-          if (lista == data[i].lista) {
-            ArrDctos.push({
-              dias: data[i].dias,
-              descuento: data[i].descuento,
-              tipo: 'ADG'
-            })
-            if (data[i].sujeto_ppto == 'S') {
-              cont++;
-              tabla2 += '<tr>'
-                + '<td class="size-text vertical">' + data[i].lista + '</td>'
-                + '<td class="size-text vertical">' + data[i].dias + '</td>'
-                + '<td class="size-text vertical">' + data[i].descuento + '</td>'
-                + '<td class="size-text vertical">' + data[i].oficina_ventas + '</td>'
-                + '</tr>';
-            } else {
-              cont2++;
-              tabla3 += '<tr>'
-                + '<td class="size-text vertical">' + data[i].lista + '</td>'
-                + '<td class="size-text vertical">' + data[i].dias + '</td>'
-                + '<td class="size-text vertical">' + data[i].descuento + '</td>'
-                + '<td class="size-text vertical">' + data[i].oficina_ventas + '</td>'
-                + '</tr>';
-            }
+      let tabla3 = `
+       <table class="table table-bordered table-hover table-sm" width="100%" id="tableCondicionesListaPlazo">
+          <thead class="table-info">
+            <tr>
+              <th class="size-th">LISTA</th>
+              <th class="size-th">DIAS</th>
+              <th class="size-th">% DESCUENTO</th>
+              <th class="size-th">OFICINA</th>
+            </tr>
+          </thead>
+          <tbody>`;
 
+      let cont = 0;
+      let cont2 = 0;
+
+      data.forEach(item => {
+        if (lista == item.lista) {
+          ArrDctos.push({dias: item.dias, descuento: item.descuento, tipo: 'ADG'});
+
+          if (item.sujeto_ppto == 'S') {
+            cont++;
+
+            tabla2 += `
+            <tr>
+              <td class="size-text vertical">${item.lista}</td>
+              <td class="size-text vertical">${item.dias}</td>
+              <td class="size-text vertical">${item.descuento}</td>
+              <td class="size-text vertical">${item.oficina_ventas}</td>
+            </tr>`;
+          } else {
+            cont2++;
+
+            tabla3 += `
+            <tr>
+              <td class="size-text vertical">${item.lista}</td>
+              <td class="size-text vertical">${item.dias}</td>
+              <td class="size-text vertical">${item.descuento}</td>
+              <td class="size-text vertical">${item.oficina_ventas}</td>
+            </tr>`;
           }
-          tabla += '<tr>'
-            + '<td class="size-text vertical">' + data[i].lista + '</td>'
-            + '<td class="size-text vertical">' + data[i].dias + '</td>'
-            + '<td class="size-text vertical">' + data[i].descuento + '</td>'
-            + '<td class="size-text vertical">' + data[i].sujeto_ppto + '</td>'
-            + '<td class="size-text vertical">' + data[i].oficina_ventas + '</td>'
-            + '</tr>';
-
-
-        }
-        tabla += '</tbody></table>';
-        tabla2 += '</tbody></table>';
-        tabla3 += '</tbody></table>';
-        $("#dvResultCondicionesEspecialesListas").html(tabla);
-
-        //Condiciones por lista de precios sujetas a cumplimiento de presupuesto de ventas
-
-        if (cont > 0) {
-          $("#dvCondicionesDetalleLista").html(tabla2);
-        } else {
-          $("#dvCondicionesDetalleLista").html(`<div class="alert alert-danger" role="alert">
-                                                    <i class="fa-solid fa-circle-exclamation"></i>
-                                                    <span class="sr-only">Error:</span> No tiene condiciones especiales asociadas.
-                                                   </div>`);
         }
 
-        //Condiciones por lista de precios sujetas a plazo de pago	
-        if (cont2 > 0) {
-          $("#dvCondicionesDetalleListaPlazo").html(tabla3);
-        } else {
-          $("#dvCondicionesDetalleListaPlazo").html(`<div class="alert alert-danger" role="alert">
-														<i class="fa-solid fa-circle-exclamation"></i>
-														<span class="sr-only">Error:</span> No tiene condiciones especiales asociadas.
-													   </div>`);
-        }
+        tabla += `
+        <tr>
+          <td class="size-text vertical">${item.lista}</td>
+          <td class="size-text vertical">${item.dias}</td>
+          <td class="size-text vertical">${item.descuento}</td>
+          <td class="size-text vertical">${item.sujeto_ppto}</td>
+          <td class="size-text vertical">${item.oficina_ventas}</td>
+        </tr>`;
+      });
+
+      tabla += `</tbody></table>`;
+      tabla2 += `</tbody></table>`;
+      tabla3 += `</tbody></table>`;
+      $("#dvResultCondicionesEspecialesListas").html(tabla);
+
+      // CONDICIONES POR LISTA DE PRECIOS SUJETAS A CUMPLIMIENTO DE PRESUPUESTO DE VENTAS
+      if (cont > 0) {
+        $("#dvCondicionesDetalleLista").html(tabla2);
       } else {
-        $("#dvResultCondicionesEspecialesListas, #dvCondicionesDetalleLista").html(`<div class="alert alert-danger" role="alert">
-																							<i class="fa-solid fa-circle-exclamation"></i>
-																							<span class="sr-only">Error:</span> No hay resultados o no ha seleccionado un cliente.
-																					   </div>`);
+        const msgHtml = `
+        <div class="alert alert-danger" role="alert">
+          <i class="fa-solid fa-circle-exclamation"></i>
+          <span class="sr-only">Error:</span> No tiene condiciones especiales asociadas.
+        </div>`;
+        $("#dvCondicionesDetalleLista").html(msgHtml);
       }
+
+      // CONDICIONES POR LISTA DE PRECIOS SUJETAS A PLAZO DE PAGO
+      if (cont2 > 0) {
+        $("#dvCondicionesDetalleListaPlazo").html(tabla3);
+      } else {
+        const msgHtml = `
+        <div class="alert alert-danger" role="alert">
+          <i class="fa-solid fa-circle-exclamation"></i>
+          <span class="sr-only">Error:</span> No tiene condiciones especiales asociadas.
+        </div>`;
+        $("#dvCondicionesDetalleListaPlazo").html(msgHtml);
+      }
+    } else {
+      const msgHtml = `
+      <div class="alert alert-danger" role="alert">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span class="sr-only">Error:</span> No hay resultados o no ha seleccionado un cliente.
+      </div>`;
+       $("#dvResultCondicionesEspecialesListas, #dvCondicionesDetalleLista").html(msgHtml);
     }
-  }).fail(function (data) {
-    console.error(data);
-  });
+  } catch (error) {
+    console.error(error); 
+  }
 }
 // FUNCIÓN PARA FILTRAR ESTADOS
 function filtroEstado(valor) {
-  theTable = $("#tablePlanillas tr:gt(0)");
+  const theTable = $("#tablePlanillas tr:gt(0)");
   theTable.each(function () {
     if (valor == 'T') {
       $(this).show();
@@ -2335,7 +2279,6 @@ function filtroEstado(valor) {
         $(this).hide();
       }
     }
-
   });
 }
 // FUNCIÓN CONSULTAR INFORMES
@@ -2475,13 +2418,9 @@ function GenerarGrafico(titulo, jsonArray) {
     Highcharts.chart('DivGrafico', {
       chart: {type: 'column'},
       title: {text: titulo},
-      accessibility: {
-        announceNewData: {enabled: true}
-      },
+      accessibility: {announceNewData: {enabled: true}},
       xAxis: {type: 'category'},
-      yAxis: {
-        title: {text: 'Numero de recibos'}
-      },
+      yAxis: {title: {text: 'Numero de recibos'}},
       legend: {enabled: false},
       plotOptions: {
         series: {
@@ -2526,6 +2465,8 @@ const compensarDocumentos = async () => {
   let fhFin = $("#fhCompenFin").val();
   let doc = $("#idCompenDoc").val();
   let mensaje = '';
+  let titulo = "";
+
   if (doc == '') {
     titulo = `Compensación por fechas`;
     mensaje = `Esta seguro de esta operación, esto no se puede reversar?`;
@@ -2535,38 +2476,24 @@ const compensarDocumentos = async () => {
   }
 
   try {
-    const data = {
-      link: "../models/RecibosCaja.php",
-      op: "COMPENSAR_DOCUMENTOS",
-      fhIni: fhIni,
-      fhFin: fhFin,
-      doc: doc
-    }
-    Swal.fire({
-      title: titulo,
-      text: mensaje,
-      type: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#82ED81",
-      cancelButtonColor: "#FFA3A4",
-      confirmButtonText: "SI",
-      cancelButtonText: "NO",
-      closeOnConfirm: false,
-      closeOnCancel: false
-    }).then(async (result) => {
-      if (result.value) {
-        let resp = await enviarPeticion(data);
-        if (resp.estatus) {
-          Swal.fire('Excelente!', resp.msg, 'success');
-          limpiarCompensar();
-        } else {
-          Swal.fire('Error!', resp.msg, 'error');
-        }
+    const result = await confirmAlert(titulo, mensaje);
+    if (result.isConfirmed) {
+      let resp = await enviarPeticion({
+        link: "../models/RecibosCaja.php",
+        op: "COMPENSAR_DOCUMENTOS",
+        fhIni: fhIni,
+        fhFin: fhFin,
+        doc: doc
+      });
+      if (resp.estatus) {
+        Swal.fire("Excelente!", resp.msg, "success");
+        limpiarCompensar();
       } else {
-        Swal.fire('Correcto!', 'Compensación cancelada', 'warning');
+        Swal.fire("Error!", resp.msg, "error");
       }
-    });
-
+    } else {
+      Swal.fire("Correcto!", "Compensación cancelada", "warning");
+    }
   } catch (e) {
     console.log(e);
   }
@@ -2574,6 +2501,22 @@ const compensarDocumentos = async () => {
 // FUNCIÓN PARA CORTAR TEXTOS
 function cortarTexto(texto, maxLongitud) {
   return texto.length > maxLongitud ? texto.slice(0, maxLongitud) + '...' : texto;
+}
+// FUNCIÓN PARA FILTAR EL AUTOCOMPLETE DE CLIENTES
+function filtrarClientes(id) {
+  let Arr_cli = ArrCli;
+  const valor = $.trim($(`#${id}`).val());
+  if (validarSiNumero(valor) == 1) {
+    Arr_cli = FiltrarCli(valor, Arr_cli, 1);
+  } else {
+    let div_cadena = valor;
+    div_cadena = div_cadena.split(" ");
+    for (var x = 0; x < div_cadena.length; x++) {
+      let expr = div_cadena[x].trim();
+      Arr_cli = FiltrarCli(expr, Arr_cli, 2);
+    }
+  }
+  return Arr_cli.slice(0, 10);
 }
 
 // EJECUCIÓN DE FUNCIONALIDADES
@@ -2607,69 +2550,68 @@ $(function () {
   });
 
   $("#FiltroPlanilla").keyup(function () {
-    theTable = $("#tablePlanillas > tbody > tr");
-    var value = $(this).val().toLowerCase();
+    const theTable = $("#tablePlanillas > tbody > tr");
+    const value = $(this).val().toLowerCase();
     theTable.filter(function () {
       $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
     });
   });
 
+  // CAMPO AUTOCOMPLETE PARA BUSQUEDA DE MULTICASH 
   $("#filtro").autocomplete({
     source: function (request, response) {
-      Array_Cash = ArrayMulticash;
-      valor = $.trim($("#filtro").val());
-      div_cadena = valor;
+      let Array_Cash = ArrayMulticash;
+      const valor = $.trim($("#filtro").val());
+      let div_cadena = valor;
       div_cadena = div_cadena.split(" ");
 
-      for (var x = 0; x < div_cadena.length; x++) {
-        expr = $.trim(div_cadena[x]);
+      for (let x = 0; x < div_cadena.length; x++) {
+        let expr = div_cadena[x].trim();
         Array_Cash = FiltrarArray(expr, Array_Cash, 2);
       }
       response(Array_Cash.slice(0, 40));
     },
     maxResults: 40,
     minLength: 3,
-    search: function () { },
-    open: function (event, ui) { },
     select: function (event, ui) {
-      var sw = 0;
-      $("#tdDetalleMulticash tr").each(function (index, element) {
-        var id = $(this).find('td').eq(9).html();
-        if (ui.item.id == id) {
-          sw = 1;
-        }
+      let sw = 0;
+
+      $("#tdDetalleMulticash tr").each(function () {
+        let id = $(this).find('td').eq(9).html();
+        if (ui.item.id == id) sw = 1;
       });
+
       if (sw == 0) {
         if (ui.item.estado == 0) {
-          $("#tdDetalleMulticash").append('<tr onDblClick="AddMulticash(this)">'
-            + '<td class="size-text">' + ui.item.cuenta + '</td>'
-            + '<td class="size-td">' + ui.item.descripcion + '</td>'
-            + '<td class="size-text">' + ui.item.numero + '</td>'
-            + '<td class="size-text">' + formatNum(ui.item.valor, '$') + '</td>'
-            + '<td class="size-text">' + ui.item.texto + '</td>'
-            + '<td class="size-text">' + ui.item.fecha_cont + '</td>'
-            + '<td class="size-text">' + ui.item.fecha_val + '</td>'
-            + '<td class="size-text">' + ui.item.estado + '</td>'
-            + '<td class="size-text">' + ui.item.referencia + '</td>'
-            + '<td class="size-text">' + ui.item.id + '</td>'
-            + '</tr>');
+          const templateHTML = `
+          <tr onDblClick="AddMulticash(this)">
+            <td class="size-text">${ui.item.cuenta}</td>
+            <td class="size-td">${ui.item.descripcion}</td>
+            <td class="size-text">${ui.item.numero}</td>
+            <td class="size-text">${formatNum(ui.item.valor, "$")}</td>
+            <td class="size-text">${ui.item.texto}</td>
+            <td class="size-text">${ui.item.fecha_cont}</td>
+            <td class="size-text">${ui.item.fecha_val}</td>
+            <td class="size-text">${ui.item.estado}</td>
+            <td class="size-text">${ui.item.referencia}</td>
+            <td class="size-text">${ui.item.id}</td>
+          </tr>`; 
+          $("#tdDetalleMulticash").append(templateHTML);
         } else {
-          Swal.fire('Oops', 'Ya el valor se aplico en el recibo :' + ui.item.id_rc, 'error');
+          Swal.fire("Oops", "Ya el valor se aplico en el recibo :" + ui.item.id_rc, "error");
         }
       } else {
-        Swal.fire('Oops', 'Valor ya agregado', 'error');
+        Swal.fire("Oops", "Valor ya agregado", "error");
       }
     }
   }).focusout(function () {
     $('#filtro').val('');
   });
 
-  //Carga de archivo PDF
-  $("#DocPDF").change(function () {
-    uploadAjax();
-  });
+  $("#DocPDF").change(function () { uploadAjax(); });
 
   const idRol = parseInt($("#RolId").val());
+  // CLICK PARA AUTORIZACIONES
   if (idRol == 1 || idRol == 26) { // Administrador & contabilidad
     $("#btnAutorizar").show();
     $("#btnCompensaciones").attr("disabled", false);
@@ -2677,14 +2619,15 @@ $(function () {
     $("#btnAutorizar").hide();
     $("#btnCompensaciones").attr("disabled", true);
   }
-  //Cuentas 
-  var sociedad = $("#Sociedad").val();
+  
+  const sociedad = $("#Sociedad").val();
+  // VALIDACIÓN DE CUENTAS
   if (sociedad == 1000) {
     $("#Cuenta").html('<option value="2815050503">2815050503 - AJUSTE AL PESO CM</option>');
   } else {
     $("#Cuenta").html('<option value="2815051601">2815051601 - AJUSTE AL PESO ROMA</option>');
   }
-  //Cargue de multicash
+  // CLICK PARA EL CARGUE DEL MULTICASH
   if (idRol == 1 || idRol == 4) { //Tesoreria & administrador
     $("#btnSubirMulticash").attr('disabled', false);
   } else {
@@ -2704,8 +2647,8 @@ $(function () {
   $("#FechaDocumento").datepicker({
     changeMonth: true,
     changeYear: true,
-    monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-    monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+    monthNames: arrayMeses,
+    monthNamesShort: arrayMesesAbrev,
     dateFormat: 'yy-mm-dd',
     width: 100,
     heigth: 100,
@@ -2715,8 +2658,8 @@ $(function () {
   $("#FechaValor,#RptFhFin,#RptFhIni, #InfoFhIni,#InfoFhFin,#fhCompenIni,#fhCompenFin").datepicker({
     changeMonth: true,
     changeYear: true,
-    monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-    monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+    monthNames: arrayMeses,
+    monthNamesShort: arrayMesesAbrev,
     dateFormat: 'yy-mm-dd',
     width: 100,
     heigth: 100
@@ -2726,44 +2669,25 @@ $(function () {
 
   $(document).keyup(function (e) {
     tecla = e.keyCode;
-    if (tecla == 115) { //F4 para guardar documento
-      Guardar();
-    }
+    if (tecla == 115) { Guardar(); } // F4 para guardar documento
   });
 
   $("#txtValidaDocumento").keyup(function (e) {
-    var tecla = e.keyCode;
-    var valor = $(this).val();
-    if (tecla == 13) { //Enter para consultar
-      if (valor != '') {
-        ValidarDocumento(valor);
-      } else {
-        Swal.fire('Error', 'Debe ingresar un número de documento válido.', 'error');
-      }
-
+    let tecla = e.keyCode;
+    let valor = $(this).val();
+    if (tecla == 13) { // Enter para consultar
+      if (valor !== "") ValidarDocumento(valor);
+      else Swal.fire("Error", "Debe ingresar un número de documento válido.", "error");
     }
   });
 
+  // CAMPO AUTOCOMPLETE PARA CLIENTES 
   $('#Cliente').autocomplete({
-    source: function (request, response) {
-      Arr_cli = ArrCli;
-      valor = $.trim($("#Cliente").val());
-      if (validarSiNumero(valor) == 1) {
-        Arr_cli = FiltrarCli(valor, Arr_cli, 1);
-      } else {
-        div_cadena = valor;
-        div_cadena = div_cadena.split(" ");
-        for (var x = 0; x < div_cadena.length; x++) {
-          expr = $.trim(div_cadena[x]);
-          Arr_cli = FiltrarCli(expr, Arr_cli, 2);
-        }
-      }
-      response(Arr_cli.slice(0, 10));
+    source: function (request, response) {     
+      response(filtrarClientes("Cliente"));
     },
     maxResults: 10,
     minLength: 3,
-    search: function () { },
-    open: function (event, ui) { },
     select: function (event, ui) {
       limpiarDatos();
 
@@ -2789,34 +2713,20 @@ $(function () {
       ConsultarCondicionLista();
     }
   });
-  //-------------------------------------------------------------------------------
+  
   $('#txt_CondCliente').autocomplete({
-    source: function (request, response) {
-      Arr_cli = ArrCli;
-      valor = $.trim($("#txt_CondCliente").val());
-      if (validarSiNumero(valor) == 1) {
-        Arr_cli = FiltrarCli(valor, Arr_cli, 1);
-      } else {
-        div_cadena = valor;
-        div_cadena = div_cadena.split(" ");
-        for (var x = 0; x < div_cadena.length; x++) {
-          expr = $.trim(div_cadena[x]);
-          Arr_cli = FiltrarCli(expr, Arr_cli, 2);
-        }
-      }
-      response(Arr_cli.slice(0, 10));
+    source: function (request, response) {      
+      response(filtrarClientes("txt_CondCliente"));
     },
     maxResults: 10,
     minLength: 3,
-    search: function () { },
-    open: function (event, ui) { },
     select: function (event, ui) {
       $("#txt_CondCodigo").val(ui.item.codigo_sap);
     }
   });
-  //-------------------------------------------------------------------------------  
+  
   $(".ClassNumero").maskMoney({
-    selectAllOnFocus: true, //evento onkeyup 
+    selectAllOnFocus: true,
     prefix: '$',
     thousands: '.',
     decimal: ',',
@@ -2824,70 +2734,75 @@ $(function () {
   });
 
   ConsultarPlanilla();
-  $("#RptFhFin,#RptFhIni").change(function () {
+
+  $("#RptFhFin, #RptFhIni").change(function () {
     ConsultarPlanilla();
   });
-  //Nuevo 29-04-2020
+
   $("#btnSubirMulticash").click(function () {
     $("#tr_det_cash").html('');
     $("#filename").val('');
     $("#dvSubirCash").modal('show');
-  })
-  //Cargue de plano Multicash
+  });
+
+  // CARGUE DE PLANO MULTICASH
   $("#filename").val('');
   $("#filename").change(function (e) {
-    var ext = $("input#filename").val().split(".").pop().toLowerCase();
+    const ext = $("input#filename").val().split(".").pop().toLowerCase();
+
     if ($.inArray(ext, ["csv"]) == -1) {
-      alert('Solo se permiten archivos CSV');
+      Swal.fire("Oops!!!", "Solo se permiten archivos CSV", "error");
       $("#filename").val('');
       return false;
     }
+
     if (e.target.files != undefined) {
-      var reader = new FileReader();
+      const reader = new FileReader();
+
       reader.onload = function (e) {
-        var csvval = e.target.result.split("\n");
-        var detalle = '';
-        var vtotal = 0;
-        for (var i = 0; i < csvval.length; i++) { //for 1		
-          var row = csvval[i];
-          if (row != '') {
-            var col = row.split(',');
+        let csvval = e.target.result.split("\n");
+        let detalle = '';
+        let vtotal = 0;
+
+        for (let i = 0; i < csvval.length; i++) {
+          const row = csvval[i];
+          if (row !== '') {
+            const col = row.split(',');
             vtotal += parseFloat(col[1]);
-            detalle += '<tr>'
-              + '<td>' + $.trim(col[0]) + '</td>'
-              + '<td>' + $.trim(col[1]) + '</td>'
-              + '<td>' + formatNum(parseFloat($.trim(col[2])) * -1, '$') + '</td>'
-              + '<td>' + $.trim(col[3]) + '</td>'
-              + '<td>' + $.trim(col[4]) + '</td>'
-              + '<td>' + $.trim(col[5]) + '</td>'
-              + '<td>' + $.trim(col[6]) + '</td>'
-              + '</tr>';
+            let valorCol2 = formatNum(parseFloat(col[2].trim()) * -1, '$');
+            detalle += `
+            <tr>
+              <td>${col[0].trim()}</td>
+              <td>${col[1].trim()}</td>
+              <td>${valorCol2}</td>
+              <td>${col[3].trim()}</td>
+              <td>${col[4].trim()}</td>
+              <td>${col[5].trim()}</td>
+              <td>${col[6].trim()}</td>
+            </tr>`;
           }
-
-        } //fin for
-        if (detalle != '') {
-          //Importe,Texto,Fecha contabilización,Fecha valor
-          var tb = '<table class="form" width="100%" id="tdImportCash">'
-            + '<thead>'
-            + '<tr>'
-            + '<th>Cuenta</th>'
-            + '<th>Documento</th>'
-            + '<th>Importe</th>'
-            + '<th>Texto</th>'
-            + '<th>Fecha Conta.</th>'
-            + '<th>Fecha Valor.</th>'
-            + '<th>Referencia</th>'
-            + '</tr>'
-            + '</thead>'
-            + '<tbody>'
-            +
-
-            detalle
-            + '</tbody>'
-            + '</table>';
-          $("#tr_det_cash").html(tb);
         }
 
+        if (detalle != '') {
+          var tb = `
+          <table class="form" width="100%" id="tdImportCash">
+            <thead>
+              <tr>
+              <th>Cuenta</th>
+              <th>Documento</th>
+              <th>Importe</th>
+              <th>Texto</th>
+              <th>Fecha Conta.</th>
+              <th>Fecha Valor.</th>
+              <th>Referencia</th>
+              </tr>
+            </thead>
+            <tbody>
+            ${detalle}
+            </tbody>
+          </table>`;
+          $("#tr_det_cash").html(tb);
+        }
       };
       reader.readAsText(e.target.files.item(0));
     }
@@ -2904,6 +2819,7 @@ $(function () {
     if ($("#CodigoSAP").val() != '') $("#dvCondiciones").modal("show");
     else Swal.fire("Error", "Debe seleccionar un cliente!.", "error");
   });
+
   // BOTONES DE HIPERVINCULO
   actualizarElementoSegunPermisos("0401", "#0401");
   actualizarElementoSegunPermisos("0102", "#0102");
@@ -2924,18 +2840,18 @@ $(function () {
         break;
     }
 
-    $("#ModalHipervinculo").modal("show")
+    $("#ModalHipervinculo").modal("show");
     $("#span-titulo-modulo").text(title);
     $(".iframe").attr('src', url).show();
   });
 
   $("#btnCompensaciones").click(() => {
     $("#modalCompensaciones").modal('show');
-  })
+  });
 
   $("#btnCompensar").click(() => {
     compensarDocumentos();
-  })
+  });
 
   $('#btnSeleccionarTodas').click(async function () {
     arrayLiquidador.length = 0;
@@ -2967,7 +2883,7 @@ $(function () {
 
   if (!arrayLiquidador.length) $('#contenedorTablasLiquidador').html(`<p class="lead text-center">No hay documentos agregados al liquidador</p>`);
   
-  $("#Cliente").on("input", function () {
+  $("#Cliente, #txt_CondCliente, #filtro").on("input", function () {
     this.value = this.value.toUpperCase();
   });
 });

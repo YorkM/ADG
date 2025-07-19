@@ -1537,8 +1537,6 @@ switch ( $_POST[ 'op' ] ) {
 			  p.oficina_ventas,
 			  p.codigo_sap,
 			  p.cliente,
-
-
 			  p.nit_cliente,
 			  p.fecha_pedido,
 			  p.valor_total,
@@ -1568,19 +1566,23 @@ switch ( $_POST[ 'op' ] ) {
 		 isnull(p.visible,1) =1 and 
 		 p.organizacion_ventas = '" . $_SESSION[ 'ses_NumOrg' ] . "' and  
 		 cast(p.fecha_real as date) between '" . Formato_Fecha_A_M_D( $_POST[ 'fh1' ] ) . "' and '" . Formato_Fecha_A_M_D( $_POST[ 'fh2' ] ) . "'";
-      if ( $_POST[ 'zona' ] > 0 ) {
+
+      if ( $_POST[ 'zona' ] !== "0" && $_POST[ 'zona' ] !== "" ) {
         $sql .= "  and p.zona_ventas = '" . $_POST[ 'zona' ] . "'";
       }
+
       if ( $_POST[ 'codigo' ] != '' ) {
         $sql .= "  and p.codigo_sap = '" . $_POST[ 'codigo' ] . "'";
       }
+
       if ( $_POST[ 'clase' ] != 'T' ) {
         $sql .= " and p.clase = '" . $_POST[ 'clase' ] . "'";
       }
+
       if ( $_POST[ 'oficina' ] != '1000' && $_POST[ 'oficina' ] != '2000' ) {
         $sql .= " and p.oficina_ventas = '" . $_POST[ 'oficina' ] . "'";
       }
-      //echo $sql;
+     
       echo json_encode( GenerarArray( $sql, '' ) );
       mssql_close();
     }

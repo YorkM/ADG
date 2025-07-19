@@ -231,6 +231,14 @@ Redireccionar();
     #select2-txtZonas-results {
       font-size: 14px !important;
     }
+
+    .no-wrap {
+      padding: 0;
+      line-height: 2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
   </style>
 </head>
 
@@ -540,7 +548,7 @@ Redireccionar();
             </tbody>
           </table>
           <div>
-            <button class="btn btn-outline-primary btn-sm w-btn shadow" onClick="GestionPedidos();">Buscar</button>
+            <button class="btn btn-outline-primary btn-sm w-btn shadow" id="buscarPedidos">Buscar</button>
             <button class="btn btn-outline-success btn-sm w-btn shadow" id="exportar_gestion">Exportar</button>
             <button class="btn btn-light btn-sm w-btn btn-micro shadow" onClick="LimpiarGestionPedido();">Limpiar</button>
           </div>

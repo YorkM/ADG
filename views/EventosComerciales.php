@@ -17,17 +17,16 @@
   <style>
     html,
     * {
-      font-size: .9rem;
+      font-size: 1rem;
     }
 
     body {
-      background-color: #F9F9F9
+      background-color: #F9F9F9;
     }
 
     div.datepicker {
       padding: 10px;
       box-shadow: 10px 10px 6px #F3F3F3;
-      ;
     }
 
     .datepicker th.dow {
@@ -101,7 +100,7 @@
       font-size: .8rem;
       text-align: left;
       color: red;
-    } 
+    }
 
     .handsontable th {
       border: 1px solid #ccc !important;
@@ -159,6 +158,39 @@
     .btn-bar {
       width: 120px;
     }
+
+    label {
+      font-size: 14px;
+    }
+
+    select>option {
+      font-size: 13px;
+    }
+
+    .no-wrap {
+      padding: 0;
+      line-height: 2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .text-green {
+      color: #055160;
+    }
+
+    .size-16 {
+      font-size: 16px;
+      font-weight: 500 !important;
+    }
+
+    .size-15 {
+      font-size: 15px;
+    }
+
+    .size-14 {
+      font-size: 14px;
+    }
   </style>
 </head>
 
@@ -170,67 +202,9 @@
   <input type="hidden" id="idEvento">
   <input type="hidden" id="oficinaSubs">
 
-  <!-- MODAL CREACION DE EVENTOS DE CIERRES  -->
-  <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="staticBackdropLabel">Creación de eventos de cierre</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <label class="p-1">Nombre</label>
-          <input class="form-control" id="nombre_evento_cierre">
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cancelar</button>
-          <button type="button" class="btn btn-outline-info" id="guardar_evento_cierre">Guardar</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- MODAL LABORATORIOS -->
-  <div class="modal fade bd-example-modal-lg" id="modal-labs" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog modal-xl">
-      <form class="form needs-validation mt-3" id="form2" onsubmit="event.preventDefault();" novalidate>
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Laboratorios participantes</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <input type="hidden" id="id-evento-modal" readonly>
-            <div class="row p-1">
-              <div class="col-9 ">
-                <label class="m-1 cl_input_csv_lab">Laboratorios participantes</label>
-                <input type="file" class="form-control cl_input_csv_lab" id="lab-csv-modal" name="lab-csv-modal">
-              </div>
-              <div class="col-1">
-                <label class="m-1 ">Agregar</label>
-                <center>
-                  <button type="button" class="btn btn-outline-success shadow-sm add-row-lab-modal "><i class="fa-solid fa-plus"></i></button>
-                </center>
-              </div>
-              <div class="col-2 text-center">
-                <label class="m-1">Eliminar lab</label>
-                <center>
-                  <button type="button" class="btn btn-outline-danger shadow-sm" onClick="EliminarLabsSave()"><i class="fa-solid fa-trash "></i></button>
-                </center>
-              </div>
-            </div>
-            <div class="row" id="list-lab-modal"></div>
-          </div>
-          <div class="modal-footer">
-            <button type="submit" class="btn btn-outline-success" id="guardar-lab-modal"><i class="fa-solid fa-flask"></i>&nbsp;Guardar</button>
-            <button type="button" class="btn btn-outline-danger" id="cancelar-lab-modal" data-bs-dismiss="modal"><i class="fa-solid fa-xmark"></i>&nbsp;Cancelar</button>
-          </div>
-        </div>
-      </form>
-    </div>
-  </div>
   <!-- VISTA GENERAL CREACIÓN - BÚSQUEDA EVENTO -->
-  <div>
-    <div class="alert alert-info mb-2" style="font-weight: 500;"><i class="fa-solid fa-star fa-flip"></i>&nbsp;0632 - EVENTOS COMERCIALES</div>
+  <div class="alert alert-info mb-2" style="font-weight: 500;"><i class="fa-solid fa-star fa-flip"></i>&nbsp;0632 - EVENTOS COMERCIALES</div>
+  <div class="container-fluid">
     <nav class="row p-1">
       <div class="nav nav-tabs" id="nav-tab" role="tablist">
         <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true"><i class="fa fa-pencil"></i> &nbsp;Creación</button>
@@ -246,12 +220,12 @@
             <input type="hidden" readonly id="id" value="0" name="id" />
             <div class="card shadow-sm p-2">
               <div class="row">
-                <div class="col">
+                <div class="col-md-6">
                   <label class="m-1">Nombre del evento</label>
-                  <input type="text" class="form-control form-control-sm" id="nombre" maxlength="255" minlength="10" name="nombre" required />
+                  <input type="text" class="form-control form-control-sm" placeholder="Nombre del evento" id="nombre" maxlength="255" minlength="10" name="nombre" required />
                   <div class="invalid-feedback"> El nombre es obligatorio! </div>
                 </div>
-                <div class="col">
+                <div class="col-md-6">
                   <label class="m-1">Oficina</label>
                   <select class="form-select form-select-sm" id="oficinas" name="oficina_ventas" required>
                   </select>
@@ -259,58 +233,58 @@
                 </div>
               </div>
               <div class="row">
-                <div class="col">
+                <div class="col-md-6">
                   <label class="m-1">Fecha inicio evento</label>
                   <input type="date" class="form-control form-control-sm fechas" name="fecha_inicio" id="fecha_inicial" required>
                   <div class="invalid-feedback"> Este campo es obligatorio! </div>
                 </div>
-                <div class="col">
+                <div class="col-md-6">
                   <label class="m-1">Fecha final evento</label>
                   <input type="date" class="form-control form-control-sm fechas" name="fecha_fin" id="fecha_final" required>
                   <div class="invalid-feedback"> Este campo es obligatorio! </div>
                 </div>
               </div>
               <div class="row">
-                <div class="col">
+                <div class="col-md-6">
                   <label class="m-1">Fecha fin viajeros terrestre</label>
                   <input type="date" class="form-control form-control-sm fechas" name="fecha_fin_terrestre" id="fecha_fin_terrestre" required>
                   <div class="invalid-feedback"> Este campo es obligatorio! </div>
                 </div>
-                <div class="col">
+                <div class="col-md-6">
                   <label class="m-1">Fecha fin viajeros aéreos</label>
                   <input type="date" class="form-control form-control-sm fechas" name="fecha_fin_aereo" id="fecha_fin_aereo" required>
                   <div class="invalid-feedback"> Este campo es obligatorio! </div>
                 </div>
               </div>
               <div class="row">
-                <div class="col">
+                <div class="col-md-6">
                   <label class="m-1">Presupuesto min. Aereos</label>
-                  <input type="text" class="form-control form-control-sm fechas format-number" name="presupuesto_aereo" id="presupuesto_aereos" required onKeyPress="return vnumeros(event)">
+                  <input type="text" class="form-control form-control-sm fechas format-number" placeholder="Presupuesto min. Aereos" name="presupuesto_aereo" id="presupuesto_aereos" required onKeyPress="return vnumeros(event)">
                   <div class="invalid-feedback"> Este campo es obligatorio! </div>
                 </div>
-                <div class="col">
+                <div class="col-md-6">
                   <label class="m-1">Presupuesto min. Terrestres</label>
-                  <input type="text" class="form-control form-control-sm fechas format-number" name="presupuesto_terrestre" id="presupuesto_terrestres" required onKeyPress=" return vnumeros(event)">
+                  <input type="text" class="form-control form-control-sm fechas format-number" placeholder="Presupuesto min. Terrestres" name="presupuesto_terrestre" id="presupuesto_terrestres" required onKeyPress=" return vnumeros(event)">
                   <div class="invalid-feedback"> Este campo es obligatorio! </div>
                 </div>
               </div>
               <div class="row">
-                <div class="col-4">
+                <div class="col-md-4">
                   <label class="m-1">Fecha fin convocatoria</label>
                   <input type="date" class="form-control form-control-sm fechas" name="fecha_fin_convocatoria" id="fecha_fin_convocatoria" required>
                   <div class="invalid-feedback"> Este campo es obligatorio! </div>
                 </div>
-                <div class="col-4">
+                <div class="col-md-4">
                   <label class="m-1">Evento cierre</label>
                   <div class="input-group mb-3 ">
                     <select class="form-select form-select-sm" id="eventos_cierres" name="id_evento_cierre">
                     </select>
                     <span class="input-group-md" id="basic-addon1">
-                      <button type="button" style="height: 29px; display: flex;" class="btn btn-sm btn-outline-primary p-2 shadow-sm" id="add-evento-cierre"><i class="fa fa-plus-circle"></i></button>
+                      <button type="button" style="height: 33px; display: flex;" class="btn btn-sm btn-outline-primary p-2 shadow-sm" id="add-evento-cierre"><i class="fa fa-plus-circle"></i></button>
                     </span>
                   </div>
                 </div>
-                <div class="col-4">
+                <div class="col-md-4">
                   <label class="m-1">Estado</label>
                   <select class="form-select form-select-sm" name="estado" id="estado">
                     <option value="A" selected>Activo</option>
@@ -322,14 +296,14 @@
                 <div class="card shadow-sm bg-light border-1 p-1 border-light">
                   <h6><i class="fa-solid fa-map-location-dot"></i> Info de lugar y logistica</h6>
                   <div class="row p-1">
-                    <div class="col">
+                    <div class="col-md-6">
                       <label class="m-1">Lugar del sitio</label>
                       <div class="input-group mb-3"> <span class="input-group-text text-primary"> <i class="fa-solid fa-hotel"></i> </span>
                         <input class="form-control form-control-sm text-primary" maxlength="60" id="info_lugar" name="info_lugar" required>
                         <div class="invalid-feedback"> Por favor digite el lugar donde sera el evento! </div>
                       </div>
                     </div>
-                    <div class="col">
+                    <div class="col-md-6">
                       <label class="m-1">Dirección</label>
                       <div class="input-group mb-3"> <span class="input-group-text text-primary"> <i class="fa-regular fa-map"></i> </span>
                         <input class="form-control form-control-sm text-primary" maxlength="60" id="info_direccion" name="info_direccion" required>
@@ -338,7 +312,7 @@
                     </div>
                   </div>
                   <div class="row p-1">
-                    <div class="col">
+                    <div class="col-12">
                       <label class="m-1">Premios</label>
                       <div class="input-group mb-3"> <span class="input-group-text text-primary"> <i class="fa-solid fa-trophy"></i> </span>
                         <textarea class="form-control text-primary" rows="2" id="info_premios" maxlength="150" name="info_premios"></textarea>
@@ -392,24 +366,24 @@
       <div class="tab-pane fade p-2" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
         <div style="width: 98%; margin: 0 auto;">
           <div class="row">
-            <div class="col">
+            <div class="col-md-6">
               <label class="m-1">Fecha inicio evento</label>
               <input type="date" class="form-control form-control-sm fechas" name="sh_fecha_inicio" id="sh_fecha_inicio" required>
             </div>
-            <div class="col">
+            <div class="col-md-6">
               <label class="m-1">Fecha final evento</label>
               <input type="date" class="form-control form-control-sm fechas" name="sh_fecha_final" id="sh_fecha_final" required>
             </div>
           </div>
           <div class="row">
-            <div class="col">
+            <div class="col-md-6">
               <label class="m-1">Estado</label>
               <select class="form-select form-select-sm" id="sh_estado">
                 <option value="A">Activos</option>
                 <option value="I">Inactivos</option>
               </select>
             </div>
-            <div class="col">
+            <div class="col-md-6">
               <label class="m-1">Oficina</label>
               <select name="sh_oficinas" id="sh_oficinas" class="form-select form-select-sm">
               </select>
@@ -427,7 +401,7 @@
           </div>
           <div class="row">
             <h5 style="font-weight: 300;">Resultados: <span id="n-result-busqueda" style="font-size: large; font-weight: 500;"></span></h5>
-            <div class="p-1" id="result"></div>
+            <div class="p-1" id="result" style="overflow: auto;"></div>
           </div>
         </div>
       </div>
@@ -461,11 +435,11 @@
               </tbody>
               <tfoot>
                 <tr style="background-color: #cff4fc;">
-                  <td>TOTALES</td>
-                  <td id="tPassport"></td>
-                  <td id="tFacturado"></td>
-                  <td id="tPendiente"></td>
-                  <td id="tPorcentaje"></td>
+                  <td class="size-16 text-green">TOTALES</td>
+                  <td class="size-16 text-green" id="tPassport"></td>
+                  <td class="size-16 text-green" id="tFacturado"></td>
+                  <td class="size-16 text-green" id="tPendiente"></td>
+                  <td class="size-16 text-green" id="tPorcentaje"></td>
                 </tr>
               </tfoot>
             </table>
@@ -556,7 +530,7 @@
           <div class="d-flex align-items-center gap-3">
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-        </div> 
+        </div>
         <div class="modal-body">
           <div class="alert alert-danger d-flex justify-content-center align-items-center gap-3 mb-3 mt-2" role="alert">
             <i class="fa-solid fa-triangle-exclamation fa-xl"></i>
@@ -642,45 +616,47 @@
         </div>
         <div class="modal-body">
           <div class="alert alert-danger d-flex justify-content-center align-items-center gap-3 mb-3 mt-2" role="alert">
-              <i class="fa-solid fa-triangle-exclamation fa-xl"></i>
-              <div style="font-weight: 500;">
-                El portafolio de materiales solo podrá cargarse en el sistema hasta el día final de la convocatoria, a las 5:00 PM
-              </div>
+            <i class="fa-solid fa-triangle-exclamation fa-xl"></i>
+            <div style="font-weight: 500;">
+              El portafolio de materiales solo podrá cargarse en el sistema hasta el día final de la convocatoria, a las 5:00 PM
+            </div>
           </div>
           <div class="row shadow-sm py-2 w-90 mx-auto mb-3 mt-2" id=barraFiltros>
-            <div class="col-5">
+            <div class="col-md-4">
               <div class="form-group">
                 <label for="archivo">Cargar portafolio</label>
                 <input type="file" class="form-control form-control-sm" accept=".csv" id="archivo">
               </div>
             </div>
-            <div class="col-7 d-flex justify-content-evenly">
-              <div class="d-flex">
-                <button class="btn btn-outline-warning btn-sm btn-bar align-self-end" title="Cargar" id="btnCargarDatos">
-                  <i class="fa-solid fa-arrow-up-from-bracket"></i>
-                  Cargar
-                </button>
-              </div>
-              <div class="d-flex">
-                <button class="btn btn-outline-success btn-sm btn-bar align-self-end" title="Guardar" id="btnGuardarDatos">
-                  <i class="fa-solid fa-floppy-disk"></i>
-                  Guardar
-                </button>
-              </div>
-              <div class="d-flex">
-                <button class="btn btn-outline-dark btn-sm btn-bar align-self-end" title="Limpiar" id="btnLimpiarDatos">
-                  <i class="fa-solid fa-eraser"></i>
-                  Limpiar
-                </button>
-              </div>
-              <div class="d-flex">
-                <button class="btn btn-outline-primary btn-sm btn-bar align-self-end" title="Ver portafolio" id="btnVerPortafolio">
-                  <i class="fa-solid fa-briefcase"></i>
-                  Ver portafolio
-                </button>
+            <div class="col-md-8 align-self-end">
+              <div class="row">
+                <div class="col-md-3">
+                  <button class="btn btn-outline-warning btn-sm w-100" title="Cargar" id="btnCargarDatos">
+                    <i class="fa-solid fa-arrow-up-from-bracket"></i>
+                    Cargar
+                  </button>
+                </div>
+                <div class="col-md-3">
+                  <button class="btn btn-outline-success btn-sm w-100" title="Guardar" id="btnGuardarDatos">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    Guardar
+                  </button>
+                </div>
+                <div class="col-md-3">
+                  <button class="btn btn-outline-dark btn-sm w-100" title="Limpiar" id="btnLimpiarDatos">
+                    <i class="fa-solid fa-eraser"></i>
+                    Limpiar
+                  </button>
+                </div>
+                <div class="col-md-3">
+                  <button class="btn btn-outline-primary btn-sm w-100" title="Ver portafolio" id="btnVerPortafolio">
+                    <i class="fa-solid fa-briefcase"></i>
+                    Ver portafolio
+                  </button>
+                </div>
               </div>
             </div>
-          </div> 
+          </div>
           <p id="errorMessages" style="color: red; font-weight: bold;"></p>
           <div style="overflow: auto;">
             <table id="tablaDatos" class="table table-sm table-bordered table-hover" style="width: 100%;">
@@ -696,6 +672,65 @@
       </div>
     </div>
   </div>
+  <!-- MODAL CREACION DE EVENTOS DE CIERRES  -->
+  <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="staticBackdropLabel">Creación de eventos de cierre</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <label class="p-1">Nombre</label>
+          <input class="form-control" id="nombre_evento_cierre">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-outline-info" id="guardar_evento_cierre">Guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- MODAL LABORATORIOS -->
+  <div class="modal fade bd-example-modal-lg" id="modal-labs" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog modal-xl">
+      <form class="form needs-validation mt-3" id="form2" onsubmit="event.preventDefault();" novalidate>
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Laboratorios participantes</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="id-evento-modal" readonly>
+            <div class="row p-1">
+              <div class="col-9 ">
+                <label class="m-1 cl_input_csv_lab">Laboratorios participantes</label>
+                <input type="file" class="form-control cl_input_csv_lab" id="lab-csv-modal" name="lab-csv-modal">
+              </div>
+              <div class="col-1">
+                <label class="m-1 ">Agregar</label>
+                <center>
+                  <button type="button" class="btn btn-outline-success shadow-sm add-row-lab-modal "><i class="fa-solid fa-plus"></i></button>
+                </center>
+              </div>
+              <div class="col-2 text-center">
+                <label class="m-1">Eliminar lab</label>
+                <center>
+                  <button type="button" class="btn btn-outline-danger shadow-sm" onClick="EliminarLabsSave()"><i class="fa-solid fa-trash "></i></button>
+                </center>
+              </div>
+            </div>
+            <div class="row" id="list-lab-modal"></div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-outline-success" id="guardar-lab-modal"><i class="fa-solid fa-flask"></i>&nbsp;Guardar</button>
+            <button type="button" class="btn btn-outline-danger" id="cancelar-lab-modal" data-bs-dismiss="modal"><i class="fa-solid fa-xmark"></i>&nbsp;Cancelar</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script type="text/javascript" src="../lib/js/jquery-2.1.1.min.js"></script>
   <script type="text/javascript" src="../lib/js/jquery-ui-1.9.2.custom.js"></script>
   <script type="text/javascript" src="../resources/bootstrap/bootstrap-5.0.2-dist/js/bootstrap.js"></script>

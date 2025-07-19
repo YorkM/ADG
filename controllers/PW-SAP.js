@@ -19,6 +19,10 @@ const confirmAlert = async (title, text) => {
   });
   return result;
 }
+// FUNCIÓN PARA CORTAR TEXTO
+function cortarTexto(texto, maxLongitud) {
+  return texto.length > maxLongitud ? texto.slice(0, maxLongitud) + '...' : texto;
+}
 // FUNCIÓN PARA VALIDAR ESTADO DE DESBLOQUEO
 const validaEstadoDesbloqueo = async () => {
   try {
@@ -662,17 +666,17 @@ function TableView(filas) {
     <table class="display" width="100%" id="tableProd">
       <thead>
         <tr style="background-color: #cff4fc;">
-          <th class="size-th">CÓDIGO</th>
-          <th class="size-th">DESCRIPCIÓN</th>
-          <th class="size-th">VALOR</th>
-          <th class="size-th">IVA</th>
-          <th class="size-th">DCTO</th>
-          <th class="size-th">VNETO</th>
-          <th class="size-th">STOCK</th>
-          <th class="size-th">CANTIDAD</th>
-          <th class="size-th">TOTAL</th>
-          <th class="size-th">ID</th>
-          <th class="size-th">INFO</th>
+          <th class="size-th no-wrap">CÓDIGO</th>
+          <th class="size-th no-wrap">DESCRIPCIÓN</th>
+          <th class="size-th no-wrap">VALOR</th>
+          <th class="size-th no-wrap">IVA</th>
+          <th class="size-th no-wrap">DCTO</th>
+          <th class="size-th no-wrap">VNETO</th>
+          <th class="size-th no-wrap">STOCK</th>
+          <th class="size-th no-wrap">CANTIDAD</th>
+          <th class="size-th no-wrap">TOTAL</th>
+          <th class="size-th no-wrap">ID</th>
+          <th class="size-th no-wrap">INFO</th>
         </tr>
       </thead>
       <tbody>`;
@@ -688,7 +692,7 @@ function TableView(filas) {
       `<img src="../resources/icons/regalo.png" width="24" height="24" onclick="InfoBon('${d.descripcion}','${d.desc_bonificado_n}','${d.stock}','${d.stock_bonificado}','${d.condicion_b}','${d.stock_prepack}')" align="absmiddle">` : '';
 
     const img_desc = parseInt(d.descuento_adg) > 0 ?
-      `<span class="glyphicon glyphicon-star-empty alert-warning" aria-hidden="true"></span> <b>%</b> ` : '';
+      `<i class="fa-regular fa-star text-warning"></i> <b>%</b> ` : '';
 
     const img_new = parseInt(d.dias_creacion) <= 90 ?
       `<img src="../resources/icons/nuevo.png" width="24" title="* Producto Nuevo *" height="24" align="absmiddle">` : '';
@@ -707,16 +711,16 @@ function TableView(filas) {
 
     tabla += `
       <tr>
-        <td class="size-td">${img_new}${d.codigo_material}</td>
-        <td class="size-12">${img_3} ${img} ${img_desc} ${d.descripcion} ${img_1} ${img_2}</td>
-        <td class="size-td" style="background-color:#64D4F7">${formatNum(d.valor_unitario, '$')}</td>
-        <td class="size-td">${d.iva}</td>
-        <td class="size-td">${d.descuento}</td>
-        <td class="size-td" style="background-color:#95F3E8">${formatNum(d.valor_neto, '$')}</td>
-        <td class="size-td">${d.stock}</td>
-        <td class="size-td"><input type="number" id="CAF${d.codigo_material}" value="${cantPedido}" class="form-control size-td cantidad" tabindex="${i + 1}" data-material='${JSON.stringify(d)}'></td>
-        <td><input type="text" class="form-control size-td" id="TOF${d.codigo_material}" value="${formatNum(vlrPedido, '$')}" disabled readonly></td>
-        <td><input type="text" class="form-control" value="${d.id_pedido}" id="IDF${d.codigo_material}" disabled readonly></td>
+        <td class="size-td no-wrap">${img_new}${d.codigo_material}</td>
+        <td class="size-12 no-wrap" title="${d.descripcion.trim()}">${img_3} ${img} ${img_desc} ${cortarTexto(d.descripcion, 70)} ${img_1} ${img_2}</td>
+        <td class="size-td no-wrap" style="background-color:#64D4F7">${formatNum(d.valor_unitario, '$')}</td>
+        <td class="size-td no-wrap">${d.iva}</td>
+        <td class="size-td no-wrap">${d.descuento}</td>
+        <td class="size-td no-wrap" style="background-color:#95F3E8">${formatNum(d.valor_neto, '$')}</td>
+        <td class="size-td no-wrap">${d.stock}</td>
+        <td class="size-td"><input type="number" id="CAF${d.codigo_material}" value="${cantPedido}" class="form-control size-td shadow-sm cantidad" tabindex="${i + 1}" data-material='${JSON.stringify(d)}'></td>
+        <td class="no-wrap"><input type="text" class="form-control size-td" id="TOF${d.codigo_material}" value="${formatNum(vlrPedido, '$')}" disabled readonly></td>
+        <td><input type="text" class="form-control" value="${d.id_pedido}" id="IDF${d.codigo_material}" readonly></td>
         <td align="center">
           <button type="button" class="btn btn-sm btn-outline-primary info-btn" style="font-weight: bolder; font-size: 15px;" data-material='${JSON.stringify(d)}'>
             <i class="fa-solid fa-plus" style="font-size: 17px"></i>
@@ -1740,13 +1744,13 @@ const ListarPedido = async () => {
             // valido si es cotización 
             btnVerPdf = `
             <button type="button" class="btn btn-default btn-sm element-gestion-pedido" onClick="VisualizarPedido()">
-              <i class="glyphicon glyphicon-save-file text-danger" aria-hidden="true"></i>
+              <i class="fa-solid fa-file-arrow-up text-danger"></i>
               Ver en pdf
             </button>`;
 
             btnEnviarPdfEmail = `
             <button type="button" class="btn btn-default btn-sm element-gestion-pedido" onClick="ConfirmarenviarPedidoEmail('${NumPed}')">
-              <i class="glyphicon glyphicon-envelope text-primary" aria-hidden="true"></i>
+              <i class="fa-solid fa-envelope text-primary"></i>
               Enviar por email
             </button>`;
           }
@@ -1855,7 +1859,7 @@ async function UpdNotas(ob) {
 // PEDIDOS TEMPORALES PENDIENTES POR RECUPERAR
 const Temporales = async () => {
   try {
-    LoadImg('Cargando...');
+    LoadImg('Cargando temporales...');
     const data = await enviarPeticion({ op: "S_TEMPORALES", link: "../models/PW-SAP.php" });
     if (data.length) {
       let header = `    
@@ -1876,22 +1880,21 @@ const Temporales = async () => {
       <table class="display" width="100%" id="tableRescue">
           <thead>
             <tr class="bag-info">
-              <th class="size-th">FECHA/HORA</th>
-              <th class="size-th">BODEGA</th>
-              <th class="size-th">NÚMERO</th>
-              <th class="size-th">NOMBRES</th>
-              <th class="size-th">VALOR</th>
-              <th class="size-th">DESTINATARIO</th>
-              <th class="size-th">TRANSFERIDO</th>
-              <th class="size-th">OPCIONES</th>
+              <th class="size-th no-wrap">FECHA/HORA</th>
+              <th class="size-th no-wrap">BODEGA</th>
+              <th class="size-th no-wrap">NÚMERO</th>
+              <th class="size-th no-wrap">NOMBRES</th>
+              <th class="size-th no-wrap">VALOR</th>
+              <th class="size-th no-wrap">DESTINATARIO</th>
+              <th class="size-th no-wrap">TRANSFERIDO</th>
+              <th class="size-th no-wrap">OPCIONES</th>
             </tr>
           </thead>
           <body>`;
 
       let cont = 0;
       let total = 0;
-      let usr = '';
-      let visualizar = '';
+
       data.forEach(item => {
         let transfer = '';
         if (item.transferido == 1) {
@@ -1960,18 +1963,17 @@ const Temporales = async () => {
 
         tabla += `
         <tr>
-          <td class="size-td">${item.fecha_pedido}</td>
-          <td class="size-td">${item.bodega}</td>
-          <td class="size-td">${item.numero}</td>
-          <td class="size-td">
-            <P style="margin: 0;">${item.cliente}</P>
+          <td class="size-td no-wrap">${item.fecha_pedido}</td>
+          <td class="size-12 no-wrap">${item.bodega}</td>
+          <td class="size-td no-wrap">${item.numero}</td>
+          <td class="size-td no-wrap">
+            <p class="no-wrap" style="margin: 0; font-size: 12px;">${item.cliente}</p>
             <small style="font-weight: bold;">
-              Zona ventas: 
-              <span class="text-primary" style="font-size: 8px;">${item.zona_ventas} - ${item.zona_descripcion}</span>
+              Zona ventas: <span class="text-primary" style="font-size: 8px;">${item.zona_ventas} - ${item.zona_descripcion}</span>
             </small>
           </td>
-          <td class="size-td">${formatNum(item.valor_total, '$')}</td>
-          <td class="size-td">${item.destinatario}</td>
+          <td class="size-td no-wrap">${formatNum(item.valor_total, '$')}</td>
+          <td class="size-td no-wrap">${item.destinatario}</td>
           <td align="center" width="4%">${transfer}</td>
           <td align="center" width="4%">
             <button type="button" class="btn btn-outline-primary btn-sm" style="font-weight: bolder; font-size: 15px;" onClick="AbrirOpciones('${$.trim(item.numero)}', '${$.trim(item.valor_total)}', '${$.trim(item.codigo_direccion)}', '${$.trim(item.direccion)}', '${$.trim(item.oficina_ventas)}', '${$.trim(item.codigo_sap)}', '${$.trim(item.transferido)}', '${$.trim(item.entrega)}', '${$.trim(item.ot)}', '${$.trim(item.numero_sap)}', '${$.trim(item.factura)}', 'P', '${$.trim(item.notas)}', '${$.trim(item.usuario)}', '${$.trim(item.destinatario)}', '${$.trim(item.cliente)}');" title="Menu de opciones">
@@ -1987,6 +1989,7 @@ const Temporales = async () => {
       $("#contenedorLeyendas").html(header);
       $("#VtotalPropios").html(`<div class="alert alert-info" role="info"><strong>VALOR TOTAL: ${formatNum(total, '$')}</strong></div>`);
       $("#DvRecuperables").html(tabla);
+
       $('#tableRescue').DataTable({
         paging: false,
         searching: false,
@@ -2002,6 +2005,7 @@ const Temporales = async () => {
           infoEmpty: "No hay registros disponibles"
         }
       });
+
     } else {
       let msgHtml = `
       <div class="alert alert-danger mt-3" role="alert">
@@ -2277,7 +2281,7 @@ const ListarEvento = async () => {
     } else {
       let resultHTML = `
       <div class="alert alert-danger" role="alert">
-        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+        <i class="fa-solid fa-triangle-exclamation"></i>
         <span class="sr-only">Error:</span>  No existen resultados para las condiciones seleccionadas
       </div>`;
       $("#ResultEventos").html(resultHTML);
@@ -2450,13 +2454,12 @@ async function Entregas() {
           Swal.fire("Excelente", data.Msj, "success");
         }
 
-        // await Promise.allSettled() 
-
         setTimeout(function () {
           Temporales(); // Temporales propios
           GestionPedidos(); // Temporales de terceros 
           consultaOpciones(NumTmp); // Actualizacion de datos en modal
         }, 2000);
+
       } else {
         Swal.fire("Cancelado", "La operación ha sido cancelada", "error");
       }
@@ -2521,9 +2524,11 @@ async function EliminarEntrega() {
     if (data.Tipo != 'S') {
       Swal.fire("Error", data.Msj, "error");
     } else {
-      Swal.fire("Excelente", data.Msj, "success");     
-      Temporales();  // Temporales propios      
-      GestionPedidos(); // Temporales de terceros
+      Swal.fire("Excelente", data.Msj, "success");
+      setTimeout(() => {
+        Temporales();  // Temporales propios      
+        GestionPedidos(); // Temporales de terceros        
+      }, 2000);
       $("#ModalEntregas").modal("hide");
     }   
   } catch (error) {
@@ -2718,17 +2723,14 @@ async function Ordenes() {
             <td>${item.posicion_ot}</td>
             <td>${item.codigo_material}</td>
             <td>${item.descripcion}</td>
-            <td>
-              <input type="text" value="${item.cantidad}" class="form-control form-control-sm" size="2%">
-            </td>
+            <td><input type="text" value="${item.cantidad}" class="form-control form-control-sm" size="2%"></td>
             <td>${item.lote}</td>
             <td>${item.numero_ot}</td>
-            <td align="center">
-              <input type="checkbox"/>
-            </td>
+            <td align="center"><input type="checkbox"/></td>
           </tr>`;
           Pneto += parseFloat((item.pneto));
         });
+
         $("#tdDetalleOrdenes").html(detalle);
         $("#ModalOpciones").modal("hide");
         $("#ModalOrdenes").modal("show");
@@ -2795,52 +2797,52 @@ function LimpiarGestionPedido() {
 }
 // FUNCIÓN GESTIÓN DE PEDIDOS
 const GestionPedidos = async () => {
-  try {
-    LoadImg('Cargando...');
-    let TemporalesHistoria = $("#txtTemporalesHistoria").val();
+  const link = "../models/PW-SAP.php";
+  let zona = $("#txtZonas").val();
+  const codigo = $("#txtCodigoSAP").val().trim();
+  const fh1 = $("#txtFecha1").val().trim();
+  const fh2 = $("#txtFecha2").val().trim();
+  const clase = $("#txtClasePedido").val().trim();
+  const oficina = $("#FiltroOficinaVentas").val().trim();
+  let data = undefined;
 
-    const dataPeticion = {
-      link: "../models/PW-SAP.php",
-      zona: $.trim($("#txtZonas").val()),
-      codigo: $.trim($("#txtCodigoSAP").val()),
-      fh1: $.trim($("#txtFecha1").val()),
-      fh2: $.trim($("#txtFecha2").val()),
-      clase: $.trim($("#txtClasePedido").val()),
-      oficina: $.trim($("#FiltroOficinaVentas").val())
-    }
+  zona = (!zona) ? "210093" : zona;
 
-    let cont = 0;
-    let total = 0;
-    let usr = '';
-    let visualizar = '';
+  let TemporalesHistoria = $("#txtTemporalesHistoria").val();
+  const dataPeticion = { link, zona, codigo, fh1, fh2, clase, oficina };
 
-    let headerTabla = `
+  let cont = 0;
+  let total = 0;
+
+  let headerTabla = `
     <div class="mb-2">
-      <button type="button" class="btn btn-sm btn-danger w-btn" onClick="FiltrosTipoPedidos('T')"><b>T</b>emporal</button>
-      <button type="button" class="btn btn-sm btn-warning w-btn" onClick="FiltrosTipoPedidos('P')"><b>P</b>edido</button>
-      <button type="button" class="btn btn-sm btn-success w-btn" onClick="FiltrosTipoPedidos('E')"><b>E</b>ntrega</button>
-      <button type="button" class="btn btn-sm btn-info w-btn" onClick="FiltrosTipoPedidos('O')"><b>O</b>rden</button>
-      <button type="button" class="btn btn-sm btn-primary w-btn" onClick="FiltrosTipoPedidos('F')"><b>F</b>actura</button>
-      <button type="button" class="btn btn-sm btn-light w-btn btn-micro" onClick="FiltrosTipoPedidos('A')"><b>TODOS</b></button>
+      <button type="button" class="btn btn-sm btn-danger w-btn mb-1" onClick="FiltrosTipoPedidos('T')"><b>T</b>emporal</button>
+      <button type="button" class="btn btn-sm btn-warning w-btn mb-1" onClick="FiltrosTipoPedidos('P')"><b>P</b>edido</button>
+      <button type="button" class="btn btn-sm btn-success w-btn mb-1" onClick="FiltrosTipoPedidos('E')"><b>E</b>ntrega</button>
+      <button type="button" class="btn btn-sm btn-info w-btn mb-1" onClick="FiltrosTipoPedidos('O')"><b>O</b>rden</button>
+      <button type="button" class="btn btn-sm btn-primary w-btn mb-1" onClick="FiltrosTipoPedidos('F')"><b>F</b>actura</button>
+      <button type="button" class="btn btn-sm btn-light w-btn btn-micro mb-1" onClick="FiltrosTipoPedidos('A')"><b>TODOS</b></button>
     </div>
     <table class="display" width="100%" id="tableRescueTerceros">
       <thead>
         <tr class="bag-info">
-          <th class="size-th">FECHA/HORA</th>
-          <th class="size-th">BODEGA</th>
-          <th class="size-th">CLASE/NÚMERO</th>
-          <th class="size-th">NOMBRES</th>
-          <th class="size-th">VALOR</th>
-          <th class="size-th">DESTINATARIO</th>
-          <th class="size-th">TRANSFERIDO</th>
-          <th class="size-th">OPCIONES</th>
-          <th class="size-th">TIPO</th>
+          <th class="size-th no-wrap">FECHA/HORA</th>
+          <th class="size-th no-wrap">BODEGA</th>
+          <th class="size-th no-wrap">CLASE/NÚMERO</th>
+          <th class="size-th no-wrap">NOMBRES</th>
+          <th class="size-th no-wrap">VALOR</th>
+          <th class="size-th no-wrap">DESTINATARIO</th>
+          <th class="size-th no-wrap">TRANSFERIDO</th>
+          <th class="size-th no-wrap">OPCIONES</th>
+          <th class="size-th no-wrap">TIPO</th>
         </tr>
       </thead>
       <body>`;
 
-    if (TemporalesHistoria == 'N') {
-      const data = await enviarPeticion({ op: "S_GESTION_PEDIDOS", ...dataPeticion });
+  if (TemporalesHistoria == 'N') {
+    try {
+      LoadImg('Cargando pedidos...');
+      data = await enviarPeticion({ op: "S_GESTION_PEDIDOS", ...dataPeticion });
       if (data.length) {
         data.forEach(item => {
           let transfer = '';
@@ -2850,22 +2852,22 @@ const GestionPedidos = async () => {
               if ($.trim(item.ot) != '0') {
                 if ($.trim(item.factura) != '0') {
                   transfer = `
-                  <button type="button" class="btn btn-primary btn-sm" onClick="Swal.fire('Excelente', 'Pedido N° ${item.numero_sap}','success');">
-                    <span aria-hidden="true"><b>F</b></span>
-                  </button>`;
+                    <button type="button" class="btn btn-primary btn-sm" onClick="Swal.fire('Excelente', 'Pedido N° ${item.numero_sap}','success');">
+                      <span aria-hidden="true"><b>F</b></span>
+                    </button>`;
                   btnText = 'F';
                 } else {
                   transfer = `
-                  <button type="button" class="btn btn-info btn-sm" onClick="Swal.fire('Excelente', 'Pedido N° ${item.numero_sap}','success');">
-                    <span aria-hidden="true"><b>O</b></span>
-                  </button>`;
+                    <button type="button" class="btn btn-info btn-sm" onClick="Swal.fire('Excelente', 'Pedido N° ${item.numero_sap}','success');">
+                      <span aria-hidden="true"><b>O</b></span>
+                    </button>`;
                   btnText = 'O';
                 }
               } else {
                 transfer = `
-                <button type="button" class="btn btn-success btn-sm" onClick="Swal.fire('Excelente', 'Pedido N° ${item.numero_sap}','success');">
-                  <span aria-hidden="true"><b>E</b></span>
-                </button>`;
+                  <button type="button" class="btn btn-success btn-sm" onClick="Swal.fire('Excelente', 'Pedido N° ${item.numero_sap}','success');">
+                    <span aria-hidden="true"><b>E</b></span>
+                  </button>`;
                 btnText = 'E';
               }
             } else {
@@ -2886,23 +2888,23 @@ const GestionPedidos = async () => {
                     break;
                 }
                 transfer += `
-                <button onclick="MostrarEstadoSolDesbloqueo(${item.numero_sap})" class="btn btn-default">
-                  ${estado_sol_des}
-                </button>`;
+                  <button onclick="MostrarEstadoSolDesbloqueo(${item.numero_sap})" class="btn btn-default">
+                    ${estado_sol_des}
+                  </button>`;
                 btnText = ''
               } else {
                 transfer = `
-                <button type="button" class="btn btn-warning btn-sm" onClick="Swal.fire('Excelente', 'Pedido N° ${item.numero_sap}','success');">
-                  <span aria-hidden="true"><b>P</b></span>
-                </button>`;
+                  <button type="button" class="btn btn-warning btn-sm" onClick="Swal.fire('Excelente', 'Pedido N° ${item.numero_sap}','success');">
+                    <span aria-hidden="true"><b>P</b></span>
+                  </button>`;
                 btnText = 'P';
               }
             }
           } else {
             transfer = `
-            <button type="button" class="btn btn-danger btn-sm" onClick="Swal.fire('Oops', 'Pendiente por transferir', 'error');">
-              <span aria-hidden="true"><b>T</b></span>
-            </button>`;
+              <button type="button" class="btn btn-danger btn-sm" onClick="Swal.fire('Oops', 'Pendiente por transferir', 'error');">
+                <span aria-hidden="true"><b>T</b></span>
+              </button>`;
             btnText = 'T';
           }
 
@@ -2910,26 +2912,26 @@ const GestionPedidos = async () => {
           item.cliente = item.cliente.replace(/"/g, '');
 
           headerTabla += `
-          <tr>
-            <td class="size-td">${item.fecha_pedido}</td>
-            <td style="font-size: 12px">${item.bodega}</td>
-            <td class="size-td">${item.clase} - ${item.numero_sap}</td>
-            <td class="size-td">
-              <p style="margin: 0; font-size: 12px">${item.cliente}</p>
-              <small style="font-weight: bold;">Zona ventas: 
-                <span class="text-primary" style="font-size: 8px;">${item.zona_ventas} - ${item.zona_descripcion}</span>
-              </small>
-            </td>
-            <td class="size-td">${formatNum(item.valor_total, '$')}</td>
-            <td class="size-td">${item.destinatario}</td>
-            <td align="center" width="4%">${transfer}</td>
-            <td align="center" width="4%">
-              <button type="button" class="btn btn-outline-primary btn-sm" style="font-weight: bolder; font-size: 15px;" onClick="AbrirOpciones('${$.trim(item.numero)}', '${$.trim(item.valor_total)}', '${$.trim(item.codigo_direccion)}', '${$.trim(item.direccion)}', '${$.trim(item.oficina_ventas)}', '${$.trim(item.codigo_sap)}', '${$.trim(item.transferido)}', '${$.trim(item.entrega)}', '${$.trim(item.ot)}', '${$.trim(item.numero_sap)}', '${$.trim(item.factura)}', 'T', '${$.trim(item.notas)}', '${$.trim(item.usuario)}', '${$.trim(item.destinatario)}', '${$.trim(item.cliente)}');" title="Menu de opciones">
-                <i class="fa-solid fa-grip" style="font-size: 16px"></i>
-              </button>
-            </td>
-            <td>${btnText}</td>
-          </tr>`;
+            <tr>
+              <td class="size-td no-wrap">${item.fecha_pedido}</td>
+              <td class="no-wrap" style="font-size: 12px">${item.bodega}</td>
+              <td class="size-td no-wrap">${item.clase} - ${item.numero_sap}</td>
+              <td class="size-td no-wrap">
+                <p class="no-wrap" style="margin: 0; font-size: 12px">${item.cliente}</p>
+                <small class="no-wrap" style="font-weight: bold;">Zona ventas: 
+                  <span class="text-primary" style="font-size: 8px;">${item.zona_ventas} - ${item.zona_descripcion}</span>
+                </small>
+              </td>
+              <td class="size-td no-wrap">${formatNum(item.valor_total, '$')}</td>
+              <td class="size-td no-wrap">${item.destinatario}</td>
+              <td align="center" width="4%">${transfer}</td>
+              <td align="center" width="4%">
+                <button type="button" class="btn btn-outline-primary btn-sm" style="font-weight: bolder; font-size: 15px;" onClick="AbrirOpciones('${item.numero.trim()}', '${item.valor_total.trim()}', '${item.codigo_direccion.trim()}', '${item.direccion.trim()}', '${item.oficina_ventas.trim()}', '${item.codigo_sap.trim()}', '${item.transferido.trim()}', '${item.entrega.trim()}', '${item.ot.trim()}', '${item.numero_sap.trim()}', '${item.factura.trim()}', 'T', '${item.notas.trim()}', '${item.usuario.trim()}', '${item.destinatario.trim()}', '${item.cliente.trim()}');" title="Menu de opciones">
+                  <i class="fa-solid fa-grip" style="font-size: 16px"></i>
+                </button>
+              </td>
+              <td>${btnText}</td>
+            </tr>`;
 
           cont++;
           total += parseFloat(item.valor_total);
@@ -2940,36 +2942,42 @@ const GestionPedidos = async () => {
       } else {
         $("#VtotalTerceros").html('');
         let msgHtml = `
-        <div class="alert alert-danger" role="alert">
-          <i class="fa-solid fa-triangle-exclamation"></i>
-          <span class="sr-only">Error:</span>NO EXISTEN RESULTADOS PARA LAS CONDICIONES SELECCIONADAS
-        </div>`;
+          <div class="alert alert-danger" role="alert">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span class="sr-only">Error:</span>NO EXISTEN RESULTADOS PARA LAS CONDICIONES SELECCIONADAS
+          </div>`;
         $("#DvRecuperablesTerceros").html(msgHtml);
       }
-    } else {
-      const data = await enviarPeticion({ op: "S_GESTION_PEDIDOS_HISTORIA", ...dataPeticion });
+    } catch (error) {
+      console.error(error);
+    } finally {
+      UnloadImg();
+    }
+  } else {
+    try {
+      data = await enviarPeticion({ op: "S_GESTION_PEDIDOS_HISTORIA", ...dataPeticion });
       if (data.length) {
         data.forEach(item => {
           headerTabla += `
-          <tr>
-            <td class="size-td">${item.fecha_pedido}</td>
-            <td class="size-td">${item.bodega}</td>
-            <td class="size-td">${item.clase} ' - ' ${item.numero}</td>
-            <td class="size-td">${item.cliente}</td>
-            <td class="size-td">${formatNum(item.valor_total, '$')}</td>
-            <td class="size-td">${item.destinatario}</td>
-            <td class="size-td" align="center" width="4%">
-              <button type="button" class="btn btn-danger btn-sm">
-                <span class="glyphicon glyphicon-time" aria-hidden="true"></span>
-              </button>
-            </td>
-            <td align="center" width="4%">
-              <button type="button" class="btn btn-default btn-sm" onClick="RecuperarHistorico(${$.trim(item.numero)})">
-                <span class="glyphicon glyphicon-transfer" aria-hidden="true"></span>
-              </button>
-            </td>
-            <td>T</td>
-          </tr>`;
+            <tr>
+              <td class="size-td no-wrap">${item.fecha_pedido}</td>
+              <td class="size-td no-wrap">${item.bodega}</td>
+              <td class="size-td no-wrap">${item.clase} ' - ' ${item.numero}</td>
+              <td class="size-td no-wrap">${item.cliente}</td>
+              <td class="size-td no-wrap">${formatNum(item.valor_total, '$')}</td>
+              <td class="size-td no-wrap">${item.destinatario}</td>
+              <td class="size-td no-wrap" align="center" width="4%">
+                <button type="button" class="btn btn-danger btn-sm">
+                  <i class="fa-regular fa-clock"></i>
+                </button>
+              </td>
+              <td align="center" width="4%">
+                <button type="button" class="btn btn-light btn-micro btn-sm" onClick="RecuperarHistorico(${$.trim(item.numero)})">
+                  <i class="fa-solid fa-right-left"></i>
+                </button>
+              </td>
+              <td>T</td>
+            </tr>`;
 
           cont++;
           total += parseFloat(item.valor_total);
@@ -2980,14 +2988,20 @@ const GestionPedidos = async () => {
       } else {
         $("#VtotalTerceros").html('');
         let msgHtml = `
-        <div class="alert alert-danger" role="alert">
-          <i class="fa-solid fa-triangle-exclamation"></i>
-          <span class="sr-only">Error:</span>NO EXISTEN RESULTADOS PARA LAS CONDICIONES SELECCIONADAS
-        </div>`;
+          <div class="alert alert-danger" role="alert">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span class="sr-only">Error:</span>NO EXISTEN RESULTADOS PARA LAS CONDICIONES SELECCIONADAS
+          </div>`;
         $("#DvRecuperablesTerceros").html(msgHtml);
       }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      UnloadImg();
     }
+  }
 
+  if (data.length) {
     $('#tableRescueTerceros').DataTable({
       paging: false,
       searching: false,
@@ -3003,11 +3017,6 @@ const GestionPedidos = async () => {
         infoEmpty: "No hay registros disponibles"
       }
     });
-
-  } catch (error) {
-    console.log(error);
-  } finally {
-    UnloadImg();
   }
 }
 // FUNCIÓN RECUPERAR HISTÓRICOS
@@ -4344,7 +4353,17 @@ $(function () {
     GestionPedidos();
   });
 
-  $("#txtZonas,#FiltroOficinaVentas,#txtClasePedido").select2();
+  $("#buscarPedidos").click(async function () {
+    const zona = $('#txtZonas').val();
+    if (zona === "0") {
+      const result = await confirmAlert("Consultar todos los pedidos!!!", "Está por consultar todos los pedidos en general, La consulta puede tardar varios minutos... ¿Desea continuar con la operación?");
+      if (!result.isConfirmed) return;
+      GestionPedidos();
+    }
+    GestionPedidos();
+  });
+
+  $("#txtZonas, #FiltroOficinaVentas, #txtClasePedido").select2();
 
   // VALIDO SI EXISTE NIT PARA LOS CLIENTES
   validarCargaClientes();
@@ -4861,5 +4880,9 @@ $(function () {
 
   $('#btnMas2').click(function () {
     $('#ModalAjustesBusqueda').modal('show');
+  });
+
+  $("#txt_cliente, #ClienteEntregas, #txtFactCliente, #txtFaltanteCliente, #txtCliente").on("input", function () {
+    this.value = this.value.toUpperCase();
   });
 });
