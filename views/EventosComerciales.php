@@ -20,9 +20,9 @@
       font-size: 1rem;
     }
 
-    body {
+    /* body {
       background-color: #F9F9F9;
-    }
+    } */
 
     div.datepicker {
       padding: 10px;
@@ -59,7 +59,8 @@
     }
 
     label {
-      font-weight: 500
+      font-weight: 400;
+      font-size: 15px;
     }
 
     .input-group-text {
@@ -86,7 +87,7 @@
 
     #tablaEventos thead tr th {
       font-size: .93rem !important;
-      font-weight: 500;
+      font-weight: 700;
     }
 
     .handsontable td {
@@ -109,10 +110,6 @@
       color: #055160;
     }
 
-    #tablaEventos tbody tr td {
-      font-size: .8rem !important;
-    }
-
     .low-percentage {
       background-color: #ec7063 !important;
     }
@@ -126,28 +123,33 @@
     }
 
     #tablaOficinas thead tr th {
-      font-weight: 500;
+      font-weight: 700;
       color: #055160;
+      text-transform: uppercase;
     }
 
     #tablaEventos thead tr th {
-      font-weight: 500;
+      font-weight: 700;
       color: #055160;
+      text-transform: uppercase;
     }
 
     #tablaPresupuestoEvento thead tr th {
-      font-weight: 500;
+      font-weight: 700;
       color: #055160;
+      text-transform: uppercase;
     }
 
     #tablaPresupuestoZona thead tr th {
-      font-weight: 500;
+      font-weight: 700;
       color: #055160;
+      text-transform: uppercase;
     }
 
     #tablaDatos thead tr th {
-      font-weight: 500;
+      font-weight: 700;
       color: #055160;
+      text-transform: uppercase;
     }
 
     #tablaOficinas tfoot tr td {
@@ -157,10 +159,6 @@
 
     .btn-bar {
       width: 120px;
-    }
-
-    label {
-      font-size: 14px;
     }
 
     select>option {
@@ -191,6 +189,10 @@
     .size-14 {
       font-size: 14px;
     }
+
+    .size-13 {
+      font-size: 13px;
+    }
   </style>
 </head>
 
@@ -211,73 +213,73 @@
         <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false"><i class="fa fa-search"></i>&nbsp;Búsqueda</button>
       </div>
     </nav>
-    <div class="tab-content " id="nav-tabContent">
-      <div class="tab-pane fade show active " id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+    <div class="tab-content" id="nav-tabContent">
+      <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
         <div style="width: 95%; margin: 0 auto;">
           <form class="form needs-validation mt-3" id="form" onsubmit="event.preventDefault();" novalidate>
             <input type="hidden" id="org" name="organizacion_ventas" value="" readonly />
             <input type="hidden" id="usuario" name="usuario" value="" readonly />
             <input type="hidden" readonly id="id" value="0" name="id" />
-            <div class="card shadow-sm p-2">
-              <div class="row">
+            <div class="card shadow-sm p-3">
+              <div class="row mb-2">
                 <div class="col-md-6">
                   <label class="m-1">Nombre del evento</label>
-                  <input type="text" class="form-control form-control-sm" placeholder="Nombre del evento" id="nombre" maxlength="255" minlength="10" name="nombre" required />
+                  <input type="text" class="form-control form-control-sm shadow-sm" placeholder="Nombre del evento" id="nombre" maxlength="255" minlength="10" name="nombre" required />
                   <div class="invalid-feedback"> El nombre es obligatorio! </div>
                 </div>
                 <div class="col-md-6">
                   <label class="m-1">Oficina</label>
-                  <select class="form-select form-select-sm" id="oficinas" name="oficina_ventas" required>
+                  <select class="form-select form-select-sm shadow-sm" id="oficinas" name="oficina_ventas" required>
                   </select>
                   <div class="invalid-feedback"> Por favor seleccione la oficina! </div>
                 </div>
               </div>
-              <div class="row">
+              <div class="row mb-2">
                 <div class="col-md-6">
                   <label class="m-1">Fecha inicio evento</label>
-                  <input type="date" class="form-control form-control-sm fechas" name="fecha_inicio" id="fecha_inicial" required>
+                  <input type="date" class="form-control form-control-sm fechas shadow-sm" name="fecha_inicio" id="fecha_inicial" required>
                   <div class="invalid-feedback"> Este campo es obligatorio! </div>
                 </div>
                 <div class="col-md-6">
                   <label class="m-1">Fecha final evento</label>
-                  <input type="date" class="form-control form-control-sm fechas" name="fecha_fin" id="fecha_final" required>
+                  <input type="date" class="form-control form-control-sm fechas shadow-sm" name="fecha_fin" id="fecha_final" required>
                   <div class="invalid-feedback"> Este campo es obligatorio! </div>
                 </div>
               </div>
-              <div class="row">
+              <div class="row mb-2">
                 <div class="col-md-6">
                   <label class="m-1">Fecha fin viajeros terrestre</label>
-                  <input type="date" class="form-control form-control-sm fechas" name="fecha_fin_terrestre" id="fecha_fin_terrestre" required>
+                  <input type="date" class="form-control form-control-sm fechas shadow-sm" name="fecha_fin_terrestre" id="fecha_fin_terrestre" required>
                   <div class="invalid-feedback"> Este campo es obligatorio! </div>
                 </div>
                 <div class="col-md-6">
                   <label class="m-1">Fecha fin viajeros aéreos</label>
-                  <input type="date" class="form-control form-control-sm fechas" name="fecha_fin_aereo" id="fecha_fin_aereo" required>
+                  <input type="date" class="form-control form-control-sm fechas shadow-sm" name="fecha_fin_aereo" id="fecha_fin_aereo" required>
                   <div class="invalid-feedback"> Este campo es obligatorio! </div>
                 </div>
               </div>
-              <div class="row">
+              <div class="row mb-2">
                 <div class="col-md-6">
                   <label class="m-1">Presupuesto min. Aereos</label>
-                  <input type="text" class="form-control form-control-sm fechas format-number" placeholder="Presupuesto min. Aereos" name="presupuesto_aereo" id="presupuesto_aereos" required onKeyPress="return vnumeros(event)">
+                  <input type="text" class="form-control form-control-sm fechas format-number shadow-sm" placeholder="Presupuesto min. Aereos" name="presupuesto_aereo" id="presupuesto_aereos" required onKeyPress="return vnumeros(event)">
                   <div class="invalid-feedback"> Este campo es obligatorio! </div>
                 </div>
                 <div class="col-md-6">
                   <label class="m-1">Presupuesto min. Terrestres</label>
-                  <input type="text" class="form-control form-control-sm fechas format-number" placeholder="Presupuesto min. Terrestres" name="presupuesto_terrestre" id="presupuesto_terrestres" required onKeyPress=" return vnumeros(event)">
+                  <input type="text" class="form-control form-control-sm fechas format-number shadow-sm" placeholder="Presupuesto min. Terrestres" name="presupuesto_terrestre" id="presupuesto_terrestres" required onKeyPress=" return vnumeros(event)">
                   <div class="invalid-feedback"> Este campo es obligatorio! </div>
                 </div>
               </div>
-              <div class="row">
+              <div class="row mb-2">
                 <div class="col-md-4">
                   <label class="m-1">Fecha fin convocatoria</label>
-                  <input type="date" class="form-control form-control-sm fechas" name="fecha_fin_convocatoria" id="fecha_fin_convocatoria" required>
+                  <input type="date" class="form-control form-control-sm fechas shadow-sm" name="fecha_fin_convocatoria" id="fecha_fin_convocatoria" required>
                   <div class="invalid-feedback"> Este campo es obligatorio! </div>
                 </div>
                 <div class="col-md-4">
                   <label class="m-1">Evento cierre</label>
                   <div class="input-group mb-3 ">
-                    <select class="form-select form-select-sm" id="eventos_cierres" name="id_evento_cierre">
+                    <select class="form-select form-select-sm shadow-sm" id="eventos_cierres" name="id_evento_cierre">
                     </select>
                     <span class="input-group-md" id="basic-addon1">
                       <button type="button" style="height: 33px; display: flex;" class="btn btn-sm btn-outline-primary p-2 shadow-sm" id="add-evento-cierre"><i class="fa fa-plus-circle"></i></button>
@@ -286,27 +288,27 @@
                 </div>
                 <div class="col-md-4">
                   <label class="m-1">Estado</label>
-                  <select class="form-select form-select-sm" name="estado" id="estado">
+                  <select class="form-select form-select-sm shadow-sm" name="estado" id="estado">
                     <option value="A" selected>Activo</option>
                     <option value="I">Inactivo</option>
                   </select>
                 </div>
               </div>
               <div class="row p-1">
-                <div class="card shadow-sm bg-light border-1 p-1 border-light">
-                  <h6><i class="fa-solid fa-map-location-dot"></i> Info de lugar y logistica</h6>
+                <div class="card shadow-sm border-1 p-2 border-light">
+                  <h5 style="font-weight: 400;"><i class="fa-solid fa-location-dot"></i> Info de lugar y logistica</h5>
                   <div class="row p-1">
                     <div class="col-md-6">
                       <label class="m-1">Lugar del sitio</label>
                       <div class="input-group mb-3"> <span class="input-group-text text-primary"> <i class="fa-solid fa-hotel"></i> </span>
-                        <input class="form-control form-control-sm text-primary" maxlength="60" id="info_lugar" name="info_lugar" required>
+                        <input class="form-control form-control-sm text-primary shadow-sm" maxlength="60" id="info_lugar" name="info_lugar" required>
                         <div class="invalid-feedback"> Por favor digite el lugar donde sera el evento! </div>
                       </div>
                     </div>
                     <div class="col-md-6">
                       <label class="m-1">Dirección</label>
                       <div class="input-group mb-3"> <span class="input-group-text text-primary"> <i class="fa-regular fa-map"></i> </span>
-                        <input class="form-control form-control-sm text-primary" maxlength="60" id="info_direccion" name="info_direccion" required>
+                        <input class="form-control form-control-sm text-primary shadow-sm" maxlength="60" id="info_direccion" name="info_direccion" required>
                         <div class="invalid-feedback"> Por favor digite la dirección! </div>
                       </div>
                     </div>
@@ -315,7 +317,7 @@
                     <div class="col-12">
                       <label class="m-1">Premios</label>
                       <div class="input-group mb-3"> <span class="input-group-text text-primary"> <i class="fa-solid fa-trophy"></i> </span>
-                        <textarea class="form-control text-primary" rows="2" id="info_premios" maxlength="150" name="info_premios"></textarea>
+                        <textarea class="form-control text-primary shadow-sm" rows="2" id="info_premios" maxlength="150" name="info_premios"></textarea>
                       </div>
                     </div>
                   </div>
@@ -324,7 +326,7 @@
               <div class="row p-1 mt-2">
                 <div class="col-md-8">
                   <label class="m-1">Laboratorios participantes</label>
-                  <input type="file" class="form-control form-control-sm" id="lab-csv">
+                  <input type="file" class="form-control form-control-sm shadow-sm" id="lab-csv">
                 </div>
                 <div class="col-sm-6 mt-2 col-md-2 d-flex">
                   <button type="button" class="btn btn-outline-success btn-sm w-100 align-self-end shadow-sm add-row-lab " id="add-row-lab">
@@ -344,11 +346,11 @@
                 <div class="col m-1">
                   <div class="card p-1 mt-2">
                     <label class="m-1">Banner 1</label>
-                    <input type="file" class="form-control form-control-sm" onchange="previewImage(event, '#img-banner-1')"
+                    <input type="file" class="form-control form-control-sm shadow-sm" onchange="previewImage(event, '#img-banner-1')"
                       id="img_publicitaria_1" name="img_publicitaria_1">
                     <img class="" src="" id="img-banner-1" width="100%" height="130">
                     <label class="m-1">Banner 2</label>
-                    <input type="file" class="form-control form-control-sm" onchange="previewImage(event, '#img-banner-2')" id="img_publicitaria_2" name="img_publicitaria_2">
+                    <input type="file" class="form-control form-control-sm shadow-sm" onchange="previewImage(event, '#img-banner-2')" id="img_publicitaria_2" name="img_publicitaria_2">
                     <img class="" src="" id="img-banner-2" width="100%" height="130">
                   </div>
                 </div>
@@ -366,33 +368,31 @@
       <div class="tab-pane fade p-2" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
         <div style="width: 98%; margin: 0 auto;">
           <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-3">
               <label class="m-1">Fecha inicio evento</label>
-              <input type="date" class="form-control form-control-sm fechas" name="sh_fecha_inicio" id="sh_fecha_inicio" required>
+              <input type="date" class="form-control form-control-sm fechas shadow-sm" name="sh_fecha_inicio" id="sh_fecha_inicio" required>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-3">
               <label class="m-1">Fecha final evento</label>
-              <input type="date" class="form-control form-control-sm fechas" name="sh_fecha_final" id="sh_fecha_final" required>
+              <input type="date" class="form-control form-control-sm fechas shadow-sm" name="sh_fecha_final" id="sh_fecha_final" required>
             </div>
-          </div>
-          <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-3">
               <label class="m-1">Estado</label>
-              <select class="form-select form-select-sm" id="sh_estado">
+              <select class="form-select form-select-sm shadow-sm" id="sh_estado">
                 <option value="A">Activos</option>
                 <option value="I">Inactivos</option>
               </select>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-3">
               <label class="m-1">Oficina</label>
-              <select name="sh_oficinas" id="sh_oficinas" class="form-select form-select-sm">
+              <select name="sh_oficinas" id="sh_oficinas" class="form-select form-select-sm shadow-sm">
               </select>
             </div>
           </div>
           <div class="row">
             <div class="container-fluid mt-4">
               <div class="input-group mb-3">
-                <input type="text" class="form-control form-control-sm" id="filtro" placeholder="Nombre / Oficina / Usuario">
+                <input type="text" class="form-control form-control-sm shadow-sm" id="filtro" placeholder="Nombre / Oficina / Usuario">
                 <span class="input-group-text text-primary">
                   <button class="btn btn-sm btn-outline-primary" id="buscar-evento"><i class="fa-solid fa-search"></i></button>
                 </span>
@@ -400,7 +400,7 @@
             </div>
           </div>
           <div class="row">
-            <h5 style="font-weight: 300;">Resultados: <span id="n-result-busqueda" style="font-size: large; font-weight: 500;"></span></h5>
+            <h5 style="font-weight: 400; font-size: 16px; text-align: right;">TOTAL EVENTOS: <span id="n-result-busqueda" style="font-size: 20px; font-weight: 700;">0</span></h5>
             <div class="p-1" id="result" style="overflow: auto;"></div>
           </div>
         </div>
@@ -525,7 +525,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <div class="modal-title">
-            <h5 style="font-weight: 500; color: #055160;">Asignación de Presupuesto Evento <span id="tituloModalPresu" style="font-size: medium;"></span></h5>
+            <h5 style="font-weight: 500; color: #055160;">ASIGNACIÓN DE PRESUPUESTO EVENTO <span id="tituloModalPresu" style="font-size: medium;"></span></h5>
           </div>
           <div class="d-flex align-items-center gap-3">
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -538,27 +538,27 @@
               El presupuesto solo podrá cargarse en el sistema hasta el día final de la convocatoria, a las 5:00 PM
             </div>
           </div>
-          <h5 class="text-center mb-3" style="color: #055160; font-weight: 400;">Crear presupuesto evento oficina</h5>
+          <h5 class="text-center mb-3" style="color: #055160; font-weight: 400;">CREAR PRESUPUESTO EVENTO OFICINA</h5>
           <form class="mb-1" id="formularioPresupuesto">
             <div class="row">
               <div class="col-md-6">
                 <div class="form-group">
                   <label for="idEventoPresu">Evento</label>
-                  <input type="text" id="idEventoPresu" class="form-control form-control-sm" name="ID_EVENTO" readonly>
+                  <input type="text" id="idEventoPresu" class="form-control form-control-sm shadow-sm" name="ID_EVENTO" readonly>
                 </div>
                 <div class="form-group mt-2">
                   <label for="eventoAnterior">Evento anterior</label>
-                  <input type="text" id="eventoAnterior" class="form-control form-control-sm" name="EVENTO_ANTERIOR">
+                  <input type="text" id="eventoAnterior" class="form-control form-control-sm shadow-sm" name="EVENTO_ANTERIOR">
                 </div>
               </div>
               <div class="col-md-6">
                 <div class="form-group">
                   <label for="oficinaPresupuesto">Oficina</label>
-                  <select class="form-select form-select-sm" name="OFICINA_VENTAS" id="oficinaPresupuesto"></select>
+                  <select class="form-select form-select-sm shadow-sm" name="OFICINA_VENTAS" id="oficinaPresupuesto"></select>
                 </div>
                 <div class="form-group mt-2">
                   <label for="presupuesto">Presupuesto</label>
-                  <input type="text" id="presupuesto" class="form-control form-control-sm" name="PRESUPUESTO">
+                  <input type="text" id="presupuesto" class="form-control form-control-sm shadow-sm" name="PRESUPUESTO">
                 </div>
               </div>
             </div>
@@ -579,10 +579,10 @@
       <div class="modal-content">
         <div class="modal-header">
           <div class="modal-title">
-            <h5>Asignación de Presupuesto Zona</h5>
+            <h5>ASIGNACIÓN DE PRESUPUESTO ZONA</h5>
           </div>
           <div class="d-flex justify-content-between align-items-center gap-3">
-            <p style="margin: auto;">TOTAL PRESUPUESTO: <span style="font-weight: 700; font-size: large;" id="totalPresupuesto">$2000.000</span></p>
+            <p style="margin: auto; font-weight: 700; color: #055160;">TOTAL PRESUPUESTO: <span style="font-weight: 700; font-size: large;" id="totalPresupuesto">$0</span></p>
             <button class="btn btn-outline-primary btn-sm" id="btnGuardarPresupuesto">
               <i class="fa-solid fa-floppy-disk"></i>
               Guardar
@@ -608,7 +608,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <div class="modal-title">
-            <h5 style="font-weight: 500; color: #055160;">Asignación de Portafolio Evento <span id="tituloModalPorta" style="font-size: medium;"></span></h5>
+            <h5 style="font-weight: 500; color: #055160; text-transform: uppercase;">Asignación de Portafolio Evento <span id="tituloModalPorta" style="font-size: medium;"></span></h5>
           </div>
           <div class="d-flex justify-content-between align-items-center gap-3">
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>

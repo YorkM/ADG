@@ -474,7 +474,7 @@ Redireccionar();
             </div>
           </div>
           <p id="n_resultados" class="n_resultados lead p-total"></p>
-          <div id="dvResultProductos"></div>
+          <div id="dvResultProductos" style="overflow-x: auto;"></div>
         </div>
       </div>
       <!-- TAB PEDIDO -->
@@ -548,9 +548,18 @@ Redireccionar();
             </tbody>
           </table>
           <div>
-            <button class="btn btn-outline-primary btn-sm w-btn shadow" id="buscarPedidos">Buscar</button>
-            <button class="btn btn-outline-success btn-sm w-btn shadow" id="exportar_gestion">Exportar</button>
-            <button class="btn btn-light btn-sm w-btn btn-micro shadow" onClick="LimpiarGestionPedido();">Limpiar</button>
+            <button class="btn btn-outline-primary btn-sm w-btn shadow" id="buscarPedidos">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              Buscar
+            </button>
+            <button class="btn btn-outline-success btn-sm w-btn shadow" id="exportar_gestion">
+              <i class="fa-solid fa-file-excel"></i>
+              Exportar
+            </button>
+            <button class="btn btn-light btn-sm w-btn btn-micro shadow" onClick="LimpiarGestionPedido();">
+              <i class="fa-solid fa-broom"></i>
+              Limpiar
+            </button>
           </div>
           <hr>
         </div>
@@ -587,9 +596,18 @@ Redireccionar();
             </tbody>
           </table>
           <div class="mt-2">
-            <button class="btn btn-outline-primary btn-sm w-btn shadow" onClick="GestionEntregas();">Buscar</button>
-            <button class="btn btn-outline-success btn-sm w-btn shadow" onClick="UnificarEntrega();">Crear Entrega</button>
-            <button class="btn btn-light btn-sm w-btn btn-micro shadow" onClick="LimpiarEntregas();">Limpiar</button>
+            <button class="btn btn-outline-primary btn-sm w-btn shadow" onClick="GestionEntregas();">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              Buscar
+            </button>
+            <button class="btn btn-outline-success btn-sm w-btn shadow" onClick="UnificarEntrega();">
+              <i class="fa-solid fa-pen"></i>
+              Crear Entrega
+            </button>
+            <button class="btn btn-light btn-sm w-btn btn-micro shadow" onClick="LimpiarEntregas();">
+              <i class="fa-solid fa-broom"></i>
+              Limpiar
+            </button>
           </div>
         </div>
         <hr>
@@ -620,9 +638,18 @@ Redireccionar();
             </tbody>
           </table>
           <div class="mt-2">
-            <button class="btn btn-outline-primary btn-sm w-btn shadow" onClick="Faltante();">Buscar</button>
-            <button class="btn btn-outline-success btn-sm w-btn shadow" onClick="fnExcelReport('tdFaltantes');">Exportar</button>
-            <button class="btn btn-light btn-sm w-btn btn-micro shadow" onClick="LimpiarFaltantes();">Limpiar</button>
+            <button class="btn btn-outline-primary btn-sm w-btn shadow" onClick="Faltante();">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              Buscar
+            </button>
+            <button class="btn btn-outline-success btn-sm w-btn shadow" onClick="fnExcelReport('tdFaltantes');">
+              <i class="fa-solid fa-file-excel"></i>
+              Exportar
+            </button>
+            <button class="btn btn-light btn-sm w-btn btn-micro shadow" onClick="LimpiarFaltantes();">
+              <i class="fa-solid fa-broom"></i>
+              Limpiar
+            </button>
           </div>
         </div>
         <hr>
@@ -658,8 +685,14 @@ Redireccionar();
             </tbody>
           </table>
           <div class="mt-2">
-            <button class="btn btn-outline-primary btn-sm w-btn shadow" onClick="ListarFacturas();">Buscar</button>
-            <button class="btn btn-light btn-sm w-btn btn-micro shadow" onClick="LimpiarFacturas();">Limpiar</button>
+            <button class="btn btn-outline-primary btn-sm w-btn shadow" onClick="ListarFacturas();">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              Buscar
+            </button>
+            <button class="btn btn-light btn-sm w-btn btn-micro shadow" onClick="LimpiarFacturas();">
+              <i class="fa-solid fa-broom"></i>
+              Limpiar
+            </button>
           </div>
           <hr>
           <div id="VtotalFacturas"></div>
@@ -865,10 +898,10 @@ Redireccionar();
   </div>
   <!-- MODAL INFORMACION DE MATERIALES -->
   <div class="modal fade" id="ModalInfoMaterial" tabindex="-1" aria-labelledby="ModalInfoMaterialLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog" style="min-width: 70%;">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="ModalInfoMaterialLabel">Datos adicionales de productos</h5>
+          <h5 class="modal-title" id="ModalInfoMaterialLabel">DATOS ADICIONALES DE PRODUCTOS</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <div class="modal-body">
@@ -1000,7 +1033,7 @@ Redireccionar();
               </tr>
               <tr>
                 <td>Identificación</td>
-                <td id="txt_nit"></td>
+                <td id="txt_nit2"></td>
               </tr>
               <tr>
                 <td>Código Interno:</td>
@@ -1634,7 +1667,6 @@ Redireccionar();
   <script type="text/javascript" src="../lib/js/funciones.js?<?php echo (rand()); ?>"></script>
   <script type="text/javascript" src="../lib/js/servicios.js?<?php echo (rand()); ?>"></script>
   <script type="text/javascript" src="../resources/HighCharts/code/highcharts.js?<?php echo (rand()); ?>"></script>
-  <script type="text/javascript" src="../lib/bootstrap-notify/bootstrap-notify.min.js"></script>
   <script type="text/javascript" src="../resources/select2/js/select2.full.min.js"></script>
   <script type="text/javascript" src="../controllers/PW-SAP.js?<?php echo (rand()); ?>"></script>
   <script type="text/javascript" src="../lib/js/Isa.js?<?php echo (rand()); ?>"></script>

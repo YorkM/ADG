@@ -657,6 +657,13 @@ function sortJSON(data, key, orden) {
     if (orden === 'desc') return ((x > y) ? -1 : ((x < y) ? 1 : 0));
   });
 }
+// FUNCIÓN REORDENAR TABINDEX
+function reordenarTabindex() {
+  let inputs = document.querySelectorAll('input.cantidad');
+  inputs.forEach((input, index) => {
+    input.setAttribute('tabindex', index + 1);
+  });
+}
 // FUNCIÓN PARA ARMAR TABLA PRINCIPAL DE RESULTADOS DE PRODUCTOS
 function TableView(filas) {
   const op_inf = $("#DvChkKits").hasClass('DivCheckBoxTrue') ? 1 : 0;
@@ -664,8 +671,8 @@ function TableView(filas) {
 
   let tabla = `
     <table class="display" width="100%" id="tableProd">
-      <thead>
-        <tr style="background-color: #cff4fc;">
+      <thead style="background-color: #cff4fc;">
+        <tr>
           <th class="size-th no-wrap">CÓDIGO</th>
           <th class="size-th no-wrap">DESCRIPCIÓN</th>
           <th class="size-th no-wrap">VALOR</th>
@@ -718,7 +725,7 @@ function TableView(filas) {
         <td class="size-td no-wrap">${d.descuento}</td>
         <td class="size-td no-wrap" style="background-color:#95F3E8">${formatNum(d.valor_neto, '$')}</td>
         <td class="size-td no-wrap">${d.stock}</td>
-        <td class="size-td"><input type="number" id="CAF${d.codigo_material}" value="${cantPedido}" class="form-control size-td shadow-sm cantidad" tabindex="${i + 1}" data-material='${JSON.stringify(d)}'></td>
+        <td class="size-td"><input type="number" id="CAF${d.codigo_material}" value="${cantPedido}" class="form-control size-td shadow-sm cantidad" data-material='${JSON.stringify(d)}'></td>
         <td class="no-wrap"><input type="text" class="form-control size-td" id="TOF${d.codigo_material}" value="${formatNum(vlrPedido, '$')}" disabled readonly></td>
         <td><input type="text" class="form-control" value="${d.id_pedido}" id="IDF${d.codigo_material}" readonly></td>
         <td align="center">
@@ -739,7 +746,7 @@ function TableView(filas) {
     ordering: true,
     info: false,
     responsive: true,
-    scrollX: true,
+    // scrollX: true,
     columnDefs: [
       { targets: [9], className: "d-none" },
       { targets: [10], orderable: false }
@@ -750,7 +757,8 @@ function TableView(filas) {
     }
   });
 
-  // Delegar eventos para campos dinámicos
+  reordenarTabindex();
+
   $('#tableProd').on('blur', '.cantidad', function () {
     const { codigo_material, valor_unitario, iva, descuento, valor_neto, stock, vlr_pedido, id_pedido, cant_bonificado, cant_regular, stock_bonificado } = $(this).data('material');
     const cantidad = $(this).val();
@@ -931,6 +939,8 @@ function BuscarProductoArr(isn) {
         Arr = recursiva(expr, Arr, f_sto, f_dto, f_bon, isn, f_new, f_ofe);
       }
     }
+
+    $("#dvResultProductos").html(``);
 
     if (Arr.length > 0) {
       TableView(Arr);
@@ -1164,16 +1174,51 @@ function renderMaterialInfo(data, { vunit, v1, v2, v3, v4, iva, dcto }) {
     <div class="container-fluid">
       <div class="row">
         <!-- Columna de datos básicos -->
-        <div class="col-md-6">
+        <div class="col-md-5">
           <div class="panel panel-info">
-            <div class="panel-heading text-green bag-info">DATOS BÁSICOS</div>
+            <img src="https://dfnas.pwmultiroma.com/imagenesMateriales/no_imagen.png" class="img-responsive img-material w-100 img-fluid h-100">
+          </div>
+        </div>
+        
+        <!-- Columna de datos de venta -->
+        <div class="col-md-7">
+          <div class="panel panel-info">
+            <div class="panel-heading text-green bag-info">DATOS DE VENTA</div>
             <table class="form" width="100%" align="center">
               <tbody>
                 <tr>
-                  <td colspan="2" align="center">
-                    <img src="https://dfnas.pwmultiroma.com/imagenesMateriales/no_imagen.png" class="img-responsive img-material w-100 img-fluid" height="345">
-                  </td>
+                  <td class="size-10"><strong>VLR BRUTO</strong></td>
+                  <td class="text-green">${formatNum(vunit, '$')}</td>
                 </tr>
+                <tr>
+                  <td class="size-10"><strong>VLR NETO SIN IVA</strong></td>
+                  <td class="text-green">${formatNum(v1, '$')}</td>
+                </tr>
+                <tr>
+                  <td class="size-10"><strong>VLR NETO FINANCIERO</strong></td>
+                  <td class="text-green">${formatNum(v4, '$')}</td>
+                </tr>
+                <tr>
+                  <td class="size-10"><strong>VLR DESCUENTO</strong></td>
+                  <td class="text-green">${formatNum(v3, '$')}</td>
+                </tr>
+                <tr>
+                  <td class="size-10"><strong>VLR IVA</strong></td>
+                  <td class="text-green">${formatNum(v2, '$')}</td>
+                </tr>
+                <tr>
+                  <td class="size-10"><strong>PORCENTAJE DCTO</strong></td>
+                  <td class="text-green">${dcto}%</td>
+                </tr>
+                <tr>
+                  <td class="size-10"><strong>PORCENTAJE IVA</strong></td>
+                  <td class="text-green">${iva}%</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="panel-heading text-green bag-info mt-2">DATOS BÁSICOS</div>
+            <table class="form" width="100%" align="center">
+              <tbody>                
                 <tr>
                   <td class="size-10"><strong>CÓDIGO</strong></td>
                   <td class="text-green">${data[0].CODIGO_MATERIAL}</td>
@@ -1222,52 +1267,13 @@ function renderMaterialInfo(data, { vunit, v1, v2, v3, v4, iva, dcto }) {
             </table>
           </div>
         </div>
-        
-        <!-- Columna de datos de venta -->
-        <div class="col-md-6">
-          <div class="panel panel-info">
-            <div class="panel-heading text-green bag-info">DATOS DE VENTA</div>
-            <table class="form" width="100%" align="center">
-              <tbody>
-                <tr>
-                  <td class="size-10"><strong>VLR BRUTO</strong></td>
-                  <td class="text-green">${formatNum(vunit, '$')}</td>
-                </tr>
-                <tr>
-                  <td class="size-10"><strong>VLR NETO SIN IVA</strong></td>
-                  <td class="text-green">${formatNum(v1, '$')}</td>
-                </tr>
-                <tr>
-                  <td class="size-10"><strong>VLR NETO FINANCIERO</strong></td>
-                  <td class="text-green">${formatNum(v4, '$')}</td>
-                </tr>
-                <tr>
-                  <td class="size-10"><strong>VLR DESCUENTO</strong></td>
-                  <td class="text-green">${formatNum(v3, '$')}</td>
-                </tr>
-                <tr>
-                  <td class="size-10"><strong>VLR IVA</strong></td>
-                  <td class="text-green">${formatNum(v2, '$')}</td>
-                </tr>
-                <tr>
-                  <td class="size-10"><strong>PORCENTAJE DCTO</strong></td>
-                  <td class="text-green">${dcto}%</td>
-                </tr>
-                <tr>
-                  <td class="size-10"><strong>PORCENTAJE IVA</strong></td>
-                  <td class="text-green">${iva}%</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
       </div>
         
       <!-- Columna de datos de ingreso -->
       <div class="row mt-3">
         <div class="col-md-12">
           <div class="panel panel-info">
-            <div class="panel-heading">INVENTARIO FÍSICO POR LOTES</div>
+            <div class="text-green">INVENTARIO FÍSICO POR LOTES</div>
             <div style="overflow: auto;">
               <table class="table" width="100%" align="center">
                 <thead>
@@ -2392,7 +2398,7 @@ const Rastreo = async () => {
       if (data.length) {
         $("#txt_org").html(item.ORG);
         $("#txt_bodega").html(item.BODEGA);
-        $("#txt_nit").html(item.NIT);
+        $("#txt_nit2").html(item.NIT);
         $("#txt_cod_sap").html(item.CODIGO_SAP);
         $("#txt_nombres").html(item.NOMBRES + '-' + item.RAZON_COMERCIAL);
         $("#txt_direccion").html(item.DIRECCION);
@@ -4379,7 +4385,7 @@ $(function () {
       $("#dvResultProductos").html('');
     } else {
       let n = 0;
-      if (validarSiNumero(valor) == 1) {
+      if (validarSiNumero($("#txt_bproductos").val()) == 1) {
         n = 1;
       }
       BuscarProductoArr(n);

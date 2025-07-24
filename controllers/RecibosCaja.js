@@ -794,8 +794,8 @@ async function ConsultarMulticashBanco() {
   try {
     LoadImg('Consultando multicash...');
     const data = await enviarPeticion({ op: 'S_MULTICASH', link: "../models/RecibosCaja.php", Estado: 0, mes, anio, dia });
+    ArrayMulticashBanco = [];
     if (data.length) {
-      ArrayMulticashBanco = [];
       data.forEach(item => {
         let value = `CUENTA: ${item.CUENTA} | ${item.DESCRIPCION.trim()} | REF: ${item.REFERENCIA} | VALOR: ${formatNum(item.VALOR, '$')} | FECHA: ${item.FECHA_VALOR}`;
         let item_busqueda = `${item.CUENTA} ${item.DESCRIPCION.trim()} ${item.NUMERO} ${item.VALOR} ${item.TEXTO} ${item.FECHA_CONTABILIZACION} ${item.FECHA_VALOR} ${item.ESTADO} ${item.REFERENCIA}`;
@@ -816,23 +816,24 @@ async function ConsultarMulticashBanco() {
         }
         ArrayMulticashBanco.push(obj);
       });
+    }
 
-      const resultado = ArrayMulticashBanco.map(mc => {
-        const cliente = ArrCli.find(c => c.nit.trim() === mc.referencia.trim());
-        if (cliente && mc.id_rc === "0") {
-          return { ...cliente, ...mc };
-        }
-        return null;
-      }).filter(item => item !== null);
+    const resultado = ArrayMulticashBanco.map(mc => {
+      const cliente = ArrCli.find(c => c.nit.trim() === mc.referencia.trim());
+      if (cliente && mc.id_rc === "0") {
+        return { ...cliente, ...mc };
+      }
+      return null;
+    }).filter(item => item !== null);
 
-      $('#tdPlanillas2 tbody').html(``);
-      let elementos = ``;
+    $('#tdPlanillas2 tbody').html(``);
+    let elementos = ``;
 
-      $('#cantBancos').text(resultado.length);
+    $('#cantBancos').text(resultado.length);
 
-      if (resultado.length) {
-        resultado.forEach((item, index) => {
-          elementos += `
+    if (resultado.length) {
+      resultado.forEach((item, index) => {
+        elementos += `
             <tr>
               <td class="size-text no-wrap vertical">${index + 1}</td>
               <td class="size-text no-wrap vertical">${item.cuenta}</td>
@@ -843,8 +844,8 @@ async function ConsultarMulticashBanco() {
               <td class="size-text no-wrap vertical">${item.referencia}</td>
               <td class="size-text no-wrap vertical">${item.codigo_sap}</td>
               <td class="size-td no-wrap vertical">
-                <p class="m-0">${item.nombres}</p>
-                <p class="size-10 text-primary m-0">${item.razon_comercial}</p>
+                <p class="m-0" style="font-size: 11px;">${item.nombres}</p>
+                <p class="text-primary m-0" style="font-size: 8px;">${item.razon_comercial}</p>
               </td>
               <td class="size-td no-wrap vertical">${item.bodega_desc.split(' ')[1]}</td>
               <td class="size-text no-wrap vertical">${item.zona_ventas}</td>
@@ -856,40 +857,39 @@ async function ConsultarMulticashBanco() {
                 </button>
               </td>
             </tr>`;
-        });
+      });
 
-        $('#tdPlanillas2 tbody').html(elementos);
+      $('#tdPlanillas2 tbody').html(elementos);
 
-        $('#tdPlanillas2').off().on('click', '.observacion', function () {
-          limpiarDatos();
-          const { codigo_sap, referencia } = JSON.parse($(this).attr('data-id'));
-          const MultiDay = $('#MultiDay2').val();
+      $('#tdPlanillas2').off().on('click', '.observacion', function () {
+        limpiarDatos();
+        const { codigo_sap, referencia } = JSON.parse($(this).attr('data-id'));
+        const MultiDay = $('#MultiDay2').val();
 
-          $('#btnCliente').click();
-          const valorBuscado = codigo_sap;
-          const coincidencia = ArrCli.find(item => item.codigo_sap === valorBuscado);
+        $('#btnCliente').click();
+        const valorBuscado = codigo_sap;
+        const coincidencia = ArrCli.find(item => item.codigo_sap === valorBuscado);
 
-          if (coincidencia) {
-            $('#Cliente')
-              .val(coincidencia.nombres)
-              .data('ui-autocomplete')._trigger('select', null, { item: coincidencia });
+        if (coincidencia) {
+          $('#Cliente')
+            .val(coincidencia.nombres)
+            .data('ui-autocomplete')._trigger('select', null, { item: coincidencia });
 
-            setTimeout(() => {
-              $('#btnMulticash').click();
-              const valorBuscado = referencia.trim();
-              const coincidencia2 = ArrayMulticashBanco.find(item => item.referencia.trim() === valorBuscado);
-              if (coincidencia2) {
-                $('#filtro')
-                  .val(coincidencia2.item_busqueda)
-                  .data('ui-autocomplete')._trigger('select', null, { item: coincidencia2 });
+          setTimeout(() => {
+            $('#btnMulticash').click();
+            const valorBuscado = referencia.trim();
+            const coincidencia2 = ArrayMulticashBanco.find(item => item.referencia.trim() === valorBuscado);
+            if (coincidencia2) {
+              $('#filtro')
+                .val(coincidencia2.item_busqueda)
+                .data('ui-autocomplete')._trigger('select', null, { item: coincidencia2 });
 
-                $('#MultiDay').val(MultiDay).trigger('change');
-              }
-            }, 2000);
-          }
-        });
-      } else $('#tdPlanillas2 tbody').html(`<td class="text-center lead" colspan="14">Multicash no disponible</td>`);
-    }
+              $('#MultiDay').val(MultiDay).trigger('change');
+            }
+          }, 2000);
+        }
+      });
+    } else $('#tdPlanillas2 tbody').html(`<td class="text-center lead" colspan="14">Multicash no disponible</td>`);
   } catch (error) {
     console.error(error);
   } finally {

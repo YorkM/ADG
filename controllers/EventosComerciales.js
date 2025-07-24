@@ -1266,11 +1266,11 @@ const getZonasPresupuesto = async (oficina, idEvento) => {
       resp.data.forEach((item, index) => {
         tabla += `
         <tr>
-          <td>${index + 1}</td>
-          <td>${item.ZONA_VENTAS}</td>
-          <td>${item.ZONA_DESCRIPCION}</td>
+          <td class="size-15">${index + 1}</td>
+          <td class="size-15">${item.ZONA_VENTAS}</td>
+          <td class="size-14">${item.ZONA_DESCRIPCION}</td>
           <td style="display: none;">${item.PRESUPUESTO}</td>    
-          <td><input type="text" class="form-control form-control-sm inputPresupuestoZona" value="${formatNum(item.PRESUPUESTO, "$")}"></td>    
+          <td><input type="text" class="form-control form-control-sm size-15 inputPresupuestoZona" value="${formatNum(item.PRESUPUESTO, "$")}"></td>    
         </tr>`;
       });
 
@@ -1299,7 +1299,7 @@ const getPresupuestoEvento = async (idEvento) => {
   const totalPresupuesto = resp.data.reduce((acc, item) => acc + parseFloat(item.PRESUPUESTO), 0);
 
   let tabla = `
-  <h5 class="text-center mt-2 mb-3" style="color: #055160; font-weight: 400">Presupuesto evento oficina</h5>
+  <h5 class="text-center mt-2 mb-3" style="color: #055160; font-weight: 400">PRESUPUESTO EVENTO OFICINA</h5>
   <table class="table table-bordered table-sm table-hover" id="tablaPresupuestoEvento">
     <thead class="table-info">
       <tr>
@@ -1315,9 +1315,9 @@ const getPresupuestoEvento = async (idEvento) => {
     resp.data.forEach(item => {
       tabla += `
       <tr>
-        <td style="vertical-align: middle;">${item.OFICINA_VENTAS} - ${item.DESCRIPCION}</td>
-        <td style="vertical-align: middle;">${formatNum(item.EVENTO_ANTERIOR, "$")}</td>
-        <td style="vertical-align: middle;">${formatNum(item.PRESUPUESTO, "$")}</td>
+        <td class="size-14" style="vertical-align: middle;">${item.OFICINA_VENTAS} - ${item.DESCRIPCION}</td>
+        <td class="size-15" style="vertical-align: middle;">${formatNum(item.EVENTO_ANTERIOR, "$")}</td>
+        <td class="size-15" style="vertical-align: middle;">${formatNum(item.PRESUPUESTO, "$")}</td>
         <td class="text-center">
           <button class="btn btn-outline-primary btn-sm btn-presupuesto" data-item="${item.OFICINA_VENTAS}">
             <i class="fa-solid fa-circle-plus"></i>
@@ -1333,9 +1333,9 @@ const getPresupuestoEvento = async (idEvento) => {
       </tbody>
       <tfoot class="table-info">
         <tr>
-          <td style="vertical-align: middle;">TOTALES</td>
-          <td style="vertical-align: middle; font-weight: 600">${formatNum(totalPresupuestoAnterior, "$")}</td>
-          <td style="vertical-align: middle; font-weight: 600">${formatNum(totalPresupuesto, "$")}</td>                
+          <td style="vertical-align: middle; font-weight: 700;" class="text-green">TOTALES</td>
+          <td style="vertical-align: middle; font-weight: 700;" class="text-green">${formatNum(totalPresupuestoAnterior, "$")}</td>
+          <td style="vertical-align: middle; font-weight: 700;" class="text-green">${formatNum(totalPresupuesto, "$")}</td>                
           <td style="vertical-align: middle;"></td>                
         </tr>
       </tfoot>
@@ -1617,14 +1617,14 @@ const buscarEventos = async () => {
 
       tabla += `
       <tr>
-        <td class="no-wrap">${(index + 1)}</td>
-        <td class="no-wrap">${item.id}</td>
-        <td class="no-wrap">${item.nombre}</td>
-        <td class="no-wrap">${item.fecha_inicio}</td>
-        <td class="no-wrap">${item.fecha_fin}</td>
-        <td class="no-wrap">${item.oficina_ventas}</td>
+        <td class="no-wrap size-14">${(index + 1)}</td>
+        <td class="no-wrap size-14">${item.id}</td>
+        <td class="no-wrap size-13">${item.nombre}</td>
+        <td class="no-wrap size-14">${item.fecha_inicio}</td>
+        <td class="no-wrap size-14">${item.fecha_fin}</td>
+        <td class="no-wrap size-14">${item.oficina_ventas}</td>
         <td class="no-wrap">${estado}</td>						
-        <td class="no-wrap">${item.usuario}</td>
+        <td class="no-wrap size-13">${item.usuario}</td>
         <td class="no-wrap">
           <span class="badge bg-primary shadow-sm" style="width: 30px;">${item.n_lab}</span> 
           <button class="btn btn-sm" onclick="abrirModalLab(${item.id})">
@@ -1668,7 +1668,6 @@ const buscarEventos = async () => {
       const id = $(this).attr('data-id');
       $('#idEvento').val(id);
       const resp = await verConsolidadoEvento(id);
-      console.log(resp);      
       if (resp.ok) {
         $('#modalSeguimiento').modal('show');
       } else {
