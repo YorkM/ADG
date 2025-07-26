@@ -68,9 +68,7 @@ const getGruposArticulos = async () => {
    });
 
    let grupos = `<option value="">0000 - TODOS</option>`;
-   resp.data.forEach(item => {
-      grupos += `<option value="${item.GRUPO_ARTICULO.trim()}">${item.GRUPO_ARTICULO} - ${item.DESCRIPCION1}</option>`;
-   });
+   resp.data.forEach(item => grupos += `<option value="${item.GRUPO_ARTICULO.trim()}">${item.GRUPO_ARTICULO} - ${item.DESCRIPCION1}</option>`);
    $('#proveedor').html(grupos);
 }
 // FUNCIÓN OBTENER LOS BENEFICARIOS DE LA NOTA
@@ -119,6 +117,10 @@ const getBeneficiarios2 = async (oficina = "2100") => {
    }));
 
    zonasParejas = resultadoFinal.filter(item => item.integrantes.length == 2);
+
+   console.log(resultadoFinal);
+   console.log("");
+   console.log(zonasParejas);
 }
 // OBTENER Y CALCULAR DATOS COORDINADORES
 const resumenDatosCoordinadores = (zonas, cuotaActual, valorNota) => {

@@ -548,15 +548,15 @@ Redireccionar();
             </tbody>
           </table>
           <div>
-            <button class="btn btn-outline-primary btn-sm w-btn shadow" id="buscarPedidos">
+            <button class="btn btn-outline-primary btn-sm w-btn shadow-sm" id="buscarPedidos">
               <i class="fa-solid fa-magnifying-glass"></i>
               Buscar
             </button>
-            <button class="btn btn-outline-success btn-sm w-btn shadow" id="exportar_gestion">
+            <button class="btn btn-outline-success btn-sm w-btn shadow-sm" id="exportar_gestion">
               <i class="fa-solid fa-file-excel"></i>
               Exportar
             </button>
-            <button class="btn btn-light btn-sm w-btn btn-micro shadow" onClick="LimpiarGestionPedido();">
+            <button class="btn btn-light btn-sm w-btn btn-micro shadow-sm" onClick="LimpiarGestionPedido();">
               <i class="fa-solid fa-broom"></i>
               Limpiar
             </button>
@@ -596,15 +596,15 @@ Redireccionar();
             </tbody>
           </table>
           <div class="mt-2">
-            <button class="btn btn-outline-primary btn-sm w-btn shadow" onClick="GestionEntregas();">
+            <button class="btn btn-outline-primary btn-sm w-btn shadow-sm" onClick="GestionEntregas();">
               <i class="fa-solid fa-magnifying-glass"></i>
               Buscar
             </button>
-            <button class="btn btn-outline-success btn-sm w-btn shadow" onClick="UnificarEntrega();">
+            <button class="btn btn-outline-success btn-sm w-btn shadow-sm" onClick="UnificarEntrega();">
               <i class="fa-solid fa-pen"></i>
               Crear Entrega
             </button>
-            <button class="btn btn-light btn-sm w-btn btn-micro shadow" onClick="LimpiarEntregas();">
+            <button class="btn btn-light btn-sm w-btn btn-micro shadow-sm" onClick="LimpiarEntregas();">
               <i class="fa-solid fa-broom"></i>
               Limpiar
             </button>
@@ -638,15 +638,15 @@ Redireccionar();
             </tbody>
           </table>
           <div class="mt-2">
-            <button class="btn btn-outline-primary btn-sm w-btn shadow" onClick="Faltante();">
+            <button class="btn btn-outline-primary btn-sm w-btn shadow-sm" onClick="Faltante();">
               <i class="fa-solid fa-magnifying-glass"></i>
               Buscar
             </button>
-            <button class="btn btn-outline-success btn-sm w-btn shadow" onClick="fnExcelReport('tdFaltantes');">
+            <button class="btn btn-outline-success btn-sm w-btn shadow-sm" onClick="fnExcelReport('tdFaltantes');">
               <i class="fa-solid fa-file-excel"></i>
               Exportar
             </button>
-            <button class="btn btn-light btn-sm w-btn btn-micro shadow" onClick="LimpiarFaltantes();">
+            <button class="btn btn-light btn-sm w-btn btn-micro shadow-sm" onClick="LimpiarFaltantes();">
               <i class="fa-solid fa-broom"></i>
               Limpiar
             </button>
@@ -685,11 +685,11 @@ Redireccionar();
             </tbody>
           </table>
           <div class="mt-2">
-            <button class="btn btn-outline-primary btn-sm w-btn shadow" onClick="ListarFacturas();">
+            <button class="btn btn-outline-primary btn-sm w-btn shadow-sm" onClick="ListarFacturas();">
               <i class="fa-solid fa-magnifying-glass"></i>
               Buscar
             </button>
-            <button class="btn btn-light btn-sm w-btn btn-micro shadow" onClick="LimpiarFacturas();">
+            <button class="btn btn-light btn-sm w-btn btn-micro shadow-sm" onClick="LimpiarFacturas();">
               <i class="fa-solid fa-broom"></i>
               Limpiar
             </button>

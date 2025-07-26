@@ -12,6 +12,30 @@ const confirmAlert = async (title, text) => {
    });
    return result;
 }
+// DICCIONARIO DE MESES
+const meses = {
+   "01": "ENERO",
+   "02": "FEBRERO",
+   "03": "MARZO",
+   "04": "ABRIL",
+   "05": "MAYO",
+   "06": "JUNIO",
+   "07": "JULIO",
+   "08": "AGOSTO",
+   "09": "SEPTIEMBRE",
+   "10": "OCTUBRE",
+   "11": "NOVIEMBRE",
+   "12": "DICIEMBRE",
+}
+// FUNCIÓN PARA FILTRAR TABLAS
+const filtrar = (filtro) => {
+   const filas = document.querySelectorAll('#tablaProyeccion tbody tr');
+   filas.forEach(fila => {
+      const celdas = fila.querySelectorAll('td');
+      const coincide = Array.from(celdas).some(td => td.textContent.toLowerCase().includes(filtro));
+      fila.style.display = coincide ? '' : 'none';
+   });
+}
 // SETEAR FECHA ACTUAL A CAMPOS FILTROS
 const setearFechas = () => {
    const fecha = new Date();
@@ -26,6 +50,15 @@ const getConceptos = async () => {
          data.forEach(item => conceptos += `<option value="${item.ID}">${item.TEXTO}</option>`);
          $('#concepto').html(conceptos);
       }
+   } catch (error) {
+      console.log(error);
+   }
+}
+// FUNCIÓN PARA OBTENER LOS INGRESOS Y EGRESOS DE SAP
+const getIngresosEgresos = async () => {
+   try {
+      const { data } = await enviarPeticion({op: "G_INGRE_EGRE", link: "../models/FlujoCaja.php"});
+      console.log(data);
    } catch (error) {
       console.log(error);
    }
@@ -65,7 +98,7 @@ const guardarMovimiento = async () => {
    const descripcion = $('#descripcion').val();
 
    if (!fecha || !tipoM || !concepto || !monto) {
-      Swal.fire("Guardar movimiento", "Los campos... Fecha Movimiento - Tipo Movimiento - Concepto - Monto/Valor, Son obligatorios", "error");
+      Swal.fire("Guardar movimiento", "Los campos... Fecha Movimiento - Tipo Movimiento - Concepto - Monto/Valor, son obligatorios", "error");
       return;
    }
 
@@ -77,15 +110,15 @@ const guardarMovimiento = async () => {
          op: "I_MOVIMIENTO", 
          link: "../models/FlujoCaja.php",
          organizacion,
-         descripcion,
+         descripcion: descripcion || "-",
          concepto,
          usuario, 
          fecha,
          tipoM, 
          monto,
-         dia,
+         anio,
          mes,
-         anio
+         dia
       });
 
       if (resp.ok) {
@@ -104,8 +137,18 @@ const guardarMovimiento = async () => {
 }
 // FUNCIÓN PARA OBTENER LOS MOVIMIENTOS
 const getMovimientos = async () => {
+   const organizacion = $('#numOrg').val();
+   const fechaInicio = $('#fechaInicio').val();
+   const fechaFinal = $('#fechaFinal').val();
    try {
-      const { data } =  await enviarPeticion({ op: "G_MOVIMIENTOS", link: "../models/FlujoCaja.php" });    
+      const { data } =  await enviarPeticion({ 
+         op: "G_MOVIMIENTOS", 
+         link: "../models/FlujoCaja.php",
+         organizacion,
+         fechaInicio,
+         fechaFinal 
+      });
+
       let elementos = ``;
       let textColor = "";
       let textColor2 = "";
@@ -122,7 +165,7 @@ const getMovimientos = async () => {
             elementos += `
             <tr>
                <td class="no-wrap size-14 text-center">${item.DIA}</td>
-               <td class="no-wrap size-14 text-center">${item.MES}</td>
+               <td class="no-wrap size-13 text-center">${meses[item.MES]}</td>
                <td class="no-wrap size-14 text-center">${item.ANIO}</td>
                <td class="no-wrap size-14 text-center">${item.ORGANIZACION}</td>
                <td class="no-wrap text-center"><span style="font-size: 10px; background-color: ${textColor2}; color: white; padding: 3px 6px; border-radius: 4px; display: inline-block; width: 4rem; font-weight: bold;">${item.TIPO_M}</span></td>
@@ -137,7 +180,7 @@ const getMovimientos = async () => {
             console.log($(this).parent());
          });
       } else {
-         elementos = `<td colspan="8" class="lead text-center">No hay movimientos guardados</td>`;
+         elementos = `<td colspan="9" class="lead text-center">No hay movimientos guardados relacionados a las fechas seleccionadas</td>`;
       }      
       $('#tablaProyeccion tbody').html(elementos);
    } catch (error) {
@@ -168,7 +211,7 @@ const getBimestreFlujoCaja = async () => {
             </tr>`;
          }); 
       } else {
-         elementos = `<td colspan="8" class="lead text-center">No hay datos disponibles</td>`;
+         elementos = `<td colspan="10" class="lead text-center">No hay datos disponibles</td>`;
       }      
       $('#tablaProyeccion2 tbody').html(elementos);
    } catch (error) {
@@ -181,11 +224,17 @@ $(function () {
    $('#fechaInicio').val(setearFechas());
    $('#fechaFinal').val(setearFechas());
 
+   $('#fechaInicio, #fechaFinal').change(function () {
+      getMovimientos();
+   });
+
+   getIngresosEgresos();
+
    getConceptos();
 
    getMovimientos();
 
-   getBimestreFlujoCaja()
+   getBimestreFlujoCaja();
 
    $('#btnConcepto').click(function () {
       $('#agregarConcepto').modal("show");
@@ -208,5 +257,10 @@ $(function () {
 
    $('#guardarConcepto').click(function () {     
       guardarConcepto();
+   });
+
+   $('#filtroBusqueda').keyup(function () {
+      const filtro = this.value.toLowerCase();
+      filtrar(filtro);
    });
 });
