@@ -2745,8 +2745,43 @@ const formulario = async (e) => {
   }
 };
 
+// BY JOHN
+
+function CargarLaboratorios() {
+  $.ajax({
+    type: "POST",
+    encoding: "UTF-8",
+    url: "../models/Eventos.php",
+    dataType: "json",
+    error: function (OBJ, ERROR, JQERROR) {
+      alert(JQERROR);
+    },
+    data: {
+      op: "B_GARTICULOS",
+    },
+    async: true,
+    success: function (data) {
+      var option = "";
+      for (var i = 0; i <= data.length - 1; i++) {
+        option +=
+          '<option value="' +
+          data[i].GRUPO_ARTICULO +
+          '">' +
+          data[i].GRUPO_ARTICULO +
+          " - " +
+          data[i].DESCRIPCION1 +
+          "</option>";
+      }
+      $("#LabConfir").html(option);
+    },
+  });
+}
+
+//FIN BY JOHN
+
 // EJECUCIÓN DE FUNCIONES AL CARGAR EL DOM
 $(function () {
+  CargarLaboratorios();
   const oficinas = OficinasVentas("S");
   $("#oficinaPresupuesto").html(oficinas);
 
@@ -2819,7 +2854,7 @@ $(function () {
   });
 
   $("#eventos_cierres").select2({
-    theme: "bootstrap-5",
+    // theme: "bootstrap-5",
   });
 
   $("#cancelar-lab-modal").click(function () {
@@ -2957,4 +2992,5 @@ $(function () {
     document.getElementById("tableBody").innerHTML = ``;
     document.getElementById("tableHeader").innerHTML = ``;
   });
+  $("#LabConfir").select2();
 });

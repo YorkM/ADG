@@ -403,23 +403,23 @@ Redireccionar();
             </tbody>
           </table>
           <div class="container-btn">
-            <button type="button" class="btn btn-outline-secondary w-btn btn-sm shadow" id="btnLimpiar" onClick="Limpiar();">
+            <button type="button" class="btn btn-outline-secondary w-btn btn-sm shadow-sm" id="btnLimpiar" onClick="Limpiar();">
               <i class="fa-solid fa-file"></i>
               Nuevo
             </button>
-            <button type="button" class="btn btn-outline-primary w-btn btn-sm shadow" id="btnMas">
+            <button type="button" class="btn btn-outline-primary w-btn btn-sm shadow-sm" id="btnMas">
               <i class="fa-solid fa-list"></i>
               Más
             </button>
-            <button type="button" class="btn btn-outline-success w-btn btn-sm shadow" id="btnPuntos">
+            <button type="button" class="btn btn-outline-success w-btn btn-sm shadow-sm" id="btnPuntos">
               <i class="fa-solid fa-heart"></i>
               Puntos
             </button>
-            <button type="button" class="btn btn-outline-danger w-btn btn-sm shadow" id="btnDescuentos" style="display: none">
+            <button type="button" class="btn btn-outline-danger w-btn btn-sm shadow-sm" id="btnDescuentos" style="display: none">
               <i class="fa-solid fa-bullhorn"></i>
               Descuentos para ti!
             </button>
-            <button type="button" class="btn btn-outline-warning w-btn btn-sm shadow" id="btnEstadisticas" style="display: none">
+            <button type="button" class="btn btn-outline-warning w-btn btn-sm shadow-sm" id="btnEstadisticas" style="display: none">
               <i class="fa-solid fa-chart-pie"></i>
               Estadísticas
             </button>
@@ -1668,7 +1668,7 @@ Redireccionar();
   <script type="text/javascript" src="../lib/js/servicios.js?<?php echo (rand()); ?>"></script>
   <script type="text/javascript" src="../resources/HighCharts/code/highcharts.js?<?php echo (rand()); ?>"></script>
   <script type="text/javascript" src="../resources/select2/js/select2.full.min.js"></script>
-  <script type="text/javascript" src="../controllers/PW-SAP.js?<?php echo (rand()); ?>"></script>
+  <script type="text/javascript" src="../controllers/PW-SAP-TEST.js?<?php echo (rand()); ?>"></script>
   <script type="text/javascript" src="../lib/js/Isa.js?<?php echo (rand()); ?>"></script>
 </body>
 
