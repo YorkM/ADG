@@ -1,4 +1,3 @@
-const urlModels = "../models/PW-SAP-TEST.php";
 let ArrProd = [];
 let ArrEan = [];
 let ArrCli = [];
@@ -29,20 +28,19 @@ const validaEstadoDesbloqueo = async () => {
   try {
     const pedido = $("#ped_numero_sap").val();
     const resp = await enviarPeticion({
-      link: urlModels,
+      link: '../models/PW-SAP.php',
       pedido: pedido,
       op: 'status_sol_desbloqueo'
     });
 
-    // Verifica que resp sea un array y tenga elementos
     if (Array.isArray(resp) && resp.length > 0) {
-      return resp[0].nsolicitud > 0; // Devuelve true si nsolicitud es mayor que 0
+      return resp[0].nsolicitud > 0;
     }
 
-    return false; // Devuelve false si no hay solicitudes
+    return false;
   } catch (error) {
     console.error('Error en la validación de estado de desbloqueo:', error);
-    return false; // Devuelve false en caso de error
+    return false;
   }
 };
 // FUNCIÓN PARA GESTIONAR SOLICITUD DE DESBLOQUEO
@@ -73,7 +71,7 @@ const SolDesbloqueo = async () => {
       try {
         const nota = Swal.getPopup().querySelector('#nota').value;
         const resp = await enviarPeticion({
-          link: urlModels,
+          link: '../models/PW-SAP.php',
           pedido: $("#ped_numero_sap").val(),
           op: 'enviar_sol_desbloqueo',
           nota
@@ -87,7 +85,7 @@ const SolDesbloqueo = async () => {
           Swal.fire("Error", resp.mensaje, "error");
           return;
         }
-        Swal.fire("Ok", "Se envio la solicitud correctamente!", "success");
+        Swal.fire("Ok", "Se envió la solicitud correctamente!", "success");
         Temporales();
       } catch (error) {
         Swal.showValidationMessage(`Request failed: ${error}`);
@@ -95,16 +93,12 @@ const SolDesbloqueo = async () => {
     },
     allowOutsideClick: () => !Swal.isLoading()
   }).then((result) => {
-    console.log(result)
+    console.log(result);
   });
 }
 // FUNCIÓN PARA MOSTRAR ESTADO DE SOLICITUD DE DESBLOQUEO
 const MostrarEstadoSolDesbloqueo = async (pedido) => {
-  const resp = await enviarPeticion({
-    link: urlModels,
-    op: 'datos_sol',
-    pedido
-  });
+  const resp = await enviarPeticion({ link: '../models/PW-SAP.php', op: 'datos_sol', pedido });
 
   let estado = '';
   switch (resp[0].ESTADO) {
@@ -124,7 +118,7 @@ const MostrarEstadoSolDesbloqueo = async (pedido) => {
 
 const guardSolicitudesDesbloqueoPedidos = async () => {
   try {
-    const resp = await enviarPeticion({ link: urlModels, op: 'SOL_PENDIENTE' });
+    const resp = await enviarPeticion({ link: '../models/PW-SAP.php', op: 'SOL_PENDIENTE' });
   } catch (e) {
     console.error(e)
   }
@@ -205,7 +199,7 @@ async function GruposArticulos() {
 // FUNCIÓN CONSULTA DE OPCIONES
 async function consultaOpciones(pedido, alm = undefined, rdespacho = undefined, rpuntoventa = undefined) {
   try {
-    const data = await enviarPeticion({ op: "S_GESTION_PEDIDOS_UNICO", link: urlModels, pedido });
+    const data = await enviarPeticion({ op: "S_GESTION_PEDIDOS_UNICO", link: "../models/PW-SAP.php", pedido });
     if (data.length) {
       let item = data[0];
       $("#ped_gestion").val(item.factura);
@@ -252,7 +246,7 @@ const PermisosZonas = async () => {
   try {
     let rol = $("#Rol").val();
 
-    const data = await enviarPeticion({ op: "S_PERMISO_ZONA", link: urlModels, rol });
+    const data = await enviarPeticion({ op: "S_PERMISO_ZONA", link: "../models/PW-SAP.php", rol });
     if (data.length > 0) sw = 1;
   } catch (error) {
     console.error(error);
@@ -266,7 +260,7 @@ const ZonasVentas = async () => {
     let sw = await PermisosZonas();
     let idUsr = $("#UsrId").val();
 
-    const data = await enviarPeticion({ op: "S_ZONAS_VENTA", link: urlModels, sw, idUsr });
+    const data = await enviarPeticion({ op: "S_ZONAS_VENTA", link: "../models/PW-SAP.php", sw, idUsr });
     if (data.length > 0) {
       if (sw == 1) {
         zonas = `<option value="0">000000 - TODAS</option>`;
@@ -290,7 +284,7 @@ function LoadImg(texto = "Cargando...") {
 
   const html = `
     <img src="../resources/icons/preloader.gif" alt="Cargando..." />
-    <figcaption style="font-size: 25px; margin-bottom: 5px; font-weight: bold;">${texto}</figcaption>
+    <figcaption style="font-size: 20px; margin-bottom: 5px; font-weight: bold; text-align: center;">${texto}</figcaption>
     <figcaption id="txtTimer" style="font-weight: bold;">0</figcaption>`;
 
   const loader = document.getElementById("loaderOverlay");
@@ -331,7 +325,7 @@ const LoadArrayCli = async () => {
 
     const data = await enviarPeticion({
       op: "B_CLIENTE",
-      link: urlModels,
+      link: "../models/PW-SAP.php",
       org: $("#Organizacion").val(),
       sw: 'a'
     });
@@ -382,7 +376,7 @@ function validarSiNumero(numero) {
 // FUNCIÓN PARA EDITAR UN PEDIDO
 const EditarPedido = async (Numero, Tipo) => {
   try {
-    const data = await enviarPeticion({ op: "S_EDITAR_PW", link: urlModels, Numero, Tipo });
+    const data = await enviarPeticion({ op: "S_EDITAR_PW", link: "../models/PW-SAP.php", Numero, Tipo });
     if (data.length) {
       const item = data[0];
       $("#ModalEditarPedidos").modal("hide");
@@ -720,14 +714,17 @@ function TableView(filas) {
     tabla += `
       <tr>
         <td class="size-td no-wrap">${img_new}${d.codigo_material}</td>
-        <td class="size-12 no-wrap" title="${d.descripcion.trim()}">${img_3} ${img} ${img_desc} ${cortarTexto(d.descripcion, 70)} ${img_1} ${img_2}</td>
+        <td class="p-0 size-12 no-wrap">
+          <div class="m-0" title="${d.descripcion.trim()}">${img_3} ${img} ${img_desc} ${cortarTexto(d.descripcion, 70)} ${img_1} ${img_2}</div>
+          <p class="m-0 text-primary" style="font-size: 10px;">${d.grupoAr} - ${d.fechaV}</p>
+        </td>
         <td class="size-td no-wrap" style="background-color:#64D4F7">${formatNum(d.valor_unitario, '$')}</td>
         <td class="size-td no-wrap">${d.iva}</td>
         <td class="size-td no-wrap">${d.descuento}</td>
         <td class="size-td no-wrap" style="background-color:#95F3E8">${formatNum(d.valor_neto, '$')}</td>
         <td class="size-td no-wrap">${d.stock}</td>
-        <td class="size-td"><input type="number" id="CAF${d.codigo_material}" value="${cantPedido}" class="form-control size-td shadow-sm cantidad" data-material='${JSON.stringify(d)}'></td>
-        <td class="no-wrap"><input type="text" class="form-control size-td" id="TOF${d.codigo_material}" value="${formatNum(vlrPedido, '$')}" disabled readonly></td>
+        <td class="td-input-two"><input type="number" id="CAF${d.codigo_material}" value="${cantPedido}" class="form-control size-td shadow-sm cantidad" data-material='${JSON.stringify(d)}'></td>
+        <td class="td-input"><input type="text" class="form-control size-td" id="TOF${d.codigo_material}" value="${formatNum(vlrPedido, '$')}" disabled readonly></td>
         <td><input type="text" class="form-control" value="${d.id_pedido}" id="IDF${d.codigo_material}" readonly></td>
         <td align="center">
           <button type="button" class="btn btn-sm btn-outline-primary info-btn" style="font-weight: bolder; font-size: 15px;" data-material='${JSON.stringify(d)}'>
@@ -747,7 +744,6 @@ function TableView(filas) {
     ordering: true,
     info: false,
     responsive: true,
-    // scrollX: true,
     columnDefs: [
       { targets: [9], className: "d-none" },
       { targets: [10], orderable: false }
@@ -776,7 +772,7 @@ const GuardarShoping = async () => {
   try {
     const data = await enviarPeticion({
       op: "GUARDA_SHOPING",
-      link: urlModels,
+      link: "../models/PW-SAP.php",
       codigo_sap: $("#txt_codigoSap").val(),
       shoping_codmaterial: $("#shoping_codmaterial").val(),
       shoping_preciomaterial: unformatNum($("#shoping_preciomaterial").val()),
@@ -961,7 +957,7 @@ function BuscarProductoArr(isn) {
 // FUNCIÓN CARGAR EAN
 async function CargarEan() {
   try {
-    const data = await enviarPeticion({ op: "B_EAN", link: urlModels });
+    const data = await enviarPeticion({ op: "B_EAN", link: "../models/PW-SAP.php" });
     data.forEach(item => {
       let e = { codigo_material: item.codigo_material, ean: item.ean }
       ArrEan.push(e);
@@ -1010,11 +1006,13 @@ async function BuscarProductos() {
   try {
     LoadImg('Cargando portafolio...');
     ArrProd = [];
-    const data = await enviarPeticion({ op: op_sw, link: urlModels, desc, bodega, lista, numero, eps, ctrl, f_sto, f_dto, f_bon, f_bar, top, orden, TipoPed, f_new, Grp1, Grp2, CodigoSAP });
+    const data = await enviarPeticion({ op: op_sw, link: "../models/PW-SAP.php", desc, bodega, lista, numero, eps, ctrl, f_sto, f_dto, f_bon, f_bar, top, orden, TipoPed, f_new, Grp1, Grp2, CodigoSAP });
     data.forEach(item => {
       let det = {
         codigo_material: item.codigo_material,
         descripcion: $.trim(item.descripcion),
+        grupoAr: $.trim(item.grupoAr),
+        fechaV: $.trim(item.fechaV),
         valor_unitario: item.valor_unitario,
         iva: item.iva,
         descuento: item.descuento,
@@ -1054,7 +1052,7 @@ async function GuardarHuella() {
   try {
     const data = await enviarPeticion({
       op: "G_HUELLA",
-      link: urlModels,
+      link: "../models/PW-SAP.php",
       codigo_sap: $("#txt_codigoSap").val(),
       codigo_material: $("#huella_codmaterial").val(),
       cantidad: $("#huella_cantidad").val(),
@@ -1137,7 +1135,7 @@ async function InfoMaterial(pcodigo, pvalor, piva, pdcto, pdesc, pstock, op) {
       <i class="fas fa-spinner fa-spin"></i> Cargando...
     </div>`;
     $('#ContenidoInfoMateriales').html(msgHtml);
-    const data = await enviarPeticion({ op: opc, link: urlModels, cod: pcodigo, org, ofi, lst });
+    const data = await enviarPeticion({ op: opc, link: "../models/PW-SAP.php", cod: pcodigo, org, ofi, lst });
     if (data.length) {
       if (op === "0") {
         renderMaterialInfo(data, { vunit, v1, v2, v3, v4, iva, dcto });
@@ -1438,7 +1436,7 @@ async function AddProducto(pcodigo, pvalor, piva, pdcto, pcant, pneto, pstock, p
 // FUNCIÓN QUE CONSTRUYE EL LISTADO DE DESTINATARIOS DE MERCANCIA 
 async function Destinatarios(codSap, ciudad, direccion) {
   try {
-    const data = await enviarPeticion({ op: "B_DESTINATARIO", link: urlModels, codSap: $.trim(codSap) });
+    const data = await enviarPeticion({ op: "B_DESTINATARIO", link: "../models/PW-SAP.php", codSap: $.trim(codSap) });
     let destino = `<option value="0" selected>Principal - ${ciudad} - ${direccion}</option>`;
     if (data != '') {
       data.forEach((item, i) => destino += `<option value="${item.id}">alterna ${i} - ${item.direccion}</option>`);
@@ -1457,7 +1455,7 @@ async function InsertarEncabezado() {
     try {
       const data = await enviarPeticion({
         op: "I_PEDIDO_ENCABEZADO",
-        link: urlModels,
+        link: "../models/PW-SAP.php",
         organizacion_ventas: $("#Organizacion").val(),
         oficina_ventas: $("#txt_oficina").val(),
         canal_distribucion: 10,
@@ -1496,7 +1494,7 @@ async function InsertarDetalle(NumPed, codigo, cant, vlr_unitario, descuento, to
   try {
     const data = await enviarPeticion({
       op: "I_PEDIDO_DETALLE",
-      link: urlModels,
+      link: "../models/PW-SAP.php",
       NumPed: NumPed,
       codigo: codigo,
       cant: cant,
@@ -1531,7 +1529,7 @@ async function ActualizarDetalle(idfila, cant, totalfila, codigo) {
 
     const data = await enviarPeticion({
       op: "U_PEDIDO_DETALLE",
-      link: urlModels,
+      link: "../models/PW-SAP.php",
       idfila: idfila,
       cant: cant,
       vlr_total: totalfila,
@@ -1558,7 +1556,7 @@ async function EliminarDetalle(idfila, codigo) {
 
     const data = await enviarPeticion({
       op: "D_PEDIDO_DETALLE",
-      link: urlModels,
+      link: "../models/PW-SAP.php",
       idfila: idfila,
       numero: numero,
       oficina: $("#txt_oficina").val(),
@@ -1600,7 +1598,7 @@ async function VerificaPedido() {
   try {
     let num = $("#txt_numero").val();
     if (num > 0) {
-      const data = await enviarPeticion({ op: "S_VERIFICA_PEDIDO", link: urlModels, num });
+      const data = await enviarPeticion({ op: "S_VERIFICA_PEDIDO", link: "../models/PW-SAP.php", num });
       if (data == '') {
         let numsap = $.trim($("#txt_numero_sap").val());
         if (numsap != 0) {
@@ -1659,7 +1657,7 @@ const ListarPedido = async () => {
 
     LoadImg('Cargando pedido...');
 
-    const data = await enviarPeticion({ op: "S_PEDIDO_DETALLE", link: urlModels, numero });
+    const data = await enviarPeticion({ op: "S_PEDIDO_DETALLE", link: "../models/PW-SAP.php", numero });
     if (data.length) {
       let cont = 0;
       let vtotal = 0;
@@ -1718,7 +1716,7 @@ const ListarPedido = async () => {
         detalle += `
         <tr ${clase}>
           <td class="size-td">${item.codigo}</td>
-          <td class="size-td">${img} ${item.descripcion} ${msj}</td>
+          <td class="size-td no-wrap">${img} ${item.descripcion} ${msj}</td>
           <td class="size-td">${formatNum(item.valor_unitario, "$")}</td>
           <td class="size-td">${item.iva}</td>
           <td class="size-td">${item.descuento}</td>
@@ -1726,9 +1724,8 @@ const ListarPedido = async () => {
           <td class="size-td">${item.stock}</td>
           <td>
             <input ${acces} ${style} type="number" id="CAF${item.codigo}" onKeyPress="return vnumeros(event)" value="${item.cantidad}" class="form-control size-td" tabindex="${(index + 1)}" onBlur="AddProducto('${$.trim(item.codigo)}', '${$.trim(item.valor_unitario)}', '${$.trim(item.iva)}', '${$.trim(item.descuento)}', this.value, '${$.trim(item.valor_neto)}', '${$.trim(item.stock)}', '${$.trim(item.valor_total)}', '${$.trim(item.id)}', '${$.trim(Bonifica)}', '${$.trim(item.cant_bonificado)}', '${$.trim(item.cant_regular)}', '${$.trim(item.stock_bonificado)}'); ListarPedido();">
-          </td>
-          <td><input type="text" class="form-control size-td" id="TOF${item.codigo}" value="${item.valor_total}" disabled readonly></td>
-          <td><input type="text" class="form-control size-td" id="IDF${item.codigo}" value="${item.id}" disabled readonly></td>
+          </td><td class="td-input"><input type="text" class="form-control size-td" id="TOF${item.codigo}" value="${item.valor_total}" disabled readonly></td>
+          <td class="td-input"><input type="text" class="form-control size-td" id="IDF${item.codigo}" value="${item.id}" disabled readonly></td>
         </tr>`;
       });
 
@@ -1856,8 +1853,8 @@ async function UpdNotas(ob) {
     let nota = $.trim($(ob).val());
     let nump = $.trim($("#txt_numero").val());
     if (nump != '') {
-      const data = await enviarPeticion({ op: "U_NOTAS", link: urlModels, nota, nump });
-      console.log(data);
+      const data = await enviarPeticion({ op: "U_NOTAS", link: "../models/PW-SAP.php", nota, nump });
+      if (data.ok) Swal.fire("OK", "Nota actualizada correctamente", "success");
     }
   } catch (error) {
     console.log(error);
@@ -1867,7 +1864,7 @@ async function UpdNotas(ob) {
 const Temporales = async () => {
   try {
     LoadImg('Cargando temporales...');
-    const data = await enviarPeticion({ op: "S_TEMPORALES", link: urlModels });
+    const data = await enviarPeticion({ op: "S_TEMPORALES", link: "../models/PW-SAP.php" });
     if (data.length) {
       let header = `    
       <div class="alert alert-warning alert-dismissible mt-2 mb-5" role="alert">
@@ -1875,11 +1872,11 @@ const Temporales = async () => {
         transcurrido este tiempo serán eliminados de manera automática por nuestro sistema.
       </div>
       <div class="mb-2">
-        <span class="badge text-bg-danger"><strong>T</strong>emporal</span>
-        <span class="badge text-bg-warning"><strong>P</strong>edido</span>
-        <span class="badge text-bg-success"><strong>E</strong>ntrega</span>
-        <span class="badge text-bg-info"><strong>O</strong>rden</span>
-        <span class="badge text-bg-primary"><strong>F</strong>actura</span>              
+        <span class="badge text-bg-danger size-14"><strong>T</strong>emporal</span>
+        <span class="badge text-bg-warning size-14"><strong>P</strong>edido</span>
+        <span class="badge text-bg-success size-14"><strong>E</strong>ntrega</span>
+        <span class="badge text-bg-info size-14"><strong>O</strong>rden</span>
+        <span class="badge text-bg-primary size-14"><strong>F</strong>actura</span>              
       </div>            
       <div id="VtotalPropios"></div>`;
 
@@ -1973,7 +1970,7 @@ const Temporales = async () => {
           <td class="size-td no-wrap">${item.fecha_pedido}</td>
           <td class="size-12 no-wrap">${item.bodega}</td>
           <td class="size-td no-wrap">${item.numero}</td>
-          <td class="size-td no-wrap">
+          <td class="p-0 size-td no-wrap">
             <p class="no-wrap" style="margin: 0; font-size: 12px;">${item.cliente}</p>
             <small style="font-weight: bold;">
               Zona ventas: <span class="text-primary" style="font-size: 8px;">${item.zona_ventas} - ${item.zona_descripcion}</span>
@@ -2145,7 +2142,7 @@ async function EnviarMail(tipo, numero) {
 // ENVÍO DE EMAIL DE ANULACIÓN DE PEDIDOS
 async function EnviarMailAnulacion(tipo, numero, texto) {
   try {
-    const data = await enviarPeticion({ op: "EMAIL", link: urlModels, tipo, numero, texto });
+    const data = await enviarPeticion({ op: "EMAIL", link: "../models/PW-SAP.php", tipo, numero, texto });
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -2359,7 +2356,7 @@ const EliminarPW = async (numero) => {
     const result = await confirmAlert("Eliminar Pedido Web", "¿Está seguro(a) de eliminar el pedido?");
     if (!result.isConfirmed) return;
 
-    const data = await enviarPeticion({ op: "D_PEDIDO", link: urlModels, numero });
+    const data = await enviarPeticion({ op: "D_PEDIDO", link: "../models/PW-SAP.php", numero });
 
     if (data == 0) {
       Swal.fire("Excelente", "Pedido eliminado correctamente!", "success");
@@ -2471,7 +2468,7 @@ async function Entregas() {
         Swal.fire("Cancelado", "La operación ha sido cancelada", "error");
       }
     } else {
-      const data = await enviarPeticion({ op: 'S_ENTREGA', link: urlModels, numero});
+      const data = await enviarPeticion({ op: 'S_ENTREGA', link: "../models/PW-SAP.php", numero});
       if (data.length) {
         let detalle = '';
         let clas = '';
@@ -2602,7 +2599,7 @@ async function Prioridad_ot(ot, almacen, despacho, punto) {
   try {
     const data = await enviarPeticion({
       op: 'Prioridad_ot',
-      link: urlModels,
+      link: "../models/PW-SAP.php",
       ot: ot,
       almacen: almacen,
       recojeDespachos: despacho, // Cambiado de 'despacho' a 'recojeDespachos'
@@ -2719,7 +2716,7 @@ async function Ordenes() {
         let detalle = '';
         let clas = '';
         let Pneto = 0;
-        const data = await enviarPeticion({ op: 'S_ORDEN', link: urlModels, numero: Num });
+        const data = await enviarPeticion({ op: 'S_ORDEN', link: "../models/PW-SAP.php", numero: Num });
         data.forEach(item => {
           if (parseInt(item.ENTREGA) == 0) {
             clas = 'class="alert-danger"';
@@ -2804,7 +2801,7 @@ function LimpiarGestionPedido() {
 }
 // FUNCIÓN GESTIÓN DE PEDIDOS
 const GestionPedidos = async () => {
-  const link = urlModels;
+  const link = "../models/PW-SAP.php";
   let zona = $("#txtZonas").val();
   const codigo = $("#txtCodigoSAP").val().trim();
   const fh1 = $("#txtFecha1").val().trim();
@@ -2923,7 +2920,7 @@ const GestionPedidos = async () => {
               <td class="size-td no-wrap">${item.fecha_pedido}</td>
               <td class="no-wrap" style="font-size: 12px">${item.bodega}</td>
               <td class="size-td no-wrap">${item.clase} - ${item.numero_sap}</td>
-              <td class="size-td no-wrap">
+              <td class="p-0 size-td no-wrap">
                 <p class="no-wrap" style="margin: 0; font-size: 12px">${item.cliente}</p>
                 <small class="no-wrap" style="font-weight: bold;">Zona ventas: 
                   <span class="text-primary" style="font-size: 8px;">${item.zona_ventas} - ${item.zona_descripcion}</span>
@@ -3034,7 +3031,7 @@ async function RecuperarHistorico(numero) {
     const result = await confirmAlert(`¿Está seguro(a) de restablecer el pedido temporal número ${numero}?`, "Tenga presente que las condiciones (Precios, Descuentos, Bonificaciones) serán recalculadas a la fecha actual");
     if (result.isConfirmed) {
       LoadImg('Restaurando...');
-      const data = await enviarPeticion({op: "G_PEDIDOS_HISTORIA_TMP", link: urlModels, numero});
+      const data = await enviarPeticion({op: "G_PEDIDOS_HISTORIA_TMP", link: "../models/PW-SAP.php", numero});
       if (!data.error) {
         Swal.fire("Excelente", data.mensaje, "success");
       } else {
@@ -3099,7 +3096,7 @@ const GestionEntregas = async () => {
       LoadImg('Cargando...');
       const data = await enviarPeticion({
         op: "S_ENTREGAS",
-        link: urlModels,
+        link: "../models/PW-SAP.php",
         oficina: $.trim($("#OficinaEntregas").val()),
         codigo: $.trim($("#CodigoSAPEntregas").val()),
         fh1: $.trim($("#EntregasFecha1").val()),
@@ -3290,7 +3287,7 @@ const ListarFacturas = async () => {
 
   if ((codigo != '') || (fact != '')) {
     try {
-      const data = await enviarPeticion({ op: "S_FACTURAS", link: urlModels, codigo, fh1, fh2, fact });
+      const data = await enviarPeticion({ op: "S_FACTURAS", link: "../models/PW-SAP.php", codigo, fh1, fh2, fact });
       if (data.length) {
         let tabla = `
           <table class="display" width="100%" id="tableEntregas">
@@ -3402,7 +3399,7 @@ const Faltante = async () => {
   if (codigo != '' || fact != undefined) {
     try {
       LoadImg('Cargando...');
-      const data = await enviarPeticion({ op: "S_FALTANTES", link: urlModels, codigo, fh1, fh2, fact });
+      const data = await enviarPeticion({ op: "S_FALTANTES", link: "../models/PW-SAP.php", codigo, fh1, fh2, fact });
       if (data != '' && data != null) {
         let tabla = `
          <table class="table" align="center" id="tdFaltantes">
@@ -3469,7 +3466,7 @@ const Faltante = async () => {
 async function VerficarPedido(numTMP) {
   let result = 0;
   try {
-    const data = await enviarPeticion({op: "VERIFY_PEDIDO", link: urlModels, numTMP: numTMP});
+    const data = await enviarPeticion({op: "VERIFY_PEDIDO", link: "../models/PW-SAP.php", numTMP: numTMP});
     result = data[0].ESTADO;
   } catch (error) {
     console.error(error);
@@ -3480,7 +3477,7 @@ async function VerficarPedido(numTMP) {
 async function NumeroSAP(numTMP) {
   let result = 0;
   try {
-    const data = await enviarPeticion({op: 'NUMERO_SAP', link: urlModels, numTMP: numTMP});
+    const data = await enviarPeticion({op: 'NUMERO_SAP', link: "../models/PW-SAP.php", numTMP: numTMP});
     result = data[0].NUMERO_SAP;
   } catch (error) {
     console.error(error);
@@ -3492,7 +3489,7 @@ async function datos_cupo() {
   let org = $.trim($("#Organizacion").val());
   let codigo = $.trim($("#txt_codigoSap").val());
   try {
-    const data = await enviarPeticion({op: "S_CUPO_CREDITO", link: urlModels, org, codigo});
+    const data = await enviarPeticion({op: "S_CUPO_CREDITO", link: "../models/PW-SAP.php", org, codigo});
     return data;
   } catch (error) {
     console.log(error);
@@ -3506,7 +3503,7 @@ async function top10_materiales() {
   let org = $("#Organizacion").val();
 
   try {
-    const data = await enviarPeticion({op: 'B_TOP20_MATERIALES', link: urlModels, cod, org, ano,  mes});
+    const data = await enviarPeticion({op: 'B_TOP20_MATERIALES', link: "../models/PW-SAP.php", cod, org, ano,  mes});
     return data;
   } catch (error) {
     console.error(error);
@@ -3530,7 +3527,7 @@ async function dataComportamiento() {
     cod = $('#CodigoSAP').val();
   }
   try {
-    const data = await enviarPeticion({op: 'B_FACTURACION_MES', link: urlModels, cod, org, ano, mes});
+    const data = await enviarPeticion({op: 'B_FACTURACION_MES', link: "../models/PW-SAP.php", cod, org, ano, mes});
     return data;
   } catch (error) {
     console.error(error);
@@ -3545,9 +3542,12 @@ async function NotaRapida() {
 
   if (entr == '' || entr == 0 || entr == '0') {
     try {
-      const data = await enviarPeticion({op: "U_NOTAS", link: urlModels, nota, nump});
-      if (nums != 0) GuardarDirecto();
-      else Swal.fire('Excelente', 'Nota actualizada con éxito.', 'success');
+      const data = await enviarPeticion({op: "U_NOTAS", link: "../models/PW-SAP.php", nota, nump});
+      console.log(data);
+      if (data.ok) {
+        if (nums != 0) GuardarDirecto();
+        else Swal.fire('Excelente', 'Nota actualizada con éxito.', 'success');
+      }
     } catch (error) {
       console.log(error);
     }   
@@ -3611,7 +3611,7 @@ async function LogDatos() {
   try {
     const data = await enviarPeticion({
       op: "CONSULTA_LOG",
-      link: urlModels,
+      link: "../models/PW-SAP.php",
       Ped: Ped,
       PedSAP: PedSAP,
       Entrega: Entrega,
@@ -3665,7 +3665,7 @@ async function LogDatos() {
 async function ValidarBonificados(numero) {
   let datos;
   try {
-    const data = enviarPeticion({op: "VALIDA_BONIFICADO_S", link: urlModels, numero});
+    const data = enviarPeticion({op: "VALIDA_BONIFICADO_S", link: "../models/PW-SAP.php", numero});
     datos = data;
   } catch (error) {
     console.error(error);
@@ -3705,7 +3705,7 @@ async function CargaGruposClientes(grupo) {
 async function Permisos() {
   let rol = $("#Rol").val();
   try {
-    const data = await enviarPeticion({op: "S_PERMISOS", link: urlModels, rol, modulo: '0101'});
+    const data = await enviarPeticion({op: "S_PERMISOS", link: "../models/PW-SAP.php", rol, modulo: '0101'});
     if (data.length) {
       data.forEach(item => {
         if (item.id_mod_per == 1023) {
@@ -3721,7 +3721,7 @@ async function Permisos() {
 const consultarPuntos = async (codigo_sap) => {
   try {
     const resp = await enviarPeticion({
-      link: urlModels,
+      link: "../models/PW-SAP.php",
       op: "S_PUNTOS_CLIENTE",
       codigo_sap
     });
@@ -3740,7 +3740,7 @@ const consultarObsequios = async () => {
   const oficina = $.trim($("#txt_oficina").val());
   try {
     const resp = await enviarPeticion({
-      link: urlModels,
+      link: "../models/PW-SAP.php",
       op: "S_OBSEQUIOS_PUNTOS",
       organizacion,
       oficina
@@ -3789,7 +3789,7 @@ const redimirProducto = async (codigo, url) => {
   const lista = $.trim($("#txt_lista").val());
   try {
     const resp = await enviarPeticion({
-      link: urlModels,
+      link: "../models/PW-SAP.php",
       op: "S_OBSEQUIOS_PUNTOS_PRODUCTO",
       organizacion,
       oficina,
@@ -3821,7 +3821,7 @@ const crearPedidoRedencion = async () => {
       $("#ModalPPDetalle").modal('hide');
       LoadImg('Generando solicitud, por favor espere...');
       const resp = await enviarPeticion({
-        link: urlModels,
+        link: "../models/PW-SAP.php",
         op: "I_CREAR_PEDIDO_REDENCION",
         codigo_sap,
         puntos,
@@ -3830,7 +3830,7 @@ const crearPedidoRedencion = async () => {
       if (!resp.error) {
         if (resp.cod_error == 0) {
           await enviarPeticion({
-            link: urlModels,
+            link: "../models/PW-SAP.php",
             op: "MAIL_REDENCIONES",
             id: resp.numero
           });
@@ -3897,7 +3897,7 @@ const Cartera_edades = async () => {
   try {
     const resp = await enviarPeticion({
       op: "Cartera_edades",
-      link: urlModels,
+      link: "../models/PW-SAP.php",
       org: $("#Organizacion").val(),
       codigo_sap: $("#txt_codigoSap").val()
     });
@@ -3955,7 +3955,7 @@ const Presupuesto_datos = async () => {
   try {
     const resp = await enviarPeticion({
       op: "Presupuesto_datos",
-      link: urlModels,
+      link: "../models/PW-SAP.php",
       org: $("#Organizacion").val(),
       codigo_sap: $("#txt_codigoSap").val()
     });
@@ -4042,7 +4042,7 @@ function filtrarPorCodigos(objeto1, objeto2) {
 // FUNCIÓN PARA OBTENER EL TOP 20 DE PRODUCTOS MAS VENDIDOS
 async function Top_20_mas_vendidos_con_copi() {
   const resp = await enviarPeticion({
-    link: urlModels,
+    link: '../models/PW-SAP.php',
     op: 'Top_20_mas_vendidos_con_copi',
     org: $("#Organizacion").val(),
     lista: $("#txt_lista").val(),
@@ -4339,6 +4339,12 @@ const filtrarClientesCampos = (idCampo) => {
     }
   }
   return Arr_cli.slice(0, 10);
+}
+
+const parrafo = document.getElementById("pTotal");
+function manejarCambio(e) {
+  parrafo.textContent = e.matches ? "T. PEDIDO:" : "VALOR TOTAL PEDIDO:";
+  parrafo.style.fontSize = e.matches ? "12px" : "14px";
 }
 
 // EJECUCIÓN DE LAS FUNCIONALIDADES AL CARGAR EL DOM
@@ -4891,4 +4897,8 @@ $(function () {
   $("#txt_cliente, #ClienteEntregas, #txtFactCliente, #txtFaltanteCliente, #txtCliente").on("input", function () {
     this.value = this.value.toUpperCase();
   });
+
+  const mediaQuery = window.matchMedia("(max-width: 1347px)");
+  manejarCambio(mediaQuery);
+  mediaQuery.addListener(manejarCambio);
 });

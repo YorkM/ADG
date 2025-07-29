@@ -55,9 +55,9 @@ const getConceptos = async () => {
    }
 }
 // FUNCIÓN PARA OBTENER LOS INGRESOS Y EGRESOS DE SAP
-const getIngresosEgresos = async () => {
+const getMovimientosAutomaticos = async () => {
    try {
-      const { data } = await enviarPeticion({op: "G_INGRE_EGRE", link: "../models/FlujoCaja.php"});
+      const { data } = await enviarPeticion({op: "G_SALDOS_BANCOS", link: "../models/FlujoCaja.php"});
       console.log(data);
    } catch (error) {
       console.log(error);
@@ -228,7 +228,7 @@ $(function () {
       getMovimientos();
    });
 
-   getIngresosEgresos();
+   getMovimientosAutomaticos();
 
    getConceptos();
 

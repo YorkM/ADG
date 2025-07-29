@@ -10,7 +10,7 @@ switch ($_POST['op']) {
         else echo json_encode(['ok' => false, 'data' => []]);
         break;
 
-    case "G_INGRE_EGRE":
+    case "G_SALDOS_BANCOS":
         $query = "SELECT CASE BSCHL WHEN '40' THEN 'INGRESOS' ELSE 'EGRESOS' END AS tipo,   
         BSCHL AS clave, SUM(WRBTR) * 100 AS importe FROM BSEG 
         WHERE GJAHR = '2025' AND BUKRS = '2000' AND 
