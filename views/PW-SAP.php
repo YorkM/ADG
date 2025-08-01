@@ -49,6 +49,14 @@ Redireccionar();
       padding: 0 5px;
     }
 
+    .title-tab {
+      background-color: #cff4fc;
+      border: 1px solid #9eeaf9;
+      color: #055160;
+      font-weight: 500;
+      padding: 8px;
+    }
+
     .size-text {
       font-size: 14px;
     }
@@ -233,11 +241,25 @@ Redireccionar();
       max-width: 80px !important;
       box-sizing: border-box !important;
     }
+
+    @media (max-width: 576px) {
+      .btn-text {
+        display: none;
+      }
+    }
+
+    label {
+      font-size: smaller;
+    }
+
+    .swal2-title::selection {
+      color: #055160;
+    }
   </style>
 </head>
 
 <body>
-  <div class="alert alert-info" style="font-weight: 500;"><i class="fa-solid fa-star fa-flip"></i>&nbsp;0101 - PEDIDOS WEB-SAP</div>
+  <div id="tituloModulo" class="alert alert-info" style="font-weight: 500;"><i class="fa-solid fa-star fa-flip"></i>&nbsp;0101 - PEDIDOS WEB-SAP</div>
 
   <input type="hidden" id="Dpto" value="<?php echo (!empty($_SESSION["ses_DepId"])) ? $_SESSION["ses_DepId"] : ""; ?>">
   <input type="hidden" id="Organizacion" value="<?php echo (!empty($_SESSION["ses_NumOrg"])) ? $_SESSION["ses_NumOrg"] : ""; ?>">
@@ -261,23 +283,26 @@ Redireccionar();
       <ul class="nav nav-tabs" id="nav-tab" role="tablist">
         <li class="nav-item" role="presentation">
           <button class="nav-link active" id="btnClientes" data-bs-toggle="tab" data-bs-target="#dvClientes" type="button" role="tab" aria-controls="dvClientes" aria-selected="true">
-            <i class="fa-solid fa-user-tie"></i>&nbsp;Cliente
+            <i class="fa-solid fa-user-tie"></i>&nbsp;
+            <span class="btn-text">Cliente</span>
           </button>
         </li>
         <li class="nav-item" role="presentation">
           <button class="nav-link" id="btnProductos" data-bs-toggle="tab" data-bs-target="#dvProductos" type="button" role="tab" aria-controls="dvProductos" aria-selected="false">
-            <i class="fa-solid fa-pills"></i>&nbsp;Productos
+            <i class="fa-solid fa-pills"></i>&nbsp;
+            <span class="btn-text">Productos</span>
           </button>
         </li>
         <li class="nav-item" role="presentation">
           <button class="nav-link" id="btnPedidos" data-bs-toggle="tab" data-bs-target="#dvPedidos" type="button" role="tab" aria-controls="dvPedidos" aria-selected="false">
-            <i class="fa-solid fa-file-invoice"></i>&nbsp;Pedido
+            <i class="fa-solid fa-file-invoice"></i>&nbsp;
+            <span class="btn-text">Pedido</span>
           </button>
         </li>
         <li class="nav-item dropdown" role="presentation">
           <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
-            <i class="fa-solid fa-list-check"></i>
-            &nbsp;Gestión
+            <i class="fa-solid fa-list-check"></i>&nbsp;
+            <span class="btn-text">Gestión</span>
           </a>
           <ul class="dropdown-menu">
             <li>
@@ -424,40 +449,8 @@ Redireccionar();
         </div>
       </div>
       <!-- TAB PRODUCTOS -->
-      <div class="tab-pane fade p-2" id="dvProductos" role="tabpanel" aria-labelledby="nav-profile-tab">
+      <div class="tab-pane fade p-1" id="dvProductos" role="tabpanel" aria-labelledby="nav-profile-tab">
         <div class="container-fluid">
-          <!-- <div class="row mt-2 mb-1">
-            <div class="col-sm-3 col-lg-2 mb-1">
-              <button class="btn btn-sm btn-light btn-micro-two w-100" type="button" onclick="BotonBonificado(this)">
-                <img src="../resources/icons/regalo.png" width="24" heigth="24" alt="PRODUCTO BONIFICADO" align="absmiddle">
-                &nbsp;Bonificado
-              </button>
-            </div>
-            <div class="col-sm-3 col-lg-2 mb-1">
-              <button class="btn btn-sm btn-light btn-micro-two w-100" type="button" onclick="BotonOfertas(this)">
-                <img src="../resources/icons/pw/tag_marcado.png" width="24" alt="PRODUCTO OFERTADO" heigth="24" align="absmiddle">
-                &nbsp;Ofertas
-              </button>
-            </div>
-            <div class="col-sm-3 col-lg-2 mb-1">
-              <button class="btn btn-sm btn-light btn-micro-two w-100" type="button" onclick="BotonDescuentos(this)">
-                <img src="../resources/icons/pw/tag_discount.png" width="24" heigth="24" alt="SOLO DESCUENTOS" align="absmiddle">
-                &nbsp;Descuentos
-              </button>
-            </div>
-            <div class="col-sm-3 col-lg-2 mb-1">
-              <button class="btn btn-sm btn-light btn-micro-two w-100" type="button" onclick="Top_20_mas_vendidos_con_copi(this)">
-                <img src="../resources/icons/pw/top-10.png" width="24" heigth="24" alt="TOP 20" align="absmiddle">
-                &nbsp;TOP 20
-              </button>
-            </div>
-            <div class="col-sm-12 col-lg-4 mb-1">
-              <div class="custom-total shadow-sm">
-                <P class="p-total" id="pTotal">VALOR TOTAL PEDIDO:</P>
-                <input type="text" id="txt_total" class="sin_borde input-total" readonly disabled>
-              </div>
-            </div>
-          </div> -->
           <div class="row mt-2 mb-1 justify-content-center text-center flex-wrap">
             <div class="col-3 col-sm-3 col-lg-2 mb-1 d-flex justify-content-center">
               <button class="btn btn-sm btn-light btn-micro-two w-100 d-flex align-items-center justify-content-center" type="button" title="Bonificados" onclick="BotonBonificado(this)">
@@ -483,8 +476,6 @@ Redireccionar();
                 <span class="d-none d-sm-inline">TOP 20</span>
               </button>
             </div>
-
-            <!-- TOTAL -->
             <div class="col-12 col-lg-4 mb-1">
               <div class="custom-total shadow-sm">
                 <p class="p-total" id="pTotal">VALOR TOTAL PEDIDO:</p>
@@ -494,7 +485,7 @@ Redireccionar();
           </div>
 
           <div class="input-group mb-2">
-            <input type="text" id="txt_bproductos" class="form-control shadow-sm" tabindex="1" placeholder="F2 - Descripción de producto: Nombre - Código - Grupo">
+            <input type="text" id="txt_bproductos" class="form-control shadow-sm" autocomplete="off" tabindex="1" placeholder="F2 - Descripción de producto: Nombre - Código - Grupo">
             <div class="input-group-btn">
               <button class="btn btn-light btn-micro shadow-sm" type="button" title="Búsqueda de productos por voz" onclick="iniciarVozATexto('txt_bproductos',this)">
                 <i class="fa-solid fa-microphone"></i>&nbsp;
@@ -526,210 +517,216 @@ Redireccionar();
       <!-- RECUPERAR PEDIDOS TERCEROS -->
       <div class="tab-pane fade p-2" id="dvRecuperarTerceros" role="tabpanel">
         <input type="hidden" id="txtCodigoSAP" readonly disabled>
-        <div class="div-container">
-          <table style="width: 100%;">
-            <thead>
-              <tr class="custom-tr">
-                <th class="custom-thead" colspan="3">PEDIDOS DE TERCEROS</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="custom-tr">
-                <td class="size-text">Cliente</td>
-                <td><input type="text" id="txtCliente" placeholder="Ingrese el cliente" class="form-control size-td shadow-sm"></td>
-              </tr>
-              <tr>
-                <td class="size-text">Zona de ventas</td>
-                <td><select id="txtZonas" class="form-select size-text shadow-sm" style="width:100%">
-                  </select></td>
-              </tr>
-              <tr class="custom-tr">
-                <td class="size-td">Clase de Pedido</td>
-                <td><select id="txtClasePedido" class="form-select size-text shadow-sm" style="width:100%">
-                    <option value="T" selected>TODOS</option>
-                    <option value="ZPWA">ZPWA - ADMINISTRADOR</option>
-                    <option value="ZPWV">ZPWV - VENDEDOR</option>
-                    <option value="ZPWL">ZPWL - TELEVENDEDOR</option>
-                    <option value="ZPWP">ZPWP - PROVEEDOR</option>
-                    <option value="ZPWT">ZPWT - TRANSFERENCISTA</option>
-                    <option value="ZPWC">ZPWC - CLIENTE</option>
-                    <option value="ZPIC">ZPIC - INTEGRACION COMERCIAL</option>
-                  </select></td>
-              </tr>
-              <tr class="custom-tr">
-                <td class="size-text">Oficina de ventas</td>
-                <td colspan="2"><select id="FiltroOficinaVentas" class="form-select size-td shadow-sm" style="width:100%">
-                  </select></td>
-              </tr>
-              <tr class="custom-tr">
-                <td class="size-text">Fecha Inicial</td>
-                <td colspan="2"><input type="text" id="txtFecha1" placeholder="Fecha Inicial" class="form-control size-td shadow-sm"></td>
-              </tr>
-              <tr class="custom-tr">
-                <td class="size-text">Fecha Final</td>
-                <td colspan="2"><input type="text" id="txtFecha2" placeholder="Fecha Final" class="form-control size-td shadow-sm"></td>
-              </tr>
-              <tr class="custom-tr">
-                <td class="size-text">Temporales Historia</td>
-                <td colspan="2"><select id="txtTemporalesHistoria" class="form-select size-td shadow-sm" style="width:100%">
-                    <option value="N" selected>NO</option>
-                    <option value="S">SI</option>
-                  </select></td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="container-fluid">
+          <h6 class="title-tab">PEDIDOS DE TERCEROS</h6>
+          <div class="row mb-2">
+            <div class="col-md-2">
+              <div class="form-group">
+                <label for="txtZonas">Zona de ventas</label>
+                <select id="txtZonas" class="form-select size-text shadow-sm" style="width:100%"></select>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <div class="form-group">
+                <label for="txtZonas">Clase de Pedido</label>
+                <select id="txtClasePedido" class="form-select size-text shadow-sm" style="width:100%">
+                  <option value="T" selected>TODOS</option>
+                  <option value="ZPWA">ZPWA - ADMINISTRADOR</option>
+                  <option value="ZPWV">ZPWV - VENDEDOR</option>
+                  <option value="ZPWL">ZPWL - TELEVENDEDOR</option>
+                  <option value="ZPWP">ZPWP - PROVEEDOR</option>
+                  <option value="ZPWT">ZPWT - TRANSFERENCISTA</option>
+                  <option value="ZPWC">ZPWC - CLIENTE</option>
+                  <option value="ZPIC">ZPIC - INTEGRACION COMERCIAL</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <div class="form-group">
+                <label for="FiltroOficinaVentas">Oficina de ventas</label>
+                <select id="FiltroOficinaVentas" class="form-select size-td shadow-sm" style="width:100%"></select>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <div class="form-group">
+                <label for="txtFecha1">Fecha Inicial</label>
+                <input type="text" id="txtFecha1" placeholder="Fecha Inicial" class="form-control size-td shadow-sm">
+              </div>
+            </div>
+            <div class="col-md-2">
+              <div class="form-group">
+                <label for="txtFecha2">Fecha Final</label>
+                <input type="text" id="txtFecha2" placeholder="Fecha Final" class="form-control size-td shadow-sm">
+              </div>
+            </div>
+            <div class="col-md-2">
+              <div class="form-group">
+                <label for="txtTemporalesHistoria">Temporales Historia</label>
+                <select id="txtTemporalesHistoria" class="form-select size-td shadow-sm" style="width:100%">
+                  <option value="N" selected>NO</option>
+                  <option value="S">SI</option>
+                </select>
+              </div>
+            </div>
+          </div>
           <div>
-            <button class="btn btn-outline-primary btn-sm w-btn shadow-sm" id="buscarPedidos">
+            <input type="text" id="txtCliente" placeholder="Ingrese el cliente" class="form-control size-th shadow-sm">
+          </div>
+          <div class="mt-2 d-flex flex-wrap gap-2">
+            <button class="btn btn-outline-primary btn-sm shadow-sm" id="buscarPedidos">
               <i class="fa-solid fa-magnifying-glass"></i>
-              Buscar
+              <span class="btn-text">&nbsp;Buscar</span>
             </button>
-            <button class="btn btn-outline-success btn-sm w-btn shadow-sm" id="exportar_gestion">
+            <button class="btn btn-outline-success btn-sm shadow-sm" id="exportar_gestion">
               <i class="fa-solid fa-file-excel"></i>
-              Exportar
+              <span class="btn-text">&nbsp;Exportar</span>
             </button>
-            <button class="btn btn-light btn-sm w-btn btn-micro shadow-sm" onClick="LimpiarGestionPedido();">
+            <button class="btn btn-light btn-sm btn-micro shadow-sm" onClick="LimpiarGestionPedido();">
               <i class="fa-solid fa-broom"></i>
-              Limpiar
+              <span class="btn-text">&nbsp;Limpiar</span>
             </button>
           </div>
-          <hr>
         </div>
-        <div id="VtotalTerceros"></div>
+        <hr>
         <div id="DvRecuperablesTerceros"></div>
       </div>
+      <!-- GFESTIÓN DE ENTREGAS -->
       <div class="tab-pane fade p-2" id="dvAddEntregas" role="tabpanel">
         <input type="hidden" id="CodigoSAPEntregas" class="form-control">
-        <div class="div-container">
-          <table style="width: 100%;">
-            <thead>
-              <tr class="custom-tr">
-                <th class="custom-thead" colspan="3">GESTION DE ENTREGAS</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="custom-tr">
-                <td class="size-text">Cliente</td>
-                <td><input type="text" id="ClienteEntregas" placeholder="Ingrese el cliente" class="form-control size-td shadow-sm"></td>
-              </tr>
-              <tr class="custom-tr">
-                <td class="size-text">Oficina</td>
-                <td><select id="OficinaEntregas" class="form-select size-td shadow-sm">
-                  </select></td>
-              </tr>
-              <tr class="custom-tr">
-                <td class="size-text">Fecha Inicial</td>
-                <td colspan="2"><input type="text" id="EntregasFecha1" placeholder="Fecha Inicial" class="form-control size-td shadow-sm"></td>
-              </tr>
-              <tr class="custom-tr">
-                <td class="size-text">Fecha Final</td>
-                <td colspan="2"><input type="text" id="EntregasFecha2" placeholder="Fecha Final" class="form-control size-td shadow-sm"></td>
-              </tr>
-            </tbody>
-          </table>
-          <div class="mt-2">
-            <button class="btn btn-outline-primary btn-sm w-btn shadow-sm" onClick="GestionEntregas();">
+        <div class="container-fluid">
+          <h6 class="title-tab">GESTION DE ENTREGAS</h6>
+          <div class="row">
+            <div class="col-md-5">
+              <div class="form-group">
+                <label for="ClienteEntregas">Cliente</label>
+                <input type="text" id="ClienteEntregas" placeholder="Ingrese el cliente" class="form-control size-td shadow-sm">
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="OficinaEntregas">Oficina</label>
+                <select id="OficinaEntregas" class="form-select size-td shadow-sm"></select>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <div class="form-group">
+                <label for="EntregasFecha1">Fecha Inicial</label>
+                <input type="text" id="EntregasFecha1" placeholder="Fecha Inicial" class="form-control size-td shadow-sm">
+              </div>
+            </div>
+            <div class="col-md-2">
+              <div class="form-group">
+                <label for="EntregasFecha2">Fecha Final</label>
+                <input type="text" id="EntregasFecha2" placeholder="Fecha Final" class="form-control size-td shadow-sm">
+              </div>
+            </div>
+          </div>
+          <div class="mt-2 d-flex flex-wrap gap-2">
+            <button class="btn btn-outline-primary btn-sm shadow-sm" onClick="GestionEntregas();">
               <i class="fa-solid fa-magnifying-glass"></i>
-              Buscar
+              <span class="btn-text">&nbsp;Buscar</span>
             </button>
-            <button class="btn btn-outline-success btn-sm w-btn shadow-sm" onClick="UnificarEntrega();">
+            <button class="btn btn-outline-success btn-sm shadow-sm" onClick="UnificarEntrega();">
               <i class="fa-solid fa-pen"></i>
-              Crear Entrega
+              <span class="btn-text">&nbsp;Crear Entrega</span>
             </button>
-            <button class="btn btn-light btn-sm w-btn btn-micro shadow-sm" onClick="LimpiarEntregas();">
+            <button class="btn btn-light btn-micro btn-sm shadow-sm" onClick="LimpiarEntregas();">
               <i class="fa-solid fa-broom"></i>
-              Limpiar
+              <span class="btn-text">&nbsp;Limpiar</span>
             </button>
           </div>
         </div>
-        <hr>
-        <div id="DvListaEntregas"></div>
+        <div class="mt-3" id="DvListaEntregas"></div>
       </div>
+      <!-- LISTADO DE FALTANTES -->
       <div class="tab-pane fade p-2" id="dvFaltantes" role="tabpanel">
         <input type="hidden" id="txtFaltanteCodigoCliente" class="form-control" readonly disabled>
-        <div class="div-container">
-          <table style="width: 100%;">
-            <thead>
-              <tr class="custom-tr">
-                <th class="custom-thead" colspan="3">LISTADO DE FALTANTES</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="custom-tr" id="tr_cliente_faltante">
-                <td class="size-text">Cliente</td>
-                <td><input type="text" id="txtFaltanteCliente" placeholder="Ingrese el cliente" class="form-control size-td shadow-sm"></td>
-              </tr>
-              <tr class="custom-tr">
-                <td class="size-text">Fecha Inicial</td>
-                <td colspan="2"><input type="text" id="txtFaltanteFecha1" placeholder="Fecha Inicial" class="form-control size-td shadow-sm"></td>
-              </tr>
-              <tr class="custom-tr">
-                <td class="size-text">Fecha Final</td>
-                <td colspan="2"><input type="text" id="txtFaltanteFecha2" placeholder="Fecha Final" class="form-control size-td shadow-sm"></td>
-              </tr>
-            </tbody>
-          </table>
-          <div class="mt-2">
-            <button class="btn btn-outline-primary btn-sm w-btn shadow-sm" onClick="Faltante();">
+        <div class="container-fluid mb-3">
+          <h6 class="title-tab">LISTADO DE FALTANTES</h6>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="txtFaltanteCliente">Cliente</label>
+                <input type="text" id="txtFaltanteCliente" placeholder="Ingrese el cliente" class="form-control size-td shadow-sm">
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="txtFaltanteFecha1">Fecha Inicial</label>
+                <input type="text" id="txtFaltanteFecha1" placeholder="Fecha Inicial" class="form-control size-td shadow-sm">
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="txtFaltanteFecha2">Fecha Final</label>
+                <input type="text" id="txtFaltanteFecha2" placeholder="Fecha Inicial" class="form-control size-td shadow-sm">
+              </div>
+            </div>
+          </div>
+          <div class="mt-2 d-flex flex-wrap gap-2">
+            <button class="btn btn-outline-primary btn-sm shadow-sm" onClick="Faltante();">
               <i class="fa-solid fa-magnifying-glass"></i>
-              Buscar
+              <span class="btn-text">&nbsp;Buscar</span>
             </button>
-            <button class="btn btn-outline-success btn-sm w-btn shadow-sm" onClick="fnExcelReport('tdFaltantes');">
+            <button class="btn btn-outline-success btn-sm shadow-sm" onClick="fnExcelReport('tdFaltantes');">
               <i class="fa-solid fa-file-excel"></i>
-              Exportar
+              <span class="btn-text">&nbsp;Exportar</span>
             </button>
-            <button class="btn btn-light btn-sm w-btn btn-micro shadow-sm" onClick="LimpiarFaltantes();">
+            <button class="btn btn-light btn-sm btn-micro shadow-sm" onClick="LimpiarFaltantes();">
               <i class="fa-solid fa-broom"></i>
-              Limpiar
+              <span class="btn-text">&nbsp;Limpiar</span>
             </button>
           </div>
         </div>
-        <hr>
         <div id="VtotalFaltante"></div>
         <div id="DvListaFaltante"></div>
       </div>
+      <!-- LISTADO DE FACTURAS -->
       <div class="tab-pane fade p-2" id="dvListaFacts" role="tabpanel">
         <input type="hidden" id="txtFactCodigoCliente" class="form-control" readonly disabled>
-        <div class="div-container">
-          <table style="width: 100%;">
-            <thead>
-              <tr class="custom-tr">
-                <th class="custom-thead" colspan="3">FACTURACIÓN DE TERCEROS</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="custom-tr" id="tr_cliente_fact">
-                <td class="size-text">Cliente</td>
-                <td><input type="text" id="txtFactCliente" placeholder="Ingrese el cliente" class="form-control size-text shadow-sm"></td>
-              </tr>
-              <tr class="custom-tr">
-                <td class="size-text">Número factura</td>
-                <td><input type="text" id="txtNumFact" placeholder="Número de factura" class="form-control size-text shadow-sm"></td>
-              </tr>
-              <tr class="custom-tr">
-                <td class="size-text">Fecha Inicial</td>
-                <td colspan="2"><input type="text" id="txtFactFecha1" placeholder="Fecha Inicial" class="form-control size-text shadow-sm"></td>
-              </tr>
-              <tr class="custom-tr">
-                <td class="size-text">Fecha Final</td>
-                <td colspan="2"><input type="text" id="txtFactFecha2" placeholder="Fecha Final" class="form-control size-text shadow-sm"></td>
-              </tr>
-            </tbody>
-          </table>
-          <div class="mt-2">
-            <button class="btn btn-outline-primary btn-sm w-btn shadow-sm" onClick="ListarFacturas();">
+        <div class="container-fluid">
+          <h6 class="title-tab">FACTURACIÓN DE TERCEROS</h6>
+          <div class="row">
+            <div class="col-md-5">
+              <div class="form-group">
+                <label for="txtFactCliente">Cliente</label>
+                <input type="text" id="txtFactCliente" placeholder="Ingrese el cliente" class="form-control size-td shadow-sm">
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="txtNumFact">Número factura</label>
+                <input type="text" id="txtNumFact" placeholder="Número de factura" class="form-control size-text shadow-sm">
+              </div>
+            </div>
+            <div class="col-md-2">
+              <div class="form-group">
+                <label for="txtFactFecha1">Fecha Inicial</label>
+                <input type="text" id="txtFactFecha1" placeholder="Fecha Inicial" class="form-control size-text shadow-sm">
+              </div>
+            </div>
+            <div class="col-md-2">
+              <div class="form-group">
+                <label for="txtFactFecha2">Fecha Final</label>
+                <input type="text" id="txtFactFecha2" placeholder="Fecha Final" class="form-control size-text shadow-sm">
+              </div>
+            </div>
+          </div>
+          <div class="mt-2 d-flex flex-wrap gap-2">
+            <button class="btn btn-outline-primary btn-sm shadow-sm" onClick="ListarFacturas();">
               <i class="fa-solid fa-magnifying-glass"></i>
-              Buscar
+              <span class="btn-text">&nbsp;Buscar</span>
             </button>
-            <button class="btn btn-light btn-sm w-btn btn-micro shadow-sm" onClick="LimpiarFacturas();">
+            <button class="btn btn-light btn-sm btn-micro shadow-sm" onClick="LimpiarFacturas();">
               <i class="fa-solid fa-broom"></i>
-              Limpiar
+              <span class="btn-text">&nbsp;Limpiar</span>
             </button>
           </div>
-          <hr>
           <div id="VtotalFacturas"></div>
           <div id="DvListaFacturas"></div>
         </div>
       </div>
+      <!-- LISTADO DE EVENTOS -->
       <div class="tab-pane fade p-2" id="dvEventos" role="tabpanel">
         <div class="container-fluid">
           <div class="row mb-2">
@@ -794,9 +791,9 @@ Redireccionar();
             <div class="row">
               <div class="col-md-4">
                 <div class="panel panel-info">
-                  <div class="panel-heading bag-info text-green p-2">Opciones</div>
+                  <div style="border: 1px solid #bdeaf1;" class="panel-heading bag-info text-green p-2">Opciones</div>
                   <ul class="list-group">
-                    <button type="button" class="list-group-item text-start size-a" onClick="SolDesbloqueo()" id="btn-sol-desbloqueo" title="Solicitar desbloqueo de pedido" style="display: none;">
+                    <button type="button" class="list-group-item text-start size-a" onClick="SolDesbloqueo()" id="btn-sol-desbloqueo" title="Solicitar desbloqueo de pedido" style="display: none; border-top-right-radius: 0; border-top-left-radius: 0;">
                       <i class="fa-solid fa-unlock text-danger"></i> Sol. Desbloqueo
                     </button>
                     <button type="button" id="btnMenu1" class="list-group-item text-start size-a" onClick="GuardarDirecto()" title="Guardar Directo">
@@ -834,7 +831,7 @@ Redireccionar();
               </div>
               <div class="col-md-8" id="Result">
                 <div class="panel panel-info">
-                  <div class="panel-heading bag-info text-green p-2">Flujo de documentos</div>
+                  <div style="border: 1px solid #bdeaf1;" class="panel-heading bag-info text-green p-2">Flujo de documentos</div>
                   <table class="form" width="100%">
                     <tr>
                       <td>Usuario ADG</td>
@@ -869,8 +866,8 @@ Redireccionar();
                       <td><textarea id="NotasRapidas" placeholder="Notas de pedidos" class="form-control" style="background-color: #FFC;"></textarea></td>
                     </tr>
                   </table>
-                  <div>
-                    <button type="button" class="btn btn-light btn-sm btn-micro w-100" onClick="NotaRapida();" id="btnNotaRapida">
+                  <div class="mt-2">
+                    <button type="button" class="btn btn-outline-primary btn-sm w-100" onClick="NotaRapida();" id="btnNotaRapida">
                       <i class="fa-solid fa-check-double"></i> Salvar Nota
                     </button>
                   </div>
@@ -1681,6 +1678,23 @@ Redireccionar();
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- MODAL SOLICITUD DE DESBLOQUEO -->
+  <div class="modal fade" id="modalSolictudDesbloqueo" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="min-width: 50%;">
+      <div class="modal-content">
+        <div class="modal-body" style="padding: 20px;">
+          <h4 class="text-center text-secondary">Solicitud de desbloqueo del pedido número:<span class="fw-bold text-success d-block" style="font-size: 25px;" id="numPedidoDesb"></span></h4>
+          <div class="mt-3">
+            <textarea id="nota" class="form-control shadow-sm" rows="2" style="background-color: #FFC;" placeholder="Si tienes una observación, escríbela aquí"></textarea>
+          </div>
+          <div class="d-flex justify-content-center gap-3 mt-3">
+            <button class="btn btn-outline-success btn-sm" id="btnEnviarSolicitud">Enviar solicitud</button>
+            <button class="btn btn-outline-secondary btn-sm" id="btnCancelarSolicitud">Cancelar</button>
+          </div>
         </div>
       </div>
     </div>

@@ -1,3 +1,4 @@
+const urlModel = "../models/PW-SAP.php";
 let ArrProd = [];
 let ArrEan = [];
 let ArrCli = [];
@@ -28,7 +29,7 @@ const validaEstadoDesbloqueo = async () => {
   try {
     const pedido = $("#ped_numero_sap").val();
     const resp = await enviarPeticion({
-      link: '../models/PW-SAP.php',
+      link: urlModel,
       pedido: pedido,
       op: 'status_sol_desbloqueo'
     });
@@ -45,7 +46,7 @@ const validaEstadoDesbloqueo = async () => {
 };
 // FUNCIÓN PARA GESTIONAR SOLICITUD DE DESBLOQUEO
 const SolDesbloqueo = async () => {
-  // 2024-10-04 Christian Bula: Se añade control para solo poder volver a montar la solicitud si el estado es (R:Rechazado - A: Aprobado)*/
+  // 2024-10-04 Christian Bula: Se añade control para solo poder volver a montar la solicitud si el estado es (R:Rechazado - A: Aprobado)
   let status = await validaEstadoDesbloqueo();
   if (status) {
     Swal.fire({
@@ -56,49 +57,44 @@ const SolDesbloqueo = async () => {
     });
     return;
   }
-  // 2024-10-04 Christian Bula
-  Swal.fire({
-    title: "Solicitud de desbloqueo del pedido #" + $("#ped_numero_sap").val(),
-    html: `<textarea id="nota" class="swal2-input form-control"  placeholder="Si tienes una observacion , escribela aquí"></textarea>`,
-    text: "Solicitar desbloqueo de pedido #" + $("#ped_numero_sap").val(),
-    inputAttributes: {
-      autocapitalize: "off"
-    },
-    showCancelButton: true,
-    confirmButtonText: "Enviar solicitud",
-    showLoaderOnConfirm: true,
-    preConfirm: async () => {
-      try {
-        const nota = Swal.getPopup().querySelector('#nota').value;
-        const resp = await enviarPeticion({
-          link: '../models/PW-SAP.php',
-          pedido: $("#ped_numero_sap").val(),
-          op: 'enviar_sol_desbloqueo',
-          nota
-        });
-        if (!resp.ok) {
-          Swal.fire("Error", "No se pudo enviar la solicitud, por favor validar", "error");
-          return;
-        }
 
-        if (resp.solicitada) {
-          Swal.fire("Error", resp.mensaje, "error");
-          return;
-        }
-        Swal.fire("Ok", "Se envió la solicitud correctamente!", "success");
-        Temporales();
-      } catch (error) {
-        Swal.showValidationMessage(`Request failed: ${error}`);
-      }
-    },
-    allowOutsideClick: () => !Swal.isLoading()
-  }).then((result) => {
-    console.log(result);
-  });
+  const pedido = $("#ped_numero_sap").val();
+  
+  $('#ModalOpciones').modal("hide");
+  $('#numPedidoDesb').text(pedido);
+  $('#modalSolictudDesbloqueo').modal("show");
+}
+// FUNCIÓN EJECUTAR SOLICITUD DE DESBLOQUEO
+const ejecutarSolDesbloqueo = async () => {
+  const nota = document.querySelector('#nota').value.trim();
+  if (!nota) {
+    showToastr("error", "Por favor escribe una observación antes de enviar");
+    return false;
+  }
+
+  try {
+    const pedido = $("#ped_numero_sap").val();
+    const resp = await enviarPeticion({ op: 'enviar_sol_desbloqueo', link: urlModel, pedido, nota });
+
+    if (!resp.ok) {
+      Swal.fire("Error", "No se pudo enviar la solicitud, por favor validar", "error");
+      return false;
+    }
+
+    if (resp.solicitada) {
+      Swal.fire("Error", resp.mensaje, "error");
+      return false;
+    }
+
+    Swal.fire("Ok", "Se envió la solicitud correctamente!", "success");
+    Temporales();
+  } catch (error) {
+    console.log(`Error al enviar la solicitud: ${error}`);
+  }
 }
 // FUNCIÓN PARA MOSTRAR ESTADO DE SOLICITUD DE DESBLOQUEO
 const MostrarEstadoSolDesbloqueo = async (pedido) => {
-  const resp = await enviarPeticion({ link: '../models/PW-SAP.php', op: 'datos_sol', pedido });
+  const resp = await enviarPeticion({ link: urlModel, op: 'datos_sol', pedido });
 
   let estado = '';
   switch (resp[0].ESTADO) {
@@ -115,15 +111,15 @@ const MostrarEstadoSolDesbloqueo = async (pedido) => {
 
   Swal.fire("Estado de la solicitud", `Tu solicitud se encuentra ${estado}<br> Nota: ${resp[0].RESPUESTA}`, "info");
 }
-
+// FUNCIÓN GUARDAR SOLICITUDES DE DESBLOQUEO
 const guardSolicitudesDesbloqueoPedidos = async () => {
   try {
-    const resp = await enviarPeticion({ link: '../models/PW-SAP.php', op: 'SOL_PENDIENTE' });
+    const resp = await enviarPeticion({ link: urlModel, op: 'SOL_PENDIENTE' });
   } catch (e) {
     console.error(e)
   }
 }
-
+// FUNCIÓN CERRAR ALERTAS DE DESBLOQUEO
 const cerrarAlertaDesbloqueoPedidos = () => {
   $("#alarma_sol_desbloqueo").html('').hide()
 }
@@ -199,7 +195,7 @@ async function GruposArticulos() {
 // FUNCIÓN CONSULTA DE OPCIONES
 async function consultaOpciones(pedido, alm = undefined, rdespacho = undefined, rpuntoventa = undefined) {
   try {
-    const data = await enviarPeticion({ op: "S_GESTION_PEDIDOS_UNICO", link: "../models/PW-SAP.php", pedido });
+    const data = await enviarPeticion({ op: "S_GESTION_PEDIDOS_UNICO", link: urlModel, pedido });
     if (data.length) {
       let item = data[0];
       $("#ped_gestion").val(item.factura);
@@ -246,7 +242,7 @@ const PermisosZonas = async () => {
   try {
     let rol = $("#Rol").val();
 
-    const data = await enviarPeticion({ op: "S_PERMISO_ZONA", link: "../models/PW-SAP.php", rol });
+    const data = await enviarPeticion({ op: "S_PERMISO_ZONA", link: urlModel, rol });
     if (data.length > 0) sw = 1;
   } catch (error) {
     console.error(error);
@@ -260,7 +256,7 @@ const ZonasVentas = async () => {
     let sw = await PermisosZonas();
     let idUsr = $("#UsrId").val();
 
-    const data = await enviarPeticion({ op: "S_ZONAS_VENTA", link: "../models/PW-SAP.php", sw, idUsr });
+    const data = await enviarPeticion({ op: "S_ZONAS_VENTA", link: urlModel, sw, idUsr });
     if (data.length > 0) {
       if (sw == 1) {
         zonas = `<option value="0">000000 - TODAS</option>`;
@@ -277,15 +273,17 @@ const ZonasVentas = async () => {
   }
 }
 // FUNCIÓN DE ACTIVACIÓN DE TABS
-function activaTab(btnTab) { $(`#${btnTab}`).click(); };
+function activaTab(btnTab) { 
+  $(`#${btnTab}`).click(); 
+};
 // FUNCIÓN LOADING DE LA APP
 function LoadImg(texto = "Cargando...") {
   let n = 0;
 
   const html = `
-    <img src="../resources/icons/preloader.gif" alt="Cargando..." />
-    <figcaption style="font-size: 20px; margin-bottom: 5px; font-weight: bold; text-align: center;">${texto}</figcaption>
-    <figcaption id="txtTimer" style="font-weight: bold;">0</figcaption>`;
+  <img src="../resources/icons/preloader.gif" alt="Cargando..." />
+  <figcaption style="font-size: 23px; margin-bottom: 5px; font-weight: bold; text-align: center;">${texto}</figcaption>
+  <figcaption id="txtTimer" style="font-weight: bold;">0</figcaption>`;
 
   const loader = document.getElementById("loaderOverlay");
   loader.innerHTML = html;
@@ -323,12 +321,7 @@ const LoadArrayCli = async () => {
     LoadImg('Cargando información... Espere un momento');
     await new Promise(requestAnimationFrame);
 
-    const data = await enviarPeticion({
-      op: "B_CLIENTE",
-      link: "../models/PW-SAP.php",
-      org: $("#Organizacion").val(),
-      sw: 'a'
-    });
+    const data = await enviarPeticion({op: "B_CLIENTE", link: urlModel, org: $("#Organizacion").val(), sw: 'a'});
 
     if (data.length) {
       ArrCli = data.map(item => ({
@@ -376,7 +369,7 @@ function validarSiNumero(numero) {
 // FUNCIÓN PARA EDITAR UN PEDIDO
 const EditarPedido = async (Numero, Tipo) => {
   try {
-    const data = await enviarPeticion({ op: "S_EDITAR_PW", link: "../models/PW-SAP.php", Numero, Tipo });
+    const data = await enviarPeticion({ op: "S_EDITAR_PW", link: urlModel, Numero, Tipo });
     if (data.length) {
       const item = data[0];
       $("#ModalEditarPedidos").modal("hide");
@@ -772,7 +765,7 @@ const GuardarShoping = async () => {
   try {
     const data = await enviarPeticion({
       op: "GUARDA_SHOPING",
-      link: "../models/PW-SAP.php",
+      link: urlModel,
       codigo_sap: $("#txt_codigoSap").val(),
       shoping_codmaterial: $("#shoping_codmaterial").val(),
       shoping_preciomaterial: unformatNum($("#shoping_preciomaterial").val()),
@@ -957,7 +950,7 @@ function BuscarProductoArr(isn) {
 // FUNCIÓN CARGAR EAN
 async function CargarEan() {
   try {
-    const data = await enviarPeticion({ op: "B_EAN", link: "../models/PW-SAP.php" });
+    const data = await enviarPeticion({ op: "B_EAN", link: urlModel });
     data.forEach(item => {
       let e = { codigo_material: item.codigo_material, ean: item.ean }
       ArrEan.push(e);
@@ -1006,7 +999,7 @@ async function BuscarProductos() {
   try {
     LoadImg('Cargando portafolio...');
     ArrProd = [];
-    const data = await enviarPeticion({ op: op_sw, link: "../models/PW-SAP.php", desc, bodega, lista, numero, eps, ctrl, f_sto, f_dto, f_bon, f_bar, top, orden, TipoPed, f_new, Grp1, Grp2, CodigoSAP });
+    const data = await enviarPeticion({ op: op_sw, link: urlModel, desc, bodega, lista, numero, eps, ctrl, f_sto, f_dto, f_bon, f_bar, top, orden, TipoPed, f_new, Grp1, Grp2, CodigoSAP });
     data.forEach(item => {
       let det = {
         codigo_material: item.codigo_material,
@@ -1052,7 +1045,7 @@ async function GuardarHuella() {
   try {
     const data = await enviarPeticion({
       op: "G_HUELLA",
-      link: "../models/PW-SAP.php",
+      link: urlModel,
       codigo_sap: $("#txt_codigoSap").val(),
       codigo_material: $("#huella_codmaterial").val(),
       cantidad: $("#huella_cantidad").val(),
@@ -1135,7 +1128,7 @@ async function InfoMaterial(pcodigo, pvalor, piva, pdcto, pdesc, pstock, op) {
       <i class="fas fa-spinner fa-spin"></i> Cargando...
     </div>`;
     $('#ContenidoInfoMateriales').html(msgHtml);
-    const data = await enviarPeticion({ op: opc, link: "../models/PW-SAP.php", cod: pcodigo, org, ofi, lst });
+    const data = await enviarPeticion({ op: opc, link: urlModel, cod: pcodigo, org, ofi, lst });
     if (data.length) {
       if (op === "0") {
         renderMaterialInfo(data, { vunit, v1, v2, v3, v4, iva, dcto });
@@ -1436,7 +1429,7 @@ async function AddProducto(pcodigo, pvalor, piva, pdcto, pcant, pneto, pstock, p
 // FUNCIÓN QUE CONSTRUYE EL LISTADO DE DESTINATARIOS DE MERCANCIA 
 async function Destinatarios(codSap, ciudad, direccion) {
   try {
-    const data = await enviarPeticion({ op: "B_DESTINATARIO", link: "../models/PW-SAP.php", codSap: $.trim(codSap) });
+    const data = await enviarPeticion({ op: "B_DESTINATARIO", link: urlModel, codSap: $.trim(codSap) });
     let destino = `<option value="0" selected>Principal - ${ciudad} - ${direccion}</option>`;
     if (data != '') {
       data.forEach((item, i) => destino += `<option value="${item.id}">alterna ${i} - ${item.direccion}</option>`);
@@ -1455,7 +1448,7 @@ async function InsertarEncabezado() {
     try {
       const data = await enviarPeticion({
         op: "I_PEDIDO_ENCABEZADO",
-        link: "../models/PW-SAP.php",
+        link: urlModel,
         organizacion_ventas: $("#Organizacion").val(),
         oficina_ventas: $("#txt_oficina").val(),
         canal_distribucion: 10,
@@ -1494,7 +1487,7 @@ async function InsertarDetalle(NumPed, codigo, cant, vlr_unitario, descuento, to
   try {
     const data = await enviarPeticion({
       op: "I_PEDIDO_DETALLE",
-      link: "../models/PW-SAP.php",
+      link: urlModel,
       NumPed: NumPed,
       codigo: codigo,
       cant: cant,
@@ -1529,7 +1522,7 @@ async function ActualizarDetalle(idfila, cant, totalfila, codigo) {
 
     const data = await enviarPeticion({
       op: "U_PEDIDO_DETALLE",
-      link: "../models/PW-SAP.php",
+      link: urlModel,
       idfila: idfila,
       cant: cant,
       vlr_total: totalfila,
@@ -1556,7 +1549,7 @@ async function EliminarDetalle(idfila, codigo) {
 
     const data = await enviarPeticion({
       op: "D_PEDIDO_DETALLE",
-      link: "../models/PW-SAP.php",
+      link: urlModel,
       idfila: idfila,
       numero: numero,
       oficina: $("#txt_oficina").val(),
@@ -1598,7 +1591,7 @@ async function VerificaPedido() {
   try {
     let num = $("#txt_numero").val();
     if (num > 0) {
-      const data = await enviarPeticion({ op: "S_VERIFICA_PEDIDO", link: "../models/PW-SAP.php", num });
+      const data = await enviarPeticion({ op: "S_VERIFICA_PEDIDO", link: urlModel, num });
       if (data == '') {
         let numsap = $.trim($("#txt_numero_sap").val());
         if (numsap != 0) {
@@ -1657,7 +1650,7 @@ const ListarPedido = async () => {
 
     LoadImg('Cargando pedido...');
 
-    const data = await enviarPeticion({ op: "S_PEDIDO_DETALLE", link: "../models/PW-SAP.php", numero });
+    const data = await enviarPeticion({ op: "S_PEDIDO_DETALLE", link: urlModel, numero });
     if (data.length) {
       let cont = 0;
       let vtotal = 0;
@@ -1738,7 +1731,7 @@ const ListarPedido = async () => {
 
       if (NumPedSAP == 0) {
         btnEliminar = `
-        <button type="button" class="btn btn-danger btn-sm w-btn" onClick="EliminarPW('${NumPed}'); Limpiar(); activaTab('btnClientes');">
+        <button type="button" class="btn btn-danger btn-sm w-btn" onClick="EliminarPW('${NumPed}');">
           <i class="fa-solid fa-trash-can"></i>
           Eliminar
         </button>`;
@@ -1853,7 +1846,7 @@ async function UpdNotas(ob) {
     let nota = $.trim($(ob).val());
     let nump = $.trim($("#txt_numero").val());
     if (nump != '') {
-      const data = await enviarPeticion({ op: "U_NOTAS", link: "../models/PW-SAP.php", nota, nump });
+      const data = await enviarPeticion({ op: "U_NOTAS", link: urlModel, nota, nump });
       if (data.ok) Swal.fire("OK", "Nota actualizada correctamente", "success");
     }
   } catch (error) {
@@ -1864,7 +1857,7 @@ async function UpdNotas(ob) {
 const Temporales = async () => {
   try {
     LoadImg('Cargando temporales...');
-    const data = await enviarPeticion({ op: "S_TEMPORALES", link: "../models/PW-SAP.php" });
+    const data = await enviarPeticion({ op: "S_TEMPORALES", link: urlModel });
     if (data.length) {
       let header = `    
       <div class="alert alert-warning alert-dismissible mt-2 mb-5" role="alert">
@@ -2142,7 +2135,7 @@ async function EnviarMail(tipo, numero) {
 // ENVÍO DE EMAIL DE ANULACIÓN DE PEDIDOS
 async function EnviarMailAnulacion(tipo, numero, texto) {
   try {
-    const data = await enviarPeticion({ op: "EMAIL", link: "../models/PW-SAP.php", tipo, numero, texto });
+    const data = await enviarPeticion({ op: "EMAIL", link: urlModel, tipo, numero, texto });
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -2165,9 +2158,7 @@ function WSInvenTotal() {
       }),
       dataType: "html",
       async: true,
-      success: function (data) {
-        //alert(data);
-      }
+      success: function (data) {}
     });
   }
 }
@@ -2356,11 +2347,13 @@ const EliminarPW = async (numero) => {
     const result = await confirmAlert("Eliminar Pedido Web", "¿Está seguro(a) de eliminar el pedido?");
     if (!result.isConfirmed) return;
 
-    const data = await enviarPeticion({ op: "D_PEDIDO", link: "../models/PW-SAP.php", numero });
+    const data = await enviarPeticion({ op: "D_PEDIDO", link: urlModel, numero });
 
     if (data == 0) {
       Swal.fire("Excelente", "Pedido eliminado correctamente!", "success");
       Temporales();
+      Limpiar(); 
+      activaTab('btnClientes');
     } else {
       Swal.fire("Error", "Error al intentar eliminar pedido!", "error");
     }
@@ -2468,7 +2461,7 @@ async function Entregas() {
         Swal.fire("Cancelado", "La operación ha sido cancelada", "error");
       }
     } else {
-      const data = await enviarPeticion({ op: 'S_ENTREGA', link: "../models/PW-SAP.php", numero});
+      const data = await enviarPeticion({ op: 'S_ENTREGA', link: urlModel, numero});
       if (data.length) {
         let detalle = '';
         let clas = '';
@@ -2599,7 +2592,7 @@ async function Prioridad_ot(ot, almacen, despacho, punto) {
   try {
     const data = await enviarPeticion({
       op: 'Prioridad_ot',
-      link: "../models/PW-SAP.php",
+      link: urlModel,
       ot: ot,
       almacen: almacen,
       recojeDespachos: despacho, // Cambiado de 'despacho' a 'recojeDespachos'
@@ -2642,15 +2635,15 @@ async function Ordenes() {
 
   let htmlConfirm = `
   <div style="text-align: left; margin-top: 20px;">
-        <label style="display: block; margin-bottom: 10px; text-align: center;">
-            <input type="checkbox" id="recojeDespachos" name="recojeDespachos"> 
-            Recoge en Despachos
-        </label>
-        ${pedidoBodega == '1100' ?
-      `<label style="display: block; text-align: center;">
-            <input type="checkbox" id="recojePuntoVenta" name="recojePuntoVenta"> 
-            Recoge en Punto de venta
-        </label>` : ''}
+    <label style="display: block; margin-bottom: 10px; text-align: center;">
+        <input type="checkbox" id="recojeDespachos" name="recojeDespachos"> 
+        Recoge en Despachos
+    </label>
+    ${pedidoBodega == '1100' ?
+  `<label style="display: block; text-align: center;">
+        <input type="checkbox" id="recojePuntoVenta" name="recojePuntoVenta"> 
+        Recoge en Punto de venta
+    </label>` : ''}
   </div>`;
   
   if (entrega != 0 && entrega != '') {
@@ -2716,7 +2709,7 @@ async function Ordenes() {
         let detalle = '';
         let clas = '';
         let Pneto = 0;
-        const data = await enviarPeticion({ op: 'S_ORDEN', link: "../models/PW-SAP.php", numero: Num });
+        const data = await enviarPeticion({ op: 'S_ORDEN', link: urlModel, numero: Num });
         data.forEach(item => {
           if (parseInt(item.ENTREGA) == 0) {
             clas = 'class="alert-danger"';
@@ -2801,7 +2794,7 @@ function LimpiarGestionPedido() {
 }
 // FUNCIÓN GESTIÓN DE PEDIDOS
 const GestionPedidos = async () => {
-  const link = "../models/PW-SAP.php";
+  const link = urlModel;
   let zona = $("#txtZonas").val();
   const codigo = $("#txtCodigoSAP").val().trim();
   const fh1 = $("#txtFecha1").val().trim();
@@ -2819,29 +2812,32 @@ const GestionPedidos = async () => {
   let total = 0;
 
   let headerTabla = `
-    <div class="mb-2">
-      <button type="button" class="btn btn-sm btn-danger w-btn mb-1" onClick="FiltrosTipoPedidos('T')"><b>T</b>emporal</button>
-      <button type="button" class="btn btn-sm btn-warning w-btn mb-1" onClick="FiltrosTipoPedidos('P')"><b>P</b>edido</button>
-      <button type="button" class="btn btn-sm btn-success w-btn mb-1" onClick="FiltrosTipoPedidos('E')"><b>E</b>ntrega</button>
-      <button type="button" class="btn btn-sm btn-info w-btn mb-1" onClick="FiltrosTipoPedidos('O')"><b>O</b>rden</button>
-      <button type="button" class="btn btn-sm btn-primary w-btn mb-1" onClick="FiltrosTipoPedidos('F')"><b>F</b>actura</button>
-      <button type="button" class="btn btn-sm btn-light w-btn btn-micro mb-1" onClick="FiltrosTipoPedidos('A')"><b>TODOS</b></button>
+  <div class="d-flex flex-wrap justify-content-center justify-content-md-between align-items-center gap-2 mb-1">
+    <div style="background-color: #cff4fc; border: 1px solid #9eeaf9; padding: 5px 15px; color: #055160; font-weight: 500; border-radius: 3px;" id="VtotalTerceros"></div>
+    <div>
+      <button type="button" class="btn btn-sm btn-danger mb-1" onClick="FiltrosTipoPedidos('T')"><b>T</b><span class="btn-text">emporal</span></button>
+      <button type="button" class="btn btn-sm btn-warning mb-1" onClick="FiltrosTipoPedidos('P')"><b>P</b><span class="btn-text">edido</span></button>
+      <button type="button" class="btn btn-sm btn-success mb-1" onClick="FiltrosTipoPedidos('E')"><b>E</b><span class="btn-text">ntrega</span></button>
+      <button type="button" class="btn btn-sm btn-info mb-1" onClick="FiltrosTipoPedidos('O')"><b>O</b><span class="btn-text">rden</span></button>
+      <button type="button" class="btn btn-sm btn-primary mb-1" onClick="FiltrosTipoPedidos('F')"><b>F</b><span class="btn-text">actura</span></button>
+      <button type="button" class="btn btn-sm btn-light btn-micro mb-1" onClick="FiltrosTipoPedidos('A')"><b>TODOS</b></button>
     </div>
-    <table class="display" width="100%" id="tableRescueTerceros">
-      <thead>
-        <tr class="bag-info">
-          <th class="size-th no-wrap">FECHA/HORA</th>
-          <th class="size-th no-wrap">BODEGA</th>
-          <th class="size-th no-wrap">CLASE/NÚMERO</th>
-          <th class="size-th no-wrap">NOMBRES</th>
-          <th class="size-th no-wrap">VALOR</th>
-          <th class="size-th no-wrap">DESTINATARIO</th>
-          <th class="size-th no-wrap">TRANSFERIDO</th>
-          <th class="size-th no-wrap">OPCIONES</th>
-          <th class="size-th no-wrap">TIPO</th>
-        </tr>
-      </thead>
-      <body>`;
+  </div>
+  <table class="display" width="100%" id="tableRescueTerceros">
+    <thead>
+      <tr class="bag-info">
+        <th class="size-th no-wrap">FECHA/HORA</th>
+        <th class="size-th no-wrap">BODEGA</th>
+        <th class="size-th no-wrap">CLASE/NÚMERO</th>
+        <th class="size-th no-wrap">NOMBRES</th>
+        <th class="size-th no-wrap">VALOR</th>
+        <th class="size-th no-wrap">DESTINATARIO</th>
+        <th class="size-th no-wrap">TRANSFERIDO</th>
+        <th class="size-th no-wrap">OPCIONES</th>
+        <th class="size-th no-wrap">TIPO</th>
+      </tr>
+    </thead>
+    <body>`;
 
   if (TemporalesHistoria == 'N') {
     try {
@@ -2916,40 +2912,41 @@ const GestionPedidos = async () => {
           item.cliente = item.cliente.replace(/"/g, '');
 
           headerTabla += `
-            <tr>
-              <td class="size-td no-wrap">${item.fecha_pedido}</td>
-              <td class="no-wrap" style="font-size: 12px">${item.bodega}</td>
-              <td class="size-td no-wrap">${item.clase} - ${item.numero_sap}</td>
-              <td class="p-0 size-td no-wrap">
-                <p class="no-wrap" style="margin: 0; font-size: 12px">${item.cliente}</p>
-                <small class="no-wrap" style="font-weight: bold;">Zona ventas: 
-                  <span class="text-primary" style="font-size: 8px;">${item.zona_ventas} - ${item.zona_descripcion}</span>
-                </small>
-              </td>
-              <td class="size-td no-wrap">${formatNum(item.valor_total, '$')}</td>
-              <td class="size-td no-wrap">${item.destinatario}</td>
-              <td align="center" width="4%">${transfer}</td>
-              <td align="center" width="4%">
-                <button type="button" class="btn btn-outline-primary btn-sm" style="font-weight: bolder; font-size: 15px;" onClick="AbrirOpciones('${item.numero.trim()}', '${item.valor_total.trim()}', '${item.codigo_direccion.trim()}', '${item.direccion.trim()}', '${item.oficina_ventas.trim()}', '${item.codigo_sap.trim()}', '${item.transferido.trim()}', '${item.entrega.trim()}', '${item.ot.trim()}', '${item.numero_sap.trim()}', '${item.factura.trim()}', 'T', '${item.notas.trim()}', '${item.usuario.trim()}', '${item.destinatario.trim()}', '${item.cliente.trim()}');" title="Menu de opciones">
-                  <i class="fa-solid fa-grip" style="font-size: 16px"></i>
-                </button>
-              </td>
-              <td>${btnText}</td>
-            </tr>`;
+          <tr>
+            <td class="size-td no-wrap">${item.fecha_pedido}</td>
+            <td class="no-wrap" style="font-size: 12px">${item.bodega}</td>
+            <td class="size-td no-wrap">${item.clase} - ${item.numero_sap}</td>
+            <td class="p-0 size-td no-wrap">
+              <p class="no-wrap" style="margin: 0; font-size: 12px">${item.cliente}</p>
+              <small class="no-wrap" style="font-weight: bold;">Zona ventas: 
+                <span class="text-primary" style="font-size: 8px;">${item.zona_ventas} - ${item.zona_descripcion}</span>
+              </small>
+            </td>
+            <td class="size-td no-wrap">${formatNum(item.valor_total, '$')}</td>
+            <td class="size-td no-wrap">${item.destinatario}</td>
+            <td align="center" width="4%">${transfer}</td>
+            <td align="center" width="4%">
+              <button type="button" class="btn btn-outline-primary btn-sm" style="font-weight: bolder; font-size: 15px;" onClick="AbrirOpciones('${item.numero.trim()}', '${item.valor_total.trim()}', '${item.codigo_direccion.trim()}', '${item.direccion.trim()}', '${item.oficina_ventas.trim()}', '${item.codigo_sap.trim()}', '${item.transferido.trim()}', '${item.entrega.trim()}', '${item.ot.trim()}', '${item.numero_sap.trim()}', '${item.factura.trim()}', 'T', '${item.notas.trim()}', '${item.usuario.trim()}', '${item.destinatario.trim()}', '${item.cliente.trim()}');" title="Menu de opciones">
+                <i class="fa-solid fa-grip" style="font-size: 16px"></i>
+              </button>
+            </td>
+            <td>${btnText}</td>
+          </tr>`;
 
           cont++;
           total += parseFloat(item.valor_total);
         });
         headerTabla += `</tbody></table>`;
-        $("#VtotalTerceros").html(`<div class="alert alert-info" role="info"><b>VALOR TOTAL: ${formatNum(total, '$')}</b></div>`);
+        // $("#VtotalTerceros").html(`<div class="alert alert-info" role="info"><b>VALOR TOTAL: ${formatNum(total, '$')}</b></div>`);
         $("#DvRecuperablesTerceros").html(headerTabla);
+        $("#VtotalTerceros").html(`<p class="m-0">VALOR TOTAL: <span style="font-size: large; font-weight: 700;">${formatNum(total, '$')}</span></p>`);
       } else {
         $("#VtotalTerceros").html('');
         let msgHtml = `
-          <div class="alert alert-danger" role="alert">
-            <i class="fa-solid fa-triangle-exclamation"></i>
-            <span class="sr-only">Error:</span>NO EXISTEN RESULTADOS PARA LAS CONDICIONES SELECCIONADAS
-          </div>`;
+        <div class="alert alert-danger" role="alert">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          <span class="sr-only">Error:</span>NO EXISTEN RESULTADOS PARA LAS CONDICIONES SELECCIONADAS
+        </div>`;
         $("#DvRecuperablesTerceros").html(msgHtml);
       }
     } catch (error) {
@@ -2987,7 +2984,7 @@ const GestionPedidos = async () => {
           total += parseFloat(item.valor_total);
         });
         headerTabla += `</tbody></table>`;
-        $("#VtotalTerceros").html(`<div class="alert alert-info" role="info"><b>VALOR TOTAL: ${formatNum(total, '$')}</b></div>`);
+        $("#VtotalTerceros").html(`<p class="m-0">VALOR TOTAL: <span style="font-size: large; font-weight: 700;">${formatNum(total, '$')}</span></p>`);
         $("#DvRecuperablesTerceros").html(headerTabla);
       } else {
         $("#VtotalTerceros").html('');
@@ -3031,7 +3028,7 @@ async function RecuperarHistorico(numero) {
     const result = await confirmAlert(`¿Está seguro(a) de restablecer el pedido temporal número ${numero}?`, "Tenga presente que las condiciones (Precios, Descuentos, Bonificaciones) serán recalculadas a la fecha actual");
     if (result.isConfirmed) {
       LoadImg('Restaurando...');
-      const data = await enviarPeticion({op: "G_PEDIDOS_HISTORIA_TMP", link: "../models/PW-SAP.php", numero});
+      const data = await enviarPeticion({op: "G_PEDIDOS_HISTORIA_TMP", link: urlModel, numero});
       if (!data.error) {
         Swal.fire("Excelente", data.mensaje, "success");
       } else {
@@ -3096,7 +3093,7 @@ const GestionEntregas = async () => {
       LoadImg('Cargando...');
       const data = await enviarPeticion({
         op: "S_ENTREGAS",
-        link: "../models/PW-SAP.php",
+        link: urlModel,
         oficina: $.trim($("#OficinaEntregas").val()),
         codigo: $.trim($("#CodigoSAPEntregas").val()),
         fh1: $.trim($("#EntregasFecha1").val()),
@@ -3287,7 +3284,7 @@ const ListarFacturas = async () => {
 
   if ((codigo != '') || (fact != '')) {
     try {
-      const data = await enviarPeticion({ op: "S_FACTURAS", link: "../models/PW-SAP.php", codigo, fh1, fh2, fact });
+      const data = await enviarPeticion({ op: "S_FACTURAS", link: urlModel, codigo, fh1, fh2, fact });
       if (data.length) {
         let tabla = `
           <table class="display" width="100%" id="tableEntregas">
@@ -3399,7 +3396,7 @@ const Faltante = async () => {
   if (codigo != '' || fact != undefined) {
     try {
       LoadImg('Cargando...');
-      const data = await enviarPeticion({ op: "S_FALTANTES", link: "../models/PW-SAP.php", codigo, fh1, fh2, fact });
+      const data = await enviarPeticion({ op: "S_FALTANTES", link: urlModel, codigo, fh1, fh2, fact });
       if (data != '' && data != null) {
         let tabla = `
          <table class="table" align="center" id="tdFaltantes">
@@ -3466,7 +3463,7 @@ const Faltante = async () => {
 async function VerficarPedido(numTMP) {
   let result = 0;
   try {
-    const data = await enviarPeticion({op: "VERIFY_PEDIDO", link: "../models/PW-SAP.php", numTMP: numTMP});
+    const data = await enviarPeticion({op: "VERIFY_PEDIDO", link: urlModel, numTMP: numTMP});
     result = data[0].ESTADO;
   } catch (error) {
     console.error(error);
@@ -3477,7 +3474,7 @@ async function VerficarPedido(numTMP) {
 async function NumeroSAP(numTMP) {
   let result = 0;
   try {
-    const data = await enviarPeticion({op: 'NUMERO_SAP', link: "../models/PW-SAP.php", numTMP: numTMP});
+    const data = await enviarPeticion({op: 'NUMERO_SAP', link: urlModel, numTMP: numTMP});
     result = data[0].NUMERO_SAP;
   } catch (error) {
     console.error(error);
@@ -3489,7 +3486,7 @@ async function datos_cupo() {
   let org = $.trim($("#Organizacion").val());
   let codigo = $.trim($("#txt_codigoSap").val());
   try {
-    const data = await enviarPeticion({op: "S_CUPO_CREDITO", link: "../models/PW-SAP.php", org, codigo});
+    const data = await enviarPeticion({op: "S_CUPO_CREDITO", link: urlModel, org, codigo});
     return data;
   } catch (error) {
     console.log(error);
@@ -3503,7 +3500,7 @@ async function top10_materiales() {
   let org = $("#Organizacion").val();
 
   try {
-    const data = await enviarPeticion({op: 'B_TOP20_MATERIALES', link: "../models/PW-SAP.php", cod, org, ano,  mes});
+    const data = await enviarPeticion({op: 'B_TOP20_MATERIALES', link: urlModel, cod, org, ano,  mes});
     return data;
   } catch (error) {
     console.error(error);
@@ -3527,7 +3524,7 @@ async function dataComportamiento() {
     cod = $('#CodigoSAP').val();
   }
   try {
-    const data = await enviarPeticion({op: 'B_FACTURACION_MES', link: "../models/PW-SAP.php", cod, org, ano, mes});
+    const data = await enviarPeticion({op: 'B_FACTURACION_MES', link: urlModel, cod, org, ano, mes});
     return data;
   } catch (error) {
     console.error(error);
@@ -3542,7 +3539,7 @@ async function NotaRapida() {
 
   if (entr == '' || entr == 0 || entr == '0') {
     try {
-      const data = await enviarPeticion({op: "U_NOTAS", link: "../models/PW-SAP.php", nota, nump});
+      const data = await enviarPeticion({op: "U_NOTAS", link: urlModel, nota, nump});
       console.log(data);
       if (data.ok) {
         if (nums != 0) GuardarDirecto();
@@ -3573,10 +3570,7 @@ function FiltrosTipoPedidos(tipo) {
     valor_total += valor;
   });
 
-  $("#VtotalTerceros").html(`
-    <div class="alert alert-info" role="info">
-      <strong>VALOR TOTAL: ${formatNum(valor_total, '$')}</strong>
-    </div>`);
+  $("#VtotalTerceros").html(`<p class="m-0">VALOR TOTAL: <span style="font-size: large; font-weight: 700;">${formatNum(valor_total, '$')}</span></p>`);
 }
 // FUNCIÓN DESCARGAR EXCEL
 function DescargarExcel(OPC) {
@@ -3611,7 +3605,7 @@ async function LogDatos() {
   try {
     const data = await enviarPeticion({
       op: "CONSULTA_LOG",
-      link: "../models/PW-SAP.php",
+      link: urlModel,
       Ped: Ped,
       PedSAP: PedSAP,
       Entrega: Entrega,
@@ -3665,7 +3659,7 @@ async function LogDatos() {
 async function ValidarBonificados(numero) {
   let datos;
   try {
-    const data = enviarPeticion({op: "VALIDA_BONIFICADO_S", link: "../models/PW-SAP.php", numero});
+    const data = enviarPeticion({op: "VALIDA_BONIFICADO_S", link: urlModel, numero});
     datos = data;
   } catch (error) {
     console.error(error);
@@ -3705,7 +3699,7 @@ async function CargaGruposClientes(grupo) {
 async function Permisos() {
   let rol = $("#Rol").val();
   try {
-    const data = await enviarPeticion({op: "S_PERMISOS", link: "../models/PW-SAP.php", rol, modulo: '0101'});
+    const data = await enviarPeticion({op: "S_PERMISOS", link: urlModel, rol, modulo: '0101'});
     if (data.length) {
       data.forEach(item => {
         if (item.id_mod_per == 1023) {
@@ -3721,7 +3715,7 @@ async function Permisos() {
 const consultarPuntos = async (codigo_sap) => {
   try {
     const resp = await enviarPeticion({
-      link: "../models/PW-SAP.php",
+      link: urlModel,
       op: "S_PUNTOS_CLIENTE",
       codigo_sap
     });
@@ -3740,7 +3734,7 @@ const consultarObsequios = async () => {
   const oficina = $.trim($("#txt_oficina").val());
   try {
     const resp = await enviarPeticion({
-      link: "../models/PW-SAP.php",
+      link: urlModel,
       op: "S_OBSEQUIOS_PUNTOS",
       organizacion,
       oficina
@@ -3789,7 +3783,7 @@ const redimirProducto = async (codigo, url) => {
   const lista = $.trim($("#txt_lista").val());
   try {
     const resp = await enviarPeticion({
-      link: "../models/PW-SAP.php",
+      link: urlModel,
       op: "S_OBSEQUIOS_PUNTOS_PRODUCTO",
       organizacion,
       oficina,
@@ -3821,7 +3815,7 @@ const crearPedidoRedencion = async () => {
       $("#ModalPPDetalle").modal('hide');
       LoadImg('Generando solicitud, por favor espere...');
       const resp = await enviarPeticion({
-        link: "../models/PW-SAP.php",
+        link: urlModel,
         op: "I_CREAR_PEDIDO_REDENCION",
         codigo_sap,
         puntos,
@@ -3830,7 +3824,7 @@ const crearPedidoRedencion = async () => {
       if (!resp.error) {
         if (resp.cod_error == 0) {
           await enviarPeticion({
-            link: "../models/PW-SAP.php",
+            link: urlModel,
             op: "MAIL_REDENCIONES",
             id: resp.numero
           });
@@ -3897,7 +3891,7 @@ const Cartera_edades = async () => {
   try {
     const resp = await enviarPeticion({
       op: "Cartera_edades",
-      link: "../models/PW-SAP.php",
+      link: urlModel,
       org: $("#Organizacion").val(),
       codigo_sap: $("#txt_codigoSap").val()
     });
@@ -3955,7 +3949,7 @@ const Presupuesto_datos = async () => {
   try {
     const resp = await enviarPeticion({
       op: "Presupuesto_datos",
-      link: "../models/PW-SAP.php",
+      link: urlModel,
       org: $("#Organizacion").val(),
       codigo_sap: $("#txt_codigoSap").val()
     });
@@ -4042,7 +4036,7 @@ function filtrarPorCodigos(objeto1, objeto2) {
 // FUNCIÓN PARA OBTENER EL TOP 20 DE PRODUCTOS MAS VENDIDOS
 async function Top_20_mas_vendidos_con_copi() {
   const resp = await enviarPeticion({
-    link: '../models/PW-SAP.php',
+    link: urlModel,
     op: 'Top_20_mas_vendidos_con_copi',
     org: $("#Organizacion").val(),
     lista: $("#txt_lista").val(),
@@ -4342,9 +4336,13 @@ const filtrarClientesCampos = (idCampo) => {
 }
 
 const parrafo = document.getElementById("pTotal");
+const input = document.getElementById("txt_total");
+const tituloModulo = document.getElementById("tituloModulo");
 function manejarCambio(e) {
   parrafo.textContent = e.matches ? "T. PEDIDO:" : "VALOR TOTAL PEDIDO:";
   parrafo.style.fontSize = e.matches ? "12px" : "14px";
+  input.style.fontSize = e.matches ? "16px" : "20px";
+  tituloModulo.style.display = e.matches ? "none" : "block";
 }
 
 // EJECUCIÓN DE LAS FUNCIONALIDADES AL CARGAR EL DOM
@@ -4769,8 +4767,9 @@ $(function () {
   });
 
   // NUEVO PARA CARGA DE ARCHIVO PLANO 
-  $("#filename").val('');
+  $("#filename").val(''); 
   $("#filename").change(function (e) {
+    debugger;
     const ext = $("input#filename").val().split(".").pop().toLowerCase();
 
     if ($.inArray(ext, ["csv"]) == -1) {
@@ -4784,51 +4783,65 @@ $(function () {
       LoadImg("Subiendo CSV");
 
       let reader = new FileReader();
-      reader.onload = function (e) {
+      reader.onload = async function (e) {
         let csvval = e.target.result.split("\n");
-        let SiAdd = new Array();
         let NoAdd = '';
+        let arrayProductosCSV = [];
 
         for (let i = 0; i < csvval.length; i++) {
           let row = csvval[i];
           if (row != '') {
             let col = row.split(',');
-            let desc = escapeRegExp($.trim(col[0]));
-            let SwAdd = 0;
+            let codigo = escapeRegExp($.trim(col[0]));
+            let cantidad = escapeRegExp($.trim(col[1]));
             Arr = ArrProd;
-            Arr = recursiva(desc, Arr, 0, 0, 0, 1);
+            Arr = recursiva(codigo, Arr, 0, 0, 0, 1);
 
-            if (Arr.length > 0) {
-              for (let x = 0; x < Arr.length; x++) {							
-                let d = Arr[0];
-                for (let y = 0; y < SiAdd.length; y++) {
-                  if (SiAdd[y].codigo == $.trim(d.codigo_material)) SwAdd = 1;
-                }
-                if (SwAdd == 0) {
-                  let cant = parseInt($.trim(col[1]));
-                  let reg = parseInt($.trim(d.cant_regular));
-                  if ((reg > 0) && (reg > cant)) {
-                    UnloadImg();
-                    if (confirm(`El producto ${$.trim(d.descripcion)} presenta bonificado, desea aumentar la cantidad a ${reg} unidades para ganarlo?`)) cant = reg;
-                    LoadImg("Subiendo CSV");
-                  }
-                  AddProductoPlano($.trim(d.codigo_material), $.trim(d.valor_unitario), $.trim(d.iva), $.trim(d.descuento), cant, $.trim(d.valor_neto), $.trim(d.stock), $.trim(d.vlr_pedido), $.trim(d.id_pedido), $.trim(0), $.trim(d.cant_bonificado), $.trim(d.ant_regular), $.trim(d.stock_bonificado));
-                  d = {codigo: desc}
-                  SiAdd.push(d);
-                } else {
-                  NoAdd += $.trim(col[0]) + ",\n";
-                }
-              }
-            } else NoAdd += $.trim(col[0]) + ",\n";
+            if (Arr.length === 1) {
+              Arr[0].cantidad = cantidad;
+              arrayProductosCSV.push(Arr[0]);
+            } else if (Arr.length === 0) {
+              NoAdd += col[0].trim() + ",\n";
+            }
           }
+        }
+
+        if (arrayProductosCSV.length) {
+          for (const item of arrayProductosCSV) {
+            if ((item.cant_regular > 0) && (item.cant_regular > item.cantidad)) {
+              UnloadImg();
+
+              const result = await confirmAlert("Producto bonificado", `El producto ${$.trim(item.descripcion)} presenta bonificado, desea aumentar la cantidad a ${item.cant_regular} unidades para ganarlo?`);
+
+              if (result.isConfirmed) item.cantidad = item.cant_regular;
+              LoadImg("Subiendo CSV");
+            }
+
+            await AddProductoPlano(
+              item.codigo_material.trim(),
+              item.valor_unitario,
+              item.iva,
+              item.descuento,
+              item.cantidad,
+              item.valor_neto,
+              item.stock,
+              item.vlr_pedido,
+              item.id_pedido, 0,
+              item.cant_bonificado,
+              item.cant_regular,
+              item.stock_bonificado
+            );
+          }        
         }
 
         WSInvenTotal();
         ListarPedido();
-        activaTab("btnPedidos");
+        setTimeout(() => {
+          activaTab("btnPedidos");
+        }, 1000);
         $("#filename").val('');
         UnloadImg();
-        if (NoAdd != '') Swal.fire('Codigos no encontrados o no validos', NoAdd, 'warning');
+        if (NoAdd != '') Swal.fire('Códigos no encontrados o no válidos', NoAdd, 'warning');
       };
       reader.readAsText(e.target.files.item(0));
     }
@@ -4893,12 +4906,21 @@ $(function () {
   $('#btnMas2').click(function () {
     $('#ModalAjustesBusqueda').modal('show');
   });
-
+  
   $("#txt_cliente, #ClienteEntregas, #txtFactCliente, #txtFaltanteCliente, #txtCliente").on("input", function () {
     this.value = this.value.toUpperCase();
   });
-
+  
   const mediaQuery = window.matchMedia("(max-width: 1347px)");
   manejarCambio(mediaQuery);
   mediaQuery.addListener(manejarCambio);
+
+  $('#btnCancelarSolicitud').click(function () {
+    $('#nota').val("");
+    $('#modalSolictudDesbloqueo').modal('hide');
+  });
+
+  $('#btnEnviarSolicitud').click(function () {
+    ejecutarSolDesbloqueo();
+  });
 });
