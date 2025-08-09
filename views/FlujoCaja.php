@@ -11,6 +11,7 @@
    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
    <link type="text/css" rel="stylesheet" href="../resources/plugins/jquery-ui/jquery-ui.css" />
    <link rel="stylesheet" href="../resources/select2/css/select2.css">
+   <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
    <style>
       html,
       * {
@@ -56,6 +57,10 @@
          overflow: hidden;
          text-overflow: ellipsis;
       }
+
+      .vertical {
+         vertical-align: middle;
+      }
    </style>
 </head>
 
@@ -76,6 +81,8 @@
             <button class="nav-link" id="btnProyeccion" data-bs-toggle="tab" data-bs-target="#divProyeccion" type="button" role="tab" aria-controls="divProyeccion" aria-selected="false"><i class="fa-solid fa-list"></i>&nbsp;Movimientos</button>
 
             <button class="nav-link" id="btnFlujo" data-bs-toggle="tab" data-bs-target="#divFlujo" type="button" role="tab" aria-controls="divFlujo" aria-selected="false"><i class="fa-solid fa-arrows-rotate"></i>&nbsp;Flujo de caja</button>
+
+            <button class="nav-link" id="btnEstadisticas" data-bs-toggle="tab" data-bs-target="#divEstadisticas" type="button" role="tab" aria-controls="divEstadisticas" aria-selected="false"><i class="fa-solid fa-chart-simple"></i>&nbsp;Estadísticas</button>
          </div>
       </nav>
       <div class="tab-content" id="nav-tabContent">
@@ -105,6 +112,16 @@
                <div class="row mb-3">
                   <div class="col-md-6">
                      <div class="form-group">
+                        <label for="tipoP">Tipo Presupuesto</label>
+                        <select id="tipoP" class="form-select shadow-sm size-14">
+                           <option value="">-- Seleccione el tipo de presupuesto --</option>
+                           <option value="1">REAL</option>
+                           <option value="2">PROYECTADO</option>
+                        </select>
+                     </div>
+                  </div>
+                  <div class="col-md-6">
+                     <div class="form-group">
                         <label for="concepto">Concepto</label>
                         <div class="input-group mb-3">
                            <select id="concepto" class="form-select shadow-sm size-14" aria-describedby="concepto" aria-label="concepto"></select>
@@ -113,25 +130,25 @@
                            </button>
                         </div>
                      </div>
-                  </div>
+                  </div>                  
+               </div>
+               <div class="row">
                   <div class="col-md-6">
                      <div class="form-group">
                         <label for="monto">Monto (Valor)</label>
-                        <input type="text" class="form-control shadow-sm" id="monto" placeholder="Monto o valor del movimiento">
+                        <input type="text" class="form-control shadow-sm" id="monto" placeholder="Monto o valor del movimiento" autocomplete="off">
                      </div>
                   </div>
-               </div>
-               <div class="row">
                   <div class="col-md-6">
                      <div class="form-group">
                         <label for="descripcion">Descripción</label>
                         <textarea class="form-control shadow-sm size-14" rows="1" id="descripcion" placeholder="Descripción del movimiento(Opcional)"></textarea>
                      </div>
                   </div>
-                  <div class="col-md-6 align-self-end">
-                     <div>
-                        <button class="btn btn-outline-primary shadow-sm w-100" id="btnGuardar">Guardar movimiento</button>
-                     </div>
+               </div>
+               <div class="mt-3">
+                  <div class="d-flex justify-content-center">
+                     <button class="btn btn-outline-primary shadow-sm w-50" id="btnGuardar">Guardar movimiento</button>
                   </div>
                </div>
             </div>
@@ -141,7 +158,7 @@
                <div class="col-md-6">
                   <div class="form-group">
                      <label for="filtroBusqueda">Filtro de búsqueda</label>
-                     <input type="text" class="form-control shadow-sm size-14" placeholder="Filtro de búsqueda..." id="filtroBusqueda" autocomplete="false">
+                     <input type="text" class="form-control shadow-sm size-14" placeholder="Filtro de búsqueda..." id="filtroBusqueda" autocomplete="off">
                   </div>
                </div>
                <div class="col-md-3">
@@ -169,7 +186,7 @@
                         <th class="no-wrap size-14 text-green">CONCEPTO</th>
                         <th class="no-wrap size-14 text-green text-center">MONTO</th>
                         <th class="no-wrap size-14 text-green">DESCRIPCIÓN</th>
-                        <th class="no-wrap size-14 text-green text-center">EDITAR</th>                        
+                        <th class="no-wrap size-14 text-green text-center">EDITAR</th>
                      </tr>
                   </thead>
                   <tbody>
@@ -179,6 +196,47 @@
             </div>
          </div>
          <div class="tab-pane fade p-2" id="divFlujo" role="tabpanel" aria-labelledby="divFlujo">
+            <div class="row mb-3">
+               <div class="col-md-6">
+                  <div class="form-group">
+                     <label for="filtroBusqueda2">Filtro de búsqueda</label>
+                     <input type="text" class="form-control shadow-sm size-14" placeholder="Filtro de búsqueda..." id="filtroBusqueda2" autocomplete="off">
+                  </div>
+               </div>
+               <div class="col-md-3">
+                  <div class="form-group">
+                     <label for="fechaInicio2">Fecha Inicio</label>
+                     <input type="date" class="form-control shadow-sm size-14" id="fechaInicio2">
+                  </div>
+               </div>
+               <div class="col-md-3">
+                  <div class="form-group">
+                     <label for="fechaFinal2">Fecha Final</label>
+                     <input type="date" class="form-control shadow-sm size-14" id="fechaFinal2">
+                  </div>
+               </div>
+            </div>
+            <hr>
+            <h5 class="text-center text-green">FLUJO DE CAJA POR DÍA</h5>
+            <div class="mb-5" style="overflow: auto;" id="contenedorTablaProyeccionDia">
+               <table class="table table-bordered table-hover table-sm" id="tablaProyeccionDia">
+                  <thead class="bg-celeste">
+                     <tr>
+                        <th class="size-14 text-green text-center no-wrap">DÍA</th>
+                        <th class="size-14 text-green text-center no-wrap">TOTAL INGRESOS</th>
+                        <th class="size-14 text-green text-center no-wrap">TOTAL EGRESOS</th>
+                        <th class="size-14 text-green text-center no-wrap">NETO FLUJO CAJA</th>
+                        <th class="size-14 text-green text-center no-wrap">NÚMERO DE INGRESOS</th>
+                        <th class="size-14 text-green text-center no-wrap">NÚMERO DE EGRESOS</th>
+                        <th class="size-14 text-green text-center no-wrap">% DE EGRESOS SOBRE INGRESOS</th>
+                     </tr>
+                  </thead>
+                  <tbody>
+
+                  </tbody>
+               </table>
+            </div>
+            <h5 class="text-center text-green">FLUJO DE CAJA POR BIMESTRE</h5>
             <div style="overflow: auto;" id="contenedorTablaProyeccion2">
                <table class="table table-bordered table-hover table-sm" id="tablaProyeccion2">
                   <thead class="bg-celeste">
@@ -201,6 +259,33 @@
                </table>
             </div>
          </div>
+         <div class="tab-pane fade p-2" id="divEstadisticas" role="tabpanel" aria-labelledby="divEstadisticas">
+           <h5 class="text-center text-green mb-3">COMPARATIVA ENTRE LO REAL Y LO PROYECTADO</h5>
+            <div style="overflow: auto;" id="contenedorTablaProyeccionRP">
+               <table class="table table-bordered table-hover table-sm" id="tablaProyeccionRP">
+                  <thead class="bg-celeste">
+                     <tr>
+                        <th class="size-14 text-green text-center no-wrap">FECHA</th>
+                        <th class="size-14 text-green text-center no-wrap">INGRESO REAL</th>
+                        <th class="size-14 text-green text-center no-wrap">INGRESO PROYECTADO</th>
+                        <th class="size-14 text-green text-center no-wrap">EGRESO REAL</th>
+                        <th class="size-14 text-green text-center no-wrap">EGRESO PROYECTADO</th>
+                     </tr>
+                  </thead>
+                  <tbody>
+
+                  </tbody>
+               </table>
+            </div>
+            <div class="row mt-5">
+               <div class="col-md-6">
+                  <canvas id="graficaFlujoCaja" width="100%" height="50"></canvas>
+               </div>
+               <div class="col-md-6">
+                  <canvas id="graficaEgresos" width="400" height="200"></canvas>
+               </div>
+            </div>
+         </div>
       </div>
    </div>
 
@@ -218,7 +303,7 @@
             <div class="modal-body">
                <div class="form-group mb-2">
                   <label for="newConcepto">Concepto</label>
-                  <input type="text" class="form-control shadow-sm size-14" placeholder="Escriba el nuevo concepto que desea agregar" id="newConcepto" autocomplete="false">
+                  <input type="text" class="form-control shadow-sm size-14" placeholder="Escriba el nuevo concepto que desea agregar" id="newConcepto" autocomplete="off">
                </div>
                <div class="d-flex justify-content-end">
                   <button class="btn btn-outline-primary shadow-sm" id="guardarConcepto">Guardar concepto</button>
@@ -234,6 +319,8 @@
    <script src="../resources/bootstrap/bootstrap-5.0.2-dist/js/bootstrap.bundle.js"></script>
    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
    <script src="../resources/select2/js/select2.full.min.js"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
    <script type="text/javascript" src="../lib/js/servicios.js?<?php echo (rand()); ?>"></script>
    <script type="text/javascript" src="../lib/js/funciones.js?<?php echo (rand()); ?>"></script>
    <script type="module" src="../controllers/FlujoCaja.js?<?php echo (rand()); ?>"></script>

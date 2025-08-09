@@ -20,8 +20,7 @@ Redireccionar();
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link type="text/css" rel="stylesheet" href="../resources/css/Animate.css?<?php echo (rand()); ?>">
-  <link type="text/css" rel="stylesheet" href="../resources/css/BootstrapTabs.css?<?php echo (rand()); ?>">
-  <link type="text/css" rel="stylesheet" href="../resources/select2-bootstrap4-theme/select2-bootstrap4.css">
+  <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
   <link type="text/css" rel="stylesheet" href="../resources/select2/css/select2.css">
   <link type="text/css" rel="stylesheet" href="../resources/fontawesome/css/all.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.13.2/dist/sweetalert2.min.css">
@@ -203,13 +202,16 @@ Redireccionar();
       font-size: 14px !important;
     }
 
-    #select2-txtZonas-container,
-    #select2-FiltroOficinaVentas-container,
-    #select2-txtClasePedido-container,
-    #select2-FiltroOficinaVentas-results,
-    #select2-txtClasePedido-results,
-    #select2-txtZonas-results {
-      font-size: 14px !important;
+    #select2-FiltroOficinaVentas-results>li {
+      font-size: 13px !important;
+    }
+
+    #select2-txtClasePedido-results>li {
+      font-size: 13px !important;
+    }
+
+    #select2-txtZonas-results>li {
+      font-size: 13px !important;
     }
 
     .no-wrap {
@@ -252,8 +254,20 @@ Redireccionar();
       font-size: smaller;
     }
 
-    .swal2-title::selection {
-      color: #055160;
+    .sin-borde {
+      font-size: 20px;
+      border: none;
+      background-color: transparent;
+    }
+
+    .DivCheckBoxTrue {
+      border: 1px solid #187BB9;
+    }
+
+    .btn-display {
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
   </style>
 </head>
@@ -479,7 +493,7 @@ Redireccionar();
             <div class="col-12 col-lg-4 mb-1">
               <div class="custom-total shadow-sm">
                 <p class="p-total" id="pTotal">VALOR TOTAL PEDIDO:</p>
-                <input type="text" id="txt_total" class="sin_borde input-total" readonly disabled>
+                <input type="text" id="txt_total" class="sin-borde input-total" readonly disabled>
               </div>
             </div>
           </div>
@@ -523,13 +537,13 @@ Redireccionar();
             <div class="col-md-2">
               <div class="form-group">
                 <label for="txtZonas">Zona de ventas</label>
-                <select id="txtZonas" class="form-select size-text shadow-sm" style="width:100%"></select>
+                <select id="txtZonas" class="form-select form-select-sm size-text shadow-sm" style="width:100%"></select>
               </div>
             </div>
             <div class="col-md-2">
               <div class="form-group">
                 <label for="txtZonas">Clase de Pedido</label>
-                <select id="txtClasePedido" class="form-select size-text shadow-sm" style="width:100%">
+                <select id="txtClasePedido" class="form-select form-select-sm size-text shadow-sm" style="width:100%">
                   <option value="T" selected>TODOS</option>
                   <option value="ZPWA">ZPWA - ADMINISTRADOR</option>
                   <option value="ZPWV">ZPWV - VENDEDOR</option>
@@ -544,7 +558,7 @@ Redireccionar();
             <div class="col-md-2">
               <div class="form-group">
                 <label for="FiltroOficinaVentas">Oficina de ventas</label>
-                <select id="FiltroOficinaVentas" class="form-select size-td shadow-sm" style="width:100%"></select>
+                <select id="FiltroOficinaVentas" class="form-select form-select-sm size-td shadow-sm" style="width:100%"></select>
               </div>
             </div>
             <div class="col-md-2">
@@ -777,7 +791,7 @@ Redireccionar();
     <div class="modal-dialog" style="min-width: 70%;">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5">Menú de opciones</h1>
+          <h1 class="modal-title fs-5 text-green">MENÚ DE OPCIONES</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <div class="modal-body" id="ContenidoModalOpciones">
@@ -793,37 +807,37 @@ Redireccionar();
                 <div class="panel panel-info">
                   <div style="border: 1px solid #bdeaf1;" class="panel-heading bag-info text-green p-2">Opciones</div>
                   <ul class="list-group">
-                    <button type="button" class="list-group-item text-start size-a" onClick="SolDesbloqueo()" id="btn-sol-desbloqueo" title="Solicitar desbloqueo de pedido" style="display: none; border-top-right-radius: 0; border-top-left-radius: 0;">
+                    <button type="button" class="list-group-item text-start size-a btn-display" onClick="SolDesbloqueo()" id="btn-sol-desbloqueo" title="Solicitar desbloqueo de pedido" style="display: none; border-top-right-radius: 0; border-top-left-radius: 0;">
                       <i class="fa-solid fa-unlock text-danger"></i> Sol. Desbloqueo
                     </button>
-                    <button type="button" id="btnMenu1" class="list-group-item text-start size-a" onClick="GuardarDirecto()" title="Guardar Directo">
+                    <button type="button" id="btnMenu1" class="list-group-item text-start size-a btn-display" onClick="GuardarDirecto()" title="Guardar Directo">
                       <i class="fa-solid fa-floppy-disk"></i> Guardar
                     </button>
-                    <button type="button" id="btnMenu2" class="list-group-item text-start size-a" title="Recuperar pedido" onClick="RecuperarPedido()">
+                    <button type="button" id="btnMenu2" class="list-group-item text-start size-a btn-display" title="Recuperar pedido" onClick="RecuperarPedido()">
                       <i class="fa-solid fa-rotate-right"></i> Recuperar
                     </button>
-                    <button type="button" id="btnMenu3" class="list-group-item text-start size-a" onClick="VisualizarPedido()" title="Visualizar PDF">
+                    <button type="button" id="btnMenu3" class="list-group-item text-start size-a btn-display" onClick="VisualizarPedido()" title="Visualizar PDF">
                       <i class="fa-solid fa-file"></i> Visualizar
                     </button>
-                    <button type="button" id="btnMenu4" class="list-group-item text-start size-a" onClick="Rastreo()" title="Rastreo de pedido">
+                    <button type="button" id="btnMenu4" class="list-group-item text-start size-a btn-display" onClick="Rastreo()" title="Rastreo de pedido">
                       <i class="fa-solid fa-arrows-up-down-left-right"></i> Rastreo
                     </button>
-                    <button type="button" id="btnMenu5" class="list-group-item text-start size-a" onClick="EliminarPedido()" title="Eliminar">
+                    <button type="button" id="btnMenu5" class="list-group-item text-start size-a btn-display" onClick="EliminarPedido()" title="Eliminar">
                       <i class="fa-solid fa-trash-can"></i> Eliminar
                     </button>
-                    <button type="button" id="btnMenu6" class="list-group-item text-start size-a" onClick="Entregas()" title="Generar entregas">
+                    <button type="button" id="btnMenu6" class="list-group-item text-start size-a btn-display" onClick="Entregas()" title="Generar entregas">
                       <i class="fa-solid fa-check-double"></i> Entregas
                     </button>
-                    <button type="button" id="btnMenu7" class="list-group-item text-start size-a" onClick="Ordenes()" title="Generar OT">
+                    <button type="button" id="btnMenu7" class="list-group-item text-start size-a btn-display" onClick="Ordenes()" title="Generar OT">
                       <i class="fa-solid fa-cart-shopping"></i> OT - Logistica
                     </button>
-                    <button type="button" id="btnMenu8" class="list-group-item text-start size-a" title="Generar Factura">
+                    <button type="button" id="btnMenu8" class="list-group-item text-start size-a btn-display" title="Generar Factura">
                       <i class="fa-solid fa-file-invoice"></i> Factura
                     </button>
-                    <button type="button" id="btnMenu9" class="list-group-item text-start size-a" title="Refrescar">
+                    <button type="button" id="btnMenu9" class="list-group-item text-start size-a btn-display" title="Refrescar">
                       <i class="fa-solid fa-arrows-rotate"></i> Refrescar
                     </button>
-                    <button type="button" id="btnMenu10" class="list-group-item text-start size-a" title="Log de notificaciones">
+                    <button type="button" id="btnMenu10" class="list-group-item text-start size-a btn-display" title="Log de notificaciones">
                       <i class="fa-solid fa-magnifying-glass-plus"></i> Historial
                     </button>
                   </ul>
@@ -832,42 +846,42 @@ Redireccionar();
               <div class="col-md-8" id="Result">
                 <div class="panel panel-info">
                   <div style="border: 1px solid #bdeaf1;" class="panel-heading bag-info text-green p-2">Flujo de documentos</div>
-                  <table class="form" width="100%">
-                    <tr>
-                      <td>Usuario ADG</td>
-                      <td><input type="text" id="ped_usuario" class="form-control size-th" disabled readonly></td>
+                  <table width="100%">
+                    <tr class="custom-tr">
+                      <td class="size-td">Usuario ADG</td>
+                      <td><input type="text" id="ped_usuario" class="form-control size-th shadow-sm" disabled readonly></td>
                     </tr>
-                    <tr>
-                      <td>Pedido ADG</td>
-                      <td><input type="text" id="ped_numero" class="form-control size-th" disabled readonly></td>
+                    <tr class="custom-tr">
+                      <td class="size-td">Pedido ADG</td>
+                      <td><input type="text" id="ped_numero" class="form-control size-th shadow-sm" disabled readonly></td>
                     </tr>
-                    <tr>
-                      <td>Dirección pedido</td>
-                      <td><input type="text" id="direccion_pedido" class="form-control size-th" disabled readonly></td>
+                    <tr class="custom-tr">
+                      <td class="size-td">Dirección pedido</td>
+                      <td><input type="text" id="direccion_pedido" class="form-control size-th shadow-sm" disabled readonly></td>
                     </tr>
-                    <tr>
-                      <td>Pedido SAP</td>
-                      <td><input type="text" id="ped_numero_sap" class="form-control size-th" disabled readonly></td>
+                    <tr class="custom-tr">
+                      <td class="size-td">Pedido SAP</td>
+                      <td><input type="text" id="ped_numero_sap" class="form-control size-th shadow-sm" disabled readonly></td>
                     </tr>
-                    <tr>
-                      <td>Entrega</td>
-                      <td><input type="text" id="ped_entrega" class="form-control size-th" disabled readonly></td>
+                    <tr class="custom-tr">
+                      <td class="size-td">Entrega</td>
+                      <td><input type="text" id="ped_entrega" class="form-control size-th shadow-sm" disabled readonly></td>
                     </tr>
-                    <tr>
-                      <td>Orden</td>
-                      <td><input type="text" id="ped_ot" class="form-control size-th" disabled readonly></td>
+                    <tr class="custom-tr">
+                      <td class="size-td">Orden</td>
+                      <td><input type="text" id="ped_ot" class="form-control size-th shadow-sm" disabled readonly></td>
                     </tr>
-                    <tr>
-                      <td>Factura</td>
-                      <td><input type="text" id="ped_factura" class="form-control size-th" disabled readonly></td>
+                    <tr class="custom-tr">
+                      <td class="size-td">Factura</td>
+                      <td><input type="text" id="ped_factura" class="form-control size-th shadow-sm" disabled readonly></td>
                     </tr>
-                    <tr>
-                      <td>Notas</td>
-                      <td><textarea id="NotasRapidas" placeholder="Notas de pedidos" class="form-control" style="background-color: #FFC;"></textarea></td>
+                    <tr class="custom-tr">
+                      <td class="size-td">Notas</td>
+                      <td><textarea id="NotasRapidas" placeholder="Notas de pedidos" class="form-control shadow-sm" style="background-color: #FFC;"></textarea></td>
                     </tr>
                   </table>
                   <div class="mt-2">
-                    <button type="button" class="btn btn-outline-primary btn-sm w-100" onClick="NotaRapida();" id="btnNotaRapida">
+                    <button type="button" class="btn btn-outline-primary btn-sm w-100 shadow-sm" onClick="NotaRapida();" id="btnNotaRapida">
                       <i class="fa-solid fa-check-double"></i> Salvar Nota
                     </button>
                   </div>
@@ -887,7 +901,7 @@ Redireccionar();
     <div class="modal-dialog" style="min-width: 60%;">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5">VISUALIZAR PEDIDO</h1>
+          <h1 class="modal-title fs-5 text-green">VISUALIZAR PEDIDO</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <div class="modal-body" id="ContenidoPDF">
@@ -908,7 +922,7 @@ Redireccionar();
     <div class="modal-dialog" style="min-width: 60%;">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5">VISUALIZAR FACTURA</h1>
+          <h1 class="modal-title fs-5 text-green">VISUALIZAR FACTURA</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <div class="modal-body" id="ContenidoPDFfactura">
@@ -929,7 +943,7 @@ Redireccionar();
     <div class="modal-dialog" style="min-width: 70%;">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="ModalInfoMaterialLabel">DATOS ADICIONALES DE PRODUCTOS</h5>
+          <h5 class="modal-title text-green" id="ModalInfoMaterialLabel">DATOS ADICIONALES DE PRODUCTOS</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <div class="modal-body">
@@ -1040,7 +1054,7 @@ Redireccionar();
     <div class="modal-dialog" style="min-width: 60%;">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5">SEGUIMIENTO / RASTREO DE PEDIDOS</h1>
+          <h1 class="modal-title fs-5 text-green">SEGUIMIENTO / RASTREO DE PEDIDOS</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <div class="modal-body">
@@ -1213,25 +1227,25 @@ Redireccionar();
   </div>
   <!-- MODAL MENU DE ENTREGAS -->
   <div class="modal fade" id="ModalEntregas" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" style="min-width: 60%;">
+    <div class="modal-dialog" style="min-width: 70%;">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5">ENTREGA DE PEDIDO</h1>
+          <h1 class="modal-title fs-5 text-green">ENTREGA DE PEDIDO</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <div class="modal-body">
-          <table class="form" width="100%">
-            <thead class="custom-thead">
+          <table class="table table-bordered table-hover table-sm" style="width: 100%;">
+            <thead>
               <tr>
-                <th>POS</th>
-                <th>CODIGO</th>
-                <th>DESCRIPCION</th>
-                <th>CANTIDAD</th>
-                <th>PEDIDO</th>
-                <th>DESCUENTO</th>
-                <th>ENTREGA</th>
-                <th>ANULAR</th>
-                <th>STOCK</th>
+                <th class="size-th bag-info">POS</th>
+                <th class="size-th bag-info">CODIGO</th>
+                <th class="size-th bag-info">DESCRIPCION</th>
+                <th class="size-th bag-info">CANTIDAD</th>
+                <th class="size-th bag-info">PEDIDO</th>
+                <th class="size-th bag-info">DESCUENTO</th>
+                <th class="size-th bag-info">ENTREGA</th>
+                <th class="size-th bag-info">ANULAR</th>
+                <th class="size-th bag-info">STOCK</th>
               </tr>
             </thead>
             <tbody id="tdDetalleEntregas">
@@ -1239,16 +1253,12 @@ Redireccionar();
           </table>
         </div>
         <div class="modal-footer">
-          <p align="left" id="valor_entrega"></p>
-          <p align="left" id="valor_entrega_iva"></p>
+          <p class="size-th" align="left" id="valor_entrega"></p>
+          <p class="size-th" align="left" id="valor_entrega_iva"></p>
           <div>
-            <button type="button" class="btn btn-success btn-sm" onClick="DescargarExcel('ENTREGA')">
-              <i class="fa-solid fa-download"></i>
-              Excel
-            </button>
-            <button type="button" class="btn btn-warning btn-sm" onClick="ModificarEntrega();">Editar/Guardar</button>
-            <button type="button" class="btn btn-danger btn-sm" onClick="EliminarEntrega();">Eliminar</button>
-            <button type="button" class="btn btn-outline-danger btn-sm" data-bs-dismiss="modal">Cerrar</button>
+            <button type="button" class="btn btn-success btn-sm" title="Exportar a Excel" onClick="DescargarExcel('ENTREGA')"><i class="fa-solid fa-download"></i></button>
+            <button type="button" class="btn btn-warning btn-sm" title="Editar y/o Guardar" onClick="ModificarEntrega();"><i class="fa-solid fa-floppy-disk"></i></button>
+            <button type="button" class="btn btn-danger btn-sm" title="Eliminar entrega" onClick="EliminarEntrega();"><i class="fa-solid fa-trash-can"></i></button>
           </div>
         </div>
       </div>
@@ -1259,19 +1269,19 @@ Redireccionar();
     <div class="modal-dialog" style="min-width: 60%;">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5">ORDEN DE TRANSPORTE</h1>
+          <h1 class="modal-title fs-5 text-green">ORDEN DE TRANSPORTE</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <div class="modal-body">
-          <table class="form" width="100%">
+          <table class="table table-bordered table-hover table-sm" width="100%">
             <thead>
-              <th>POS</th>
-              <th>CODIGO</th>
-              <th>DESCRIPCION</th>
-              <th>CANTIDAD</th>
-              <th>LOTE</th>
-              <th>OT</th>
-              <th>ANULAR</th>
+              <th class="size-th bag-info">POS</th>
+              <th class="size-th bag-info">CÓDIGO</th>
+              <th class="size-th bag-info">DESCRIPCION</th>
+              <th class="size-th bag-info">CANTIDAD</th>
+              <th class="size-th bag-info">LOTE</th>
+              <th class="size-th bag-info">OT</th>
+              <th class="size-th bag-info">ANULAR</th>
             </thead>
             <tbody id="tdDetalleOrdenes">
             </tbody>
@@ -1279,7 +1289,7 @@ Redireccionar();
         </div>
         <div class="modal-footer">
           <div>
-            <p align="left" id="valor_orden"></p>
+            <p class="size-th" align="left" id="valor_orden"></p>
             <button type="button" class="btn btn-success btn-sm" onClick="DescargarExcel('OT')">
               <span class="glyphicon glyphicon-cloud-download" aria-hidden="true"></span>
               Excel
@@ -1298,7 +1308,7 @@ Redireccionar();
     <div class="modal-dialog" style="min-width: 60%;">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5">LOG DE CAMBIOS</h1>
+          <h1 class="modal-title fs-5 text-green">LOG DE CAMBIOS</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <div class="modal-body" id="DetalleLog">
@@ -1315,7 +1325,7 @@ Redireccionar();
     <div class="modal-dialog" style="min-width: 60%;">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5">GRAN FERIA VIRTUAL MAYO</h1>
+          <h1 class="modal-title fs-5 text-green">GRAN FERIA VIRTUAL MAYO</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <div class="modal-body" id="DetalleLog">
@@ -1332,7 +1342,7 @@ Redireccionar();
     <div class="modal-dialog" style="min-width: 70%;">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="ModalPPLabel">Información de Puntos</h5>
+          <h5 class="modal-title text-green" id="ModalPPLabel">INFORMACIÓN DE PUNTOS</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body pt-0">
@@ -1353,7 +1363,7 @@ Redireccionar();
     <div class="modal-dialog" style="min-width: 80%;">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5">Top 20 Productos destacados</h1>
+          <h1 class="modal-title fs-5 text-green">TOP 20 PRODUCTOS DESTACADOS</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <div class="modal-body" id="TablaTop20_100_130">
@@ -1370,7 +1380,7 @@ Redireccionar();
     <div class="modal-dialog" style="min-width: 60%;">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5">Redimir</h1>
+          <h1 class="modal-title fs-5 text-green">REDIMIR</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <div class="modal-body">
@@ -1406,7 +1416,7 @@ Redireccionar();
     <div class="modal-dialog" style="min-width: 60%;">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5">MODIFICAR PEDIDOS SAP</h1>
+          <h1 class="modal-title fs-5 text-green">MODIFICAR PEDIDOS SAP</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <div class="modal-body">
@@ -1451,7 +1461,7 @@ Redireccionar();
     <div class="modal-dialog" style="min-width: 60%;">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5">ESTADISTICAS</h1>
+          <h1 class="modal-title fs-5 text-green">ESTADISTICAS</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <div class="modal-body">
@@ -1481,81 +1491,81 @@ Redireccionar();
     <div class="modal-dialog" style="min-width: 60%;">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5">INFORMACIÓN ADICIONAL DE CLIENTE</h1>
+          <h1 class="modal-title fs-5 text-green">INFORMACIÓN ADICIONAL DE CLIENTE</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <div class="modal-body">
-          <table class="form" width="100%">
+          <table width="100%">
             <tbody>
-              <tr>
-                <td>Código</td>
-                <td><input type="text" id="txt_codigoSap" class="form-control size-td" readonly></td>
+              <tr class="custom-tr">
+                <td class="size-th">Código</td>
+                <td><input type="text" id="txt_codigoSap" class="form-control size-td shadow-sm" readonly></td>
               </tr>
-              <tr>
-                <td>Nit</td>
-                <td><input type="text" id="txt_nit" class="form-control size-td" readonly></td>
+              <tr class="custom-tr">
+                <td class="size-th">Nit</td>
+                <td><input type="text" id="txt_nit" class="form-control size-td shadow-sm" readonly></td>
               </tr>
-              <tr>
-                <td>Ciudad</td>
-                <td><input type="text" id="txt_ciudad" class="form-control size-td" readonly></td>
+              <tr class="custom-tr">
+                <td class="size-th">Ciudad</td>
+                <td><input type="text" id="txt_ciudad" class="form-control size-td shadow-sm" readonly></td>
               </tr>
-              <tr>
-                <td>Dirección</td>
-                <td><input type="text" id="txt_dir" class="form-control size-td" readonly></td>
+              <tr class="custom-tr">
+                <td class="size-th">Dirección</td>
+                <td><input type="text" id="txt_dir" class="form-control size-td shadow-sm" readonly></td>
               </tr>
-              <tr>
-                <td>Vendedor</td>
+              <tr class="custom-tr">
+                <td class="size-th">Vendedor</td>
                 <td>
                   <div class="input-group">
                     <span class="input-group-addon" id="basic-addon1"> <span class="glyphicon glyphicon-user" aria-hidden="true"></span></span>
-                    <input type="text" class="form-control size-td" id="txt_vendedor" aria-describedby="basic-addon1" readonly>
+                    <input type="text" class="form-control size-td shadow-sm" id="txt_vendedor" aria-describedby="basic-addon1" readonly>
                   </div>
                   <div class="input-group">
                     <span class="input-group-addon" id="basic-addon1"> <span class="glyphicon glyphicon-earphone" aria-hidden="true"></span></span>
-                    <input type="text" class="form-control size-td" id="txt_vendedor_tel" aria-describedby="basic-addon1" readonly>
+                    <input type="text" class="form-control size-td shadow-sm" id="txt_vendedor_tel" aria-describedby="basic-addon1" readonly>
                   </div>
                 </td>
               </tr>
-              <tr>
-                <td>Televendedor</td>
+              <tr class="custom-tr">
+                <td class="size-th">Televendedor</td>
                 <td>
                   <div class="input-group">
                     <span class="input-group-addon" id="basic-addon1"> <span class="glyphicon glyphicon-user" aria-hidden="true"></span></span>
-                    <input type="text" class="form-control size-td" id="txt_televendedor" aria-describedby="basic-addon1" readonly>
+                    <input type="text" class="form-control size-td shadow-sm" id="txt_televendedor" aria-describedby="basic-addon1" readonly>
                   </div>
                   <div class="input-group">
                     <span class="input-group-addon" id="basic-addon1"> <span class="glyphicon glyphicon-earphone" aria-hidden="true"></span></span>
-                    <input type="text" class="form-control size-td" id="txt_televendedor_tel" aria-describedby="basic-addon1" readonly>
+                    <input type="text" class="form-control size-td shadow-sm" id="txt_televendedor_tel" aria-describedby="basic-addon1" readonly>
                   </div>
                 </td>
               </tr>
-              <tr>
-                <td>Lista Precios</td>
-                <td><input type="text" id="txt_lista" class="form-control size-td" readonly></td>
+              <tr class="custom-tr">
+                <td class="size-th">Lista Precios</td>
+                <td><input type="text" id="txt_lista" class="form-control size-td shadow-sm" readonly></td>
               </tr>
-              <tr>
-                <td>Condición de Pago</td>
-                <td><input type="text" id="txt_condicion" class="form-control size-td" readonly></td>
+              <tr class="custom-tr">
+                <td class="size-th">Condición de Pago</td>
+                <td><input type="text" id="txt_condicion" class="form-control size-td shadow-sm" readonly></td>
               </tr>
-              <tr>
-                <td>Institucionales</td>
-                <td><input type="text" id="txt_institucional" class="form-control size-td" readonly>
+              <tr class="custom-tr">
+                <td class="size-th">Institucionales</td>
+                <td><input type="text" id="txt_institucional" class="form-control size-td shadow-sm" readonly>
               </tr>
-              <tr>
-                <td>Controlados</td>
-                <td><input type="text" id="txt_controlado" class="form-control size-td" readonly></td>
+              <tr class="custom-tr">
+                <td class="size-th">Controlados</td>
+                <td><input type="text" id="txt_controlado" class="form-control size-td shadow-sm" readonly></td>
               </tr>
-              <tr>
-                <td>Descuento Financiero %</td>
-                <td><input type="text" id="txt_descuento" class="form-control size-td" readonly /></td>
+              <tr class="custom-tr">
+                <td class="size-th">Descuento Financiero %</td>
+                <td><input type="text" id="txt_descuento" class="form-control size-td shadow-sm" readonly /></td>
               </tr>
-              <tr>
-                <td>Grupo 1</td>
-                <td><select class="form-select size-td" id="txtGrp1" readonly disabled></select></td>
+              <tr class="custom-tr">
+                <td class="size-th">Grupo 1</td>
+                <td><select class="form-select size-td shadow-sm" id="txtGrp1" readonly disabled></select></td>
               </tr>
-              <tr>
-                <td>Grupo 2</td>
-                <td><select class="form-select size-td" id="txtGrp2" readonly disabled></select></td>
+              <tr class="custom-tr">
+                <td class="size-th">Grupo 2</td>
+                <td><select class="form-select size-td shadow-sm" id="txtGrp2" readonly disabled></select></td>
               </tr>
             </tbody>
           </table>
@@ -1571,93 +1581,90 @@ Redireccionar();
     <div class="modal-dialog" style="min-width: 70%;">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5" id="exampleModalLabel">Configuración de búsqueda</h1>
+          <h1 class="modal-title fs-5 text-green" id="exampleModalLabel">CONFIGURACIÓN DE BÚSQUEDA</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <div class="modal-body">
-          <table class="form" width="100%">
-            <tr>
-              <td>
-                <img src="../resources/icons/pw/tag_stock.png" width="24" title="SOLO CON STOCK" heigth="24" align="absmiddle">
-                &nbsp;Stock
-              </td>
-              <td>
-                <div id="DvChkStock" class="DivCheckBox DivCheckBoxTrue"></div>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <img src="../resources/icons/pw/tag_discount.png" width="24" heigth="24" title="SOLO DESCUENTOS" align="absmiddle">
-                &nbsp;Descuentos
-              </td>
-              <td>
-                <div id="DvChkDctos" class="DivCheckBox"></div>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <img src="../resources/icons/pw/tag_marcado.png" width="24" title="PRODUCTO OFERTADO" heigth="24" align="absmiddle">
-                &nbsp;Productos Ofertados
-              </td>
-              <td>
-                <div id="DvChkOfertado" class="DivCheckBox"></div>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <img src="../resources/icons/regalo.png" width="24" heigth="24" title="PRODUCTO BONIFICADO" align="absmiddle">
-                &nbsp;Bonificados
-              </td>
-              <td>
-                <div id="DvChkBonif" class="DivCheckBox"></div>
-              </td>
-            </tr>
-            <tr>
-              <td width="400">
-                <img src="../resources/icons/nuevo.png" width="24" title="PRODUCTOS NUEVO" heigth="24" align="absmiddle">
-                &nbsp;Productos Nuevos (90 Dias)
-              </td>
-              <td>
-                <div id="DvChkNuevos" class="DivCheckBox"></div>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <img src="../resources/icons/pw/tag_kit.png" width="24" title="PRODUCTOS KITS" heigth="24" align="absmiddle">
-                &nbsp;KIT'S
-              </td>
-              <td>
-                <div id="DvChkKits" class="DivCheckBox"></div>
-              </td>
-            </tr>
-          </table>
-          <table class="form mt-2" width="100%">
-            <tr>
-              <td>Proveedores</td>
-              <td>
-                <select id="txtGrupoArticulo" class="form-select size-td" style="width:100%">
-                </select>
-              </td>
-            </tr>
-            <tr>
-              <td>Numero Temporal</td>
-              <td align="center">
-                <input type="text" id="txt_numero" class="form-control size-td" readonly>
-              </td>
-            </tr>
-            <tr>
-              <td>Numero SAP</td>
-              <td align="center">
-                <input type="text" id="txt_numero_sap" class="form-control size-td" readonly>
-              </td>
-            </tr>
-            <tr>
-              <td>Importar Plano [codigo,cantidad]</td>
-              <td align="center">
-                <input type="file" id="filename" name="filename" class="form-control size-td" readonly>
-              </td>
-            </tr>
-          </table>
+          <div class="container-fluid mb-5">
+            <div class="row align-items-center mb-2">
+              <div class="col-md-6 size-14">
+                <img src="../resources/icons/pw/tag_stock.png" width="24" title="SOLO CON STOCK" heigth="24" align="abxsiddle">&nbsp;Stock
+              </div>
+              <div class="col-md-6">
+                <input class="form-check-input shadow-sm" type="checkbox" id="DvChkStock" checked>
+              </div>
+            </div>
+            <div class="row align-items-center mb-2">
+              <div class="col-md-6 size-14">
+                <img src="../resources/icons/pw/tag_discount.png" width="24" heigth="24" title="SOLO DESCUENTOS" align="absmiddle">&nbsp;Descuentos
+              </div>
+              <div class="col-md-6">
+                <input class="form-check-input shadow-sm" type="checkbox" id="DvChkDctos">
+              </div>
+            </div>
+            <div class="row align-items-center mb-2">
+              <div class="col-md-6 size-14">
+                <img src="../resources/icons/pw/tag_marcado.png" width="24" title="PRODUCTO OFERTADO" heigth="24" align="absmiddle">&nbsp;Productos Ofertados
+              </div>
+              <div class="col-md-6">
+                <input class="form-check-input shadow-sm" type="checkbox" id="DvChkOfertado">
+              </div>
+            </div>
+            <div class="row align-items-center mb-2">
+              <div class="col-md-6 size-14">
+                <img src="../resources/icons/regalo.png" width="24" heigth="24" title="PRODUCTO BONIFICADO" align="absmiddle">&nbsp;Bonificados
+              </div>
+              <div class="col-md-6">
+                <input class="form-check-input shadow-sm" type="checkbox" id="DvChkBonif">
+              </div>
+            </div>
+            <div class="row align-items-center mb-2">
+              <div class="col-md-6 size-14">
+                <img src="../resources/icons/nuevo.png" width="24" title="PRODUCTOS NUEVO" heigth="24" align="absmiddle">&nbsp;Productos Nuevos(90 Días)
+              </div>
+              <div class="col-md-6">
+                <input class="form-check-input shadow-sm" type="checkbox" id="DvChkNuevos">
+              </div>
+            </div>
+            <div class="row align-items-center mb-2">
+              <div class="col-md-6 size-14">
+                <img src="../resources/icons/pw/tag_kit.png" width="24" title="PRODUCTOS KITS" heigth="24" align="absmiddle">&nbsp;KIT'S
+              </div>
+              <div class="col-md-6">
+                <input class="form-check-input shadow-sm" type="checkbox" id="DvChkKits">
+              </div>
+            </div>
+          </div>
+          <div class="container-fluid">
+            <div class="row mb-2">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="txt_numero">Número Temporal</label>
+                  <input type="text" id="txt_numero" class="form-control size-td shadow-sm" readonly>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="txt_numero_sap">Número SAP</label>
+                  <input type="text" id="txt_numero_sap" class="form-control size-td shadow-sm" readonly>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="txtGrupoArticulo">Proveedores</label>
+                  <select id="txtGrupoArticulo" class="form-select size-td shadow-sm" style="width:100%"></select>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="filename">Importar Plano [codigo, cantidad]</label>
+                  <input type="file" id="filename" name="filename" class="form-control size-td shadow-sm" readonly>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-outline-danger btn-sm" data-bs-dismiss="modal">Cerrar</button>
@@ -1670,7 +1677,7 @@ Redireccionar();
     <div class="modal-dialog" style="min-width: 60%;">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5">INFORMACIÓN DE BONIFICADOS</h1>
+          <h1 class="modal-title fs-5 text-green">INFORMACIÓN DE BONIFICADOS</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <div class="modal-body" id="ContenidoInfoBonificados">

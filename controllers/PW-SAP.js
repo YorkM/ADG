@@ -405,17 +405,21 @@ function CargarEvento() {
 
       let grupo = parent.parent.$("#AbrirVentas").val();
       let tipo = parent.parent.$("#AbrirVentasTipo").val();
+
       switch (tipo) {
         case 'DES':
-          $("#DvChkDctos").addClass('DivCheckBoxTrue');
+          // $("#DvChkDctos").addClass('DivCheckBoxTrue');
+          document.querySelector('#DvChkDctos').checked = true;
           break;
-        case 'BON':
-          $("#DvChkBonif").addClass('DivCheckBoxTrue');
+          case 'BON':
+          // $("#DvChkBonif").addClass('DivCheckBoxTrue');
+          document.querySelector('#DvChkBonif').checked = true;
           break;
       }
       $("#txt_bproductos").val($.trim(grupo));
 
       BuscarProductos();
+
       setTimeout(function () {
         BuscarProductoArr(0);
       }, 2000);
@@ -654,7 +658,8 @@ function reordenarTabindex() {
 }
 // FUNCIÓN PARA ARMAR TABLA PRINCIPAL DE RESULTADOS DE PRODUCTOS
 function TableView(filas) {
-  const op_inf = $("#DvChkKits").hasClass('DivCheckBoxTrue') ? 1 : 0;
+  // const op_inf = $("#DvChkKits").hasClass('DivCheckBoxTrue') ? 1 : 0;
+  const op_inf = (document.querySelector('#DvChkKits').checked) ? 1 : 0;
   const org = $.trim($("#Organizacion").val());
 
   let tabla = `
@@ -902,12 +907,18 @@ function BuscarProductoArr(isn) {
   let f_new = 0;
   let f_ofe = 0;
 
-  if ($("#DvChkStock").hasClass('DivCheckBoxTrue')) f_sto = 1;
-  if ($("#DvChkDctos").hasClass('DivCheckBoxTrue')) f_dto = 1;
-  if ($("#DvChkBonif").hasClass('DivCheckBoxTrue')) f_bon = 1;
-  if ($("#DvChkBarras").hasClass('DivCheckBoxTrue')) f_bar = 1;
-  if ($("#DvChkNuevos").hasClass('DivCheckBoxTrue')) f_new = 1;
-  if ($("#DvChkOfertado").hasClass('DivCheckBoxTrue')) f_ofe = 1;
+  // if ($("#DvChkStock").hasClass('DivCheckBoxTrue')) f_sto = 1;
+  if (document.querySelector('#DvChkStock').checked) f_sto = 1;
+  // if ($("#DvChkDctos").hasClass('DivCheckBoxTrue')) f_dto = 1;
+  if (document.querySelector('#DvChkDctos').checked) f_dto = 1;
+  // if ($("#DvChkBonif").hasClass('DivCheckBoxTrue')) f_bon = 1;
+  if (document.querySelector('#DvChkBonif').checked) f_bon = 1;
+  // if ($("#DvChkBarras").hasClass('DivCheckBoxTrue')) f_bar = 1;
+  // if (document.querySelector('#DvChkBarras').checked) f_bar = 1;
+  // if ($("#DvChkNuevos").hasClass('DivCheckBoxTrue')) f_new = 1;
+  if (document.querySelector('#DvChkNuevos').checked) f_new = 1;
+  // if ($("#DvChkOfertado").hasClass('DivCheckBoxTrue')) f_ofe = 1;
+  if (document.querySelector('#DvChkOfertado').checked) f_ofe = 1;
 
   let sh_cod = 0;
   let sh_ean = 0;
@@ -981,17 +992,26 @@ async function BuscarProductos() {
   let f_bar = 0;
   let f_new = 0;
 
-  if ($("#DvChkStock").hasClass('DivCheckBoxTrue')) f_sto = 1;
-  if ($("#DvChkDctos").hasClass('DivCheckBoxTrue')) f_dto = 1;
-  if ($("#DvChkBonif").hasClass('DivCheckBoxTrue')) f_bon = 1;
-  if ($("#DvChkBarras").hasClass('DivCheckBoxTrue')) f_bar = 1;
-  if ($("#DvChkNuevos").hasClass('DivCheckBoxTrue')) f_new = 1;
+  // if ($("#DvChkStock").hasClass('DivCheckBoxTrue')) f_sto = 1;
+  if (document.querySelector('#DvChkStock').checked) f_sto = 1;
+  // if ($("#DvChkDctos").hasClass('DivCheckBoxTrue')) f_dto = 1;
+  if (document.querySelector('#DvChkDctos').checked) f_dto = 1;
+  // if ($("#DvChkBonif").hasClass('DivCheckBoxTrue')) f_bon = 1;
+  if (document.querySelector('#DvChkBonif').checked) f_bon = 1;
+  // if ($("#DvChkBarras").hasClass('DivCheckBoxTrue')) f_bar = 1;
+  // if (document.querySelector('#DvChkBarras').checked) f_bar = 1;
+  // if ($("#DvChkNuevos").hasClass('DivCheckBoxTrue')) f_new = 1;
+  if (document.querySelector('#DvChkNuevos').checked) f_new = 1;
 
   let TipoPed = $("#TxtIntegracion").val();
 
   let op_sw = 'B_PRODUCTOS';
   let op_inf = 0;
-  if ($("#DvChkKits").hasClass('DivCheckBoxTrue')) {
+  // if ($("#DvChkKits").hasClass('DivCheckBoxTrue')) {
+  //   op_sw = 'B_PRODUCTOS_KIT';
+  //   op_inf = 1;
+  // }
+  if (document.querySelector('#DvChkKits').checked) {
     op_sw = 'B_PRODUCTOS_KIT';
     op_inf = 1;
   }
@@ -1153,13 +1173,13 @@ function renderMaterialInfo(data, { vunit, v1, v2, v3, v4, iva, dcto }) {
 
   const stockRows = data[0]['INVENTARIO_LOTES'].map(item => `
     <tr>
-      <td>${item.CENTRO} </tb>
-      <td>${item.ALMACEN} </td>
-      <td>${item.TIPO_MOV}</td>
-      <td>${item.LOTE}</td>
-      <td>${item.VMCTO}</td>
-      <td>${parseInt(item.CANTIDAD)}</td>
-      <td>${item.UBICACION}</td>
+      <td class="size-td">${item.CENTRO} </tb>
+      <td class="size-td">${item.ALMACEN} </td>
+      <td class="size-td">${item.TIPO_MOV}</td>
+      <td class="size-td">${item.LOTE}</td>
+      <td class="size-td">${item.VMCTO}</td>
+      <td class="size-td">${parseInt(item.CANTIDAD)}</td>
+      <td class="size-td">${item.UBICACION}</td>
     </tr>`).join('');
 
   const html = `
@@ -1180,31 +1200,31 @@ function renderMaterialInfo(data, { vunit, v1, v2, v3, v4, iva, dcto }) {
               <tbody>
                 <tr>
                   <td class="size-10"><strong>VLR BRUTO</strong></td>
-                  <td class="text-green">${formatNum(vunit, '$')}</td>
+                  <td class="text-green size-td">${formatNum(vunit, '$')}</td>
                 </tr>
                 <tr>
                   <td class="size-10"><strong>VLR NETO SIN IVA</strong></td>
-                  <td class="text-green">${formatNum(v1, '$')}</td>
+                  <td class="text-green size-td">${formatNum(v1, '$')}</td>
                 </tr>
                 <tr>
                   <td class="size-10"><strong>VLR NETO FINANCIERO</strong></td>
-                  <td class="text-green">${formatNum(v4, '$')}</td>
+                  <td class="text-green size-td">${formatNum(v4, '$')}</td>
                 </tr>
                 <tr>
                   <td class="size-10"><strong>VLR DESCUENTO</strong></td>
-                  <td class="text-green">${formatNum(v3, '$')}</td>
+                  <td class="text-green size-td">${formatNum(v3, '$')}</td>
                 </tr>
                 <tr>
                   <td class="size-10"><strong>VLR IVA</strong></td>
-                  <td class="text-green">${formatNum(v2, '$')}</td>
+                  <td class="text-green size-td">${formatNum(v2, '$')}</td>
                 </tr>
                 <tr>
                   <td class="size-10"><strong>PORCENTAJE DCTO</strong></td>
-                  <td class="text-green">${dcto}%</td>
+                  <td class="text-green size-td">${dcto}%</td>
                 </tr>
                 <tr>
                   <td class="size-10"><strong>PORCENTAJE IVA</strong></td>
-                  <td class="text-green">${iva}%</td>
+                  <td class="text-green size-td">${iva}%</td>
                 </tr>
               </tbody>
             </table>
@@ -1213,43 +1233,43 @@ function renderMaterialInfo(data, { vunit, v1, v2, v3, v4, iva, dcto }) {
               <tbody>                
                 <tr>
                   <td class="size-10"><strong>CÓDIGO</strong></td>
-                  <td class="text-green">${data[0].CODIGO_MATERIAL}</td>
+                  <td class="text-green size-td">${data[0].CODIGO_MATERIAL}</td>
                 </tr>
                 <tr>
                   <td class="size-10"><strong>TEXTO CORTO</strong></td>
-                  <td class="size-10 size-td text-green">${data[0].DESCRIPCION}</td>
+                  <td class="size-11 text-green">${data[0].DESCRIPCION}</td>
                 </tr>
                 <tr>
                   <td class="size-10"><strong>REGISTRO INFO</strong></td>
-                  <td class="text-green">${data[0].CODIGO_SAP}</td>
+                  <td class="text-green size-td">${data[0].CODIGO_SAP}</td>
                 </tr>
                 <tr>
                   <td class="size-10"><strong>TEXTO LARGO</strong></td>
-                  <td class="size-10 size-td text-green">${data[0].DESCRIPCION2}</td>
+                  <td class="size-11 text-green">${data[0].DESCRIPCION2}</td>
                 </tr>
                 <tr>
                   <td class="size-10"><strong>LABORATORIO</strong></td>
-                  <td class="text-green">${data[0].LAB}</td>
+                  <td class="text-green size-td">${data[0].LAB}</td>
                 </tr>
                 <tr>
                   <td class="size-10"><strong>INVIMA</strong></td>
-                  <td class="text-green">${data[0].INVIMA}</td>
+                  <td class="text-green size-td">${data[0].INVIMA}</td>
                 </tr>
                 <tr>
                   <td class="size-10"><strong>EAN</strong></td>
-                  <td class="text-green">${data[0].EAN}</td>
+                  <td class="text-green size-td">${data[0].EAN}</td>
                 </tr>
                 <tr>
                   <td class="size-10"><strong>EMBALAJE</strong></td>
-                  <td class="text-green">${data[0].EMBALAJE}</td>
+                  <td class="text-green size-td">${data[0].EMBALAJE}</td>
                 </tr>
                 <tr>
                   <td class="size-10"><strong>FECHA CREACIÓN</strong></td>
-                  <td class="text-green">${data[0].FECHA_CREACION}</td>
+                  <td class="text-green size-td">${data[0].FECHA_CREACION}</td>
                 </tr>
                 <tr>
                   <td class="size-10"><strong>DIAS CREACIÓN</strong></td>
-                  <td class="text-green">${data[0].DIAS_CREACION}</td>
+                  <td class="text-green size-td">${data[0].DIAS_CREACION}</td>
                 </tr>
                 <tr>
                   <td class="size-10"><strong>CONTROLADO</strong>: ${ctrl}</td>
@@ -1267,16 +1287,16 @@ function renderMaterialInfo(data, { vunit, v1, v2, v3, v4, iva, dcto }) {
           <div class="panel panel-info">
             <div class="text-green">INVENTARIO FÍSICO POR LOTES</div>
             <div style="overflow: auto;">
-              <table class="table" width="100%" align="center">
+              <table class="table table-bordered table-hover table-sm" width="100%" align="center">
                 <thead>
                     <tr>
-                      <th class="bag-info text-green">CENTRO</th>
-                      <th class="bag-info text-green">ALMACEN</th>
-                      <th class="bag-info text-green">MOV</th>
-                      <th class="bag-info text-green">LOTE</th>
-                      <th class="bag-info text-green">VENCIMIENTO</th>
-                      <th class="bag-info text-green">STOCK</th>
-                      <th class="bag-info text-green">UBICACION</th>
+                      <th class="bag-info size-th">CENTRO</th>
+                      <th class="bag-info size-th">ALMACEN</th>
+                      <th class="bag-info size-th">MOV</th>
+                      <th class="bag-info size-th">LOTE</th>
+                      <th class="bag-info size-th">VENCIMIENTO</th>
+                      <th class="bag-info size-th">STOCK</th>
+                      <th class="bag-info size-th">UBICACION</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -1296,14 +1316,14 @@ function renderMaterialInfo(data, { vunit, v1, v2, v3, v4, iva, dcto }) {
 function renderKitInfo(data) {
   const rows = data.map(item => `
     <tr>
-      <td>${item.CODIGO_MATERIAL}</td>
-      <td>${item.DESCRIPCION}</td>
-      <td>${formatNum(item.VALOR_UNITARIO, '$')}</td>
-      <td>${item.IVA}</td>
-      <td>${item.DESCUENTO}</td>
-      <td>${formatNum(item.VALOR_NETO, '$')}</td>
-      <td>${item.CANTIDAD}</td>
-      <td>${formatNum((parseFloat(item.VALOR_NETO) * parseInt(item.CANTIDAD)), '$')}</td>
+      <td class="size-td">${item.CODIGO_MATERIAL}</td>
+      <td class="size-td">${item.DESCRIPCION}</td>
+      <td class="size-td">${formatNum(item.VALOR_UNITARIO, '$')}</td>
+      <td class="size-td">${item.IVA}</td>
+      <td class="size-td">${item.DESCUENTO}</td>
+      <td class="size-td">${formatNum(item.VALOR_NETO, '$')}</td>
+      <td class="size-td">${item.CANTIDAD}</td>
+      <td class="size-td">${formatNum((parseFloat(item.VALOR_NETO) * parseInt(item.CANTIDAD)), '$')}</td>
     </tr>
   `).join('');
 
@@ -2292,10 +2312,12 @@ function AddEvento(grupo, tipo) {
   if ($("#txt_codigoSap").val() != '') {
     switch (tipo) {
       case 'DES':
-        $("#DvChkDctos").addClass('DivCheckBoxTrue');
+        // $("#DvChkDctos").addClass('DivCheckBoxTrue');
+        document.querySelector('#DvChkDctos').checked = true;
         break;
       case 'BON':
-        $("#DvChkBonif").addClass('DivCheckBoxTrue');
+        // $("#DvChkBonif").addClass('DivCheckBoxTrue');
+        document.querySelector('#DvChkBonif').checked = true;
         break;
     }
 
@@ -2448,7 +2470,13 @@ async function Entregas() {
         if (data.Tipo != 'S') {
           Swal.fire("Error", data.Msj, "error");
         } else {
-          Swal.fire("Excelente", data.Msj, "success");
+          $('#ModalOpciones').modal("hide");
+          Swal.fire("Excelente", data.Msj, "success")
+          .then((result) => {
+            if (result.isConfirmed) {
+              $('#ModalOpciones').modal("show");
+            }
+          });
         }
 
         setTimeout(function () {
@@ -2483,19 +2511,15 @@ async function Entregas() {
 
           detalle += `
           <tr ${clas}>
-            <td>${item.POSICION}</td>
-            <td>${item.CODIGO_MATERIAL}</td>
-            <td>${icon} ${item.DESCRIPCION}</td>
-            <td>
-              <input type="text" value="${item.CANTIDAD}" class="form-control form-control-sm" size="2%">
-            </td>
-            <td>${item.CANT_PED}</td>
-            <td>${item.DESCUENTO}%</td>
-            <td>${item.ENTREGA}</td>
-            <td align="center">
-              <input type="checkbox"/>
-            </td>
-            <td>${item.STOCK}</td>
+            <td class="size-td vertical">${item.POSICION}</td>
+            <td class="size-td vertical">${item.CODIGO_MATERIAL}</td>
+            <td class="size-td vertical">${icon} ${item.DESCRIPCION}</td>
+            <td class="vertical"><input type="text" value="${item.CANTIDAD}" class="form-control form-control-sm" size="2%"></td>
+            <td class="size-td vertical">${item.CANT_PED}</td>
+            <td class="size-td vertical">${item.DESCUENTO}%</td>
+            <td class="size-td vertical">${item.ENTREGA}</td>
+            <td class="vertical" align="center"><input type="checkbox"></td>
+            <td class="size-td vertical">${item.STOCK}</td>
           </tr>`;
           Pneto = Pneto + parseFloat((item.PNETO));
           PnetoIva = PnetoIva + parseFloat((item.PNETO_IVA));
@@ -2503,8 +2527,8 @@ async function Entregas() {
         $("#tdDetalleEntregas").html(detalle);
         $("#ModalOpciones").modal("hide");
         $("#ModalEntregas").modal("show");
-        $("#valor_entrega").html(`VALOR ENTREGADO SIN IVA: <span><strong>${formatNum(Pneto, '$')}</strong></span>`);
-        $("#valor_entrega_iva").html(`VALOR ENTREGADO: <span><strong>${formatNum(PnetoIva, '$')}</strong></span>`);
+        $("#valor_entrega").html(`VALOR ENTREGADO SIN IVA: <span style="font-size: 16px"><strong>${formatNum(Pneto, '$')}</strong></span>`);
+        $("#valor_entrega_iva").html(`VALOR ENTREGADO: <span style="font-size: 16px"><strong>${formatNum(PnetoIva, '$')}</strong></span>`);
       }      
     }
   } catch (error) {
@@ -2688,7 +2712,13 @@ async function Ordenes() {
             } else {
               let rdespa = opcionesRecojo.recojeDespachos ? '1' : '0';
               let rpunto = opcionesRecojo.recojePuntoVenta ? '1' : '0';
-              Swal.fire("Excelente", data.Msj, "success");
+              $('#ModalOpciones').modal("hide");
+              Swal.fire("Excelente", data.Msj, "success")
+                .then((result) => {
+                  if (result.isConfirmed) {
+                    $('#ModalOpciones').modal("show");
+                  }
+                });
 
               setTimeout(function () {
                 Temporales(); // Temporales propios                  
@@ -2717,13 +2747,13 @@ async function Ordenes() {
 
           detalle += `
           <tr ${clas}>
-            <td>${item.posicion_ot}</td>
-            <td>${item.codigo_material}</td>
-            <td>${item.descripcion}</td>
-            <td><input type="text" value="${item.cantidad}" class="form-control form-control-sm" size="2%"></td>
-            <td>${item.lote}</td>
-            <td>${item.numero_ot}</td>
-            <td align="center"><input type="checkbox"/></td>
+            <td class="size-td vertical">${item.posicion_ot}</td>
+            <td class="size-td vertical">${item.codigo_material}</td>
+            <td class="size-td vertical">${item.descripcion}</td>
+            <td class="vertical"><input type="text" value="${item.cantidad}" class="form-control form-control-sm size-td" size="2%"></td>
+            <td class="size-td vertical">${item.lote}</td>
+            <td class="size-td vertical">${item.numero_ot}</td>
+            <td class="size-td vertical" align="center"><input type="checkbox"/></td>
           </tr>`;
           Pneto += parseFloat((item.pneto));
         });
@@ -2731,7 +2761,7 @@ async function Ordenes() {
         $("#tdDetalleOrdenes").html(detalle);
         $("#ModalOpciones").modal("hide");
         $("#ModalOrdenes").modal("show");
-        $("#valor_orden").html(`VALOR ORDEN: <span><strong>${formatNum(Pneto, '$')}</strong></span>`);
+        $("#valor_orden").html(`VALOR ORDEN: <span style="font-size: 16px"><strong>${formatNum(Pneto, '$')}</strong></span>`);
       } catch (error) {
         console.error(error);
       }
@@ -2767,6 +2797,7 @@ async function EliminarOT() {
   
     const data = await enviarPeticion({
       op: 'ELIMINA_OT',
+      link: "../models/WS-PW.php",
       ot: $.trim($("#ped_ot").val()),
       alm: almacen
     });
@@ -3993,19 +4024,30 @@ const Presupuesto_datos = async () => {
 function toggleButton(button, checkboxDivId) {
   $(button).toggleClass('btn-light btn-success');
   toggleDivCheckbox(checkboxDivId);
+
+  const valor = $.trim($('#txt_bproductos').val());
+  if (valor != "") {
+    if ($('#txt_bproductos').val().length > 2) {
+      if (validarSiNumero(valor) == 1) BuscarProductoArr(1);
+      else BuscarProductoArr(0);
+    }
+  } else {
+    $("#dvResultProductos").html("");
+    $("#n_resultados").text("");
+  }
 }
 // FUNCIÓN PARA EL MANEJO DEL TOGGLE CHECK-BOX
 function toggleDivCheckbox(checkboxDivId) {
-  let checkboxDiv = $('#' + checkboxDivId);
-  let icon = checkboxDiv.find('.checkbox-icon');
+  let checkboxDiv = document.querySelector(`#${checkboxDivId}`);
+  // let checkboxDiv = $('#' + checkboxDivId);
+  // let icon = checkboxDiv.find('.checkbox-icon');
 
-  // Verificar si el div tiene la clase 'DivCheckBoxTrue'
-  if (checkboxDiv.hasClass('DivCheckBoxTrue')) {
-    checkboxDiv.removeClass('DivCheckBoxTrue');
-    icon.text('☐'); // Cambiar a desmarcado
+  if (checkboxDiv.checked) {
+    // checkboxDiv.removeClass('DivCheckBoxTrue');
+    checkboxDiv.checked = false;
   } else {
-    checkboxDiv.addClass('DivCheckBoxTrue');
-    icon.text('✔'); // Cambiar a marcado
+    // checkboxDiv.addClass('DivCheckBoxTrue');
+    checkboxDiv.checked = true;
   }
 }
 
@@ -4373,7 +4415,9 @@ $(function () {
     GestionPedidos();
   });
 
-  $("#txtZonas, #FiltroOficinaVentas, #txtClasePedido").select2();
+  $("#txtZonas, #FiltroOficinaVentas, #txtClasePedido").select2({
+    theme: 'bootstrap-5'
+  });
 
   // VALIDO SI EXISTE NIT PARA LOS CLIENTES
   validarCargaClientes();
@@ -4631,7 +4675,7 @@ $(function () {
   Limpiar();
 
   // FILTROS DESCUENTOS, BONIFICADOS Y STOCK
-  $(".DivCheckBox").click(async function () {
+  $(".form-check-input").click(async function () {
     let id = $(this).attr('id');
 
     if ($(this).hasClass('DivCheckBoxTrue')) $(this).removeClass('DivCheckBoxTrue');
@@ -4640,9 +4684,10 @@ $(function () {
     id = $(this).attr("id");
     if (id == 'DvChkKits') BuscarProductos();
 
+    let valor = $('#txt_bproductos').val();
     let n = 0;
     let sto = 0;
-    // if (validarSiNumero(valor) == 1) n = 1;
+    if (validarSiNumero(valor) == 1) n = 1;
 
     if ($("#DvChkStock").hasClass('DivCheckBoxTrue')) sto = 1; // solo con stock
 
@@ -4769,7 +4814,6 @@ $(function () {
   // NUEVO PARA CARGA DE ARCHIVO PLANO 
   $("#filename").val(''); 
   $("#filename").change(function (e) {
-    debugger;
     const ext = $("input#filename").val().split(".").pop().toLowerCase();
 
     if ($.inArray(ext, ["csv"]) == -1) {
