@@ -21,29 +21,62 @@ function conectarBI() {
 }
 /* CONEXION HANNA. */
 
+// function conectarHanaSap() {
+
+//   try {
+//     $driver = "HDB"; // 32 bit odbc drivers that come with the hana client      installation.
+//     //PRODUCTIVO
+//     $servername = "181.49.157.131:32113";
+//     $db_name = "HDB"; // This is the default name of your hana instance. 
+//     $username = "SAPABAP1"; // This is the default username, do provide your username
+//     $password = "M4n4g3r16"; // This is the default password, do provide your own   password.
+//     //CALIDAD
+//     //$servername     = "190.145.65.251:32013";
+//     //$db_name        = "RED";      // This is the default name of your hana instance. 
+//     //$username       = "SAPABAP1"; // This is the default username, do provide your username
+//     //$password       = "M4n4g3r16"; // This is the default password, do provide your own   password.		
+//     $conn = odbc_connect( $driver, $username, $password, SQL_CUR_USE_ODBC );
+
+//     if ( !$conn ) {
+
+//       die( 'Error al intentar conectar a la base de datos de Hanna,' . odbc_errormsg() );
+//     }
+//     return $conn;
+//   } catch ( Exception $e ) {
+//     echo "Ha ocurrido un error: " . $e->getMessage();
+//   }
+// }
+
 function conectarHanaSap() {
+  // Datos de conexión
+  $driver    = "HDB";
+  $servername = "181.49.157.131:32113";
+  $db_name    = "HDB";
+  $username   = "SAPABAP1";
+  $password   = "M4n4g3r16";
 
   try {
-    $driver = "HDB"; // 32 bit odbc drivers that come with the hana client      installation.
-    //PRODUCTIVO
-    $servername = "181.49.157.131:32113";
-    $db_name = "HDB"; // This is the default name of your hana instance. 
-    $username = "SAPABAP1"; // This is the default username, do provide your username
-    $password = "M4n4g3r16"; // This is the default password, do provide your own   password.
-    //CALIDAD
-    //$servername     = "190.145.65.251:32013";
-    //$db_name        = "RED";      // This is the default name of your hana instance. 
-    //$username       = "SAPABAP1"; // This is the default username, do provide your username
-    //$password       = "M4n4g3r16"; // This is the default password, do provide your own   password.		
-    $conn = odbc_connect( $driver, $username, $password, SQL_CUR_USE_ODBC );
+    // Convertir warnings en excepciones
+    set_error_handler(function ($errno, $errstr) {
+      throw new Exception($errstr, $errno);
+    });
 
-    if ( !$conn ) {
+    // Intentar conexión ODBC
+    $conn = odbc_connect($driver, $username, $password, SQL_CUR_USE_ODBC);
 
-      die( 'Error al intentar conectar a la base de datos de Hanna,' . odbc_errormsg() );
+    // Restaurar manejador de errores
+    restore_error_handler();
+
+    // Si no hay conexión
+    if (!$conn) {
+      throw new Exception("No se pudo conectar a SAP HANA: " . odbc_errormsg());
     }
+
     return $conn;
-  } catch ( Exception $e ) {
-    echo "Ha ocurrido un error: " . $e->getMessage();
+  } catch (Exception $e) {
+    restore_error_handler(); // Asegura restauración
+    error_log("Error en conectarHanaSap: " . $e->getMessage());
+    return false; // Devolver false en lugar de romper la ejecución
   }
 }
 

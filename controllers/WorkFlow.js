@@ -157,8 +157,9 @@ const getInfoTablaGastos = async () => {
       "GENERAL": "#5C7285",
     }
     let table = `
-    <table class="table table-bordered">
-    <thead class="table-info">
+    <div class="tabla-estilo-wrapper">
+    <table class="tabla-estilo">
+    <thead class="sticky-top">
         <tr>
             <th>Cargo</th>
             <th>Concepto</th>
@@ -179,6 +180,7 @@ const getInfoTablaGastos = async () => {
     table += `
       </tbody>
     </table>
+    </div>
     `
     $('#containerTablaGastos').html(table);
     $('#modalTablaGastos').modal('show');
@@ -1609,8 +1611,9 @@ const getSolicitudes = async () => {
     else resp = resp.filter(elem => elem.USUARIO === usuario);
 
     let tabla = `
-      <table id="tablaSolicitudes" class="table table-sm table-bordered table-hover" style="width: 100%;">
-        <thead class="table-info">
+      <div class="tabla-estilo-wrapper">
+        <table class="tabla-estilo">
+        <thead class="sticky-top">
             <tr>
                 <th>N°</th>
                 <th>Oficina</th>

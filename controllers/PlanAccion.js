@@ -101,9 +101,9 @@ const getPlanesAccion = async () => {
             data = data.filter(item => item.USUARIO === usuario);
         }
 
-        let tabla = `
-             <table id="tablaDatos" class="table table-sm table-bordered table-hover" style="width: 100%;">
-                <thead class="table-info">
+        let tabla = `<div class="card tabla-estilo-wrapper" style="max-height: 70vh">
+             <table id="tablaDatos" class="tabla-estilo" style="width: 100%;">
+                <thead class="sticky-top">
                     <tr>
                         <th>Proceso</th>
                         <th>Período a cumplir</th>
@@ -131,7 +131,7 @@ const getPlanesAccion = async () => {
                         <td class="align-tds">${item.CAUSA_RAIZ.toUpperCase()}</td>
                         <td class="align-tds">${item.INDICADOR.toUpperCase()}</td>
                         <td class="text-center">
-                            <button class="btn btn-primary btn-sm btn-accion" data-item="${item.ID}">
+                            <button class="btn-outline-primary btn-sm btn-accion" data-item="${item.ID}">
                                 <i class="fa-solid fa-circle-plus 2xl"></i>
                             </button>
                         </td>
@@ -140,7 +140,7 @@ const getPlanesAccion = async () => {
 
             tabla += `
                 </tbody>
-            </table>`;
+            </table></div>`;
 
             $('#contenedorTablaPlanes').html(tabla);
             $('#tablaDatos').on('click', '.btn-accion', async function () {
@@ -150,9 +150,9 @@ const getPlanesAccion = async () => {
                 $('#modalPlanes').modal('show');
             });
         } else $('#contenedorTablaPlanes').html(`
-                <p style="text-align: center; font-size: x-large;">
+                <div class="alert alert-warning" style="text-align: center; role="alert">
                     No hay planes disponibles para las fechas seleccionadas
-                </p>`);
+                </div>`);
     } catch (error) {
         console.log(error);
     }
@@ -181,9 +181,9 @@ const getDetallePlanesAccion = async (id) => {
 
         const { data } = await enviarPeticion({ op: "G_DETALLES_PLANES_ACCION", link: "../models/PlanAccion.php", id });
 
-        let tabla = `
-             <table id="tablaDatosDetalle" class="table table-sm table-bordered table-hover" style="width: 100%;">
-                <thead class="table-info">
+        let tabla = `<div class="tabla-estilo-wrapper" style="max-height: 70vh">
+             <table id="tablaDatosDetalle" class="tabla-estilo" style="width: 100%;">
+                <thead class="sticky-top">
                     <tr>
                         <th>Acciones concretas</th>
                         <th>Fecha inicio</th>
@@ -243,7 +243,7 @@ const getDetallePlanesAccion = async (id) => {
 
             tabla += `
                 </tbody>
-            </table>`;
+            </table></div>`;
 
             $('#tablaDetallePlan').html(tabla);
 

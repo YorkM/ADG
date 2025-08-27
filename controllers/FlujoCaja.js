@@ -57,6 +57,10 @@ const getConceptos = async () => {
 }
 // FUNCIÓN PARA OBTENER LOS INGRESOS Y EGRESOS DE SAP
 const getMovimientosAutomaticos = async () => {
+   let hoy = new Date();
+   hoy.setDate(hoy.getDate() - 1);
+   let diaAnterior = hoy.toISOString().split('T')[0];
+   const DA = diaAnterior.split('-');
    let fecha = new Date();
    fecha = fecha.toISOString().split('T')[0];
    const FC = fecha.split('-');
@@ -77,7 +81,7 @@ const getMovimientosAutomaticos = async () => {
          const { data: saldosBancos } = await enviarPeticion({ 
             op: "G_SALDOS_BANCOS", 
             link: URL,
-            fechaSAP: `${anio}${mes}${dia}`,
+            fechaSAP: `${DA[0]}${DA[1]}${DA[2]}`,
             organizacion,
             anio,
          });

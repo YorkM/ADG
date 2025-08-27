@@ -15,15 +15,18 @@ switch ($_POST['op']) {
         $organizacion = $_POST['organizacion'];
         $fechaSAP = $_POST['fechaSAP'];
 
-        $cuentas = $organizacion === "2000" 
-        ? "'1110050200', '1110050300', '1110050600', '1110050800', '1110051100', '1110051300', '1120100400'"
-        : "'1110050100', '1110050500', '1110050700', '1110050900'";
 
+        $cuentasArray = $organizacion === "2000"
+            ? ['1110050200', '1110050300', '1110050600', '1110050800', '1110051100', '1110051300', '1120100400']
+            : ['1110050100', '1110050500', '1110050700', '1110050900'];
+
+        $cuentas = "'" . implode("','", $cuentasArray) . "'";
+        
         $query = "SELECT CASE BSCHL WHEN '40' THEN 'INGRESOS' ELSE 'EGRESOS' END AS tipo,   
         BSCHL AS clave, SUM(WRBTR) * 100 AS importe FROM BSEG 
         WHERE GJAHR = '$anio' AND BUKRS = '$organizacion' AND 
-        BSCHL IN ('40', '50') AND VALUT = '$fechaSAP' AND 
-        HKONT IN ($cuentas)
+        BSCHL IN('40', '50') AND VALUT = '20250810' AND 
+        HKONT IN($cuentas)
         GROUP BY BSCHL";
 
         $resultado = generarArrayHana($query, "");
@@ -203,7 +206,7 @@ switch ($_POST['op']) {
             ) AS PORCENTAJE_EGRESOS_SOBRE_INGRESOS
 
         FROM BASE
-        WHERE FECHA BETWEEN '2025-08-09' AND '2025-08-09'
+        -- WHERE FECHA BETWEEN '2025-08-09' AND '2025-08-09'
         GROUP BY FECHA
         ORDER BY FECHA";
 

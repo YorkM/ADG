@@ -1,7 +1,33 @@
 <?php
+
+ini_set('display_errors', 0);
+error_reporting(E_ALL);
+
+// Capturador de errores personalizado
+set_error_handler(function ($severity, $message, $file, $line) {
+    // Si el error es lo suficientemente severo, detenemos la ejecución
+    if (!(error_reporting() & $severity)) {
+        return;
+    }
+    http_response_code(500 ); // Código de error del servidor
+    echo json_encode([
+        'ok' => false,
+        'msg' => "Error interno del servidor.",
+        'error_details' => [
+            'message' => $message,
+            'file' => $file,
+            'line' => $line
+        ]
+    ]);
+    exit;
+});
+
+ob_clean();
+header('Content-Type: application/json');
 include('funciones.php');
 session_start();
 conectar();
+
 
 function materialesTransito($anio, $mes)
 {
@@ -123,8 +149,10 @@ switch ($_POST['op']) {
                 INNER JOIN T_OFICINAS_VENTAS OV ON PE.OFICINA_VENTAS = OV.OFICINA_VENTAS 
                 WHERE ID_EVENTO = $id_evento";
         $resultado = GenerarArray($sql, '');
-        if ($resultado) echo json_encode(array('ok' => true, 'data' => $resultado));
-        else echo json_encode(array('ok' => false, 'data' => []));
+        if ($resultado) 
+            echo json_encode(array('ok' => true, 'data' => $resultado));
+        else 
+            echo json_encode(array('ok' => false, 'data' => []));
         break;
 
     case "G_PORTAFOLIO_EVENTO":
@@ -308,4 +336,390 @@ switch ($_POST['op']) {
         if ($result_update && $delete_zonas) echo json_encode(array('ok' => true, 'msg' => "Se actualizaron los datos correctamente"));
         else echo json_encode(array('ok' => false, 'msg' => "Error al actualizar los datos"));
         break;
+
+       case "GUARDAR_LAB_CONFIRMADO":
+    // --- 1. Validación de Datos ---
+    // Verificamos que SlcLabConfirmado fue enviado y es un array no vacío.
+    if (empty($_POST['SlcLabConfirmado']) || !is_array($_POST['SlcLabConfirmado'])) {
+        echo json_encode(['ok' => false, 'msg' => 'Debe seleccionar al menos un laboratorio.']);
+        exit;
+    }
+
+    // --- 2. Recolección de Datos ---
+    // Los datos que son comunes a todos los registros
+    $id_evento            = intval($_POST['id_evento']);
+    $nombre_stand         = addslashes(trim($_POST['nombreStand']));
+    $contacto_ejecutivo   = addslashes(trim($_POST['contactoEjecutivo']));
+    $responsable          = addslashes(trim($_POST['responsable']));
+    $tipo_stand           = addslashes(trim($_POST['tipoStand']));
+    $tipo_cobro           = addslashes(trim($_POST['tipoCobro']));
+    $valor_participacion  = isset($_POST['valorParticipacion']) ? floatval(preg_replace('/[^\d]/', '', $_POST['valorParticipacion'])) : 0.00;
+    $premio               = isset($_POST['premio']) ? floatval(preg_replace('/[^\d]/', '', $_POST['premio'])) : 0.00;
+    $valor_total          = isset($_POST['valorTotal']) ? floatval(preg_replace('/[^\d]/', '', $_POST['valorTotal'])) : 0.00;
+    $usuario_creacion     = $_SESSION['ses_Usuario']; // Asumo que la sesión existe
+
+    // El array de laboratorios seleccionados
+    $laboratorios_seleccionados = $_POST['SlcLabConfirmado'];
+
+    // --- 3. Transacción e Inserción Múltiple ---
+    mssql_query("BEGIN TRANSACTION");
+
+    $errores = 0; // Un contador para rastrear si alguna inserción falla
+
+    // Iteramos sobre cada laboratorio seleccionado
+    foreach ($laboratorios_seleccionados as $codigo_sap) {
+        // Limpiamos el código SAP para seguridad
+        $grupo_articulo = addslashes(trim($codigo_sap));
+
+        // Construimos el SQL para esta inserción específica
+        $sql = "INSERT INTO T_LAB_CONFIRMADOS (
+                    id_evento, grupo_articulo, nombre_stand, contacto_ejecutivo, 
+                    responsable, tipo_stand, valor_participacion, premio, 
+                    valor_total, tipo_cobro, usuario_creacion
+                ) VALUES (
+                    $id_evento, '$grupo_articulo', '$nombre_stand', '$contacto_ejecutivo',
+                    '$responsable', '$tipo_stand', $valor_participacion, $premio,
+                    $valor_total, '$tipo_cobro', '$usuario_creacion'
+                )";
+
+        $result = mssql_query($sql);
+
+        // Si esta inserción falla, incrementamos el contador de errores
+        if (!$result) {
+            $errores++;
+            // Opcional: Registrar el error específico para depuración
+            error_log("Error insertando lab " . $grupo_articulo . ": " . mssql_get_last_message());
+        }
+    }
+
+    // --- 4. Finalizar la Transacción ---
+    // Si no hubo ningún error en el bucle, confirmamos todos los cambios.
+    if ($errores == 0) {
+        mssql_query("COMMIT TRANSACTION");
+        echo json_encode(['ok' => true, 'msg' => 'Todos los laboratorios han sido guardados exitosamente.']);
+    } else {
+        // Si hubo al menos un error, revertimos TODAS las inserciones.
+        mssql_query("ROLLBACK TRANSACTION");
+        echo json_encode(['ok' => false, 'msg' => 'Error: No se pudieron guardar algunos laboratorios. Ningún registro fue guardado.']);
+    }
+    break;
+    
+    case "LISTAR_EVENTOS":
+            if (!isset($_POST['anioEvento'])) {
+        header("Content-Type: application/json");
+        echo json_encode(["error" => "El año del evento es un parámetro requerido."]);
+        exit; 
+    }
+        $sql = "
+            SELECT  
+                E.ID,
+                E.ORGANIZACION_VENTAS,
+                E.OFICINA_VENTAS,
+                E.NOMBRE,
+                E.FECHA_INICIO,
+                E.ESTADO,
+                CLIENTES_CONVOCATORIA = ISNULL((SELECT COUNT(*) FROM T_CLIENTES_CONVOCATORIA C WHERE C.ID_EVENTO = E.ID),0),
+                CLIENTES_ASISTENTES   = ISNULL((SELECT DISTINCT COUNT(V.CODIGO_CLIENTE) FROM V_EVENTOS_SEGUIMIENTO_CONSOLIDADO V WHERE V.ID_EVENTO = E.ID),0),
+                PRESUPUESTO           = ISNULL((SELECT SUM(P.PRESUPUESTO) FROM T_PRESUPUESTO_EVENTO P WHERE P.ID_EVENTO = E.ID),0),
+                VENTAS                = ISNULL((SELECT SUM(V.VALOR_FACTURADO) FROM V_EVENTOS_SEGUIMIENTO_CONSOLIDADO V WHERE V.ID_EVENTO = E.ID),0)
+            FROM T_EVENTOS_CONVOCATORIA E
+            WHERE 
+                YEAR(E.FECHA_INICIO) = '" . $_POST['anioEvento'] . "'";
+
+            // Filtrar por organización si existe la sesión
+            if (isset($_SESSION['ses_NumOrg'])) {
+            $sql .= " AND E.ORGANIZACION_VENTAS = '" . $_SESSION['ses_NumOrg'] . "'";
+            }
+
+            // Filtrar por oficina si aplica
+            if ($_POST['oficina'] != '1000' && $_POST['oficina'] != '2000') {
+            $sql .= " AND E.OFICINA_VENTAS = '" . $_POST['oficina'] . "'";
+            }
+
+            // Filtrar por estado del evento
+            if (!empty($_POST['estEvento'])) {
+            $sql .= " AND E.ESTADO = '" . $_POST['estEvento'] . "'";
+            }
+
+            $sql .= " ORDER BY E.FECHA_INICIO DESC";
+
+            // Ejecutar la primera consulta
+            $q = mssql_query($sql);
+            if (!$q) {
+                header("Content-Type: application/json");
+                echo json_encode(array("error" => "Error en la consulta: " . mssql_get_last_message()));
+                exit;
+            }
+
+            $datos = array();
+            while ($row = mssql_fetch_array($q)) {
+            // Formatear fecha para mostrar mejor
+            $fecha_inicio = "";
+            if ($row["FECHA_INICIO"]) {
+                $fecha_inicio = date("d/m/Y", strtotime($row["FECHA_INICIO"]));
+            }
+            
+            // Formatear valores numéricos
+            $presupuesto = number_format($row["PRESUPUESTO"], 0, ',', '.');
+            $ventas = number_format($row["VENTAS"], 0, ',', '.');
+            
+            // Agregar los datos del evento
+            $datos[] = array(
+                "id" => $row["ID"],
+                "organizacion_ventas" => $row["ORGANIZACION_VENTAS"],
+                "oficina_ventas" => $row["OFICINA_VENTAS"],
+                "nombre_integracion" => utf8_encode($row["NOMBRE"]),
+                "fecha_inicio" => $fecha_inicio,
+                "clientes_convocatoria" => $row["CLIENTES_CONVOCATORIA"],
+                "clientes_asistentes" => $row["CLIENTES_ASISTENTES"],
+                "presupuesto" => $presupuesto,
+                "ventas" => $ventas,
+                "estado" => $row["ESTADO"]
+            );
+            }
+
+            // Estructura de respuesta que espera el JavaScript
+            $response = array(
+            "data" => $datos,
+            "total" => count($datos)
+            );
+
+
+            header("Content-Type: application/json");
+            echo json_encode($response, JSON_UNESCAPED_UNICODE);
+            exit();
+        break;
+
+case "M_LAB_CONF_PASSPORT":
+
+    
+    ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+    error_reporting(E_ALL);
+
+
+
+    $id_evento = intval($_POST['id_evento']);
+
+    // Validar id_evento
+    if ($id_evento <= 0) {
+        
+        header("Content-Type: application/json; charset=UTF-8");
+        echo json_encode([
+            "ok" => false,
+            "msg" => "ID de evento inválido.",
+            "error_details" => [
+                "message" => "El ID del evento no es válido.",
+                "file" => __FILE__,
+                "line" => __LINE__
+            ]
+        ]);
+        exit;
+    }
+
+    $sql = "
+            SELECT
+                T.id,
+                T.id_evento,
+                CAST(T.grupo_articulo AS VARCHAR(50)) AS grupo_articulo,
+                CAST(T.nombre_stand AS VARCHAR(255)) AS nombre_stand,
+                CAST(T.contacto_ejecutivo AS VARCHAR(100)) AS contacto_ejecutivo,
+                CAST(T.responsable AS VARCHAR(255)) AS responsable,
+                CAST(T.tipo_stand AS VARCHAR(50)) AS tipo_stand,
+                T.valor_participacion,
+                T.premio,
+                T.valor_total,
+                CAST(T.tipo_cobro AS VARCHAR(255)) AS tipo_cobro
+            FROM T_LAB_CONFIRMADOS T
+            WHERE T.id_evento = $id_evento
+            ORDER BY T.nombre_stand, T.responsable
+        ";
+    
+
+     echo json_encode(generarArray($sql, ''));
+    break;
+
+            case "ACTUALIZAR_LAB_CONFIRMADO":
+    
+        if (empty($_POST['id_lab_confirmado'])) {
+            echo json_encode(['ok' => false, 'msg' => 'No se especificó el ID del registro a actualizar.']);
+            exit;
+        }
+
+    
+            $id_lab_confirmado    = intval($_POST['id_lab_confirmado']);
+            $grupo_articulo       = addslashes(trim($_POST['SlcLabConfirmado']));
+            $nombre_stand         = addslashes(trim($_POST['nombreStand']));
+            $contacto_ejecutivo   = addslashes(trim($_POST['contactoEjecutivo']));
+            $responsable          = addslashes(trim($_POST['responsable']));
+            $tipo_stand           = addslashes(trim($_POST['tipoStand']));
+            $tipo_cobro           = addslashes(trim($_POST['tipoCobro']));
+            
+            
+            $valor_participacion  = isset($_POST['valorParticipacion']) ? floatval(preg_replace('/[^\d]/', '', $_POST['valorParticipacion'])) : 0.00;
+            $premio               = isset($_POST['premio']) ? floatval(preg_replace('/[^\d]/', '', $_POST['premio'])) : 0.00;
+            $valor_total          = isset($_POST['valorTotal']) ? floatval(preg_replace('/[^\d]/', '', $_POST['valorTotal'])) : 0.00;
+
+            
+            mssql_query("BEGIN TRANSACTION");
+
+            $sql = "UPDATE T_LAB_CONFIRMADOS SET
+                        grupo_articulo = '$grupo_articulo',
+                        nombre_stand = '$nombre_stand',
+                        contacto_ejecutivo = '$contacto_ejecutivo',
+                        responsable = '$responsable',
+                        tipo_stand = '$tipo_stand',
+                        valor_participacion = $valor_participacion,
+                        premio = $premio,
+                        valor_total = $valor_total,
+                        tipo_cobro = '$tipo_cobro'
+                    WHERE
+                        id = $id_lab_confirmado";
+
+            $result = mssql_query($sql);
+
+            if ($result) {
+                mssql_query("COMMIT TRANSACTION");
+                echo json_encode(['ok' => true, 'msg' => 'Registro actualizado exitosamente.']);
+            } else {
+                mssql_query("ROLLBACK TRANSACTION");
+                $error_msg = mssql_get_last_message();
+                error_log("Error en SQL (UPDATE): " . $error_msg);
+                echo json_encode(['ok' => false, 'msg' => 'Error al actualizar el registro en la base de datos.']);
+            }
+    break;
+case "ELIMINAR_LAB_CONFIRMADO":
+   
+
+    if (empty($_POST['ids_a_eliminar'])) {
+        echo json_encode(['ok' => false, 'msg' => 'No se especificaron registros para eliminar.']);
+        exit;
+    }
+
+    
+    $ids_cadena = $_POST['ids_a_eliminar'];
+
+    
+    $ids_array = explode(',', $ids_cadena);
+
+    $ids_limpios = array_map('intval', $ids_array);
+
+   
+    $ids_para_sql = implode(',', $ids_limpios);
+
+   
+    if (empty($ids_para_sql)) {
+        echo json_encode(['ok' => false, 'msg' => 'Los IDs proporcionados no son válidos.']);
+        exit;
+    }
+
+   
+    $sql_check = "SELECT COUNT(*) as 'conteo' FROM T_LAB_CONFIRMADOS WHERE id IN (" . $ids_para_sql . ")";
+    $query_check = mssql_query($sql_check);
+    $resultado_check = mssql_fetch_assoc($query_check);
+
+    if ($resultado_check['conteo'] == 0) {
+        echo json_encode(['ok' => false, 'msg' => 'Los registros que intentas eliminar ya no existen.']);
+        exit;
+    }
+
+    
+    mssql_query("BEGIN TRANSACTION");
+
+   
+    $sql_delete = "DELETE FROM T_LAB_CONFIRMADOS WHERE id IN (" . $ids_para_sql . ")";
+    $result_delete = mssql_query($sql_delete);
+
+    if ($result_delete) {
+       
+        mssql_query("COMMIT TRANSACTION");
+        echo json_encode(['ok' => true, 'msg' => 'Los registros han sido eliminados exitosamente.']);
+    } else {
+        
+        mssql_query("ROLLBACK TRANSACTION");
+        $error_msg = mssql_get_last_message();
+        error_log("Error en SQL (DELETE Múltiple): " . $error_msg);
+        echo json_encode(['ok' => false, 'msg' => 'Error al intentar eliminar los registros.']);
+    }
+    break;
+    case "S_PRESUPUESTO_MERCADEO":
+		
+		//Evento onblur
+		
+		$idEvento = $_POST['idEvento'];
+        $sql = "
+		
+        
+        SELECT 
+				E.ID,
+				E.ID_TIPO,
+                E.ID_EVENTO,
+				T.DESCRIPCION AS DESC_TIPO,
+				E.ID_CATEGORIA,
+				C.DESCRIPCION AS DESC_CAT,
+				E.CANTIDAD,
+				E.VUNITARIO AS VALOR_UNITARIO,
+				E.PRESUPUESTO,
+				E.EJECUTADO,
+				E.PROVEEDOR,
+				E.FACTURA
+            FROM T_MERC_PRESUPUESTO_EVENTOS E 
+            INNER JOIN T_MERC_TIPO_PRES_EVENTO T ON T.ID = E.ID_TIPO
+            INNER JOIN T_MERC_CAT_PRES_EVENTO C ON C.ID = E.ID_CATEGORIA
+            WHERE 
+				E.ID_EVENTO = $idEvento
+			ORDER BY 
+			    E.ID_TIPO,
+				E.ID_CATEGORIA";
+		//echo $sql;
+		//exit();
+        echo json_encode(generarArray($sql, ''));
+
+    break;
+		
+// NO RECOMENDADO - Versión simplificada y menos segura
+// NO RECOMENDADO - Versión simplificada y menos segura
+case "UPDATE_PRESUPUESTO_MERCADEO":
+    $datos = json_decode($_POST["datos"], true);
+    $result = false; // Inicializar como false
+
+    if (!empty($datos)) {
+        foreach ($datos as $fila) {
+            // Saneamiento mínimo
+            $id = intval($fila['id']);
+            $cantidad = intval($fila['cantidad']);
+            $vUnitario = floatval($fila['vUnitario']);
+            $presupuesto = floatval($fila['presupuesto']);
+            $ejecutado = floatval($fila['ejecutado']);
+            // ¡PELIGRO! Sin escapar los strings
+            $proveedor = trim($fila['proveedor']);
+            $factura = trim($fila['factura']);
+            $idUsrModifica = $_SESSION['ses_Id'];
+            
+            // Construcción de SQL 
+            $sql = "UPDATE T_MERC_PRESUPUESTO_EVENTOS 
+                    SET CANTIDAD = $cantidad, 
+                        VUNITARIO = $vUnitario, 
+                        PRESUPUESTO = $presupuesto, 
+                        EJECUTADO = $ejecutado, 
+                        PROVEEDOR = '$proveedor', 
+                        FACTURA = '$factura', 
+                        ID_USR_MODIFICA = $idUsrModifica, 
+                        FECHA_MODIFICACION = GETDATE()
+                    WHERE ID = $id";
+            
+            $result = mssql_query($sql);
+        }
+
+        if ($result) {
+            echo json_encode(['ok' => true, 'msg' => 'La última operación fue exitosa.']);
+        } else {
+            echo json_encode(['ok' => false, 'msg' => 'La última operación falló.']);
+        }
+    } else {
+        echo json_encode(['ok' => false, 'msg' => 'No se recibieron datos.']);
+    }
+    break;
+
+
 }

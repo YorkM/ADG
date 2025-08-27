@@ -350,8 +350,9 @@ const getReporteVisitasZonas = async () => {
     $('#contenedorTablaVisitasZona').html(``);
 
     let tabla = `
-			<table class="table tabla-fija" id="tablaVisitasZona" style="width: 100%; margin-bottom: 0;">
-              <thead>
+    <div class="card tabla-estilo-wrapper" style="max-height: 70vh">
+			<table class="tabla-estilo" id="tablaVisitasZona" style="width: 100%; margin-bottom: 0;">
+              <thead class="sticky-top">
                 <tr>
                   <th class="custom-nowrap-2">N°</th>
                   <th class="custom-nowrap-2">Zona</th>
@@ -373,24 +374,24 @@ const getReporteVisitasZonas = async () => {
       resp.data.forEach((item, index) => {
         tabla += `
 				        <tr>
-                  <td class="custom-border">${index + 1}</td>
-                  <td class="custom-border">${item.zona_ventas}</td>
-                  <td class="custom-border custom-nowrap-2" style="font-size: 11px;">${item.zona_descripcion}</td>
-                  <td class="custom-border text-center">${item.programada}</td>
-                  <td class="custom-border text-center">${item.visitados}</td>
-                  <td class="custom-border text-center">${item.contactados}</td>
-                  <td class="custom-border custom-nowrap-2">${(item.fecha_ini_gestion) ? formatDate(item.fecha_ini_gestion) : ''}</td>
-                  <td class="custom-border custom-nowrap-2">${(item.fecha_fin_gestion) ? formatDate(item.fecha_fin_gestion) : ''}</td>
-                  <td class="custom-border text-center">${item.cantidad_pedidos}</td>
-                  <td class="custom-border text-center">${formatNum(item.valor_pedidos, "$")}</td>
-                  <td class="custom-border text-center">${formatNum(item.valor_facturado, "$")}</td>
-                  <td class="custom-border text-center">${formatNum(item.valor_pedidos_adicionales, "$")}</td>
+                  <td class="">${index + 1}</td>
+                  <td class="">${item.zona_ventas}</td>
+                  <td class=" custom-nowrap-2" style="font-size: 11px;">${item.zona_descripcion}</td>
+                  <td class=" text-center">${item.programada}</td>
+                  <td class=" text-center">${item.visitados}</td>
+                  <td class=" text-center">${item.contactados}</td>
+                  <td class=" custom-nowrap-2">${(item.fecha_ini_gestion) ? formatDate(item.fecha_ini_gestion) : ''}</td>
+                  <td class=" custom-nowrap-2">${(item.fecha_fin_gestion) ? formatDate(item.fecha_fin_gestion) : ''}</td>
+                  <td class=" text-center">${item.cantidad_pedidos}</td>
+                  <td class=" text-center">${formatNum(item.valor_pedidos, "$")}</td>
+                  <td class=" text-center">${formatNum(item.valor_facturado, "$")}</td>
+                  <td class=" text-center">${formatNum(item.valor_pedidos_adicionales, "$")}</td>
                 </tr>`;
       });
 
       tabla += `
 				      </tbody>
-            </table>`;
+            </table></div>`;
 
       $('#contenedorTablaVisitasZona').html(tabla);
     }
@@ -831,8 +832,9 @@ function Consultar() {
         $("#v_hora_inicio").text(hora_inicio[0]);
         $("#v_hora_final").text(hora_fin[0]);
 
-        var tabla = '<table class="table" align="center" width="100%" id="datos_visitas">'
-          + '<thead>'
+        var tabla = '<div class="card tabla-estilo-wrapper" style="max-height: 70vh">'
+          +'<table class="tabla-estilo" width="100%" id="datos_visitas">'
+          + '<thead class="sticky-top">'
           + '<tr>'
           + '<th class="custom-nowrap">VENDEDOR</th>'
           + '<th class="custom-nowrap">CLIENTE</th>'
@@ -855,7 +857,7 @@ function Consultar() {
           + '<th class="custom-nowrap">PEDIDO</th>'
           + '<th class="custom-nowrap">PEDIDO FACTURADO</th>'
           + '</tr>'
-          + '</thead>'
+          + '</thead></div>'
           + '<tbody>';
         var rv = '';
         var rc = '';
@@ -944,7 +946,7 @@ function Consultar() {
               break;
             case 'V':
               {
-                es = '<button type="button" class="btn btn-info btn-xs" aria-label="Left Align">'
+                es = '<button type="button" class="btn btn-outline-info btn-xs" aria-label="Left Align">'
                 + '<span class="fa fa-check-circle" aria-hidden="true"></span>'
                 + '</button>';
                 if (data[i].TIPO_PROGRAMACION != 'S') {
@@ -967,7 +969,7 @@ function Consultar() {
               break;
             case 'C':
               {
-                es = '<button type="button" class="btn btn-success btn-xs" aria-label="Left Align">'
+                es = '<button type="button" class="btn btn-outline-success btn-xs" aria-label="Left Align">'
                 + '<span class="fa fa-check-circle aria-hidden="true"></span>'
                 + '</button>';
                 if (data[i].TIPO_PROGRAMACION != 'S') {
@@ -1343,8 +1345,8 @@ function Consultar() {
 
         $("#Result2").html(tb);
       } else {
-        $("#Result2").html('<div class="alert alert-danger" role="alert">'
-          + '<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>'
+        $("#Result2").html('<div class="alert alert-danger m-3" role="alert">'
+          + '<span class="glyphicon glyphicon-exclamation-sign " aria-hidden="true"></span>'
           + '<span class="sr-only">Error:</span>  NO EXISTEN RESULTADOS'
           + '</div>');
       }
@@ -2026,8 +2028,8 @@ function Georeferencia(ob, id_sol_geo, direccion) {
     + '<span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span>'
     + '</button>';
   if (tipoG == 'V') {
-    status = '<button type="button" class="btn btn-info btn-sm" aria-label="Left Align">'
-      + '<span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span>'
+    status = '<button type="button" class="btn btn-outline-info btn-sm" aria-label="Left Align">'
+      + '<i class="fa-solid fa-thumbs-up"></i>'
       + '</button>';
     km = 'NA';
   } else {
@@ -2035,7 +2037,7 @@ function Georeferencia(ob, id_sol_geo, direccion) {
       km = getKilometros(lat0, lng0, lat1, lng1);
       if (parseFloat(km) <= 1) {
         status = '<button type="button" class="btn btn-success btn-sm" aria-label="Left Align">'
-          + '<span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span>'
+          + '<i class="fa-solid fa-thumbs-up"></i>'
           + '</button>';
       }
     } else {

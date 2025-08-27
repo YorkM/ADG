@@ -10,14 +10,15 @@
     <link rel="shortcut icon" href="">
     <meta charset="utf-8">
     <title>WorkFlow</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <!-- <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DynaPuff:wght@500&display=swap" rel="stylesheet">
     <link href="../resources/fontawesome-free-6.1.2-web/css/fontawesome.min.css" rel="stylesheet" />
     <link href="../resources/fontawesome-free-6.1.2-web/css/v5-font-face.min.css" rel="stylesheet" />
     <link href="../resources/fontawesome-free-6.1.2-web/css/regular.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="../resources/select2-bootstrap4-theme/select2-bootstrap4.css">
-    <link type="text/css" rel="stylesheet" href="../resources/bootstrap/bootstrap-5.0.2-dist/css/bootstrap.min.css">
+    
     <link type="text/css" rel="stylesheet" href="../resources/plugins/jquery-ui/jquery-ui.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <link title="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css" />
@@ -27,11 +28,118 @@
     <link href="../resources/niceadmin/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
     <link href="../resources/niceadmin/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
     <link rel="stylesheet" href="../resources/select2/css/select2.css">
-    <link rel="stylesheet" href="../resources/datatable/datatables.min.css">
+    <link rel="stylesheet" href="../resources/datatable/datatables.min.css"> -->
+    
+<link type="text/css" rel="stylesheet" href="../resources/bootstrap/bootstrap-5.0.2-dist/css/bootstrap.min.css">
+    <!-- Iconos -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
+        <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="../resources/css/formulario.css">
+    <link rel="stylesheet" href="../resources/css/botones.css">
+    <link rel="stylesheet" href="../resources/css/calendario.css">
+    <link rel="stylesheet" href="../resources/css/tablas.css">
+    <link rel="stylesheet" href="../resources/css/tabs.css">
+    <link rel="stylesheet" href="../resources/css/alerts.css">
+    <link rel="stylesheet" href="../resources/css/Animate.css">
+    <link rel="stylesheet" href="../resources/css/imgPreloder.css">
+
     <style>
-        html,
-        * {
-            font-size: .9rem;
+        
+/* ===================== */
+/*   ESTILO DE MODALES   */
+/* ===================== */
+
+/* Contenido del modal */
+.modal-content {
+  border-radius: 1rem;
+  border: none;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  animation: modalFadeIn 0.4s ease-out;
+  background-color: #ffffff;
+}
+
+/* Encabezado */
+.modal-header {
+  background: linear-gradient(135deg, #17a2b8, #138496);
+  color: #fff;
+  border-bottom: none;
+  padding: 1rem 1.25rem;
+  border-radius: 1rem 1rem 0 0;
+}
+.modal-header .btn-close {
+  filter: brightness(0) invert(1);
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+.modal-header .btn-close:hover {
+  opacity: 1;
+}
+
+/* Cuerpo */
+.modal-body {
+  padding: 0px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #444;
+  background-color: #fdfdfd;
+}
+
+/* Pie de página */
+        .modal-footer {
+        border-top: none;
+        padding: 0.75rem 1.25rem;
+        background-color: #f8f9fa;
+        border-radius: 0 0 1rem 1rem;
+        }
+
+        /* Botones */
+        .modal-footer .btn {
+        border-radius: 20px;
+        transition: all 0.3s ease;
+        }
+        .modal-footer .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Animación de entrada */
+        @keyframes modalFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-15px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        }
+
+        /* Animación del fondo */
+        .modal.fade .modal-dialog {
+        transform: scale(0.95);
+        transition: transform 0.3s ease-out;
+        }
+        .modal.show .modal-dialog {
+        transform: scale(1);
+        }
+
+        /* Backdrop */
+        .modal-backdrop {
+        background-color: rgba(0, 0, 0, 0.5);
+        animation: backdropFadeIn 0.3s ease-out;
+        }
+        @keyframes backdropFadeIn {
+        from { opacity: 0; }
+        to { opacity: 0.5; }
+        }
+
+        /* Inputs dentro del modal */
+        .modal-content .input-group-text {
+        background: #e9ecef;
+        color: #495057;
+        border-radius: 0.5rem 0 0 0.5rem;
         }
 
         #tablaSolicitudes tbody tr td {
@@ -46,14 +154,6 @@
             color: #055160;
         }
 
-        th,
-        td {
-            padding: 0;
-            line-height: 2;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
 
         .timeline-container {
             width: 80%;
@@ -157,6 +257,16 @@
             padding: 10px;
             margin: 10px auto;
         }
+
+    .btn-warning {
+        border-color: #ffc107;
+        color: #8b6a05ff;
+    }
+
+    .btn-warning:hover {
+    background-color: #ffc107;
+    color: #ffffff;
+}
     </style>
 </head>
 
@@ -164,259 +274,263 @@
     <input type="hidden" id="rol" value="<?php echo !empty($_SESSION["ses_RolesId"]) ? $_SESSION["ses_RolesId"] : ''; ?>" disabled>
     <input type="hidden" id="UsrId" value="<?php echo !empty($_SESSION["ses_Id"]) ? $_SESSION["ses_Id"] : ''; ?>" disabled>
     <input type="hidden" id="oficina" value="<?php echo !empty($_SESSION["ses_OfcVentas"]) ? $_SESSION["ses_OfcVentas"] : ''; ?>" disabled>   
+
+<div class="container my-4">
     <!-- CONTENIDO PRINCIPAL -->
-    <div id="main-content">
-        <div class="alert alert-info mb-2" style="font-weight: 500;"><i class="fa-solid fa-star fa-flip"></i>&nbsp;0417 - WORKFLOW</div>
-        <div class="row shadow-sm py-2 w-90 mx-auto mb-3 mt-2" id=barraFiltros>
-            <div class="mb-1 col-md-3">
-                <select class="form-select" id="filtroOficina">
-
-                </select>
+    <div id="main-content" class="mt-3">
+        <!-- alert -->
+            <div class="alert alert-info mb-4 ">
+                <i class="fa-solid fa-star fa-flip"></i> 0417 - WORK FLOW
             </div>
-            <div class="mb-1 col-md-2">
-                <select class="form-select" id="filtroDepartamentos">
+            <div class="card my-3">
+                <div class="card-header">
+                    <h5></h5>
+                </div>
 
-                </select>
-            </div>
-            <div class="mb-1 col-md-2">
-                <div class="input-group">
-                    <span style="border: 1px solid #ccc; border-radius: 3px 0 0 3px; display: flex; align-items: center; gap: 8px; padding: 0 5px;">
-                        <i class="fa-solid fa-calendar-days"></i>Desde
-                    </span>
+                <!-- Filtros superiores -->
+                <div class="row py-3 rounded bg-white w-100 mx-auto mb-3 mt-2" id="barraFiltros">
+                <div class="col-lg-3 col-md-4 col-12 mb-2">
+                    <label for="filtroOficina" class="form-label">Oficina</label>
+                    <select class="form-select form-select-sm" id="filtroOficina"></select>
+                </div>
+
+                <div class="col-lg-2 col-md-4 col-12 mb-2">
+                    <label for="filtroDepartamentos" class="form-label">Departamento</label>
+                    <select class="form-select form-select-sm" id="filtroDepartamentos"></select>
+                </div>
+
+                <div class="col-lg-2 col-md-4 col-12 mb-2">
+                    <label class="form-label">Desde</label>
+                    <div class="input-group input-group-sm">
+                    <span class="input-group-text"><i class="fa-solid fa-calendar-days"></i></span>
                     <input type="text" id="fechaDesde" class="form-control" readonly>
+                    </div>
                 </div>
-            </div>
-            <div class="mb-1 col-md-2">
-                <div class="input-group">
-                    <span style="border: 1px solid #ccc; border-radius: 3px 0 0 3px; display: flex; align-items: center; gap: 8px; padding: 0 5px;">
-                        <i class="fa-solid fa-calendar-days"></i>Hasta
-                    </span>
+
+                <div class="col-lg-2 col-md-4 col-12 mb-2">
+                    <label class="form-label">Hasta</label>
+                    <div class="input-group input-group-sm">
+                    <span class="input-group-text"><i class="fa-solid fa-calendar-days"></i></span>
                     <input type="text" id="fechaHasta" class="form-control" readonly>
-                </div>
-            </div>
-            <div class="mb-1 col-md-3">        
-                <div class="row">
-                    <div class="mb-1 col-md-6">
-                        <button class="btn btn-primary w-100" id="btnModalAddSolic">Agregar</button>
-                    </div>
-                    <div class="mb-1 col-md-6">
-                        <button class="btn btn-warning w-100" id="btnRefrescar">Refrescar</button>
                     </div>
                 </div>
+
+                <!-- Botones en una fila independiente en pantallas grandes -->
+                <div class="col-lg-3 col-md-12 col-12 mb-2 d-flex gap-2">
+                    <button class="btn btn-primary btn-sm flex-fill" id="btnModalAddSolic">
+                    <i class="fa fa-plus-circle"></i> Agregar
+                    </button>
+                    <button class="btn btn-warning btn-sm flex-fill" id="btnRefrescar">
+                    <i class="fa fa-refresh"></i> Refrescar
+                    </button>
+                </div>
+                </div>
+
+                <!-- Barra inferior -->
+                <div class="row align-items-center px-3 mb-3">
+                <div class="col-lg-3 col-md-4 col-12 mb-2">
+                    <button class="btn btn-success btn-sm w-100" id="btnExportar">
+                    <i class="fa fa-file-excel"></i> Exportar a Excel
+                    </button>
+                </div>
+                <div class="col-lg-3 col-md-4 col-12 mb-2 text-center">
+                    <label class="form-label m-0">Solicitudes:</label>
+                    <p style="font-size: 18px; color: #007bff; font-weight: bold;" id="cantSolicitudes">0</p>
+                </div>
+                <div class="col-lg-6 col-md-4 col-12 mb-2">
+                    <input type="text" class="form-control form-control-sm" placeholder="Filtrar solicitudes..." id="filtroSolicitudes">
+                </div>
+                </div>
             </div>
-        </div>
-        <div class="row align-items-center px-2 mb-3">
-            <div class="col-md-3">
-                <button class="btn btn-success w-100" id="btnExportar">Exportar a Excel</button>
-            </div>
-            <div class="col-md-3">
-                <p style="margin: 0; font-size: 20px; text-align: center;">Solicitudes: <span style="font-size: 20px; color: #007bff; font-weight: bold;" id="cantSolicitudes"></span></p>
-            </div>
-            <div class="col-md-6">
-                <input type="text" class="form-control" placeholder="Filtrar solicitudes..." id="filtroSolicitudes">
-            </div>
-        </div>
-        <div style="overflow: auto;" id="contenedorTablaSolicitudes">               
-           
-        </div>
-    </div> 
+
+            <!-- Tabla de solicitudes -->
+            <div id="contenedorTablaSolicitudes" style="overflow-x: auto;"></div>
+    </div>
+
     <!-- MODAL CREAR SOLICITUD -->
-    <div class="modal fade" id="modalAgregarSolicitud" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog" style="min-width: 70%;">
-            <div class="modal-content" style="background-color: whitesmoke;">
-                <div class="modal-header">
-                    <h3 class="modal-title text-primary" id="exampleModalLabel">Crear solicitud</h3>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal fade" id="modalAgregarSolicitud" tabindex="-1" aria-labelledby="modalAgregarSolicitudLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content bg-light shadow-sm">
+        <div class="modal-header">
+            <h5 id="modalAgregarSolicitudLabel">
+            <i class="fa-solid fa-plus-circle"></i> Crear solicitud
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body p-3">
+            <form id="formCrearSolicitud" class="needs-validation" novalidate>
+            <!-- Campos Ocultos -->
+            <div class="row g-3 d-none">
+                <div class="col-md-3">
+                <label for="organizacion" class="form-label">Organización ventas</label>
+                <select class="form-select" id="organizacion" name="ORGANIZACION_VENTAS" disabled>
+                    <option value="">--Seleccione--</option>
+                    <option value="2000">ROMA</option>
+                    <option value="1000">MULTIDROGRAS</option>
+                </select>
                 </div>
-                <div class="modal-body">
-                    <!-- FORMULARIO -->
-                    <form id="formCrearSolicitud" class="needs-validation" novalidate>
-                        <!-- CAMPOS OCULTOS IMPORTANTE -->
-                        <div class="row py-2 w-90 mx-auto">
-                            <div class="col">
-                                <div class="form-group d-none">
-                                    <label for="organizacion">Organización ventas<span class="text-danger h5">*</span></label>
-                                    <select class="form-control" id="organizacion" name="ORGANIZACION_VENTAS" disabled>
-                                        <option value="">--Seleccione una organización--</option>
-                                        <option value="2000">ROMA</option>
-                                        <option value="1000">COMERCIALIZADORA MULTIDROGRAS</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="form-group d-none">
-                                    <label for="oficina">Oficina ventas<span class="text-danger h5">*</span></label>
-                                    <select class="form-control" id="oficina_solicitante" name="OFICINA_VENTAS" disabled>
-
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="form-group d-none">
-                                    <label for="estado_solicitud">Estado</label>
-                                    <input type="text" class="form-control" value="S" id="estado_solicitud" name="ESTADO" disabled>
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="form-group d-none">
-                                    <label for="usuario_solicitante">Usuario</label>
-                                    <input type="text" class="form-control" id="usuario_solicitante" name="USUARIO_SOLICITA" disabled>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- TIPOS Y CONCEPTOS DE GASTOS -->
-                        <div class="row shadow-sm py-2 w-90 mx-auto mt-2 mb-4">
-                            <div class="col">
-                                <div class="form-group">
-                                    <label for="tipoGasto">Tipo de gasto<span class="text-danger h5">*</span></label>
-                                    <select class="form-control form-control-sm" name="TIPO_GASTO" id="tipoGasto">
-                                        <option value="">--Seleccione un tipo de gasto</option>
-                                        <option value="1">COTIZACIÓN</option>
-                                        <option value="2">FACTURA DIRECTA</option>
-                                        <option value="3">ANTICIPO</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="form-group">
-                                    <label for="conceptoFormulario">Concepto solicitud<span class="text-danger h5">*</span></label>
-                                    <div class="d-flex">
-                                        <select class="form-control form-control-sm" style="border-radius: 3px 0 0 3px;" id="conceptoFormulario" name="CONCEPTO_GASTO">
-
-                                        </select>
-                                        <button type="button" id="btnAbrirModal" class="btn btn-primary btn-sm" style="border-radius: 0 3px 3px 0;" title="Agregar concepto">
-                                            <i class="fa-solid fa-circle-plus" style="font-size: 15px;"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- COTIZACIONES -->
-                        <div class="row shadow-sm py-2 w-90 mx-auto mb-4" id="cotizaciones">
-                            <div class="col" id="inputTipoAnticipo">
-                                <div class="form-group">
-                                    <label for="tipoAnticipo">Tipo anticipo<span class="text-danger h5">*</span></label>
-                                    <select class="form-control form-control-sm" name="TIPO_ANTICIPO" id="tipoAnticipo">
-                                        <option value="">--Seleccione un tipo de anticipo</option>
-                                        <option value="1">CON COTIZACIÓN</option>
-                                        <option value="2">LEGALIZACIÓN GASTOS DE VIAJE</option>
-                                        <option value="3">SIN COTIZACIÓN</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col" id="inputValorAnticipo">
-                                <div class="form-group">
-                                    <label for="valorAnticipo1">Valor anticipo<span class="text-danger h5">*</span></label>
-                                    <input type="text" class="form-control form-control-sm" placeholder="Valor anticipo" id="valorAnticipo1" name="VALOR_ANTICIPO">
-                                </div>
-                            </div>
-                            <div class="col" id="inputNumeroPreliminar">
-                                <div class="form-group">
-                                    <label for="numeroPreliminar2">Número preliminar<span class="text-danger h5">*</span></label>
-                                    <input type="text" class="form-control form-control-sm" placeholder="Número preliminar" id="numeroPreliminar2" name="NUMERO_PRELIMINAR">
-                                </div>
-                            </div>
-                            <div class="col" id="inputArchivo1">
-                                <div class="form-group">
-                                    <label id="label1" for="adjunto_1">Adjuntar cotización 1<span class="text-danger h5">*</span></label>
-                                    <input type="file" accept=".pdf" class="form-control form-control-sm" id="adjunto_1" name="ADJUNTO_SOLICITA_1">
-                                </div>
-                            </div>
-                            <div class="col" id="inputArchivo2">
-                                <div class="form-group">
-                                    <label id="label2" for="adjunto_2">Adjuntar cotización 2</label>
-                                    <input type="file" accept=".pdf" class="form-control form-control-sm" id="adjunto_2" name="ADJUNTO_SOLICITA_2">
-                                </div>
-                            </div>
-                            <div class="col" id="inputArchivo3">
-                                <div class="form-group">
-                                    <label id="label3" for="adjunto_3">Adjuntar cotización 3</label>
-                                    <input type="file" accept=".pdf" class="form-control form-control-sm" id="adjunto_3" name="ADJUNTO_SOLICITA_3">
-                                </div>
-                            </div>
-                        </div>
-                        <!-- DATOS FACTURA -->
-                        <div class="row shadow-sm py-2 w-90 mx-auto mb-4" id="datosFactura">
-                            <div class="col-4">
-                                <div class="form-group">
-                                    <label for="fechaFactura">Fecha factura<span class="text-danger h5">*</span></label>
-                                    <input type="date" class="form-control form-control-sm" id="fechaFactura" placeholder="Fecha factura" name="FECHA_DOCUMENTO">
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="form-group">
-                                    <label for="numeroDocumento">Número documento<span class="text-danger h5">*</span></label>
-                                    <input type="text" class="form-control form-control-sm" id="numeroDocumento" placeholder="Número documento" name="NUMERO_DOCUMENTO">
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="form-group">
-                                    <label for="razonSocial">Razón social(NIT)<span class="text-danger h5">*</span></label>
-                                    <input type="text" class="form-control form-control-sm" id="razonSocial" placeholder="Razón social" name="NIT">
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="form-group">
-                                    <label for="subTotalFactura">Subtotal factura<span class="text-danger h5">*</span></label>
-                                    <input type="text" class="form-control form-control-sm" id="subTotalFactura" placeholder="Subtotal factura" name="SUBTOTAL_DOCUMENTO">
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="form-group">
-                                    <label for="iva">Iva</label>
-                                    <input type="text" class="form-control form-control-sm" id="iva" value="0" placeholder="Iva" name="IVA_DOCUMENTO">
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="form-group">
-                                    <label for="valorFactura">Total factura<span class="text-danger h5">*</span></label>
-                                    <input type="text" class="form-control form-control-sm" id="valorFactura" placeholder="Total factura" name="VALOR_DOCUMENTO">
-                                </div>
-                            </div>
-                        </div>
-                        <!-- COMENTARIO SOLICITUD -->
-                        <div class="row shadow-sm py-2 w-90 mx-auto mb-4">
-                            <div class="col">
-                                <div class="form-group">
-                                    <label for="comentario_solicitante">Comentario solicitud<span class="text-danger h5">*</span></label>
-                                    <textarea rows="2" class="form-control" style="background-color: #FFF6D7;" placeholder="Describe los criterios de tu solicitud" id="comentario_solicitante" name="COMENTARIO_SOLICITA"></textarea>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
+                <div class="col-md-3">
+                <label for="oficina_solicitante" class="form-label">Oficina</label>
+                <select class="form-select" id="oficina_solicitante" name="OFICINA_VENTAS" disabled></select>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-outline-primary" id="btnVerTablaGastos">Ver tabla de gastos</button>
-                    <button type="button" class="btn btn-outline-success" id="btnGuardar">Guardar solicitud</button>
+                <div class="col-md-3">
+                <label for="estado_solicitud" class="form-label">Estado</label>
+                <input type="text" class="form-control" value="S" id="estado_solicitud" name="ESTADO" disabled>
+                </div>
+                <div class="col-md-3">
+                <label for="usuario_solicitante" class="form-label">Usuario</label>
+                <input type="text" class="form-control" id="usuario_solicitante" name="USUARIO_SOLICITA" disabled>
                 </div>
             </div>
+
+            <!-- Tipo y Concepto -->
+            <div class="row g-3 mt-2">
+                <div class="col-md-6">
+                <label for="tipoGasto" class="form-label">Tipo de gasto <span class="text-danger">*</span></label>
+                <select class="form-select form-select-sm" name="TIPO_GASTO" id="tipoGasto">
+                    <option value="">--Seleccione--</option>
+                    <option value="1">COTIZACIÓN</option>
+                    <option value="2">FACTURA DIRECTA</option>
+                    <option value="3">ANTICIPO</option>
+                </select>
+                </div>
+                <div class="col-md-6">
+                <label for="conceptoFormulario" class="form-label">Concepto solicitud <span class="text-danger">*</span></label>
+                <div class="input-group input-group-sm">
+                    <select class="form-select" id="conceptoFormulario" name="CONCEPTO_GASTO"></select>
+                    <button style="border-radius: 0 1rem 1rem 0 !important;" type="button" id="btnAbrirModal" class="btn btn-primary" title="Agregar concepto">
+                    <i class="fa-solid fa-circle-plus"></i>
+                    </button>
+                </div>
+                </div>
+            </div>
+
+            <!-- Cotizaciones -->
+            <div class="row g-3 mt-3" id="cotizaciones">
+                <div class="col-md-4">
+                <label for="tipoAnticipo" class="form-label">Tipo anticipo <span class="text-danger">*</span></label>
+                <select class="form-select form-select-sm" name="TIPO_ANTICIPO" id="tipoAnticipo">
+                    <option value="">--Seleccione--</option>
+                    <option value="1">CON COTIZACIÓN</option>
+                    <option value="2">LEGALIZACIÓN GASTOS DE VIAJE</option>
+                    <option value="3">SIN COTIZACIÓN</option>
+                </select>
+                </div>
+                <div class="col-md-4">
+                <label for="valorAnticipo1" class="form-label">Valor anticipo <span class="text-danger">*</span></label>
+                <input type="text" class="form-control form-control-sm" id="valorAnticipo1" name="VALOR_ANTICIPO" placeholder="Valor anticipo">
+                </div>
+                <div class="col-md-4">
+                <label for="numeroPreliminar2" class="form-label">Número preliminar <span class="text-danger">*</span></label>
+                <input type="text" class="form-control form-control-sm" id="numeroPreliminar2" name="NUMERO_PRELIMINAR" placeholder="Número preliminar">
+                </div>
+                <div class="col-md-4">
+                <label for="adjunto_1" class="form-label">Adjuntar cotización 1 <span class="text-danger">*</span></label>
+                <input type="file" accept=".pdf" class="form-control form-control-sm" id="adjunto_1" name="ADJUNTO_SOLICITA_1">
+                </div>
+                <div class="col-md-4">
+                <label for="adjunto_2" class="form-label">Adjuntar cotización 2</label>
+                <input type="file" accept=".pdf" class="form-control form-control-sm" id="adjunto_2" name="ADJUNTO_SOLICITA_2">
+                </div>
+                <div class="col-md-4">
+                <label for="adjunto_3" class="form-label">Adjuntar cotización 3</label>
+                <input type="file" accept=".pdf" class="form-control form-control-sm" id="adjunto_3" name="ADJUNTO_SOLICITA_3">
+                </div>
+            </div>
+
+            <!-- Datos Factura -->
+            <div class="row g-3 mt-3" id="datosFactura">
+                <div class="col-md-4">
+                <label for="fechaFactura" class="form-label">Fecha factura <span class="text-danger">*</span></label>
+                <input type="date" class="form-control form-control-sm" id="fechaFactura" name="FECHA_DOCUMENTO">
+                </div>
+                <div class="col-md-4">
+                <label for="numeroDocumento" class="form-label">Número documento <span class="text-danger">*</span></label>
+                <input type="text" class="form-control form-control-sm" id="numeroDocumento" name="NUMERO_DOCUMENTO">
+                </div>
+                <div class="col-md-4">
+                <label for="razonSocial" class="form-label">Razón social(NIT) <span class="text-danger">*</span></label>
+                <input type="text" class="form-control form-control-sm" id="razonSocial" name="NIT">
+                </div>
+                <div class="col-md-4">
+                <label for="subTotalFactura" class="form-label">Subtotal factura <span class="text-danger">*</span></label>
+                <input type="text" class="form-control form-control-sm" id="subTotalFactura" name="SUBTOTAL_DOCUMENTO">
+                </div>
+                <div class="col-md-4">
+                <label for="iva" class="form-label">IVA</label>
+                <input type="text" class="form-control form-control-sm" id="iva" name="IVA_DOCUMENTO" value="0">
+                </div>
+                <div class="col-md-4">
+                <label for="valorFactura" class="form-label">Total factura <span class="text-danger">*</span></label>
+                <input type="text" class="form-control form-control-sm" id="valorFactura" name="VALOR_DOCUMENTO">
+                </div>
+            </div>
+
+            <!-- Comentario -->
+            <div class="row mt-3">
+                <div class="col">
+                <label for="comentario_solicitante" class="form-label">Comentario solicitud <span class="text-danger">*</span></label>
+                <textarea rows="2" class="form-control" style="background-color: #FFF6D7;" id="comentario_solicitante" name="COMENTARIO_SOLICITA"></textarea>
+                </div>
+            </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
+            <i class="fa-solid fa-xmark"></i> Cerrar
+            </button>
+            <button type="button" class="btn btn-primary" id="btnVerTablaGastos">
+            <i class="fa-solid fa-table"></i> Ver tabla de gastos
+            </button>
+            <button type="button" class="btn btn-success" id="btnGuardar">
+            <i class="fa-solid fa-floppy-disk"></i> Guardar solicitud
+            </button>
+        </div>
         </div>
     </div>
+    </div>
+
+
     <!-- MODAL CREAR CONCEPTO -->
     <div class="modal fade" id="modalAgregarConcepto" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" style="min-width: 50%;">
-            <div class="modal-content" style="background-color: whitesmoke;">
-                <div class="modal-header">
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <input type="text" class="form-control form-control-sm" placeholder="Escriba el concepto que desea agregar" id="conceptoModal">
-                    <button type="button" class="btn btn-primary btn-sm mt-2" id="btnAgregarConcepto">Agregar</button>
-                </div>
+    <div class="modal-dialog modal-dialog-centered modal-md">
+        <div class="modal-content bg-light">
+        <div class="modal-header border-bottom-0">
+            <h5 class="modal-title "><i class="fa-solid fa-lightbulb me-2"></i>Nuevo Concepto</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-3">
+            <div class="input-group input-group-sm mb-3">
+            <span class="input-group-text"><i class="fa fa-pen"></i></span>
+            <input 
+                type="text" 
+                class="form-control" 
+                placeholder="Escriba el concepto que desea agregar" 
+                id="conceptoModal"
+            >
+            </div>
+            <div class="text-end">
+            <button type="button" class="btn btn-primary btn-sm" id="btnAgregarConcepto">
+                <i class="fa fa-plus-circle"></i> Agregar
+            </button>
             </div>
         </div>
+        </div>
     </div>
+    </div>
+
+    
+
     <!-- MODAL GESTIONAR SOLICITUD. -->
     <div class="modal fade" id="modalGestionarSolicitud" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-scrollable" style="min-width: 70%; background-color: #ddd;">
             <div class="modal-content" style="background-color: whitesmoke;">
                 <div class="modal-header">
-                    <h3 class="modal-title text-primary" id="exampleModalLabel">Gestionar solicitud</h3>
+                    <h3 class="modal-title " id="exampleModalLabel">Gestionar solicitud</h3>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <!-- SECCIÓN DATOS INFO -->
-                <div class="modal-body">
+                <div class="modal-body p-3">
                     <input type="hidden" id="idOcultoSolicitud">
                     <input type="hidden" id="estadoOcultoSolicitud">
                     <div class="row" id="infoSolicitud">
@@ -441,7 +555,7 @@
                     </div>
                     <hr>
                     <div class="d-flex justify-content-center align-items-center" style="margin-top: 20px; margin-bottom: 20px;" id="divBtnRestaurar">
-                        <button class="btn btn-outline-primary btn-sm" id="btnRestaurar">Restaurar solicitud</button>
+                        <button class="btn btn-primary btn-sm" id="btnRestaurar">Restaurar solicitud</button>
                     </div>
                     <!-- SECCIÓN ADMIN -->
                     <div class="row justify-content-center mb-3" id="sectionAdmin">
@@ -478,7 +592,7 @@
                                                         <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios1" value="1">
                                                     </div>
                                                     <div style="display: flex; align-items: center; gap: 40px;">
-                                                        <button id="btnVerAdj1" class="btn btn-outline-primary btn-sm"
+                                                        <button id="btnVerAdj1" class="btn btn-primary btn-sm"
                                                             style="width: 50px; height: 24px; gap: 2px; display: flex; align-items: center;">
                                                             <i class="fa-solid fa-file"></i>
                                                             Ver
@@ -495,7 +609,7 @@
                                                         <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios2" value="2">
                                                     </div>
                                                     <div style="display: flex; align-items: center; gap: 40px;">
-                                                        <button id="btnVerAdj2" class="btn btn-outline-primary btn-sm"
+                                                        <button id="btnVerAdj2" class="btn btn-primary btn-sm"
                                                             style="width: 50px; height: 24px; gap: 2px; display: flex; align-items: center;">
                                                             <i class="fa-solid fa-file"></i>
                                                             Ver
@@ -512,7 +626,7 @@
                                                         <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios3" value="3">
                                                     </div>
                                                     <div style="display: flex; align-items: center; gap: 40px;">
-                                                        <button id="btnVerAdj3" class="btn btn-outline-primary btn-sm"
+                                                        <button id="btnVerAdj3" class="btn btn-primary btn-sm"
                                                             style="width: 50px; height: 24px; gap: 2px; display: flex; align-items: center;">
                                                             <i class="fa-solid fa-file"></i>
                                                             Ver
@@ -524,7 +638,7 @@
                                                 </div>
                                             </div>
                                             <div class="d-flex justify-content-end mt-2" style="width: 64%;" id="btnActualizarAdjDiv">
-                                                <button type="button" class="btn btn-outline-primary btn-sm" style="display: flex; justify-content: center; align-items: center; height: 24px; align-self: end;" id="btnActualizarAdj" title="Actualizar archivos">
+                                                <button type="button" class="btn btn-primary btn-sm" style="display: flex; justify-content: center; align-items: center; height: 24px; align-self: end;" id="btnActualizarAdj" title="Actualizar archivos">
                                                     Modificar
                                                 </button>
                                             </div>
@@ -559,7 +673,7 @@
                                             <input type="file" accept=".pdf" class="form-control form-control-sm" id="adjuntoAnticipo">
                                         </div>
                                         <div class="col d-flex">
-                                            <button class="btn btn-outline-primary btn-sm w-100 align-self-end" title="Ver anticipo" id="btnVerAnticipo">
+                                            <button class="btn btn-primary btn-sm w-100 align-self-end" title="Ver anticipo" id="btnVerAnticipo">
                                                 <i class="fa-solid fa-file" style="font-size: 15px;"></i>
                                                 Ver anticipo
                                             </button>
@@ -575,7 +689,7 @@
                                     </div>
                                     <div class="row">
                                         <div class="col d-flex align-item-center justify-content-center" id="sectionBtnGA">
-                                            <button id="guardarAnticipo" class="btn btn-outline-primary btn-sm" title="Guardar anticipo">
+                                            <button id="guardarAnticipo" class="btn btn-primary btn-sm" title="Guardar anticipo">
                                                 <i class="fa-solid fa-floppy-disk"></i> Guardar
                                             </button>
                                         </div>
@@ -615,7 +729,7 @@
                                             <input type="file" accept=".pdf" class="form-control form-control-sm" id="adjunto_factura">
                                         </div>
                                         <div class="col d-flex" id="btnVerFacturaDiv">
-                                            <button class="btn btn-outline-primary btn-sm align-self-end w-100" title="Ver factura" style="width: 30px; height: auto;" id="btnVerFactura">
+                                            <button class="btn btn-primary btn-sm align-self-end w-100" title="Ver factura" style="width: 30px; height: auto;" id="btnVerFactura">
                                                 <i class="fa-solid fa-file" style="font-size: 15px;"></i>
                                                 Ver factura
                                             </button>
@@ -668,7 +782,7 @@
                                     </div>
                                     <div class="row">
                                         <div class="col d-flex align-item-center justify-content-center" id="sectionBtnGF">
-                                            <button id="guardarFactura" class="btn btn-outline-primary btn-sm" title="Guardar factura(Preliminar)">
+                                            <button id="guardarFactura" class="btn btn-primary btn-sm" title="Guardar factura(Preliminar)">
                                                 <i class="fa-solid fa-floppy-disk"></i> Guardar
                                             </button>
                                         </div>
@@ -770,7 +884,7 @@
                                             <input type="file" accept=".pdf" class="form-control form-control-sm" id="adjuntoPago">
                                         </div>
                                         <div class="col d-flex" id="verAdjPagoDiv">
-                                            <button id="verAdjPago" title="Ver adjunto del pago" class="btn btn-outline-primary btn-sm w-100 align-self-end">
+                                            <button id="verAdjPago" title="Ver adjunto del pago" class="btn btn-primary btn-sm w-100 align-self-end">
                                                 <i class="fa-solid fa-file"></i>
                                                 Ver adjunto de pago
                                             </button>
@@ -817,7 +931,7 @@
                                             <input type="file" accept=".pdf" class="form-control form-control-sm" id="adjunto_factura2">
                                         </div>
                                         <div class="col d-flex" id="btnVerFacturaDiv2">
-                                            <button class="btn btn-outline-primary btn-sm align-self-end w-100" title="Ver factura" style="width: 30px; height: auto;" id="btnVerFactura2">
+                                            <button class="btn btn-primary btn-sm align-self-end w-100" title="Ver factura" style="width: 30px; height: auto;" id="btnVerFactura2">
                                                 <i class="fa-solid fa-file" style="font-size: 15px;"></i>
                                                 Ver factura
                                             </button>
@@ -870,7 +984,7 @@
                                     </div>
                                     <div class="row">
                                         <div class="col d-flex align-item-center justify-content-center" id="sectionBtnGF2">
-                                            <button id="guardarFactura2" class="btn btn-outline-primary btn-sm" title="Guardar factura(Preliminar)">
+                                            <button id="guardarFactura2" class="btn btn-primary btn-sm" title="Guardar factura(Preliminar)">
                                                 <i class="fa-solid fa-floppy-disk"></i> Guardar
                                             </button>
                                         </div>
@@ -944,7 +1058,7 @@
                                                 <input type="text" class="form-control form-control-sm" placeholder="Valor legalización" id="valorLegalizacion">
                                             </div>
                                             <div class="col d-none" id="btnVerLegalizacionDiv">
-                                                <button class="btn btn-outline-primary btn-sm align-self-end w-100" title="Ver legalización" style="width: 30px;" id="btnVerLegalizacion">
+                                                <button class="btn btn-primary btn-sm align-self-end w-100" title="Ver legalización" style="width: 30px;" id="btnVerLegalizacion">
                                                     <i class="fa-solid fa-file" style="font-size: 15px;"></i>
                                                     Ver legalización
                                                 </button>
@@ -965,7 +1079,7 @@
                                     </div>
                                     <div class="row">
                                         <div class="col d-flex align-item-center justify-content-center" id="btnGuardarLegalDiv">
-                                            <button id="btnGuardarLegal" class="btn btn-outline-primary btn-sm" title="Guardar legalización">
+                                            <button id="btnGuardarLegal" class="btn btn-primary btn-sm" title="Guardar legalización">
                                                 <i class="fa-solid fa-floppy-disk"></i> 
                                                 Guardar
                                             </button>
@@ -1016,11 +1130,12 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
                 </div>
             </div>
         </div>
     </div>
+
     <!-- MODAL VER ARCHIVOS IFRAME -->
     <div class="modal fade" id="modalVistaArchivos" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" style="min-width: 70%;">
@@ -1028,7 +1143,7 @@
                 <div class="modal-header">
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body p-3">
                     <div id="visorPDF">
 
                     </div>
@@ -1036,6 +1151,7 @@
             </div>
         </div>
     </div>
+
     <!-- MODAL COMENTARIOS. -->
     <div class="modal fade" id="modalComentarios" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" style="min-width: 70%;">
@@ -1046,7 +1162,7 @@
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body" style="padding: 20px; display: flex; justify-content: center;">
+                <div class="modal-body p-3" style="padding: 20px; display: flex; justify-content: center;">
                     <div class="timeline-container">
                         <div class="timeline"></div>
                     </div>
@@ -1054,6 +1170,7 @@
             </div>
         </div>
     </div>
+    
     <!-- MODAL VER TABLA GASTOS -->
     <div class="modal fade" id="modalTablaGastos" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" style="min-width: 70%;">
@@ -1064,7 +1181,7 @@
                     </div>               
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body" style="padding: 20px; display: flex; justify-content: center;">
+                <div class="modal-body p-3" style="padding: 20px; display: flex; justify-content: center;">
                     <div class="container" id="containerTablaGastos">
                         
                     </div>
@@ -1072,6 +1189,8 @@
             </div>
         </div>
     </div>
+
+</div>
 
     <script type="text/javascript" src="../resources/plugins/jquery/jquery.min.js"></script>
     <script type="text/javascript" src="../resources/plugins/jquery-ui/jquery-ui.js"></script>

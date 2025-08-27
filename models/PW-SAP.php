@@ -671,48 +671,115 @@ switch ( $_POST[ 'op' ] ) {
         * 20250529 - V1
         * Ampliacion 29-05-2025 Christian Bula 
         * Control de lotes desde SAP para informarlos en la descripción
-      */    
-        
-            $materialesADG = [];
-            while ($row = mssql_fetch_array($q, MSSQL_ASSOC)) {
-                $materialesADG[$row['codigo_material']] = $row;
-            }
-            mssql_free_result($q);
-           
-            $materialesList = "'" . implode("','", array_keys($materialesADG)) . "'";
-        
-            $centro = '';
-            switch($_POST[ "bodega" ]){
-                case "1100": $centro = 'MM01'; break;
-                case "1200": $centro = 'MC01'; break;
-                case "2100": $centro = 'RM01'; break;
-                case "2200": $centro = 'RB01'; break;
-                case "2300": $centro = 'RC01'; break;
-                case "2400": $centro = 'RQ01'; break;
-            }
-        
-            $sqlSAP = "select 
-                            LTRIM(a.matnr, '0') as material,
-                            a.charg as lote,
-                            b.vfdat as vmcto
-                        from lqua a
-                        join mch1 as b on  a.matnr = b.matnr and a.charg = b.charg
-                        where 
-                         LTRIM(a.matnr, '0') in($materialesList ) and 
-                         a.werks = '$centro' and 
-                         a.lgtyp <> 'CUA' and 
-                         a.lgtyp <> '916'";
-            $resultadosSAP = generarArrayHana($sqlSAP, 0);
-             // Indexar resultados SAP por material
-            $lotesSAP = [];
-            foreach ($resultadosSAP as $item) {
-                $material = $item['MATERIAL'];
-                $fechaLote = $item['VMCTO'];
-                if (empty($fechaLote)) continue;
-                if (!isset($lotesSAP[$material]) || strtotime($fechaLote) < strtotime($lotesSAP[$material])) {
-                    $lotesSAP[$material] = $fechaLote;
-                }
-            }
+      */
+
+      // $materialesADG = [];
+      // while ($row = mssql_fetch_array($q, MSSQL_ASSOC)) {
+      //     $materialesADG[$row['codigo_material']] = $row;
+      // }
+      // mssql_free_result($q);
+
+      // $materialesList = "'" . implode("','", array_keys($materialesADG)) . "'";
+
+      // $centro = '';
+      // switch($_POST[ "bodega" ]){
+      //     case "1100": $centro = 'MM01'; break;
+      //     case "1200": $centro = 'MC01'; break;
+      //     case "2100": $centro = 'RM01'; break;
+      //     case "2200": $centro = 'RB01'; break;
+      //     case "2300": $centro = 'RC01'; break;
+      //     case "2400": $centro = 'RQ01'; break;
+      // }
+
+      // $sqlSAP = "select 
+      //                 LTRIM(a.matnr, '0') as material,
+      //                 a.charg as lote,
+      //                 b.vfdat as vmcto
+      //             from lqua a
+      //             join mch1 as b on  a.matnr = b.matnr and a.charg = b.charg
+      //             where 
+      //              LTRIM(a.matnr, '0') in($materialesList ) and 
+      //              a.werks = '$centro' and 
+      //              a.lgtyp <> 'CUA' and 
+      //              a.lgtyp <> '916'";
+      // $resultadosSAP = generarArrayHana($sqlSAP, 0);
+      //  // Indexar resultados SAP por material
+      // $lotesSAP = [];
+      // foreach ($resultadosSAP as $item) {
+      //     $material = $item['MATERIAL'];
+      //     $fechaLote = $item['VMCTO'];
+      //     if (empty($fechaLote)) continue;
+      //     if (!isset($lotesSAP[$material]) || strtotime($fechaLote) < strtotime($lotesSAP[$material])) {
+      //         $lotesSAP[$material] = $fechaLote;
+      //     }
+      // }
+
+      $materialesADG = [];
+      while ($row = mssql_fetch_array($q, MSSQL_ASSOC)) {
+        $materialesADG[$row['codigo_material']] = $row;
+      }
+      mssql_free_result($q);
+
+      $materialesList = "'" . implode("','", array_keys($materialesADG)) . "'";
+
+      $centro = '';
+      switch ($_POST["bodega"]) {
+        case "1100":
+          $centro = 'MM01';
+          break;
+        case "1200":
+          $centro = 'MC01';
+          break;
+        case "2100":
+          $centro = 'RM01';
+          break;
+        case "2200":
+          $centro = 'RB01';
+          break;
+        case "2300":
+          $centro = 'RC01';
+          break;
+        case "2400":
+          $centro = 'RQ01';
+          break;
+      }
+
+      $sqlSAP = "SELECT 
+                LTRIM(a.matnr, '0') AS material,
+                a.charg AS lote,
+                b.vfdat AS vmcto
+           FROM lqua a
+           JOIN mch1 AS b ON a.matnr = b.matnr AND a.charg = b.charg
+           WHERE LTRIM(a.matnr, '0') IN($materialesList)
+             AND a.werks = '$centro'
+             AND a.lgtyp <> 'CUA'
+             AND a.lgtyp <> '916'";
+
+      $lotesSAP = [];
+
+      try {
+        $resultadosSAP = generarArrayHana($sqlSAP, 0);
+
+        if (!is_array($resultadosSAP)) {
+          $resultadosSAP = [];
+        }
+
+        foreach ($resultadosSAP as $item) {
+          $material = $item['MATERIAL'];
+          $fechaLote = $item['VMCTO'];
+
+          if (empty($fechaLote)) continue;
+
+          if (!isset($lotesSAP[$material]) || strtotime($fechaLote) < strtotime($lotesSAP[$material])) {
+            $lotesSAP[$material] = $fechaLote;
+          }
+        }
+      } catch (Exception $e) {
+        error_log("Error al consultar SAP: " . $e->getMessage());
+
+        $lotesSAP = [];
+      }
+
 
      /*
         * 20250529 - V1
@@ -725,7 +792,7 @@ switch ( $_POST[ 'op' ] ) {
          Control del lote
         */  
         $codigo = $row["codigo_material"];
-        $vmcto  = ($codigo !== null && isset($lotesSAP[$codigo])) ? $lotesSAP[$codigo] : 0;
+        $vmcto  = ($codigo !== null && isset($lotesSAP[$codigo])) ? $lotesSAP[$codigo] : "No disponible";
           
           
         if ( $row[ 'descuento_adg' ] > 0 ) {

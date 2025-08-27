@@ -448,9 +448,9 @@ Redireccionar();
               <i class="fa-solid fa-heart"></i>
               Puntos
             </button>
-            <button type="button" class="btn btn-outline-danger w-btn btn-sm shadow-sm" id="btnDescuentos" style="display: none">
+            <button type="button" class="btn btn-outline-danger w-btn btn-sm shadow-sm" title="Descuentos para ti!" id="btnDescuentos" style="display: none">
               <i class="fa-solid fa-bullhorn"></i>
-              Descuentos para ti!
+              Dtos para ti!
             </button>
             <button type="button" class="btn btn-outline-warning w-btn btn-sm shadow-sm" id="btnEstadisticas" style="display: none">
               <i class="fa-solid fa-chart-pie"></i>
@@ -510,7 +510,7 @@ Redireccionar();
             </div>
           </div>
           <p id="n_resultados" class="n_resultados lead p-total"></p>
-          <div id="dvResultProductos" style="overflow: auto; max-height: 60vh;"></div>
+          <div id="dvResultProductos" style="overflow: auto; min-height: 64vh;"></div>
         </div>
       </div>
       <!-- TAB PEDIDO -->

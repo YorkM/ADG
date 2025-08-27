@@ -88,6 +88,7 @@ const ejecutarSolDesbloqueo = async () => {
 
     Swal.fire("Ok", "Se envió la solicitud correctamente!", "success");
     Temporales();
+    $('#modalSolictudDesbloqueo').modal("hide");
   } catch (error) {
     console.log(`Error al enviar la solicitud: ${error}`);
   }
@@ -575,7 +576,8 @@ function Limpiar() {
   if ([9, 11, 120].includes(Rol)) {
     $(botonesOcultar).hide();
   } else if (Rol === 10) {
-    $(botonesOcultar + ', #btnDescuentos').hide();
+    $(botonesOcultar).hide();
+    $('#btnDescuentos').show();
   }
 
   // Permiso para eliminar pedidos y OT
@@ -713,7 +715,7 @@ function TableView(filas) {
       <tr>
         <td class="size-td no-wrap">${img_new}${d.codigo_material}</td>
         <td class="p-0 size-12 no-wrap">
-          <div class="m-0" title="${d.descripcion.trim()}">${img_3} ${img} ${img_desc} ${cortarTexto(d.descripcion, 70)} ${img_1} ${img_2}</div>
+          <div class="m-0">${img_3} ${img} ${img_desc} ${d.descripcion} ${img_1} ${img_2}</div>
           <p class="m-0 text-primary" style="font-size: 10px;">${d.grupoAr} - ${d.fechaV}</p>
         </td>
         <td class="size-td no-wrap" style="background-color:#64D4F7">${formatNum(d.valor_unitario, '$')}</td>
@@ -1020,6 +1022,7 @@ async function BuscarProductos() {
     LoadImg('Cargando portafolio...');
     ArrProd = [];
     const data = await enviarPeticion({ op: op_sw, link: urlModel, desc, bodega, lista, numero, eps, ctrl, f_sto, f_dto, f_bon, f_bar, top, orden, TipoPed, f_new, Grp1, Grp2, CodigoSAP });
+
     data.forEach(item => {
       let det = {
         codigo_material: item.codigo_material,
@@ -4380,11 +4383,14 @@ const filtrarClientesCampos = (idCampo) => {
 const parrafo = document.getElementById("pTotal");
 const input = document.getElementById("txt_total");
 const tituloModulo = document.getElementById("tituloModulo");
+const dvResultProductos = document.getElementById("dvResultProductos");
+
 function manejarCambio(e) {
   parrafo.textContent = e.matches ? "T. PEDIDO:" : "VALOR TOTAL PEDIDO:";
   parrafo.style.fontSize = e.matches ? "12px" : "14px";
   input.style.fontSize = e.matches ? "16px" : "20px";
   tituloModulo.style.display = e.matches ? "none" : "block";
+  dvResultProductos.style.height = e.matches ? "74vh" : "64vh";
 }
 
 // EJECUCIÓN DE LAS FUNCIONALIDADES AL CARGAR EL DOM
@@ -4676,6 +4682,7 @@ $(function () {
 
   // FILTROS DESCUENTOS, BONIFICADOS Y STOCK
   $(".form-check-input").click(async function () {
+    debugger;
     let id = $(this).attr('id');
 
     if ($(this).hasClass('DivCheckBoxTrue')) $(this).removeClass('DivCheckBoxTrue');
