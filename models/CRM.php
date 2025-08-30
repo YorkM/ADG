@@ -643,4 +643,41 @@ WHERE T.CODIGO_SAP= '" . $_POST['codigo'] . "'";
 		if ($update) echo json_encode(['ok' => true, 'msg' => "Documentos jurídicos actualizados correctamente"]);
 		else echo json_encode(['ok' => true, 'msg' => "Error al actualizar los documentos jurídicos"]);
 		break;
+
+	case "I_SEGUIMIENTO":
+		$idProceso = intval($_POST['idProceso']);
+		$fechaDemanda = $_POST['fechaDemanda'];
+		$estado = $_POST['estado'];
+		$juzgado = utf8_encode($_POST['juzgado']);
+		$radicado = $_POST['radicado'];
+
+		$sql = "UPDATE T_PROCESOS_JURIDICOS SET ESTADO = '$estado', JUZGADO = '$juzgado', RADICADO = '$radicado', FECHA_DEMANDA = '$fechaDemanda' WHERE ID = $idProceso";		
+		$update = mssql_query($sql);
+
+		if ($update) echo json_encode(['ok' => true, 'msg' => "Seguimiento actualizado correctamente"]);
+		else echo json_encode(['ok' => true, 'msg' => "Error al actualizar el seguimiento"]);
+		break;
+
+	case "U_ESTADO_OBSERVACIONES":
+		$idProceso = intval($_POST['idProceso']);
+		$estado = $_POST['estado'];
+
+		$sql = "UPDATE T_PROCESOS_JURIDICOS SET ESTADO = '$estado' WHERE ID = $idProceso";		
+		$update = mssql_query($sql);
+
+		if ($update) echo json_encode(['ok' => true, 'msg' => "Observaciones actualizadas correctamente"]);
+		else echo json_encode(['ok' => true, 'msg' => "Error al actualizar las observaciones"]);
+		break;
+
+	case "U_ESTADO_PROCESO":
+		$idProceso = intval($_POST['idProceso']);
+		$estadoProceso = $_POST['estadoProceso'];
+		$estado = $_POST['estado'];
+
+		$sql = "UPDATE T_PROCESOS_JURIDICOS SET ESTADO = '$estado', ESTADO_PROCESO = '$estadoProceso' WHERE ID = $idProceso";		
+		$update = mssql_query($sql);
+
+		if ($update) echo json_encode(['ok' => true, 'msg' => "Observaciones actualizadas correctamente"]);
+		else echo json_encode(['ok' => true, 'msg' => "Error al actualizar las observaciones"]);
+		break;
 }

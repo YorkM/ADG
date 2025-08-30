@@ -111,7 +111,7 @@ Redireccionar();
     }
 
     .text-green {
-      color: #055160;
+      color: #055160 !important;
     }
 
     #loaderCRM {
@@ -788,6 +788,14 @@ Redireccionar();
             <tbody>
 
             </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="5" class="bag-info text-center text-green">TOTALES</td>
+                <td id="totalCartera" class="bag-info text-green"></td>
+                <td id="totalVentas" class="bag-info text-green"></td>
+                <td class="bag-info"></td>
+              </tr>
+            </tfoot>
           </table>
         </div>
       </div>
@@ -1068,14 +1076,12 @@ Redireccionar();
                   </div>
                 </div>
               </div>
-              <div class="d-flex justify-content-end gap-3">
+              <div class="d-flex justify-content-end gap-2">
                 <button class="btn btn-outline-primary btn-sm shadow-sm" title="Ver recordatorio pago" id="btnVerRecordatorio">
-                  <i class="fa-solid fa-file"></i>
-                  Ver
+                  <i class="fa-solid fa-eye"></i>
                 </button>
                 <button class="btn btn-outline-success btn-sm shadow-sm" title="Ver carta CIFIN" id="btnVerCifin">
-                  <i class="fa-solid fa-file-lines"></i>
-                  Ver
+                  <i class="fa-solid fa-eye"></i>
                 </button>
               </div>
             </div>
@@ -1094,8 +1100,7 @@ Redireccionar();
                 <div class="col-md-2">
                   <div class="input-group d-flex justify-content-end">
                     <button class="btn btn-outline-primary btn-sm shadow-sm" title="Ver o cargar la carta prejurídica" id="btnCargarCarta">
-                      <i class="fa-solid fa-file-lines"></i>
-                      <span>Cargar carta</span>
+                      <i class="fa-solid fa-upload"></i>
                     </button>
                   </div>
                 </div>
@@ -1128,8 +1133,7 @@ Redireccionar();
               </div>
               <div class="d-flex justify-content-end">
                 <button class="btn btn-outline-primary btn-sm shadow-sm" title="Ver o guardar el acuerdo de pago" id="btnCargarAcuerdo">
-                  <i class="fa-solid fa-handshake"></i>
-                  <span>Guardar</span>
+                  <i class="fa-solid fa-upload"></i>
                 </button>
               </div>
             </div>
@@ -1152,10 +1156,9 @@ Redireccionar();
                   </div>
                 </div>
               </div>
-              <div class="d-flex justify-content-end gap-3">
+              <div class="d-flex justify-content-end gap-2">
                   <button class="btn btn-outline-primary btn-sm shadow-sm" title="Ver o cargar el soporte de pago" id="btnGuardarSoporte">
-                    <i class="fa-solid fa-receipt"></i>
-                    <span>Guardar soporte</span>
+                    <i class="fa-solid fa-upload"></i>
                   </button>
                   <button class="btn btn-outline-danger btn-sm shadow-sm" title="Enviar a cobro jurídico" id="btnEnviarJuridico">
                     <i class="fa-solid fa-gavel"></i>
@@ -1163,9 +1166,9 @@ Redireccionar();
               </div>
             </div>
           </div>
-          <h5 class="text-center text-green">GESTIÓN DE PROCESOS JURÍDICOS</h5>
-          <h6 class="title-card">PROCESO PREJURÍDICO</h6>
-          <div class="card p-2 border-card shadow-sm mb-5">
+          <h5 class="text-center text-green d-none seccion-juridico">GESTIÓN DE PROCESOS JURÍDICOS</h5>
+          <h6 class="title-card d-none seccion-juridico">PROCESO PREJURÍDICO</h6>
+          <div class="card p-2 border-card shadow-sm mb-5 d-none seccion-juridico">
             <div class="container-fluid">
               <div class="row mb-2">
                 <div class="col-md-6">
@@ -1177,7 +1180,7 @@ Redireccionar();
                 <div class="col-md-3">
                   <div class="input-group">
                     <span class="input-group-text bold-span size-13">Monto/Valor:</span>
-                    <input type="text" class="form-control form-control-sm shadow-sm size-13" autocomplete="off" style="font-weight: 500;" id="montoM">
+                    <input type="text" class="form-control form-control-sm shadow-sm size-13" placeholder="MONTO/VALOR" autocomplete="off" id="montoM">
                   </div>
                 </div>
                 <div class="col-md-3">
@@ -1189,15 +1192,14 @@ Redireccionar();
               </div>
               <div class="d-flex justify-content-end">
                 <button class="btn btn-outline-primary btn-sm shadow-sm" title="Ver o cargar la documentación jurídica" id="btnGuardarDatosJuri">
-                  <i class="fa-solid fa-folder-open"></i>
-                  <span>Cargar</span>
+                  <i class="fa-solid fa-upload"></i>
                 </button>
               </div>
             </div>
           </div>
-          <hr>
-          <h6 class="title-card">SEGUIMIENTO DEL PROCESO</h6>
-          <div class="card p-2 border-card shadow-sm mb-5">
+          <hr class="d-none seccion-juridico">
+          <h6 class="title-card d-none seccion-juridico">SEGUIMIENTO DEL PROCESO</h6>
+          <div class="card p-2 border-card shadow-sm mb-5 d-none seccion-juridico">
             <div class="container-fluid">
               <div class="row mb-2">
                 <div class="col-md-4">
@@ -1219,17 +1221,17 @@ Redireccionar();
                   </div>
                 </div>                
               </div>
-              <div class="row">                
+              <div class="row mb-2">               
                 <div class="col-md-4">
                   <div class="input-group">
                     <span class="input-group-text bold-span size-13">Juzgado:</span>
-                    <input type="text" class="form-control form-control-sm shadow-sm size-13" style="font-weight: 500;" id="juzgadoM">
+                    <input type="text" class="form-control form-control-sm shadow-sm size-13" placeholder="JUZGADO" id="juzgadoM">
                   </div>
                 </div>
                 <div class="col-md-4">
                   <div class="input-group">
                     <span class="input-group-text bold-span size-13">Radicado:</span>
-                    <input type="text" class="form-control form-control-sm shadow-sm size-13" autocomplete="off" style="font-weight: 500;" id="radicadoM">
+                    <input type="text" class="form-control form-control-sm shadow-sm size-13" placeholder="RADICADO" autocomplete="off" id="radicadoM">
                   </div>
                 </div>
                 <div class="col-md-4">
@@ -1239,11 +1241,22 @@ Redireccionar();
                   </div>
                 </div>
               </div>
+              <div class="d-flex justify-content-end gap-2">
+                <button class="btn btn-outline-success btn-sm shadow-sm" title="Ver presentación de la demanda" id="btnVerDemanda">
+                  <i class="fa-solid fa-eye"></i>
+                </button>
+                <button class="btn btn-outline-secondary btn-sm shadow-sm" title="Ver juzgado y radicado" id="btnVerRadiJuzga">
+                  <i class="fa-solid fa-eye"></i>
+                </button>
+                <button class="btn btn-outline-primary btn-sm shadow-sm" title="Ver informe de bienes o guardar la información del seguimiento" id="btnGuardarDatosSegui">
+                  <i class="fa-solid fa-upload"></i>
+                </button>
+              </div>
             </div>
           </div>
-          <hr>
-          <h6 class="title-card">OBSERVACIONES DEL PROCESO</h6>
-          <div class="card p-2 border-card shadow-sm mb-5">
+          <hr class="d-none seccion-juridico">
+          <h6 class="title-card d-none seccion-juridico">OBSERVACIONES DEL PROCESO</h6>
+          <div class="card p-2 border-card shadow-sm mb-5 d-none seccion-juridico">
             <div class="container-fluid">
               <div class="row mb-2">
                 <div class="col-md-4">
@@ -1255,7 +1268,7 @@ Redireccionar();
                 <div class="col-md-4">
                   <div class="input-group">
                     <span class="input-group-text bold-span size-13">Notificación Demanda:</span>
-                    <input type="file" accept=".pdf" class="form-control form-control-sm shadow-sm size-13" id="demandaM">
+                    <input type="file" accept=".pdf" class="form-control form-control-sm shadow-sm size-13" id="notificacionM">
                   </div>
                 </div>                
                 <div class="col-md-4">
@@ -1265,18 +1278,29 @@ Redireccionar();
                   </div>
                 </div>                
               </div>
+              <div class="d-flex justify-content-end gap-2">
+                <button class="btn btn-outline-success btn-sm shadow-sm" title="Ver mandamiento de pago u orden de embargo" id="btnVerMandamiento">
+                  <i class="fa-solid fa-eye"></i>
+                </button>
+                <button class="btn btn-outline-secondary btn-sm shadow-sm" title="Ver notificación de demanda" id="btnVerNotificación">
+                  <i class="fa-solid fa-eye"></i>
+                </button>
+                <button class="btn btn-outline-primary btn-sm shadow-sm" title="Ver acuerdo de pago o guardar información de las observaciones" id="btnVerGuardarAcuerdo">
+                  <i class="fa-solid fa-upload"></i>
+                </button>
+              </div>
             </div>
           </div>
-          <hr>
-          <h6 class="title-card">OBSERVACIONES DEL PROCESO</h6>
-          <div class="card p-2 border-card shadow-sm">
+          <hr class="d-none seccion-juridico">
+          <h6 class="title-card d-none seccion-juridico">ESTADO DEL PROCESO</h6>
+          <div class="card p-2 border-card shadow-sm d-none seccion-juridico">
             <div class="container-fluid">
               <div class="row mb-2">
                 <div class="col-md-6">
                   <div class="input-group">
                     <span class="input-group-text bold-span size-13">Estado:</span>
                     <select class="form-select form-select-sm shadow-sm size-13" id="estadoM">
-                      <option value="">--Seleccione el estado--</option>
+                      <option value="">--Seleccione el estado del proceso--</option>
                       <option value="1">PENDIENTE POR DILIGENCIA</option>
                       <option value="2">EN ACUERDO DE PAGO</option>
                       <option value="3">FINALIZADO</option>
@@ -1287,10 +1311,15 @@ Redireccionar();
                 <div class="col-md-6">
                   <div class="input-group">
                     <span class="input-group-text bold-span size-13" id="labelEstado">:</span>
-                    <input type="file" accept=".pdf" class="form-control form-control-sm shadow-sm size-13" id="demandaM">
+                    <input type="file" accept=".pdf" class="form-control form-control-sm shadow-sm size-13" id="estadoArchivo">
                   </div>
                 </div>     
-              </div>            
+              </div>   
+              <div class="d-flex justify-content-end">
+                <button class="btn btn-outline-primary btn-sm shadow-sm" title="Ver documento equivalente al estado o actualizar estado del proceso" id="btnEstado">
+                  <i class="fa-solid fa-upload"></i>
+                </button>
+              </div>         
             </div>
           </div>
         </div>

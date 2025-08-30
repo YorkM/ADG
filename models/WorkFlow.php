@@ -86,10 +86,7 @@ switch ($_POST['op']) {
         $sql .= "ORDER BY WF.FECHA_SOLICITA ";
 
         $solicitudes = GenerarArray($sql, '');
-        echo json_encode(array(
-            'data'=>$solicitudes,
-            'sql'=>$sql
-        ));
+        echo json_encode(['data '=> $solicitudes, 'sql' => $sql]);
         break;
 
     case "I_CONCEPTO":
