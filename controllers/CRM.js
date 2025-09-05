@@ -17,6 +17,19 @@ const confirmAlert = async (title, text) => {
   });
   return result;
 }
+// FUNCIÓN CARGAR MESES
+function cargaMes(campo){
+	const meses = ['', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+	const mesActual = new Date().getMonth();
+	let option = '';
+
+	for(let i = 1; i <= 12; i++) {
+		 if (mesActual === i) option += `<option value="${i}" selected="selected">${meses[i]} (Actual)</option>`;
+     else option += `<option value="${i}">${meses[i]}</option>`;
+	}
+
+	$(`#${campo}`).html(option);
+}
 // FUNCIÓN PARA SUBIR ARCHIVOS AL SERVIDOR
 const SubirArchivosAdj = async (idProceso, arrayArchivos, codigo) => {
   for (let i = 0; i < arrayArchivos.length; i++) {
@@ -1204,15 +1217,19 @@ const filtrar = (filtro) => {
 // FUNCIÓN PARA OBTENER LA ROTACIÓN
 const getRotacion = async () => {
   const filtroZonas = $("#oficina").val().substring(0, 2);
+  const mes = $('#mes').val();
   const { data } = await enviarPeticion({
     op: "G_ROTACION",
     link: "../models/CRM.php",
-    filtroZonas
+    filtroZonas,
+    mes
   });
   
   if (data.length) {
+    console.log(data);
     const totalCartera = data.reduce((acumulador, item) => acumulador + parseFloat(item.CARTERA), 0);
     const totalVentas = data.reduce((acumulador, item) => acumulador + parseFloat(item.VENTAS), 0);
+    const dias = parseInt(data[0].DIAS);
     let elementos = ``;
     data.forEach(item => {
       elementos += `
@@ -1228,11 +1245,18 @@ const getRotacion = async () => {
       </tr>`;
     });
 
+    const totalRotacion = ((totalCartera / totalVentas) * dias).toFixed(2);
+    console.log({totalCartera, totalVentas, totalRotacion});
+
     $('#tablaRotacion tbody').html(elementos);
-    $('#totalCartera').html(formatNum(totalCartera, "$"));
-    $('#totalVentas').html(formatNum(totalVentas, "$"));
+    $('#totalCartera').text(formatNum(totalCartera, "$"));
+    $('#totalVentas').text(formatNum(totalVentas, "$"));
+    $('#totalRotacion').text(`${totalRotacion}%`);
   } else {
-    $('#tablaRotacion tbody').html(`<p class="text-center lead">No hay registros disponibles</p>`);
+    $('#tablaRotacion tbody').text(`<td colspan="8" class="text-center lead">No hay registros disponibles</td>`);
+    $('#totalCartera').text(formatNum("0", "$"));
+    $('#totalVentas').text(formatNum("0", "$"));
+    $('#totalRotacion').text(`0%`);
   }
 }
 // FUNCIÓN LIMPIAR CAMPOS
@@ -1364,7 +1388,7 @@ const renderizarLogs = (position, color, item, estados) => `
 const gestionarLogs = async (idProceso) => {
   let estados = {
     '1': {icon: '<i class="fa-solid fa-envelope"></i>', texto: 'CARTA CIFIN' },
-    '2': {icon: '<i class="fa-solid fa-envelope-open-text"></i>', texto: 'CARTA PREJURIDICA' },
+    '2': {icon: '<i class="fa-solid fa-envelope-circle-check"></i>', texto: 'CARTA PREJURIDICA' },
     '3': {icon: '<i class="fa-solid fa-handshake"></i>', texto: 'ACUERDO DE PAGO' },   
     '4': {icon: '<i class="fa-solid fa-money-bill"></i>', texto: 'SOPORTE DE PAGO' },   
     '5': {icon: '<i class="fa-solid fa-thumbs-up"></i>', texto: 'FINALIZADO' },   
@@ -1372,7 +1396,10 @@ const gestionarLogs = async (idProceso) => {
     '7': {icon: '<i class="fa-solid fa-folder-open"></i>', texto: 'DOCUMENTACIÓN JURÍDICA' },
     '8': {icon: '<i class="fa-solid fa-binoculars"></i>', texto: 'DATOS SEGUIMIENTO' },
     '9': {icon: '<i class="fa-solid fa-pencil"></i>', texto: 'OBSERVACIONES' },
-    '10': {icon: '<i class="fa-solid fa-hourglass-end"></i>', texto: 'DILIGENCIA_PENDIENTE' }
+    '10': {icon: '<i class="fa-solid fa-hourglass-end"></i>', texto: 'DILIGENCIA PENDIENTE' },
+    '11': {icon: '<i class="fa-solid fa-handshake"></i>', texto: 'EN ACUERDO DE PAGO' },
+    '12': {icon: '<i class="fa-solid fa-thumbs-up"></i>', texto: 'FINALIZADO' },
+    '13': {icon: '<i class="fa-solid fa-hands-bound"></i>', texto: 'ESTADO DE INSOLVENCIA' }
   }
 
   const resp = await enviarPeticion({ op: "G_LOGS", link: "../models/CRM.php", idProceso });
@@ -1431,13 +1458,17 @@ const diccionarioEstados = {
   '7': { color: "danger", texto: 'Proceso en estado <strong>JURÍDICO</strong>, en instancia de <strong>DOCUMENTACIÓN JURÍDICA</strong>, proceso que ya cuenta con la información y con los documentos para el respectivo seguimiento del área jurídica' },
   '8': { color: "danger", texto: 'Proceso en estado <strong>JURÍDICO</strong>, en instancia de <strong>DATOS SEGUIMIENTO</strong>, proceso que ya cuenta con los datos relacionados con el seguimiento' },
   '9': { color: "danger", texto: 'Proceso en estado <strong>JURÍDICO</strong>, en instancia de <strong>OBSERVACIONES</strong>, proceso al que se le ha diligeciado la sección de observaciones y está por definirse su estado' },
-  '10': { color: "danger", texto: 'Proceso en estado <strong>JURÍDICO</strong>, en instancia de <strong>DILIGENCIA PENDIENTE</strong>, proceso en estado diligencia pendiente' }
+  '10': { color: "danger", texto: 'Proceso en estado <strong>JURÍDICO</strong>, en instancia de <strong>DILIGENCIA PENDIENTE</strong>, proceso en estado diligencia pendiente' },
+  '11': { color: "danger", texto: 'Proceso en estado <strong>JURÍDICO</strong>, en instancia de <strong>ACUERDO DE PAGO</strong>, proceso en estado de acuerdo de pago en cobro jurídico' },
+  '12': { color: "success", texto: 'Proceso en estado <strong>JURÍDICO</strong>, en instancia de <strong>FINALIZADO</strong>' },
+  '13': { color: "danger", texto: 'Proceso en estado <strong>JURÍDICO</strong>, en instancia de <strong>ESTADO DE INSOLVENCIA</strong>' }
 }
 // FUNCIÓN OBTENER DATOS DE PROCESOS
 const getDatosProcesos = async () => {
   const organizacion = $('#org').val();
+  const oficina = $('#filtroOficina').val();
   try {
-    const { data } = await enviarPeticion({ op: "G_DATOS_PROCESO", link: "../models/CRM.php", organizacion });
+    const { data } = await enviarPeticion({ op: "G_DATOS_PROCESO", link: "../models/CRM.php", organizacion, oficina });
     if (data.length) {
       let elementos = ``;
 
@@ -1449,10 +1480,10 @@ const getDatosProcesos = async () => {
         if (E === "1" || E === "2" || E === "3") {
           estado = "PREJURÍDICO";
           clase = "#ffc107";
-        } else if (E === "6" || E === "7" || E === "8" || E === "9" || E === "10") {
+        } else if (E === "6" || E === "7" || E === "8" || E === "9" || E === "10" || E === "11" || E === "13") {
           estado = "JURÍDICO";
           clase = "#dc3545";
-        } else if (E === "5") {
+        } else if (E === "5" || E === "12") {
           estado = "FINALIZADO";
           clase = "#198754 ";
         }
@@ -1462,26 +1493,24 @@ const getDatosProcesos = async () => {
         let title = "";
 
         if (validarEstado === "1") {
-          const fechaDias20 = sumarDiasHabiles(item.FECHA_ISO, 2);
+          const fechaDias20 = sumarDiasHabiles(item.FECHA_ISO, 20);
           const fechaDias20Time = new Date(fechaDias20).getTime();
           const fechaActualTime = new Date().getTime();
 
-          title = `La carta CIFIN vence en: ${formatDate(fechaDias20)}`;
+          title = `La carta CIFIN vence el: ${formatDate(fechaDias20)}`;
           
           const fechaVencida = fechaDias20Time < fechaActualTime;
           if (fechaVencida) colorFila = "#FF9B9B";
-          console.log({fechaDias20, fechaDias20Time, fechaActualTime, fechaVencida, FR: item.FECHA_ISO});
           
         } else if (validarEstado === "2") {
           const fechaDias10 = sumarDiasHabiles(item.FECHA_PREJU, 10);
           const fechaDias10Time = new Date(fechaDias10).getTime();
           const fechaActualTime = new Date().getTime();
           
-          title = `La carta prejurídica vence en: ${formatDate(fechaDias10)}`;
+          title = `La carta prejurídica vence el: ${formatDate(fechaDias10)}`;
           
           const fechaVencida = fechaDias10Time < fechaActualTime;
           if (fechaVencida) colorFila = "#FF9B9B";
-          console.log({fechaDias10, fechaDias10Time, fechaActualTime, fechaVencida, FJ: item.FECHA_PREJU});
           
         } else if (validarEstado === "3") {
           const fechaAcuerdo = new Date(item.FECHA_FIN_ACUER);
@@ -1496,8 +1525,8 @@ const getDatosProcesos = async () => {
           } else {
             colorFila = "#F8ED8C";
           }
-          console.log({ fechaAcuerdo, fechaAcuerdoTime, fechaActualTime, fechaVencida, FFA: item.FECHA_FIN_ACUER });
-        } else if (E === "5") {
+
+        } else if (E === "5" || E === "12") {
           colorFila = "#B0DB9C";
         }
         
@@ -1528,13 +1557,13 @@ const getDatosProcesos = async () => {
         (estado === "1") ? $('#btnCargarCarta').html(`<i class="fa-solid fa-upload"></i>`) : $('#btnCargarCarta').html(`<i class="fa-solid fa-eye"></i>`); 
         (estado === "1" ||  estado === "2") ? $('#btnCargarAcuerdo').html(`<i class="fa-solid fa-upload"></i>`) : $('#btnCargarAcuerdo').html(`<i class="fa-solid fa-handshake"></i>`); 
         (estado === "1" ||  estado === "2" ||  estado === "3") ? $('#btnGuardarSoporte').html(`<i class="fa-solid fa-upload"></i>`) : $('#btnGuardarSoporte').html(`<i class="fa-solid fa-eye"></i>`); 
-        (estado === "7" || estado === "8" || estado === "9" || estado === "10") ? $('#btnGuardarDatosJuri').html(`<i class="fa-solid fa-eye"></i>`) : $('#btnGuardarDatosJuri').html(`<i class="fa-solid fa-upload"></i>`);
-        (estado === "8" || estado === "9" || estado === "10") ? $('#btnGuardarDatosSegui').html(`<i class="fa-solid fa-eye"></i>`) : $('#btnGuardarDatosSegui').html(`<i class="fa-solid fa-upload"></i>`);
-        (estado === "9" || estado === "10") ? $('#btnVerGuardarAcuerdo').html(`<i class="fa-solid fa-eye"></i>`) : $('#btnVerGuardarAcuerdo').html(`<i class="fa-solid fa-upload"></i>`);
+        (estado === "7" || estado === "8" || estado === "9" || estado === "10" || estado === "11" || estado === "12" || estado === "13") ? $('#btnGuardarDatosJuri').html(`<i class="fa-solid fa-eye"></i>`) : $('#btnGuardarDatosJuri').html(`<i class="fa-solid fa-upload"></i>`);
+        (estado === "8" || estado === "9" || estado === "10" || estado === "11" || estado === "12" || estado === "13") ? $('#btnGuardarDatosSegui').html(`<i class="fa-solid fa-eye"></i>`) : $('#btnGuardarDatosSegui').html(`<i class="fa-solid fa-upload"></i>`);
+        (estado === "9" || estado === "10" || estado === "11" || estado === "12" || estado === "13") ? $('#btnVerGuardarAcuerdo').html(`<i class="fa-solid fa-eye"></i>`) : $('#btnVerGuardarAcuerdo').html(`<i class="fa-solid fa-upload"></i>`);
         
         const seccionesJuridicas = document.querySelectorAll('.seccion-juridico');
 
-        if (estado === "6" || estado === "7" || estado === "8" || estado === "9" || estado === "10") seccionesJuridicas.forEach(item => item.classList.remove('d-none'));
+        if (estado === "6" || estado === "7" || estado === "8" || estado === "9" || estado === "10" || estado === "11" || estado === "12" || estado === "13") seccionesJuridicas.forEach(item => item.classList.remove('d-none'));
         else seccionesJuridicas.forEach(item => item.classList.add('d-none'));
 
         $('#modalGestion').modal("show");
@@ -1566,7 +1595,7 @@ const guardarDatos = async () => {
   }
 
   if (!cifin) {
-    Swal.fire("Oops!!!", "Debe cargar la carta CIFIN", "error");
+    Swal.fire("Oops!!!", "Debe adjuntar la carta CIFIN", "error");
     return;
   }
 
@@ -1624,7 +1653,7 @@ const gestionarCartaPrejuridica = () => {
     const carta = document.querySelector('#cartaM').files[0];
 
     if (!carta) {
-      Swal.fire("Oops!!!", "Debe cargar la carta", "error");
+      Swal.fire("Oops!!!", "Debe adjuntar la carta prejurídica", "error");
       return;
     }
 
@@ -1938,6 +1967,10 @@ const guardarEstadoProceso = async (estadoJuridico) => {
     servicioEstado(item, estadoJuridico, "10", archivoEstado, "DILIGENCIA_PENDIENTE");
   } else if (estadoJuridico === "2") {
     servicioEstado(item, estadoJuridico, "11", archivoEstado, "ACUERDO_PAGO");
+  } else if (estadoJuridico === "3") {
+    servicioEstado(item, estadoJuridico, "12", archivoEstado, "DOCS_FIN_JURIDICO");
+  } else {
+    servicioEstado(item, estadoJuridico, "13", archivoEstado, "ESTADO_INSOLVENCIA");
   }
 
   getDatosProcesos();
@@ -1945,6 +1978,129 @@ const guardarEstadoProceso = async (estadoJuridico) => {
   $('#estadoArchivo').val("");
   $('#modalGestion').modal("hide");
 }
+// FUNCIÓN GENERAR REPORTE
+const generarReporte = async () => {
+  const organizacion= $('#org').val();
+  const oficina = $('#ofic').val();
+  const { data } = await enviarPeticion({op: "G_REPORTE_PROCESOS", link: "../models/CRM.php", organizacion, oficina});
+
+  const estados = {
+    "1": "EN DILIGENCIA PENDIENTE",
+    "2": "EN ACUERDO DE PAGO",
+    "3": "EN ESTADO FINALIZADO",
+    "4": "EN ESTADO DE INSOLVENCIA"
+  }
+
+  if (data.length) {
+    $('#contenedorPrincipalReporte').removeClass("d-none");
+
+    let tabla = `
+    <table class="table table-bordered table-hover table-sm w-100" id="tablaReporte">
+      <thead>
+        <tr>
+          <th class="size-th bag-info no-wrap">CÓDIGO</th>
+          <th class="size-th bag-info no-wrap">ZONA</th>
+          <th class="size-th bag-info no-wrap">OFICINA</th>
+          <th class="size-th bag-info no-wrap">FECHA JURÍDICA</th>
+          <th class="size-th bag-info no-wrap">NOMBRE</th>
+          <th class="size-th bag-info no-wrap">RAZÓN SOCIAL</th>
+          <th class="size-th bag-info no-wrap">CAPITAL</th>
+          <th class="size-th bag-info no-wrap">JUZGADO</th>
+          <th class="size-th bag-info no-wrap">RADICADO</th>
+          <th class="size-th bag-info no-wrap">ESTADO</th>
+        </tr>
+      </thead>
+      <tbody>`;
+
+    data.forEach(item => {
+      const valor = (item.VALOR) ? item.VALOR : "0";
+      const fechaJuri = (item.FECHA_INI_JURI) ? formatDate(new Date(item.FECHA_INI_JURI).toISOString()).split(',')[0] : "";
+
+      tabla += `
+      <tr>
+        <td class="size-13 vertical no-wrap">${item.CODIGO}</td>
+        <td class="size-12 vertical no-wrap">${item.ZONA_VENTAS}</td>
+        <td class="size-13 vertical no-wrap">${item.OFICINA}</td>
+        <td class="size-13 vertical no-wrap">${fechaJuri}</td>
+        <td class="size-12 vertical no-wrap">${item.NOMBRE_CLIENTE}</td>
+        <td class="size-12 vertical no-wrap">${item.RAZON_SOCIAL}</td>
+        <td class="size-13 vertical no-wrap">${formatNum(valor, "$")}</td>
+        <td class="size-12 vertical no-wrap">${item.JUZGADO}</td>
+        <td class="size-13 vertical no-wrap">${item.RADICADO}</td>
+        <td class="size-12 vertical no-wrap">${estados[item.ESTADO_PROCESO] || ""}</td>
+      </tr>`;
+    });
+
+    tabla += `</tbody></table>`;
+    $('#contenedorReporte').html(tabla);
+  }
+}
+// FUNCIÓN EXPORTAR A EXCEL
+function exportarExcel(idTabla, nombreArchivo = "reporte.xlsx") {
+  const tabla = document.getElementById(idTabla);
+
+  const hoja = XLSX.utils.table_to_sheet(tabla);
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, hoja, "Datos");
+
+  function s2ab(s) {
+    const buf = new ArrayBuffer(s.length);
+    const view = new Uint8Array(buf);
+    for (let i = 0; i < s.length; i++) {
+      view[i] = s.charCodeAt(i) & 0xff;
+    }
+    return buf;
+  }
+
+  const wbout = XLSX.write(wb, {
+    bookType: "xlsx",
+    type: "binary",
+    cellDates: true,
+  });
+
+  const blob = new Blob([s2ab(wbout)], { type: "application/octet-stream" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = nombreArchivo;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+// FUNCIÓN VER ARCHIVOS ESTADO PROCESO
+const verArchivosEstadoProceso = () => {
+  const item = JSON.parse(sessionStorage.DatosProceso);
+  const estadoProceso = $('#estadoM').val();
+
+  if (estadoProceso === "1") {
+    if (item.DILIGENCIA_PENDIENTE) {
+      verArchivos(item.DILIGENCIA_PENDIENTE);
+    } else {
+      Swal.fire("Oops!!!", "El soporte de diligencia pendiente no está disponible", "info");
+    }
+  } else if (estadoProceso === "2") {
+    if (item.ACUERDO_PAGO) {
+      verArchivos(item.ACUERDO_PAGO);
+    } else {
+      Swal.fire("Oops!!!", "El soporte de acuerdo de pago no está disponible", "info");
+    }
+  } else if (estadoProceso === "3") {
+    if (item.DOCS_FIN_JURIDICO) {
+      verArchivos(item.DOCS_FIN_JURIDICO);
+    } else {
+      Swal.fire("Oops!!!", "Los documentos relacionados con la finalización del caso no están disponible", "info");
+    }
+  } else if (estadoProceso === "4") {
+    if (item.ESTADO_INSOLVENCIA) {
+      verArchivos(item.ESTADO_INSOLVENCIA);
+    } else {
+      Swal.fire("Oops!!!", "El soporte de estado de insolvencia no está disponible", "info");
+    }
+  } else {
+    Swal.fire("Oops!!!", "Debe seleccionar uno de los estados para ver el respectivo soporte", "error");
+  }
+}
+
 
 // EJECUCIÓN DE FUNCIONALIDADES AL CARGAR EL DOM
 $(function () {
@@ -2205,14 +2361,19 @@ $(function () {
     theme: 'bootstrap-5'
   });
 
+  cargaMes("mes");
+
   const fechaActual = new Date().toISOString().split("T")[0];
   const fechaFinal = document.querySelector('#fechaFinM');
   fechaFinal.min = fechaActual;
 
   getZonasVentas();
 
-  const oficinas = OficinasVentas('N');
-  $("#oficina").html(oficinas);
+  const oficinasN = OficinasVentas('N');
+  $("#oficina").html(oficinasN);
+
+  const oficinasS = OficinasVentas('S');
+  $("#filtroOficina").html(oficinasS);
 
   getRotacion();
 
@@ -2220,14 +2381,12 @@ $(function () {
 
   $('#oficina').change(async function () {
     const filtro = this.value;
-    console.log(filtro);
     await getRotacion();
     setearZonasPorOficina(filtro);    
   });
 
   $('#zona').change(function () {
     const filtro = this.value;
-    console.log(filtro);
     filtrar(filtro);
   });
 
@@ -2293,6 +2452,10 @@ $(function () {
     $('#modalGestion').modal("show");
   });
 
+  $("#modalGestion").on("hidden.bs.modal", () => {
+    $('#contenedorPrincipalReporte').addClass("d-none");
+  });
+
   $('#btnGuardar').prop("disabled", true);
 
   $('#codigoJ').on('blur', function () {
@@ -2340,6 +2503,26 @@ $(function () {
     guardarEstadoProceso(estado);
   });
 
+  $('#generarReporte').click(function () {
+    generarReporte();
+  });
+
+  $('#exportarExcel').click(function () {
+    if ($('#tablaReporte tbody tr').length) {
+      exportarExcel("tablaReporte");
+    }
+  });
+
+  $('#exportarExcelMain').click(function () {
+    if ($('#tablaProcesos tbody tr').length) {
+      exportarExcel("tablaProcesos");
+    }
+  });
+
+  $('#btnVerArchivoEstado').click(function () {
+    verArchivosEstadoProceso();
+  });  
+
   $('#estadoM').change(function () {
     const estado = $(this).val();
     if (estado === "1") $('#labelEstado').text("Soporte de la Diligencia Pendiente");
@@ -2347,6 +2530,14 @@ $(function () {
     else if (estado === "3") $('#labelEstado').text("Documentos de Terminación del Caso");
     else if (estado === "4") $('#labelEstado').text("Soporte de Estado de Insolvencia");
     else $('#labelEstado').text("Ninguno:");
+  });
+
+  $('#filtroOficina').change(function () {
+    getDatosProcesos();
+  });
+
+  $('#mes').change(function () {
+    getRotacion();
   });
 
   $('#montoM').on('input', function () {

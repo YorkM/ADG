@@ -3,56 +3,56 @@ include('funciones.php');
 session_start();
 conectar();
 switch ($_POST['op']) {
-	case 'CargarClienteLogin': {
-			$sql = "SELECT  
-	          T.NOMBRES+'-'+T.RAZON_COMERCIAL AS value, 
-			  T.NIT,
-			  T.NIT_DIGITO,
-  		      T.NIT_TIPO,
-			  T.PERFIL_TRIBUTARIO,
-			  T.CODIGO_SAP,
-			  T.NOMBRES,
-			  ISNULL(T.SEXO,'N') AS SEXO,
-			  T.FECHA_CREACION,
-			  T.FECHA_NACIMIENTO,
-			  T.FECHA_MODIFICACION,
-			  T.TELEFONO1,
-			  T.TELEFONO2,
-			  T.TELEFONO3,
-			  T.EMAIL,
-			  ISNULL(t.RAZON_COMERCIAL,'') AS RAZON, 
-			  T.CUPO_CREDITO,
-			  O.CONDICION_PAGO,
-			  O.LISTA,
-			  V.NOMBRES AS VENDEDOR,
-			  L.NOMBRES AS TELEVENDEDOR,
-			  ISNULL(T.EXCENTO_IVA,0) AS EXCENTO_IVA,
-              ISNULL(T.EXCENTO_CREE,0) AS EXCENTO_CREE,
-			  ISNULL(T.RESPONSABLE_ICA,0) AS RESPONSABLE_ICA,
-			  ISNULL(O.GRAN_CONTRIBUYENTE,0) AS GRAN_CONTRIBUYENTE,
-              O.AUTORETENEDOR,
-			  O.ZONA_VENTAS,
-              O.CANAL_DISTRIBUCION,
-              O.OFICINA_VENTAS,
-              O.SECTOR,
-			  ISNULL(O.INSTITUCIONAL,0) AS INSTITUCIONAL,
-              ISNULL(O.CONTROLADOS,0) AS CONTROLADOS,
-			  T.DIRECCION,
-              T.CIUDAD,
-              T.DEPARTAMENTO,
-			  T.LONGITUD,
-			  T.LATITUD
-			FROM T_TERCEROS t 
-			INNER JOIN T_USUARIOS U ON (U.identificacion=t.nit)
-			INNER JOIN T_TERCEROS_ORGANIZACION O ON O.CODIGO_SAP = T.CODIGO_SAP
-			LEFT  JOIN T_TERCEROS L ON L.CODIGO_SAP = O.CODIGO_TELEVENDEDOR
-			LEFT  JOIN T_TERCEROS V ON V.CODIGO_SAP = O.CODIGO_VENDEDOR
-			WHERE 
-			O.ORGANIZACION_VENTAS = " . mb_strtoupper($_POST["org"], "UTF-8") . " AND 
-			O.CANAL_DISTRIBUCION  = 10 AND U.ID= '" . $_POST["id_cliente"] . "' ";
-			echo json_encode(GenerarArray($sql, ""));
-			mssql_close();
-		}
+	case 'CargarClienteLogin':
+		$sql = "SELECT  
+			T.NOMBRES+'-'+T.RAZON_COMERCIAL AS value, 
+			T.NIT,
+			T.NIT_DIGITO,
+			T.NIT_TIPO,
+			T.PERFIL_TRIBUTARIO,
+			T.CODIGO_SAP,
+			T.NOMBRES,
+			ISNULL(T.SEXO,'N') AS SEXO,
+			T.FECHA_CREACION,
+			T.FECHA_NACIMIENTO,
+			T.FECHA_MODIFICACION,
+			T.TELEFONO1,
+			T.TELEFONO2,
+			T.TELEFONO3,
+			T.EMAIL,
+			ISNULL(t.RAZON_COMERCIAL,'') AS RAZON, 
+			T.CUPO_CREDITO,
+			O.CONDICION_PAGO,
+			O.LISTA,
+			V.NOMBRES AS VENDEDOR,
+			L.NOMBRES AS TELEVENDEDOR,
+			ISNULL(T.EXCENTO_IVA,0) AS EXCENTO_IVA,
+			ISNULL(T.EXCENTO_CREE,0) AS EXCENTO_CREE,
+			ISNULL(T.RESPONSABLE_ICA,0) AS RESPONSABLE_ICA,
+			ISNULL(O.GRAN_CONTRIBUYENTE,0) AS GRAN_CONTRIBUYENTE,
+			O.AUTORETENEDOR,
+			O.ZONA_VENTAS,
+			O.CANAL_DISTRIBUCION,
+			O.OFICINA_VENTAS,
+			O.SECTOR,
+			ISNULL(O.INSTITUCIONAL,0) AS INSTITUCIONAL,
+			ISNULL(O.CONTROLADOS,0) AS CONTROLADOS,
+			T.DIRECCION,
+			T.CIUDAD,
+			T.DEPARTAMENTO,
+			T.LONGITUD,
+			T.LATITUD
+		FROM T_TERCEROS t 
+		INNER JOIN T_USUARIOS U ON (U.identificacion=t.nit)
+		INNER JOIN T_TERCEROS_ORGANIZACION O ON O.CODIGO_SAP = T.CODIGO_SAP
+		LEFT  JOIN T_TERCEROS L ON L.CODIGO_SAP = O.CODIGO_TELEVENDEDOR
+		LEFT  JOIN T_TERCEROS V ON V.CODIGO_SAP = O.CODIGO_VENDEDOR
+		WHERE 
+		O.ORGANIZACION_VENTAS = " . mb_strtoupper($_POST["org"], "UTF-8") . " AND 
+		O.CANAL_DISTRIBUCION  = 10 AND U.ID= '" . $_POST["id_cliente"] . "' ";
+
+		echo json_encode(GenerarArray($sql, ""));
+		mssql_close();
 		break;
 	case 'B_CLIENTES': {
 			$sql = "SELECT TOP 5
@@ -456,11 +456,12 @@ WHERE T.CODIGO_SAP= '" . $_POST['codigo'] . "'";
 
 	case 'G_ROTACION':
 		$filtroZonas = $_POST['filtroZonas'];
+		$mes = $_POST['mes'];
 
 		$query = "SELECT C.ZONA, Z.ZONA_DESCRIPCION AS TEXTO, C.ANIO, C.MES, C.VENTAS, C.CARTERA, C.DIAS, C.ROTACION 
 		FROM T_CARTERA_ROTACION_ZONA C
 		INNER JOIN T_ZONAS_VENTAS Z ON C.ZONA = Z.ZONA_VENTAS
-		WHERE ZONA LIKE '$filtroZonas%'
+		WHERE ZONA LIKE '$filtroZonas%' AND MES = '$mes'
 		ORDER BY C.ZONA ASC";
 
 		$result = GenerarArray($query, "");
@@ -491,11 +492,16 @@ WHERE T.CODIGO_SAP= '" . $_POST['codigo'] . "'";
 
 	case 'G_DATOS_PROCESO':
 		$organizacion = $_POST['organizacion'];
+		$oficina = $_POST['oficina'];
 
 		$query = "SELECT *, CONVERT(VARCHAR(25), FECHA_REGISTRO, 126) AS FECHA_ISO,
 		CONVERT(VARCHAR(25), FECHA_CARTA_JURI, 126) AS FECHA_PREJU,
 		CONVERT(VARCHAR(25), FECHA_FIN_ACUERDO, 126) AS FECHA_FIN_ACUER
 		FROM T_PROCESOS_JURIDICOS WHERE ORGANIZACION = '$organizacion'";
+
+		if ($oficina !== "" && $oficina !== "2000" && $oficina !== "1000") {
+			$query .= " AND OFICINA = '$oficina'";
+		}
 
 		$result = GenerarArray($query, "");
 		if ($result) echo json_encode(['ok' => true, 'data' => $result]);
@@ -512,9 +518,27 @@ WHERE T.CODIGO_SAP= '" . $_POST['codigo'] . "'";
 		else echo json_encode(['ok' => false, 'data' => []]);
 		break;
 
+	case 'G_REPORTE_PROCESOS':
+		$organizacion = $_POST['organizacion'];
+		$oficina = $_POST['oficina'];
+
+		$query = "SELECT *, CONVERT(VARCHAR(25), FECHA_REGISTRO, 126) AS FECHA_ISO,
+		CONVERT(VARCHAR(25), FECHA_CARTA_JURI, 126) AS FECHA_PREJU,
+		CONVERT(VARCHAR(25), FECHA_FIN_ACUERDO, 126) AS FECHA_FIN_ACUER,
+		CONVERT(VARCHAR(25), FECHA_INICIO_JURI, 126) AS FECHA_INI_JURI
+		FROM T_PROCESOS_JURIDICOS 
+		WHERE ORGANIZACION = '$organizacion'
+		AND ESTADO IN ('6', '7', '8', '9', '10', '11', '12', '13')
+		AND OFICINA LIKE '$oficina%'";
+
+		$result = GenerarArray($query, "");
+		if ($result) echo json_encode(['ok' => true, 'data' => $result]);
+		else echo json_encode(['ok' => false, 'data' => []]);
+		break;
+
 	case 'I_DATOS_PROCESO':
-		$nomb = utf8_encode($_POST['nombres']);
-		$razon = utf8_encode($_POST['razon']);
+		$nomb = utf8_decode($_POST['nombres']);
+		$razon = utf8_decode($_POST['razon']);
 		$org = $_POST['organizacion'];
 		$dire = $_POST['direccion'];
 		$ejec = $_POST['ejecutivo'];
@@ -648,7 +672,7 @@ WHERE T.CODIGO_SAP= '" . $_POST['codigo'] . "'";
 		$idProceso = intval($_POST['idProceso']);
 		$fechaDemanda = $_POST['fechaDemanda'];
 		$estado = $_POST['estado'];
-		$juzgado = utf8_encode($_POST['juzgado']);
+		$juzgado = utf8_decode($_POST['juzgado']);
 		$radicado = $_POST['radicado'];
 
 		$sql = "UPDATE T_PROCESOS_JURIDICOS SET ESTADO = '$estado', JUZGADO = '$juzgado', RADICADO = '$radicado', FECHA_DEMANDA = '$fechaDemanda' WHERE ID = $idProceso";		

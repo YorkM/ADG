@@ -23,6 +23,7 @@ Redireccionar();
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.13.2/dist/sweetalert2.min.css">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
   <link type="text/css" rel="stylesheet" href="../resources/css/Animate.css?<?php echo (rand()); ?>">
+
   <style>
     .swal2-popup {
       font-size: 1rem !important;
@@ -753,7 +754,7 @@ Redireccionar();
         <h6 class="title-card">ROTACIÓN DE CARTERA POR ZONA</h6>
         <div class="card p-2 border-card shadow-sm mb-4">
           <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-4">
               <div class="input-group">
                 <span class="input-group-text bold-span size-13">Oficina:</span>
                 <select id="oficina" class="form-select form-select-sm shadow-sm size-13">
@@ -761,10 +762,18 @@ Redireccionar();
                 </select>
               </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
               <div class="input-group">
                 <span class="input-group-text bold-span size-13">Zona:</span>
                 <select id="zona" class="form-select form-select-sm shadow-sm size-13">
+
+                </select>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <span class="input-group-text bold-span size-13">Mes:</span>
+                <select id="mes" class="form-select form-select-sm shadow-sm">
 
                 </select>
               </div>
@@ -793,7 +802,7 @@ Redireccionar();
                 <td colspan="5" class="bag-info text-center text-green">TOTALES</td>
                 <td id="totalCartera" class="bag-info text-green"></td>
                 <td id="totalVentas" class="bag-info text-green"></td>
-                <td class="bag-info"></td>
+                <td id="totalRotacion" class="bag-info text-green"></td>
               </tr>
             </tfoot>
           </table>
@@ -902,6 +911,22 @@ Redireccionar();
         <p style="font-family: system-ui; font-size: 14px; color: #055160;">
           A continuación se listan todos los procesos... Tanto en estados Finalizados, Prejurídicos y Jurídicos
         </p>
+        <div class="row mb-2 align-items-baseline">
+          <div class="col-md-6">
+            <input type="text" class="form-control form-control-sm shadow-sm" autocomplete="off" placeholder="Filtro de búsqueda..." id="filtro">
+          </div>
+          <div class="col-md-4">
+            <select class="form-select form-select-sm shadow-sm size-13" id="filtroOficina">
+             
+            </select>
+          </div>
+          <div class="col-md-2">
+            <button class="btn btn-outline-success btn-sm shadow-sm w-100" id="exportarExcelMain">
+              <i class="fa-solid fa-file-excel"></i>
+              Exportar a Excel
+            </button>
+          </div>
+        </div>
         <div style="overflow: auto;">
           <table class="table table-bordered table-hover table-sm" style="width: 100%;" id="tablaProcesos">
             <thead>
@@ -1010,7 +1035,7 @@ Redireccionar();
   </div>
   <!-- MODAL LOGS -->
   <div class="modal fade" id="modalLogs" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-scrollable" style="min-width: 70%;">
+    <div class="modal-dialog" style="min-width: 70%;">
       <div class="modal-content" style="background-color: whitesmoke;">
         <div class="modal-header">
           <div class="modal-title">
@@ -1050,7 +1075,7 @@ Redireccionar();
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <input type="hidden" id="idPricesoHidden">
+          <input type="hidden" id="idProcesoHidden">
           <div class="mb-5" id="alertEstados"></div>
           <h5 class="text-center text-green">GESTIÓN DE PROCESOS PREJURÍDICOS</h5>
           <h6 class="title-card">DATOS DEL PROCESO</h6>
@@ -1293,7 +1318,7 @@ Redireccionar();
           </div>
           <hr class="d-none seccion-juridico">
           <h6 class="title-card d-none seccion-juridico">ESTADO DEL PROCESO</h6>
-          <div class="card p-2 border-card shadow-sm d-none seccion-juridico">
+          <div class="card p-2 border-card shadow-sm d-none seccion-juridico mb-4">
             <div class="container-fluid">
               <div class="row mb-2">
                 <div class="col-md-6">
@@ -1315,13 +1340,34 @@ Redireccionar();
                   </div>
                 </div>     
               </div>   
-              <div class="d-flex justify-content-end">
-                <button class="btn btn-outline-primary btn-sm shadow-sm" title="Ver documento equivalente al estado o actualizar estado del proceso" id="btnEstado">
+              <div class="d-flex justify-content-end gap-2">
+                <button class="btn btn-outline-primary btn-sm shadow-sm shadow-sm" title="Ver documentos relacionados al estado del proceso... Seleccione un estado y haga click aquí para ver!!!" id="btnVerArchivoEstado">
+                  <i class="fa-solid fa-eye"></i>
+                </button>
+                <button class="btn btn-outline-primary btn-sm shadow-sm shadow-sm" title="Ver documento equivalente al estado o actualizar estado del proceso" id="btnEstado">
                   <i class="fa-solid fa-upload"></i>
                 </button>
               </div>         
             </div>
           </div>
+          <div class="d-none" id="contenedorPrincipalReporte">               
+            <h5 class="text-center text-green mb-3">REPORTE PROCESO JURÍDICO</h5>
+            <div class="d-flex justify-content-end mb-1">
+              <button class="btn btn-outline-success btn-sm" id="exportarExcel">
+                <i class="fa-solid fa-file-excel"></i>
+                Exportar a Excel
+              </button>
+            </div>
+            <div style="overflow: auto;" id="contenedorReporte">
+
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline-warning btn-sm" id="generarReporte">
+            <i class="fa-solid fa-list"></i>  
+            Generar Reporte
+          </button>
         </div>
       </div>
     </div>
@@ -1334,6 +1380,7 @@ Redireccionar();
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.13.2/dist/sweetalert2.all.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
   <script type="text/javascript" src="../resources/select2/js/select2.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script type="text/javascript" src="../lib/js/funciones.js?<?php echo (rand()); ?>"></script>
   <script type="text/javascript" src="../lib/js/servicios.js?<?php echo (rand()); ?>"></script>
   <script type="text/javascript" src="../controllers/CRM.js?<?php echo (rand()); ?>"></script>

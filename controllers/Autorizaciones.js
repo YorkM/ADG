@@ -1,4 +1,4 @@
-const idRol = parseInt($('#Rol'));
+const idRol = parseInt($('#Rol').val());
 // FUNCIÓN CONFIRM ACCIONES
 const confirmAlert = async (title, text) => {
   const result = await Swal.fire({
