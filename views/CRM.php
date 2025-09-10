@@ -108,7 +108,6 @@ Redireccionar();
 
     .bag-disabled {
       background-color: #e9ecef !important;
-      font-weight: 500;
     }
 
     .text-green {
@@ -225,6 +224,14 @@ Redireccionar();
       padding: 0;
       font-size: 10px;
       color: #9f9999;
+    }
+
+    .bag-warning {
+      background-color: #f5f5d0;
+    }
+
+    .bag-warning:focus {
+      background-color: #f5f5d0;
     }
   </style>
 </head>
@@ -809,9 +816,14 @@ Redireccionar();
         </div>
       </div>
       <!-- TAB PROCESOS JUDICIALES -->
+      <div class="d-flex justify-content-end">
+        <button class="btn btn-outline-secondary btn-sm" title="Click aquí para ver u ocultar la sección de datos básicos" id="btnHeader">
+          <i class="fa-solid fa-plus"></i>
+        </button>
+      </div>
       <div class="tab-pane fade p-1" id="dvJuridica" role="tabpanel">
-        <h6 class="title-card">DATOS BÁSICOS DEL CLIENTE</h6>
-        <div class="card p-2 border-card shadow-sm mb-4">
+        <h6 class="title-card d-none header-main">DATOS BÁSICOS DEL CLIENTE</h6>
+        <div class="card p-2 border-card shadow-sm mb-4 d-none header-main">
           <div class="container-fluid">
             <div class="row mb-3">
               <div class="col-md-4">
@@ -894,13 +906,19 @@ Redireccionar();
               </div>
             </div>
             <div class="row">
-              <div class="col-md-8">
+              <div class="col-md-6">
                 <div class="input-group">
                   <span class="input-group-text bold-span size-13">Carta CIFIN:</span>
                   <input type="file" accept=".pdf" class="form-control form-control-sm shadow-sm size-13" id="cifinJ">
                 </div>
               </div>
               <div class="col-md-4">
+                <div class="input-group">
+                  <span class="input-group-text bold-span size-13">Fecha Carta Cifin:</span>
+                  <input type="date" class="form-control form-control-sm shadow-sm size-13" id="fechaCifinJ">
+                </div>
+              </div>
+              <div class="col-md-2">
                 <button class="btn btn-outline-primary btn-sm w-100" id="btnGuardar">
                   <i class="fa-solid fa-floppy-disk"></i> Guardar datos
                 </button>
@@ -908,16 +926,14 @@ Redireccionar();
             </div>
           </div>
         </div>
-        <p style="font-family: system-ui; font-size: 14px; color: #055160;">
-          A continuación se listan todos los procesos... Tanto en estados Finalizados, Prejurídicos y Jurídicos
-        </p>
+        <!-- <p style="font-family: system-ui; font-size: 14px; color: #055160;">A continuación se listan todos los procesos... Tanto en estados Finalizados, Prejurídicos y Jurídicos</p> -->
         <div class="row mb-2 align-items-baseline">
           <div class="col-md-6">
-            <input type="text" class="form-control form-control-sm shadow-sm" autocomplete="off" placeholder="Filtro de búsqueda..." id="filtro">
+            <input type="text" class="form-control form-control-sm shadow-sm" autocomplete="off" placeholder="Filtro de búsqueda..." id="filtroProcesos">
           </div>
           <div class="col-md-4">
             <select class="form-select form-select-sm shadow-sm size-13" id="filtroOficina">
-             
+
             </select>
           </div>
           <div class="col-md-2">
@@ -1116,10 +1132,16 @@ Redireccionar();
           <div class="card p-2 border-card shadow-sm mb-5">
             <div class="container-fluid">
               <div class="row">
-                <div class="col-md-10">
+                <div class="col-md-6">
                   <div class="input-group">
                     <span class="input-group-text bold-span size-13">Carta Prejurídica:</span>
                     <input type="file" accept=".pdf" class="form-control form-control-sm shadow-sm size-13" id="cartaM">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="input-group">
+                    <span class="input-group-text bold-span size-13">Fecha Carta Prejurídica:</span>
+                    <input type="date" class="form-control form-control-sm shadow-sm size-13" id="fechaCartaM">
                   </div>
                 </div>
                 <div class="col-md-2">
@@ -1129,6 +1151,9 @@ Redireccionar();
                     </button>
                   </div>
                 </div>
+              </div>
+              <div class="mt-2">
+                <textarea class="form-control form-control-sm shadow-sm size-13 bag-warning" placeholder="Nota de carta prejurídica(Opcional)" id="comentarioCartaPreju"></textarea>
               </div>
             </div>
           </div>
@@ -1156,10 +1181,48 @@ Redireccionar();
                   </div>
                 </div>
               </div>
-              <div class="d-flex justify-content-end">
+              <div class="d-flex justify-content-between gap-2 mb-2">
+                <div style="flex: 1;">
+                  <textarea class="form-control form-control-sm shadow-sm size-13 bag-warning" placeholder="Nota de acuerdo de pago(Opcional)" id="comentarioAcuerdo"></textarea>
+                </div>
                 <button class="btn btn-outline-primary btn-sm shadow-sm" title="Ver o guardar el acuerdo de pago" id="btnCargarAcuerdo">
                   <i class="fa-solid fa-upload"></i>
                 </button>
+              </div>
+              <!-- FUNCIONALIDAD DE AGREGAR ABONOS -->
+              <button class="btn btn-outline-secondary btn-sm d-none" title="Agregar abono o acuerdo de pago" id="btnAgregarAbono">
+                <i class="fa-solid fa-plus"></i>
+              </button>
+              <div class="row mt-2 d-none" id="contenedorSeccionAbono">
+                <div class="col-md-3">
+                  <div class="input-group">
+                    <span class="input-group-text bold-span size-13">Valor Pago:</span>
+                    <input type="text" class="form-control form-control-sm shadow-sm size-13" placeholder="0.00" id="valorPagoM">
+                  </div>
+                </div>
+                <div class="col-md-5">
+                  <div class="input-group">
+                    <span class="input-group-text bold-span size-13">Tipo Pago:</span>
+                    <select class="form-select form-select-sm shadow-sm size-13" id="tipoPagoM">
+                      <option value="1" selected>ABONO</option>
+                      <option value="2">TOTAL</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="input-group">
+                    <span class="input-group-text bold-span size-13">Fecha Pago:</span>
+                    <input type="date" class="form-control form-control-sm shadow-sm size-13" id="fechaPagoM">
+                  </div>
+                </div>
+                <div class="col-md-1 d-flex justify-content-end">
+                  <button class="btn btn-outline-primary btn-sm" id="btnGuardarAbono">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="mt-2" style="overflow: auto;" id="contenedorTablaAbonos">
+
               </div>
             </div>
           </div>
@@ -1181,13 +1244,18 @@ Redireccionar();
                   </div>
                 </div>
               </div>
-              <div class="d-flex justify-content-end gap-2">
+              <div class="d-flex justify-content-between gap-2">
+                <div style="flex: 1;">
+                  <textarea class="form-control form-control-sm shadow-sm size-13 bag-warning" placeholder="Nota de finalización del caso(Opcional)" id="comentarioFinalizacion"></textarea>
+                </div>
+                <div class="align-self-center">
                   <button class="btn btn-outline-primary btn-sm shadow-sm" title="Ver o cargar el soporte de pago" id="btnGuardarSoporte">
                     <i class="fa-solid fa-upload"></i>
                   </button>
                   <button class="btn btn-outline-danger btn-sm shadow-sm" title="Enviar a cobro jurídico" id="btnEnviarJuridico">
                     <i class="fa-solid fa-gavel"></i>
                   </button>
+                </div>
               </div>
             </div>
           </div>
@@ -1215,7 +1283,10 @@ Redireccionar();
                   </div>
                 </div>
               </div>
-              <div class="d-flex justify-content-end">
+              <div class="d-flex justify-content-between gap-2">
+                <div style="flex: 1;">
+                  <textarea class="form-control form-control-sm shadow-sm size-13 bag-warning" placeholder="Nota de envío proceso a jurídico(Opcional)" id="comentarioEnvioJuri"></textarea>
+                </div>
                 <button class="btn btn-outline-primary btn-sm shadow-sm" title="Ver o cargar la documentación jurídica" id="btnGuardarDatosJuri">
                   <i class="fa-solid fa-upload"></i>
                 </button>
@@ -1232,21 +1303,21 @@ Redireccionar();
                     <span class="input-group-text bold-span size-13">Informe Bienes:</span>
                     <input type="file" accept=".pdf" class="form-control form-control-sm shadow-sm size-13" id="bienesM">
                   </div>
-                </div>                
+                </div>
                 <div class="col-md-4">
                   <div class="input-group">
                     <span class="input-group-text bold-span size-13">Presentación Demanda:</span>
                     <input type="file" accept=".pdf" class="form-control form-control-sm shadow-sm size-13" id="demandaM">
                   </div>
-                </div>                
+                </div>
                 <div class="col-md-4">
                   <div class="input-group">
                     <span class="input-group-text bold-span size-13">Juzgado/Radicado:</span>
                     <input type="file" accept=".pdf" class="form-control form-control-sm shadow-sm size-13" id="juzgaRadiM">
                   </div>
-                </div>                
+                </div>
               </div>
-              <div class="row mb-2">               
+              <div class="row mb-2">
                 <div class="col-md-4">
                   <div class="input-group">
                     <span class="input-group-text bold-span size-13">Juzgado:</span>
@@ -1266,16 +1337,21 @@ Redireccionar();
                   </div>
                 </div>
               </div>
-              <div class="d-flex justify-content-end gap-2">
-                <button class="btn btn-outline-success btn-sm shadow-sm" title="Ver presentación de la demanda" id="btnVerDemanda">
-                  <i class="fa-solid fa-eye"></i>
-                </button>
-                <button class="btn btn-outline-secondary btn-sm shadow-sm" title="Ver juzgado y radicado" id="btnVerRadiJuzga">
-                  <i class="fa-solid fa-eye"></i>
-                </button>
-                <button class="btn btn-outline-primary btn-sm shadow-sm" title="Ver informe de bienes o guardar la información del seguimiento" id="btnGuardarDatosSegui">
-                  <i class="fa-solid fa-upload"></i>
-                </button>
+              <div class="d-flex justify-content-between gap-2">
+                <div style="flex: 1;">
+                  <textarea class="form-control form-control-sm shadow-sm size-13 bag-warning" placeholder="Nota de seguimiento al proceso(Opcional)" id="comentarioSeguimiento"></textarea>
+                </div>
+                <div class="align-self-center">
+                  <button class="btn btn-outline-success btn-sm shadow-sm" title="Ver presentación de la demanda" id="btnVerDemanda">
+                    <i class="fa-solid fa-eye"></i>
+                  </button>
+                  <button class="btn btn-outline-secondary btn-sm shadow-sm" title="Ver juzgado y radicado" id="btnVerRadiJuzga">
+                    <i class="fa-solid fa-eye"></i>
+                  </button>
+                  <button class="btn btn-outline-primary btn-sm shadow-sm" title="Ver informe de bienes o guardar la información del seguimiento" id="btnGuardarDatosSegui">
+                    <i class="fa-solid fa-upload"></i>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -1289,30 +1365,35 @@ Redireccionar();
                     <span class="input-group-text bold-span size-13">Mandamiento de Pago:</span>
                     <input type="file" accept=".pdf" class="form-control form-control-sm shadow-sm size-13" id="mandamientoM">
                   </div>
-                </div>                
+                </div>
                 <div class="col-md-4">
                   <div class="input-group">
                     <span class="input-group-text bold-span size-13">Notificación Demanda:</span>
                     <input type="file" accept=".pdf" class="form-control form-control-sm shadow-sm size-13" id="notificacionM">
                   </div>
-                </div>                
+                </div>
                 <div class="col-md-4">
                   <div class="input-group">
                     <span class="input-group-text bold-span size-13">Acuerdo Pago:</span>
                     <input type="file" accept=".pdf" class="form-control form-control-sm shadow-sm size-13" id="acuerdo2M">
                   </div>
-                </div>                
+                </div>
               </div>
-              <div class="d-flex justify-content-end gap-2">
-                <button class="btn btn-outline-success btn-sm shadow-sm" title="Ver mandamiento de pago u orden de embargo" id="btnVerMandamiento">
-                  <i class="fa-solid fa-eye"></i>
-                </button>
-                <button class="btn btn-outline-secondary btn-sm shadow-sm" title="Ver notificación de demanda" id="btnVerNotificación">
-                  <i class="fa-solid fa-eye"></i>
-                </button>
-                <button class="btn btn-outline-primary btn-sm shadow-sm" title="Ver acuerdo de pago o guardar información de las observaciones" id="btnVerGuardarAcuerdo">
-                  <i class="fa-solid fa-upload"></i>
-                </button>
+              <div class="d-flex justify-content-between gap-2">
+                <div style="flex: 1;">
+                  <textarea class="form-control form-control-sm shadow-sm size-13 bag-warning" placeholder="Nota de observaciones(Opcional)" id="comentarioObservaciones"></textarea>
+                </div>
+                <div class="align-self-center">
+                  <button class="btn btn-outline-success btn-sm shadow-sm" title="Ver mandamiento de pago u orden de embargo" id="btnVerMandamiento">
+                    <i class="fa-solid fa-eye"></i>
+                  </button>
+                  <button class="btn btn-outline-secondary btn-sm shadow-sm" title="Ver notificación de demanda" id="btnVerNotificación">
+                    <i class="fa-solid fa-eye"></i>
+                  </button>
+                  <button class="btn btn-outline-primary btn-sm shadow-sm" title="Ver acuerdo de pago o guardar información de las observaciones" id="btnVerGuardarAcuerdo">
+                    <i class="fa-solid fa-upload"></i>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -1332,25 +1413,65 @@ Redireccionar();
                       <option value="4">EN ESTADO DE INSOLVENCIA</option>
                     </select>
                   </div>
-                </div>                
+                </div>
                 <div class="col-md-6">
                   <div class="input-group">
                     <span class="input-group-text bold-span size-13" id="labelEstado">:</span>
                     <input type="file" accept=".pdf" class="form-control form-control-sm shadow-sm size-13" id="estadoArchivo">
                   </div>
-                </div>     
-              </div>   
-              <div class="d-flex justify-content-end gap-2">
-                <button class="btn btn-outline-primary btn-sm shadow-sm shadow-sm" title="Ver documentos relacionados al estado del proceso... Seleccione un estado y haga click aquí para ver!!!" id="btnVerArchivoEstado">
-                  <i class="fa-solid fa-eye"></i>
-                </button>
-                <button class="btn btn-outline-primary btn-sm shadow-sm shadow-sm" title="Ver documento equivalente al estado o actualizar estado del proceso" id="btnEstado">
-                  <i class="fa-solid fa-upload"></i>
-                </button>
-              </div>         
+                </div>
+              </div>
+              <div class="d-flex justify-content-between gap-2 mb-2">
+                <div style="flex: 1;">
+                  <textarea class="form-control form-control-sm shadow-sm size-13 bag-warning" placeholder="Nota del estado del proceso(Opcional)" id="comentarioEstado"></textarea>
+                </div>
+                <div class="align-self-center">
+                  <button class="btn btn-outline-primary btn-sm shadow-sm shadow-sm" title="Ver documentos relacionados al estado del proceso... Seleccione un estado y haga click aquí para ver!!!" id="btnVerArchivoEstado">
+                    <i class="fa-solid fa-eye"></i>
+                  </button>
+                  <button class="btn btn-outline-primary btn-sm shadow-sm shadow-sm" title="Ver documento equivalente al estado o actualizar estado del proceso" id="btnEstado">
+                    <i class="fa-solid fa-upload"></i>
+                  </button>
+                </div>
+              </div>
+              <!-- FUNCIONALIDAD DE AGREGAR ABONOS -->
+              <button class="btn btn-outline-secondary btn-sm d-none" title="Agregar abono o acuerdo de pago" id="btnAgregarAbono2">
+                <i class="fa-solid fa-plus"></i>
+              </button>
+              <div class="row mt-2 d-none" id="contenedorSeccionAbono2">
+                <div class="col-md-3">
+                  <div class="input-group">
+                    <span class="input-group-text bold-span size-13">Valor Pago:</span>
+                    <input type="text" class="form-control form-control-sm shadow-sm size-13" placeholder="0.00" id="valorPagoM2">
+                  </div>
+                </div>
+                <div class="col-md-5">
+                  <div class="input-group">
+                    <span class="input-group-text bold-span size-13">Tipo Pago:</span>
+                    <select class="form-select form-select-sm shadow-sm size-13" id="tipoPagoM2">
+                      <option value="1" selected>ABONO</option>
+                      <option value="2">TOTAL</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="input-group">
+                    <span class="input-group-text bold-span size-13">Fecha Pago:</span>
+                    <input type="date" class="form-control form-control-sm shadow-sm size-13" id="fechaPagoM2">
+                  </div>
+                </div>
+                <div class="col-md-1 d-flex justify-content-end">
+                  <button class="btn btn-outline-primary btn-sm" id="btnGuardarAbono2">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="mt-2" style="overflow: auto;" id="contenedorTablaAbonos2">
+
+              </div>
             </div>
           </div>
-          <div class="d-none" id="contenedorPrincipalReporte">               
+          <div class="d-none" id="contenedorPrincipalReporte">
             <h5 class="text-center text-green mb-3">REPORTE PROCESO JURÍDICO</h5>
             <div class="d-flex justify-content-end mb-1">
               <button class="btn btn-outline-success btn-sm" id="exportarExcel">
@@ -1364,8 +1485,8 @@ Redireccionar();
           </div>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-outline-warning btn-sm" id="generarReporte">
-            <i class="fa-solid fa-list"></i>  
+          <button class="btn btn-warning btn-sm" id="generarReporte">
+            <i class="fa-solid fa-list"></i>
             Generar Reporte
           </button>
         </div>

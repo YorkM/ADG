@@ -1204,8 +1204,8 @@ let meses = {
   "12": "DICIEMBRE"
 }
 // FUNCIÓN FILTRAR POR ZONA
-const filtrar = (filtro) => {
-  const filas = document.querySelectorAll('#tablaRotacion tbody tr');
+const filtrar = (filtro, idTabla) => {
+  const filas = document.querySelectorAll(`#${idTabla} tbody tr`);
 
   filas.forEach(fila => {
     const celdas = fila.querySelectorAll('td');
@@ -1226,7 +1226,6 @@ const getRotacion = async () => {
   });
   
   if (data.length) {
-    console.log(data);
     const totalCartera = data.reduce((acumulador, item) => acumulador + parseFloat(item.CARTERA), 0);
     const totalVentas = data.reduce((acumulador, item) => acumulador + parseFloat(item.VENTAS), 0);
     const dias = parseInt(data[0].DIAS);
@@ -1246,7 +1245,6 @@ const getRotacion = async () => {
     });
 
     const totalRotacion = ((totalCartera / totalVentas) * dias).toFixed(2);
-    console.log({totalCartera, totalVentas, totalRotacion});
 
     $('#tablaRotacion tbody').html(elementos);
     $('#totalCartera').text(formatNum(totalCartera, "$"));
@@ -1307,14 +1305,15 @@ const guardarLogs = async (idProceso, estado, usuario) => {
   }
 }
 // FUNCIÓN PARA CAMBIO DE ESTADOS
-const cambiarEstados = async (idProceso, estado, campo) => {
+const cambiarEstados = async (idProceso, estado, fechaCartaPreju, comentario) => {
   try {
     const resp = await enviarPeticion({ 
       op: "U_ESTADOS", 
       link: "../models/CRM.php", 
       idProceso, 
       estado,
-      campo 
+      fechaCartaPreju,
+      comentario 
     });
     
     return resp.ok;
@@ -1459,9 +1458,165 @@ const diccionarioEstados = {
   '8': { color: "danger", texto: 'Proceso en estado <strong>JURÍDICO</strong>, en instancia de <strong>DATOS SEGUIMIENTO</strong>, proceso que ya cuenta con los datos relacionados con el seguimiento' },
   '9': { color: "danger", texto: 'Proceso en estado <strong>JURÍDICO</strong>, en instancia de <strong>OBSERVACIONES</strong>, proceso al que se le ha diligeciado la sección de observaciones y está por definirse su estado' },
   '10': { color: "danger", texto: 'Proceso en estado <strong>JURÍDICO</strong>, en instancia de <strong>DILIGENCIA PENDIENTE</strong>, proceso en estado diligencia pendiente' },
-  '11': { color: "danger", texto: 'Proceso en estado <strong>JURÍDICO</strong>, en instancia de <strong>ACUERDO DE PAGO</strong>, proceso en estado de acuerdo de pago en cobro jurídico' },
+  '11': { color: "warning", texto: 'Proceso en estado <strong>JURÍDICO</strong>, en instancia de <strong>ACUERDO DE PAGO</strong>, proceso en estado de acuerdo de pago en cobro jurídico' },
   '12': { color: "success", texto: 'Proceso en estado <strong>JURÍDICO</strong>, en instancia de <strong>FINALIZADO</strong>' },
   '13': { color: "danger", texto: 'Proceso en estado <strong>JURÍDICO</strong>, en instancia de <strong>ESTADO DE INSOLVENCIA</strong>' }
+}
+// FUNCIÓN OBTENER ABONOS
+const getAbonos = async (codigo, estado) => {
+  try {
+    const { data } = await enviarPeticion({ 
+      op: "G_ABONOS", 
+      link: "../models/CRM.php", 
+      codigo,
+      estado 
+    });
+
+    if (data.length) {
+      let tabla = `
+      <table class="table table-bordered table-hover table-sm w-100" id="tablaAbonos">
+        <thead>
+          <tr>
+            <th colspan="9" class="text-end"> 
+              <button type="button" class="btn btn-outline-success btn-sm" id="btnExportarAbonos">
+                <i class="fa-solid fa-file-excel"></i>
+                Exportar a Excel
+              </button>
+            </th>
+          </tr>
+          <tr>
+            <th class="size-th bag-info no-wrap">ORGANIZACIÓN</th>
+            <th class="size-th bag-info no-wrap">CÓDIGO</th>
+            <th class="size-th bag-info no-wrap">ZONA VENTAS</th>
+            <th class="size-th bag-info no-wrap">NOMBRE CLIENTE</th>
+            <th class="size-th bag-info no-wrap">FECHA PAGO</th>
+            <th class="size-th bag-info no-wrap">VALOR PAGO</th>
+            <th class="size-th bag-info no-wrap">TIPO</th>
+            <th class="size-th bag-info no-wrap text-center">CUMPLE</th>
+            <th class="size-th bag-info no-wrap text-center">¿CUMPLIÓ?</th>
+          </tr>
+        </thead>
+        <tbody>`;
+
+        const fechaActualTime = new Date().getTime();
+        let colorFila = "";
+
+        data.forEach(item => {
+          const fechaPago = `${item.FECHA_PAGO}T00:00:00`;
+          const fechaPagoTime = new Date(fechaPago).getTime();
+
+          const fechaVencida = fechaPagoTime < fechaActualTime;
+
+          if (fechaVencida || item.CUMPLE === "2") {
+            colorFila = "#f3a3aa";
+          } else if (item.CUMPLE === "1") {
+            colorFila = "#a5f7d1ff";
+          } else {
+            colorFila = "";
+          }
+
+          tabla += `
+          <tr>
+            <td style="background-color: ${colorFila};" class="size-13 vertical no-wrap">${item.ORGANIZACION}</td>
+            <td style="background-color: ${colorFila};" class="size-13 vertical no-wrap">${item.CODIGO}</td>
+            <td style="background-color: ${colorFila};" class="size-12 vertical no-wrap">${item.ZONA_VENTAS}</td>
+            <td style="background-color: ${colorFila};" class="size-12 vertical no-wrap">${item.NOMBRE_CLIENTE}</td>
+            <td style="background-color: ${colorFila};" class="size-13 vertical no-wrap">${item.FECHA_PAGO}</td>
+            <td style="background-color: ${colorFila};" class="size-13 vertical no-wrap">${formatNum(item.VALOR_PAGO, "$")}</td>
+            <td style="background-color: ${colorFila};" class="size-12 vertical no-wrap">${item.TIPO}</td>
+            <td style="background-color: ${colorFila};" class="size-12 vertical no-wrap text-center">${item.CUMPLE_T}</td>
+            <td style="background-color: ${colorFila};" class="d-flex justify-content-center gap-2">
+              <button type="button" class="btn btn-outline-success btn-sm btn-cumple" data-id="${item.ID}">
+                <i class="fa-solid fa-thumbs-up"></i>
+              </button>
+              <button type="button" class="btn btn-outline-danger btn-sm btn-nocumple" data-id="${item.ID}">
+                <i class="fa-solid fa-thumbs-down"></i>
+              </button>
+            </td>
+          </tr>`;
+        });
+
+        if (estado === "1") {
+          $('#contenedorTablaAbonos').html(tabla);
+        } else {
+          $('#contenedorTablaAbonos2').html(tabla);
+        }
+
+        $('#tablaAbonos').on('click', '.btn-cumple', async function () {
+          const idAbono = $(this).attr("data-id");
+          const result = await confirmAlert("Cumple Pago", "¿Desea actualizar el pago a CUMPLE?");
+          if (!result.isConfirmed) return;
+          actualizarCumplePago(idAbono, "1", "1"); 
+        });
+
+        $('#tablaAbonos').on('click', '.btn-nocumple', async function () {
+          const idAbono = $(this).attr("data-id");
+          const result = await confirmAlert("No Cumple Pago", "¿Desea actualizar el pago a NO CUMPLE?");
+          if (!result.isConfirmed) return;
+          actualizarCumplePago(idAbono, "2", "2");
+        });
+        
+      $('#tablaAbonos').on('click', '#btnExportarAbonos', async function () {
+        if ($('#tablaAbonos tbody tr').length) {
+          exportarExcel("tablaAbonos");
+        }
+      });
+      } else {
+        const msgHtml = `<p class="text-center lead">No hay fechas registradas para abonos</p>`;
+        if (estado === "1") {
+          $('#contenedorTablaAbonos').html(msgHtml);
+        } else {
+          $('#contenedorTablaAbonos2').html(msgHtml);
+        }
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
+// FUNCIÓN PARA GESTIONAR EL PROCESO
+const gestionarProceso = (item) => {
+  $('#idProcesoHidden').val(item.ID);
+  $('#codigoM').val(item.CODIGO);
+  $('#nombreM').val(item.NOMBRE_CLIENTE);
+  $('#razonM').val(item.RAZON_SOCIAL);
+
+  const estado = item.ESTADO;
+
+  const alertHTML = `
+  <div class="alert alert-${diccionarioEstados[estado].color} mb-5" role="alert">
+    ${diccionarioEstados[estado].texto}
+  </div>`;
+
+  $('#alertEstados').html(alertHTML);
+
+  (estado === "1") ? $('#btnCargarCarta').html(`<i class="fa-solid fa-upload"></i>`) : $('#btnCargarCarta').html(`<i class="fa-solid fa-eye"></i>`);
+  (estado === "1" || estado === "2") ? $('#btnCargarAcuerdo').html(`<i class="fa-solid fa-upload"></i>`) : $('#btnCargarAcuerdo').html(`<i class="fa-solid fa-handshake"></i>`);
+  (estado === "1" || estado === "2" || estado === "3") ? $('#btnGuardarSoporte').html(`<i class="fa-solid fa-upload"></i>`) : $('#btnGuardarSoporte').html(`<i class="fa-solid fa-eye"></i>`);
+  (estado === "7" || estado === "8" || estado === "9" || estado === "10" || estado === "11" || estado === "12" || estado === "13") ? $('#btnGuardarDatosJuri').html(`<i class="fa-solid fa-eye"></i>`) : $('#btnGuardarDatosJuri').html(`<i class="fa-solid fa-upload"></i>`);
+  (estado === "8" || estado === "9" || estado === "10" || estado === "11" || estado === "12" || estado === "13") ? $('#btnGuardarDatosSegui').html(`<i class="fa-solid fa-eye"></i>`) : $('#btnGuardarDatosSegui').html(`<i class="fa-solid fa-upload"></i>`);
+  (estado === "9" || estado === "10" || estado === "11" || estado === "12" || estado === "13") ? $('#btnVerGuardarAcuerdo').html(`<i class="fa-solid fa-eye"></i>`) : $('#btnVerGuardarAcuerdo').html(`<i class="fa-solid fa-upload"></i>`);
+
+  if (estado === "3") {
+    $('#btnAgregarAbono').removeClass("d-none");
+    getAbonos(item.CODIGO, "1");
+  } else if (estado === "11") {
+    $('#btnAgregarAbono2').removeClass("d-none");
+    $('#btnAgregarAbono').addClass("d-none");
+    $('#contenedorTablaAbonos').html("");
+    getAbonos(item.CODIGO, "2");
+  }  else {
+    $('#btnAgregarAbono').addClass("d-none");
+    $('#btnAgregarAbono2').addClass("d-none");
+    $('#contenedorTablaAbonos').html("");
+    $('#contenedorTablaAbonos2').html("");
+  }
+
+  const seccionesJuridicas = document.querySelectorAll('.seccion-juridico');
+
+  if (estado === "6" || estado === "7" || estado === "8" || estado === "9" || estado === "10" || estado === "11" || estado === "12" || estado === "13") seccionesJuridicas.forEach(item => item.classList.remove('d-none'));
+  else seccionesJuridicas.forEach(item => item.classList.add('d-none'));
+
+  $('#modalGestion').modal("show");
 }
 // FUNCIÓN OBTENER DATOS DE PROCESOS
 const getDatosProcesos = async () => {
@@ -1493,7 +1648,7 @@ const getDatosProcesos = async () => {
         let title = "";
 
         if (validarEstado === "1") {
-          const fechaDias20 = sumarDiasHabiles(item.FECHA_ISO, 20);
+          const fechaDias20 = sumarDiasHabiles(item.FECHA_CIFIN, 20);
           const fechaDias20Time = new Date(fechaDias20).getTime();
           const fechaActualTime = new Date().getTime();
 
@@ -1517,7 +1672,7 @@ const getDatosProcesos = async () => {
           const fechaAcuerdoTime = new Date(fechaAcuerdo).getTime();
           const fechaActualTime = new Date().getTime();
           
-          title = `El acuerdo de pago vence en: ${formatDate(fechaAcuerdo.toISOString())}`;
+          title = `El acuerdo de pago vence el: ${formatDate(fechaAcuerdo.toISOString())}`;
 
           const fechaVencida = fechaAcuerdoTime < fechaActualTime;
           if (fechaVencida) {
@@ -1540,33 +1695,7 @@ const getDatosProcesos = async () => {
         const { data } = await enviarPeticion({op: "G_PROCESO", link: "../models/CRM.php", idProceso: item.ID});
         sessionStorage.DatosProceso = JSON.stringify(data[0]);
         
-        $('#idProcesoHidden').val(item.ID);
-        $('#codigoM').val(item.CODIGO);
-        $('#nombreM').val(item.NOMBRE_CLIENTE);
-        $('#razonM').val(item.RAZON_SOCIAL);
-
-        const estado = item.ESTADO;
-
-        const alertHTML = `
-        <div class="alert alert-${diccionarioEstados[estado].color} mb-5" role="alert">
-          ${diccionarioEstados[estado].texto}
-        </div>`;
-
-        $('#alertEstados').html(alertHTML);
-
-        (estado === "1") ? $('#btnCargarCarta').html(`<i class="fa-solid fa-upload"></i>`) : $('#btnCargarCarta').html(`<i class="fa-solid fa-eye"></i>`); 
-        (estado === "1" ||  estado === "2") ? $('#btnCargarAcuerdo').html(`<i class="fa-solid fa-upload"></i>`) : $('#btnCargarAcuerdo').html(`<i class="fa-solid fa-handshake"></i>`); 
-        (estado === "1" ||  estado === "2" ||  estado === "3") ? $('#btnGuardarSoporte').html(`<i class="fa-solid fa-upload"></i>`) : $('#btnGuardarSoporte').html(`<i class="fa-solid fa-eye"></i>`); 
-        (estado === "7" || estado === "8" || estado === "9" || estado === "10" || estado === "11" || estado === "12" || estado === "13") ? $('#btnGuardarDatosJuri').html(`<i class="fa-solid fa-eye"></i>`) : $('#btnGuardarDatosJuri').html(`<i class="fa-solid fa-upload"></i>`);
-        (estado === "8" || estado === "9" || estado === "10" || estado === "11" || estado === "12" || estado === "13") ? $('#btnGuardarDatosSegui').html(`<i class="fa-solid fa-eye"></i>`) : $('#btnGuardarDatosSegui').html(`<i class="fa-solid fa-upload"></i>`);
-        (estado === "9" || estado === "10" || estado === "11" || estado === "12" || estado === "13") ? $('#btnVerGuardarAcuerdo').html(`<i class="fa-solid fa-eye"></i>`) : $('#btnVerGuardarAcuerdo').html(`<i class="fa-solid fa-upload"></i>`);
-        
-        const seccionesJuridicas = document.querySelectorAll('.seccion-juridico');
-
-        if (estado === "6" || estado === "7" || estado === "8" || estado === "9" || estado === "10" || estado === "11" || estado === "12" || estado === "13") seccionesJuridicas.forEach(item => item.classList.remove('d-none'));
-        else seccionesJuridicas.forEach(item => item.classList.add('d-none'));
-
-        $('#modalGestion').modal("show");
+        gestionarProceso(item);
       });
 
       $('#tablaProcesos').on('click', '.btn-timeline', function () {
@@ -1585,6 +1714,7 @@ const guardarDatos = async () => {
   const recordatorio = document.querySelector("#recordatorioJ").files[0];
   const cifin = document.querySelector("#cifinJ").files[0];
   const codigo = $('#codigoJ').val();
+  const fechaCifin = $('#fechaCifinJ').val();
   const nombres = $('#clienteJ').val();
   const organizacion = $('#organizacionJ').val();
   const organizacion2 = $('#org').val();
@@ -1594,8 +1724,8 @@ const guardarDatos = async () => {
     return;
   }
 
-  if (!cifin) {
-    Swal.fire("Oops!!!", "Debe adjuntar la carta CIFIN", "error");
+  if (!cifin || !fechaCifin) {
+    Swal.fire("Oops!!!", "La carta CIFIN y la fecha de la misma son requeridas", "error");
     return;
   }
 
@@ -1625,6 +1755,7 @@ const guardarDatos = async () => {
     op: "I_DATOS_PROCESO",
     link: "../models/CRM.php",
     organizacion,
+    fechaCifin,
     ejecutivo,
     direccion,
     telefono,
@@ -1651,21 +1782,25 @@ const gestionarCartaPrejuridica = () => {
   const item = JSON.parse(sessionStorage.DatosProceso);
   if (item.ESTADO === "1") {
     const carta = document.querySelector('#cartaM').files[0];
+    const comentario = $('#comentarioCartaPreju').val();
+    const fechaCartaPreju = $('#fechaCartaM').val();
 
-    if (!carta) {
-      Swal.fire("Oops!!!", "Debe adjuntar la carta prejurídica", "error");
+    if (!carta || !fechaCartaPreju) {
+      Swal.fire("Oops!!!", "La carta prejurídica y la fecha de la misma son requeridas", "error");
       return;
     }
 
     SubirArchivosAdj(item.ID, [{file: carta, campo: "CARTA_PREJURIDICA"}], item.CODIGO);
 
-    const OK = cambiarEstados(item.ID, "2", "FECHA_CARTA_JURI");
+    const OK = cambiarEstados(item.ID, "2", fechaCartaPreju, comentario);
 
     if (OK) {
       Swal.fire("Cargar Carta", "La carta prejurídica ha sido cargada correctamente", "success");
       guardarLogs(item.ID, "2", usuario);
       getDatosProcesos();
       $('#cartaM').val("");
+      $('#fechaCartaM').val("");
+      $('#comentarioCartaPreju').val("");
       $('#modalGestion').modal("hide");
     }
 
@@ -1680,9 +1815,10 @@ const gestionarCartaPrejuridica = () => {
 // FUNCIÓN PARA CARGAR EL ACUERDO PAGO
 const gestionarAcuerdo = async () => {
   const item = JSON.parse(sessionStorage.DatosProceso);
-  if (item.ESTADO === "2") {
+  if (item.ESTADO === "1" || item.ESTADO === "2") {
     const acuerdo = document.querySelector('#acuerdoM').files[0];
     const fechaInicio = $('#fechaIniM').val();
+    const comentario = $('#comentarioAcuerdo').val();
     const fechaFin = $('#fechaFinM').val();
 
     if (!acuerdo || !fechaInicio || !fechaFin) {
@@ -1696,7 +1832,8 @@ const gestionarAcuerdo = async () => {
       idProceso: item.ID,
       estado: "3",
       fechaInicio: `${fechaInicio} 00:00:00.000`,
-      fechaFin: `${fechaFin} 00:00:00.000`
+      fechaFin: `${fechaFin} 00:00:00.000`,
+      comentario
     });
     
     if (resp.ok) {
@@ -1707,6 +1844,7 @@ const gestionarAcuerdo = async () => {
       $('#acuerdoM').val("");
       $('#fechaIniM').val("");
       $('#fechaFinM').val("");
+      $('#comentarioAcuerdo').val("");
       $('#modalGestion').modal("hide");
     }
 
@@ -1724,6 +1862,7 @@ const gestionarSoportePago = async () => {
   if (item.ESTADO === "3") {
     const soporte = document.querySelector('#soporteM').files[0];
     const fechaSoporte = $('#fechaSoporteM').val();
+    const comentario = $('#comentarioFinalizacion').val();
 
     if (!soporte || !fechaSoporte) {
       Swal.fire("Oops!!!", "El soporte de pago y la fecha del soporte son obligatorios", "error");
@@ -1735,6 +1874,7 @@ const gestionarSoportePago = async () => {
       link: "../models/CRM.php",
       idProceso: item.ID,
       estado: "5",
+      comentario,
       fechaSoporte: `${fechaSoporte} 00:00:00.000`
     });
     
@@ -1746,6 +1886,7 @@ const gestionarSoportePago = async () => {
       getDatosProcesos();
       $('#soporteM').val("");
       $('#fechaSoporteM').val("");
+      $('#comentarioFinalizacion').val("");
       $('#modalGestion').modal("hide");
     }
 
@@ -1763,6 +1904,7 @@ const guardarDatosJuridica = async () => {
   if (item.ESTADO === "6") {
     const documentosJuri = document.querySelector('#documentosM').files[0];
     const fechaJuri = $('#fechaJuridicaM').val();
+    const comentario = $('#comentarioEnvioJuri').val();
     const valor = $('#montoM').val();
 
     if (!documentosJuri || !fechaJuri || !valor) {
@@ -1776,6 +1918,7 @@ const guardarDatosJuridica = async () => {
       idProceso: item.ID,
       fechaJuri: `${fechaJuri} 00:00:00.000`,
       valor: valor.replace(/\./g, ""),
+      comentario,
       estado: "7"
     });
     
@@ -1787,6 +1930,7 @@ const guardarDatosJuridica = async () => {
       $('#documentosM').val("");
       $('#fechaJuridicaM').val("");
       $('#montoM').val("");
+      $('#comentarioEnvioJuri').val("");
       $('#modalGestion').modal("hide");
     }
 
@@ -1801,7 +1945,7 @@ const guardarDatosJuridica = async () => {
 // FUNCIÓN PARA ENVIAR PROCESO A JURÍDICA
 const enviarProcesoJuridico = async () => {
   const item = JSON.parse(sessionStorage.DatosProceso);
-  if (item.ESTADO === "1" || item.ESTADO === "2") {
+  if (item.ESTADO === "1" || item.ESTADO === "2" || item.ESTADO === "3") {
     const result = await confirmAlert("Enviar proceso a jurídica", "El proceso pasará de estado prejurídico a jurídico... ¿Desea continuar?");
     if (!result.isConfirmed) return;
     
@@ -1831,6 +1975,7 @@ const guardarDatosSeguimiento = async () => {
     const demanda = document.querySelector('#demandaM').files[0];
     const juzgadoRadicado = document.querySelector('#juzgaRadiM').files[0];
     const juzgado = $('#juzgadoM').val();
+    const comentario = $('#comentarioSeguimiento').val();
     const radicado = $('#radicadoM').val();
     const fechaDemanda = $('#fechaDemandaM').val();
 
@@ -1847,6 +1992,7 @@ const guardarDatosSeguimiento = async () => {
       link: "../models/CRM.php",
       idProceso: item.ID,
       fechaDemanda: `${fechaDemanda} 00:00:00.000`,
+      comentario,
       estado: "8",
       juzgado,
       radicado
@@ -1863,6 +2009,7 @@ const guardarDatosSeguimiento = async () => {
       $('#juzgadoM').val("");
       $('#radicadoM').val("");
       $('#fechaDemandaM').val("");
+      $('#comentarioSeguimiento').val("");
       $('#modalGestion').modal("hide");
     }
 
@@ -1880,7 +2027,8 @@ const guardarDatosObservaciones = async () => {
   if (item.ESTADO === "8") {
     const mandamiento = document.querySelector('#mandamientoM').files[0];
     const notificaion = document.querySelector('#notificacionM').files[0];
-    const acuerdo = document.querySelector('#acuerdo2M').files[0];   
+    const acuerdo = document.querySelector('#acuerdo2M').files[0];
+    const comentario = $('#comentarioObservaciones').val();   
 
     if (!mandamiento || !notificaion || !acuerdo) {
       Swal.fire("Oops!!!", "Todos los campos relacionados con la observación del proceso son obligatorios", "error");
@@ -1894,6 +2042,7 @@ const guardarDatosObservaciones = async () => {
       op: "U_ESTADO_OBSERVACIONES",
       link: "../models/CRM.php",
       idProceso: item.ID,
+      comentario,
       estado: "9",
     });
     
@@ -1905,6 +2054,7 @@ const guardarDatosObservaciones = async () => {
       $('#mandamientoM').val("");
       $('#notificacionM').val("");
       $('#acuerdo2M').val("");     
+      $('#comentarioObservaciones').val("");     
       $('#modalGestion').modal("hide");
     }
 
@@ -2098,6 +2248,72 @@ const verArchivosEstadoProceso = () => {
     }
   } else {
     Swal.fire("Oops!!!", "Debe seleccionar uno de los estados para ver el respectivo soporte", "error");
+  }
+}
+// FUNCIÓN PÁRA GUARDAR LOS ABONOS
+const guardarAbono = async (estado) => {
+  const { CODIGO: codigo } = JSON.parse(sessionStorage.DatosProceso);
+
+  let valor = "";
+  let fecha = "";
+  let tipo = "";
+
+  if (estado === "1") {
+    valor = $('#valorPagoM').val();
+    fecha = $('#fechaPagoM').val();
+    tipo = $('#tipoPagoM').val();
+  } else {
+    valor = $('#valorPagoM2').val();
+    fecha = $('#fechaPagoM2').val();
+    tipo = $('#tipoPagoM2').val();
+  }
+  
+
+  if (!valor || ! fecha) {
+    Swal.fire("Oops!!!", "El valor del pago y la fecha son requeridas", "error");
+    return;
+  }
+
+  try {
+    const resp = await enviarPeticion({
+      op: "I_ABONO",
+      link: "../models/CRM.php",
+      estado,
+      codigo,
+      valor: valor.replace(/\./g, ""),
+      fecha,
+      tipo
+    });
+
+    if (resp.ok) {
+      Swal.fire("Excelente", "Abono guardado correctamente", "success");
+      getAbonos(codigo, estado);
+      $('#valorPagoM').val("");
+      $('#fechaPagoM').val("");
+      $('#valorPagoM2').val("");
+      $('#fechaPagoM2').val("");
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
+// FUNCIÓN PARA ACTUALIZAR SI CUMPLE O NO
+const actualizarCumplePago = async (idAbono, valor, estado) => {
+  const { CODIGO: codigo } = JSON.parse(sessionStorage.DatosProceso);
+  try {
+    const resp = await enviarPeticion({
+      op: "U_CUMPLE",
+      link: "../models/CRM.php",
+      idAbono,
+      valor
+    });
+
+    if (resp.ok) {
+      Swal.fire("Excelente", "El item ha sido actualizado correctamente", "success");
+      getAbonos(codigo, estado);
+    }
+  } catch (error) {
+    console.log(error);
   }
 }
 
@@ -2387,7 +2603,12 @@ $(function () {
 
   $('#zona').change(function () {
     const filtro = this.value;
-    filtrar(filtro);
+    filtrar(filtro, "tablaRotacion");
+  });
+
+  $('#filtroProcesos').on('input', function () {
+    const filtro = this.value;
+    filtrar(filtro, "tablaProcesos");
   });
 
   $('#btnGuardar').click(function () {
@@ -2454,6 +2675,9 @@ $(function () {
 
   $("#modalGestion").on("hidden.bs.modal", () => {
     $('#contenedorPrincipalReporte').addClass("d-none");
+    $('#contenedorSeccionAbono').addClass("d-none");
+    $('#btnAgregarAbono').html(`<i class="fa-solid fa-plus"></i>`);
+    $('#btnAgregarAbono2').html(`<i class="fa-solid fa-plus"></i>`);
   });
 
   $('#btnGuardar').prop("disabled", true);
@@ -2463,7 +2687,6 @@ $(function () {
     if (!codigo) {
       limpiarCampos();
       $('#btnGuardar').prop("disabled", true);
-      Swal.fire("Oops!!!", "Debe ingresar un código para obtener los datos", "error");
       return;
     }
     getDatosClientes(codigo);
@@ -2517,7 +2740,7 @@ $(function () {
     if ($('#tablaProcesos tbody tr').length) {
       exportarExcel("tablaProcesos");
     }
-  });
+  }); 
 
   $('#btnVerArchivoEstado').click(function () {
     verArchivosEstadoProceso();
@@ -2540,9 +2763,47 @@ $(function () {
     getRotacion();
   });
 
-  $('#montoM').on('input', function () {
+  $("#btnAgregarAbono").on("click", function () {
+    $("#contenedorSeccionAbono").toggleClass("d-none");
+
+    if ($("#contenedorSeccionAbono").hasClass("d-none")) {
+      $(this).html(`<i class="fa-solid fa-plus"></i>`);
+    } else {
+      $(this).html(`<i class="fa-solid fa-minus"></i>`);
+    }
+  });
+
+  $("#btnAgregarAbono2").on("click", function () {
+    $("#contenedorSeccionAbono2").toggleClass("d-none");
+
+    if ($("#contenedorSeccionAbono2").hasClass("d-none")) {
+      $(this).html(`<i class="fa-solid fa-plus"></i>`);
+    } else {
+      $(this).html(`<i class="fa-solid fa-minus"></i>`);
+    }
+  });
+
+  $("#btnHeader").on("click", function () {
+    $(".header-main").toggleClass("d-none");
+
+    if ($(".header-main").hasClass("d-none")) {
+      $(this).html(`<i class="fa-solid fa-plus"></i>`);
+    } else {
+      $(this).html(`<i class="fa-solid fa-minus"></i>`);
+    }
+  });
+  
+  $("#btnGuardarAbono").on("click", function () {
+    guardarAbono("1");
+  });
+
+  $("#btnGuardarAbono2").on("click", function () {
+    guardarAbono("2");
+  });
+
+  $('#montoM, #valorPagoM, #valorPagoM2').on('input', function () {
     let value = $(this).val().replace(/[^0-9]/g, '');
     if (value) value = parseFloat(value).toLocaleString('es-ES', { minimumFractionDigits: 0 });
     $(this).val(value);
-  });
+  });  
 });

@@ -494,9 +494,10 @@ WHERE T.CODIGO_SAP= '" . $_POST['codigo'] . "'";
 		$organizacion = $_POST['organizacion'];
 		$oficina = $_POST['oficina'];
 
-		$query = "SELECT *, CONVERT(VARCHAR(25), FECHA_REGISTRO, 126) AS FECHA_ISO,
+		$query = "SELECT *, CONVERT(VARCHAR(25), FECHA_CARTA_CIFIN, 126) AS FECHA_CIFIN,
 		CONVERT(VARCHAR(25), FECHA_CARTA_JURI, 126) AS FECHA_PREJU,
-		CONVERT(VARCHAR(25), FECHA_FIN_ACUERDO, 126) AS FECHA_FIN_ACUER
+		CONVERT(VARCHAR(25), FECHA_FIN_ACUERDO, 126) AS FECHA_FIN_ACUER,
+		CONVERT(VARCHAR(25), FECHA_INICIO_ACUERDO, 126) AS FECHA_INI_ACUER
 		FROM T_PROCESOS_JURIDICOS WHERE ORGANIZACION = '$organizacion'";
 
 		if ($oficina !== "" && $oficina !== "2000" && $oficina !== "1000") {
@@ -539,8 +540,9 @@ WHERE T.CODIGO_SAP= '" . $_POST['codigo'] . "'";
 	case 'I_DATOS_PROCESO':
 		$nomb = utf8_decode($_POST['nombres']);
 		$razon = utf8_decode($_POST['razon']);
+		$fechaCifin = $_POST['fechaCifin'];
 		$org = $_POST['organizacion'];
-		$dire = $_POST['direccion'];
+		$dire = utf8_decode($_POST['direccion']);
 		$ejec = $_POST['ejecutivo'];
 		$codigo = $_POST['codigo'];
 		$correo = $_POST['correo'];
@@ -550,8 +552,8 @@ WHERE T.CODIGO_SAP= '" . $_POST['codigo'] . "'";
 		$cedu = $_POST['cedula'];
 		$zona = $_POST['zona'];
 
-		$query = "INSERT INTO T_PROCESOS_JURIDICOS (CODIGO, ORGANIZACION, OFICINA, CEDULA, NOMBRE_CLIENTE, RAZON_SOCIAL, DIRECCION, TELEFONO, CORREO, ZONA_VENTAS, EJECUTIVO_CARGO, ESTADO, FECHA_REGISTRO, USUARIO)
-        VALUES ('$codigo', '$org', '$ofi', '$cedu', '$nomb', '$razon', '$dire', '$tel', '$correo', '$zona', '$ejec', '1', GETDATE(), '$usua');
+		$query = "INSERT INTO T_PROCESOS_JURIDICOS (CODIGO, ORGANIZACION, OFICINA, CEDULA, NOMBRE_CLIENTE, RAZON_SOCIAL, DIRECCION, TELEFONO, CORREO, ZONA_VENTAS, EJECUTIVO_CARGO, ESTADO, FECHA_CARTA_CIFIN, FECHA_REGISTRO, USUARIO)
+        VALUES ('$codigo', '$org', '$ofi', '$cedu', '$nomb', '$razon', '$dire', '$tel', '$correo', '$zona', '$ejec', '1', '$fechaCifin', GETDATE(), '$usua');
 
         SELECT SCOPE_IDENTITY() AS ID_INSERTADO;";
 
@@ -568,8 +570,8 @@ WHERE T.CODIGO_SAP= '" . $_POST['codigo'] . "'";
 
 	case 'I_LOG':
 		$idProceso = intval($_POST['idProceso']);
-		$estado  = $_POST['estado'];
 		$usuario = $_POST['usuario'];		
+		$estado  = $_POST['estado'];
 
 		$query = "INSERT INTO T_PROCESOS_JURIDICOS_LOGS (ID_PROCESO, ESTADO, USUARIO, FECHA_HORA) 
 		VALUES ($idProceso, '$estado', '$usuario', GETDATE())";
@@ -596,52 +598,55 @@ WHERE T.CODIGO_SAP= '" . $_POST['codigo'] . "'";
 		break;
 
 	case "U_ARCHIVOS":
+		$campoActualizar = $_POST['campoActualizar'];
 		$idProceso = intval($_POST['idProceso']);
 		$nombreArchivo = $_POST['nombreArchivo'];
-		$campoActualizar = $_POST['campoActualizar'];
 		
 		$sql = "UPDATE T_PROCESOS_JURIDICOS SET $campoActualizar = '$nombreArchivo' WHERE ID = $idProceso";
 		$update = mssql_query($sql);	
 
 		if ($update) echo json_encode(['ok' => true, 'msg' => "Archivos actualizados correctamente"]);
-		else echo json_encode(['ok' => true, 'msg' => "Error al actualizar los archivos"]);
+		else echo json_encode(['ok' => false, 'msg' => "Error al actualizar los archivos"]);
 		break;
 
 	case "U_ESTADOS":
 		$idProceso = intval($_POST['idProceso']);
+		$fechaCartaPreju = $_POST['fechaCartaPreju'];
+		$comentario = $_POST['comentario'];
 		$estado = $_POST['estado'];
-		$campo = $_POST['campo'];
 		
-		$sql = "UPDATE T_PROCESOS_JURIDICOS SET ESTADO = '$estado', $campo = GETDATE() WHERE ID = $idProceso";		
+		$sql = "UPDATE T_PROCESOS_JURIDICOS SET ESTADO = '$estado', FECHA_CARTA_JURI = '$fechaCartaPreju', COMENTARIO_PREJURIDICA = '$comentario' WHERE ID = $idProceso";		
 		$update = mssql_query($sql);	
 
 		if ($update) echo json_encode(['ok' => true, 'msg' => "Estado actualizado correctamente"]);
-		else echo json_encode(['ok' => true, 'msg' => "Error al actualizar estado"]);
+		else echo json_encode(['ok' => false, 'msg' => "Error al actualizar estado"]);
 		break;
 
 	case "U_ACUERDO":
+		$comentario = utf8_decode($_POST['comentario']);
 		$idProceso = intval($_POST['idProceso']);
-		$estado = $_POST['estado'];
 		$fechaInicio = $_POST['fechaInicio'];
 		$fechaFin = $_POST['fechaFin'];
+		$estado = $_POST['estado'];
 
-		$sql = "UPDATE T_PROCESOS_JURIDICOS SET ESTADO = '$estado', FECHA_INICIO_ACUERDO = '$fechaInicio', FECHA_FIN_ACUERDO = '$fechaFin' WHERE ID = $idProceso";			
+		$sql = "UPDATE T_PROCESOS_JURIDICOS SET ESTADO = '$estado', FECHA_INICIO_ACUERDO = '$fechaInicio', FECHA_FIN_ACUERDO = '$fechaFin', COMENTARIO_ACUERDO = '$comentario' WHERE ID = $idProceso";			
 		$update = mssql_query($sql);	
 
 		if ($update) echo json_encode(['ok' => true, 'msg' => "Acuerdo actualizado correctamente"]);
-		else echo json_encode(['ok' => true, 'msg' => "Error al actualizar acuerdo"]);
+		else echo json_encode(['ok' => false, 'msg' => "Error al actualizar acuerdo"]);
 		break;
 
 	case "U_SOPORTE":
+		$comentario = utf8_decode($_POST['comentario']);
 		$idProceso = intval($_POST['idProceso']);
-		$estado = $_POST['estado'];
 		$fechaSoporte = $_POST['fechaSoporte'];
+		$estado = $_POST['estado'];
 
-		$sql = "UPDATE T_PROCESOS_JURIDICOS SET ESTADO = '$estado', FECHA_SOPORTE = '$fechaSoporte' WHERE ID = $idProceso";			
+		$sql = "UPDATE T_PROCESOS_JURIDICOS SET ESTADO = '$estado', FECHA_SOPORTE = '$fechaSoporte', COMENTARIO_FINALIZA_PREJU = '$comentario' WHERE ID = $idProceso";			
 		$update = mssql_query($sql);	
 
 		if ($update) echo json_encode(['ok' => true, 'msg' => "Soporte actualizado correctamente"]);
-		else echo json_encode(['ok' => true, 'msg' => "Error al actualizar soporte"]);
+		else echo json_encode(['ok' => false, 'msg' => "Error al actualizar soporte"]);
 		break;
 
 	case "U_PROCESO_JURIDICO":
@@ -652,56 +657,105 @@ WHERE T.CODIGO_SAP= '" . $_POST['codigo'] . "'";
 		$update = mssql_query($sql);	
 
 		if ($update) echo json_encode(['ok' => true, 'msg' => "Paso a jurídico correctamente"]);
-		else echo json_encode(['ok' => true, 'msg' => "Error al pasar a jurídico"]);
+		else echo json_encode(['ok' => false, 'msg' => "Error al pasar a jurídico"]);
 		break;
 
 	case "U_DOCUMENTOS_JURIDICO":
+		$comentario = utf8_decode($_POST['comentario']);
 		$idProceso = intval($_POST['idProceso']);
 		$fechaJuri = $_POST['fechaJuri'];
 		$estado = $_POST['estado'];
 		$valor = $_POST['valor'];
 
-		$sql = "UPDATE T_PROCESOS_JURIDICOS SET ESTADO = '$estado', FECHA_INICIO_JURI = '$fechaJuri', VALOR = '$valor' WHERE ID = $idProceso";			
+		$sql = "UPDATE T_PROCESOS_JURIDICOS SET ESTADO = '$estado', FECHA_INICIO_JURI = '$fechaJuri', VALOR = '$valor', COMENTARIO_ENVIA_JURI = '$comentario' WHERE ID = $idProceso";			
 		$update = mssql_query($sql);	
 
 		if ($update) echo json_encode(['ok' => true, 'msg' => "Documentos jurídicos actualizados correctamente"]);
-		else echo json_encode(['ok' => true, 'msg' => "Error al actualizar los documentos jurídicos"]);
+		else echo json_encode(['ok' => false, 'msg' => "Error al actualizar los documentos jurídicos"]);
 		break;
 
 	case "I_SEGUIMIENTO":
+		$comentario = utf8_decode($_POST['comentario']);
 		$idProceso = intval($_POST['idProceso']);
 		$fechaDemanda = $_POST['fechaDemanda'];
-		$estado = $_POST['estado'];
 		$juzgado = utf8_decode($_POST['juzgado']);
 		$radicado = $_POST['radicado'];
+		$estado = $_POST['estado'];
 
-		$sql = "UPDATE T_PROCESOS_JURIDICOS SET ESTADO = '$estado', JUZGADO = '$juzgado', RADICADO = '$radicado', FECHA_DEMANDA = '$fechaDemanda' WHERE ID = $idProceso";		
+		$sql = "UPDATE T_PROCESOS_JURIDICOS SET ESTADO = '$estado', JUZGADO = '$juzgado', RADICADO = '$radicado', FECHA_DEMANDA = '$fechaDemanda', COMENTARIO_SEGUIMIENTO = '$comentario' WHERE ID = $idProceso";		
 		$update = mssql_query($sql);
 
 		if ($update) echo json_encode(['ok' => true, 'msg' => "Seguimiento actualizado correctamente"]);
-		else echo json_encode(['ok' => true, 'msg' => "Error al actualizar el seguimiento"]);
+		else echo json_encode(['ok' => false, 'msg' => "Error al actualizar el seguimiento"]);
 		break;
 
 	case "U_ESTADO_OBSERVACIONES":
+		$comentario = utf8_decode($_POST['comentario']);
 		$idProceso = intval($_POST['idProceso']);
 		$estado = $_POST['estado'];
 
-		$sql = "UPDATE T_PROCESOS_JURIDICOS SET ESTADO = '$estado' WHERE ID = $idProceso";		
+		$sql = "UPDATE T_PROCESOS_JURIDICOS SET ESTADO = '$estado', COMENTARIO_OBSERVACIONES = '$comentario' WHERE ID = $idProceso";		
 		$update = mssql_query($sql);
 
 		if ($update) echo json_encode(['ok' => true, 'msg' => "Observaciones actualizadas correctamente"]);
-		else echo json_encode(['ok' => true, 'msg' => "Error al actualizar las observaciones"]);
+		else echo json_encode(['ok' => false, 'msg' => "Error al actualizar las observaciones"]);
 		break;
 
 	case "U_ESTADO_PROCESO":
-		$idProceso = intval($_POST['idProceso']);
 		$estadoProceso = $_POST['estadoProceso'];
+		$idProceso = intval($_POST['idProceso']);
 		$estado = $_POST['estado'];
 
 		$sql = "UPDATE T_PROCESOS_JURIDICOS SET ESTADO = '$estado', ESTADO_PROCESO = '$estadoProceso' WHERE ID = $idProceso";		
 		$update = mssql_query($sql);
 
 		if ($update) echo json_encode(['ok' => true, 'msg' => "Observaciones actualizadas correctamente"]);
-		else echo json_encode(['ok' => true, 'msg' => "Error al actualizar las observaciones"]);
+		else echo json_encode(['ok' => false, 'msg' => "Error al actualizar las observaciones"]);
+		break;
+
+	case "U_CUMPLE":
+		$idAbono = intval($_POST['idAbono']);
+		$valor = $_POST['valor'];
+
+		$sql = "UPDATE T_ACUERDOS_PAGO SET CUMPLE = '$valor' WHERE ID = $idAbono";	
+		$update = mssql_query($sql);
+
+		if ($update) echo json_encode(['ok' => true, 'msg' => "Pago actualizado correctamente"]);
+		else echo json_encode(['ok' => false, 'msg' => "Error al actualizar el pago"]);
+		break;
+
+	case "I_ABONO":
+		$codigo = $_POST['codigo'];
+		$estado = $_POST['estado'];
+		$valor = $_POST['valor'];
+		$fecha = $_POST['fecha'];
+		$tipo = $_POST['tipo'];
+
+		$sql = "INSERT INTO T_ACUERDOS_PAGO (CODIGO, VALOR_PAGO, FECHA_PAGO, TIPO_PAGO, ESTADO)
+		VALUES ('$codigo', '$valor', '$fecha', '$tipo', '$estado')";		
+		$resultado = mssql_query($sql);
+
+		if ($resultado) echo json_encode(['ok' => true, 'msg' => "Abono guardado"]);
+		else echo json_encode(['ok' => false, 'msg' => "Error al guardar abono"]);
+		break;
+
+	case "G_ABONOS":
+		$codigo = $_POST['codigo'];		
+		$estado = $_POST['estado'];		
+
+		$sql = "SELECT AP.ID, PJ.ORGANIZACION, PJ.CODIGO, PJ.ZONA_VENTAS, ISNULL(AP.CUMPLE, 0) AS CUMPLE,
+		PJ.NOMBRE_CLIENTE, AP.FECHA_PAGO, AP.VALOR_PAGO,
+		CASE WHEN AP.TIPO_PAGO = '1' THEN 'ABONO' ELSE 'TOTAL' END AS TIPO,
+		CASE WHEN AP.ESTADO = '1' THEN 'PREJURÍDICA' ELSE 'JURÍDICA' END AS ESTADO,
+		CASE WHEN AP.CUMPLE = '1' THEN 'SI' WHEN AP.CUMPLE = '2' THEN 'NO' ELSE '-' END AS CUMPLE_T
+		FROM T_ACUERDOS_PAGO AP 
+		INNER JOIN T_PROCESOS_JURIDICOS PJ ON AP.CODIGO = PJ.CODIGO
+		WHERE AP.CODIGO = '$codigo' AND AP.ESTADO = '$estado'
+		ORDER BY AP.FECHA_PAGO ASC";
+
+		$resultado = GenerarArray($sql, "");
+
+		if ($resultado) echo json_encode(['ok' => true, 'data' => $resultado]);
+		else echo json_encode(['ok' => false, 'data' => []]);
 		break;
 }
