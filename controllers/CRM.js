@@ -1462,6 +1462,16 @@ const diccionarioEstados = {
   '12': { color: "success", texto: 'Proceso en estado <strong>JURÍDICO</strong>, en instancia de <strong>FINALIZADO</strong>' },
   '13': { color: "danger", texto: 'Proceso en estado <strong>JURÍDICO</strong>, en instancia de <strong>ESTADO DE INSOLVENCIA</strong>' }
 }
+const retornarEstado = () => {
+  const { ESTADO } = JSON.parse(sessionStorage.DatosProceso);
+  let estado = "";
+  if (["1", "2", "3", "4", "5"].includes(ESTADO)) {
+    estado = "1";
+  } else {
+    estado = "2";
+  }
+  return estado;
+}
 // FUNCIÓN OBTENER ABONOS
 const getAbonos = async (codigo, estado) => {
   try {
@@ -1477,7 +1487,7 @@ const getAbonos = async (codigo, estado) => {
       <table class="table table-bordered table-hover table-sm w-100" id="tablaAbonos">
         <thead>
           <tr>
-            <th colspan="9" class="text-end"> 
+            <th colspan="10" class="text-end"> 
               <button type="button" class="btn btn-outline-success btn-sm" id="btnExportarAbonos">
                 <i class="fa-solid fa-file-excel"></i>
                 Exportar a Excel
@@ -1494,6 +1504,7 @@ const getAbonos = async (codigo, estado) => {
             <th class="size-th bag-info no-wrap">TIPO</th>
             <th class="size-th bag-info no-wrap text-center">CUMPLE</th>
             <th class="size-th bag-info no-wrap text-center">¿CUMPLIÓ?</th>
+            <th class="size-th bag-info no-wrap text-center">SOPORTE</th>
           </tr>
         </thead>
         <tbody>`;
@@ -1507,7 +1518,9 @@ const getAbonos = async (codigo, estado) => {
 
           const fechaVencida = fechaPagoTime < fechaActualTime;
 
-          if (fechaVencida || item.CUMPLE === "2") {
+          if (fechaVencida && item.CUMPLE === "1") {
+            colorFila = "#a5f7d1ff";
+          } else if (fechaVencida || item.CUMPLE === "2") {
             colorFila = "#f3a3aa";
           } else if (item.CUMPLE === "1") {
             colorFila = "#a5f7d1ff";
@@ -1526,11 +1539,16 @@ const getAbonos = async (codigo, estado) => {
             <td style="background-color: ${colorFila};" class="size-12 vertical no-wrap">${item.TIPO}</td>
             <td style="background-color: ${colorFila};" class="size-12 vertical no-wrap text-center">${item.CUMPLE_T}</td>
             <td style="background-color: ${colorFila};" class="d-flex justify-content-center gap-2">
-              <button type="button" class="btn btn-outline-success btn-sm btn-cumple" data-id="${item.ID}">
+              <button type="button" class="btn btn-outline-success btn-sm btn-cumple" style="padding: 2px 6px;" data-id="${item.ID}">
                 <i class="fa-solid fa-thumbs-up"></i>
               </button>
-              <button type="button" class="btn btn-outline-danger btn-sm btn-nocumple" data-id="${item.ID}">
+              <button type="button" class="btn btn-outline-danger btn-sm btn-nocumple" style="padding: 2px 6px;" data-id="${item.ID}">
                 <i class="fa-solid fa-thumbs-down"></i>
+              </button>
+            </td>
+            <td style="background-color: ${colorFila};" class="text-center">
+              <button type="button" class="btn btn-outline-secondary btn-sm btn-soporte" style="padding: 2px 6px;" data-item='${JSON.stringify(item)}'>
+                <i class="fa-solid fa-upload"></i>
               </button>
             </td>
           </tr>`;
@@ -1543,24 +1561,46 @@ const getAbonos = async (codigo, estado) => {
         }
 
         $('#tablaAbonos').on('click', '.btn-cumple', async function () {
-          const idAbono = $(this).attr("data-id");
+          const idAbono = $(this).attr("data-id");          
           const result = await confirmAlert("Cumple Pago", "¿Desea actualizar el pago a CUMPLE?");
           if (!result.isConfirmed) return;
-          actualizarCumplePago(idAbono, "1", "1"); 
+          actualizarCumplePago(idAbono, "1", retornarEstado()); 
         });
 
         $('#tablaAbonos').on('click', '.btn-nocumple', async function () {
-          const idAbono = $(this).attr("data-id");
+          const idAbono = $(this).attr("data-id");          
           const result = await confirmAlert("No Cumple Pago", "¿Desea actualizar el pago a NO CUMPLE?");
           if (!result.isConfirmed) return;
-          actualizarCumplePago(idAbono, "2", "2");
+          actualizarCumplePago(idAbono, "2", retornarEstado());
+        });
+
+        $('#tablaAbonos').on('click', '.btn-soporte', async function () {
+          const { ID, CUMPLE, NUMERO_DOCUMENTO, FECHA_REALIZA_PAGO, FORMA_PAGO } = JSON.parse($(this).attr("data-item"));
+          // const item = JSON.parse($(this).attr("data-item"));
+          if (CUMPLE !== "1") {
+            Swal.fire("Oops!!!", "Este item no cumple el acuerdo de pago, por ende no se puede agregar soporte aún", "warning");
+            return;
+          }
+
+          if (NUMERO_DOCUMENTO.length) {
+            $('#numeroDocumento').val(NUMERO_DOCUMENTO);
+            $('#fechaPagoS').val(FECHA_REALIZA_PAGO);
+            $('#formaPago').val(FORMA_PAGO);
+            $('#numeroDocumento, #fechaPagoS, #formaPago, #btnGuardarSoporte2').prop("disabled", true);
+          } else {
+            $('#numeroDocumento, #fechaPagoS, #formaPago, #btnGuardarSoporte2').prop("disabled", false);
+          }
+
+          $('#idAbonoHidden').val(ID);
+          $('#modalGestion').modal("hide");
+          $('#modalSoporte').modal("show");          
         });
         
-      $('#tablaAbonos').on('click', '#btnExportarAbonos', async function () {
-        if ($('#tablaAbonos tbody tr').length) {
-          exportarExcel("tablaAbonos");
-        }
-      });
+        $('#tablaAbonos').on('click', '#btnExportarAbonos', async function () {
+          if ($('#tablaAbonos tbody tr').length) {
+            exportarExcel("tablaAbonos");
+          }
+        });
       } else {
         const msgHtml = `<p class="text-center lead">No hay fechas registradas para abonos</p>`;
         if (estado === "1") {
@@ -2316,6 +2356,38 @@ const actualizarCumplePago = async (idAbono, valor, estado) => {
     console.log(error);
   }
 }
+// FUNCIÓN PARA GUARDAR INFORMACIÓN DE PAGO
+const guardarSoportePago = async (idAbono) => {
+  const numeroDocumento = $('#numeroDocumento').val();
+  const fechaPago = $('#fechaPagoS').val();
+  const formaPago = $('#formaPago').val();
+
+  if (!numeroDocumento || !fechaPago) {
+    Swal.fire("Oops!!!", "El número del doumento y la fecha de pago son requeridas", "error");
+    return;
+  }
+
+  const result = await confirmAlert("Guardar Soporte", "Los datos relacionados al soporte del pago se guardarán");
+  if (!result.isConfirmed) return;
+
+  try {
+    const resp = await enviarPeticion({
+      op: "I_SOPORTE",
+      link: "../models/CRM.php",
+      numeroDocumento,
+      fechaPago,
+      formaPago,
+      idAbono
+    });
+
+    if (resp.ok) {
+      Swal.fire("Excelente", "Se guardaron los datos correctamente", "success");
+      $('#modalSoporte').modal("hide");
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
 
 
 // EJECUCIÓN DE FUNCIONALIDADES AL CARGAR EL DOM
@@ -2672,6 +2744,13 @@ $(function () {
   $("#modalVerPDF").on("hidden.bs.modal", () => {
     $('#modalGestion').modal("show");
   });
+  
+  $("#modalSoporte").on("hidden.bs.modal", () => {
+    $('#modalGestion').modal("show");
+    $('#numeroDocumento').val("");
+    $('#fechaPagoS').val("");
+    $('#formaPago').val("");
+  });
 
   $("#modalGestion").on("hidden.bs.modal", () => {
     $('#contenedorPrincipalReporte').addClass("d-none");
@@ -2801,9 +2880,18 @@ $(function () {
     guardarAbono("2");
   });
 
+  $("#btnGuardarSoporte2").on("click", function () {
+    const idAbono = $('#idAbonoHidden').val();
+    guardarSoportePago(idAbono);
+  });
+
   $('#montoM, #valorPagoM, #valorPagoM2').on('input', function () {
     let value = $(this).val().replace(/[^0-9]/g, '');
     if (value) value = parseFloat(value).toLocaleString('es-ES', { minimumFractionDigits: 0 });
     $(this).val(value);
-  });  
+  });
+
+  $("#numeroDocumento").on("input", function () {
+    this.value = this.value.replace(/\D/g, "");
+  });
 });

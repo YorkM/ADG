@@ -1080,6 +1080,59 @@ Redireccionar();
       </div>
     </div>
   </div>
+  <!-- MODAL SOPORTE PAGO -->
+  <div class="modal fade" id="modalSoporte" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="min-width: 70%;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5 text-green">REGISTRO DE INFORMACIÓN SOPORE DE PAGO</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="idAbonoHidden">
+          <h6 class="title-card">INFORMACIÓN SOPORTE PAGO</h6>
+          <div class="card p-2 border-card shadow-sm">
+            <div class="container-fluid">
+              <div class="row mb-2">
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label class="size-13" for="numeroDocumento">Número Documento:</label>
+                    <input type="text" class="form-control form-control-sm shadow-sm size-13" placeholder="Número Documento" id="numeroDocumento" autocomplete="off">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label class="size-13" for="fechaPagoS">Fecha Pago:</label>
+                    <input type="date" class="form-control form-control-sm shadow-sm size-13" id="fechaPagoS">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label class="size-13" for="formaPago">Forma Pago:</label>
+                    <select class="form-select form-select-sm shadow-sm size-13" id="formaPago">
+                      <option value="">---Seleccione una forma de pago---</option>
+                      <option value="1">TRANSFERENCIA</option>
+                      <option value="2">EFECTIVO</option>
+                      <option value="3">CHEQUE</option>
+                      <option value="4">CONSIGNACIÓN</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="d-flex justify-content-end">
+                <button class="btn btn-outline-primary btn-sm" id="btnGuardarSoporte2">
+                  <i class="fa-solid fa-floppy-disk"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-danger btn-sm" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
   <!-- MODAL GESTIONAR PROCESO -->
   <div class="modal fade" id="modalGestion" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable" style="min-width: 80%;">

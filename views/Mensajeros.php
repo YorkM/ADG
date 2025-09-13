@@ -22,7 +22,7 @@ Redireccionar();
   <link type="text/css" rel="stylesheet" href="../resources/css/Animate.css?<?php echo (rand()); ?>">
   <link href="../lib/exportar_html_excel/dist/css/tableexport.css" rel="stylesheet" type="text/css">
   <link href="../resources/fontawesome/css/all.min.css" rel="stylesheet" type="text/css">
-  <!-- <link type="text/css" rel="stylesheet" href="../resources/css/BootstrapTabs.css?<?php echo (rand()); ?>"> -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
   <style>
     .bag-info {
       background-color: #cff4fc !important;
@@ -91,10 +91,14 @@ Redireccionar();
       height: 300px;
       margin-bottom: 10px;
     }
+
+    label {
+      font-weight: 500;
+    }
   </style>
 </head>
 
-<body>  
+<body>
   <div id="tituloModuloRD" class="alert alert-info" style="font-weight: 500;"><i class="fa-solid fa-star fa-flip"></i>&nbsp;0505 - REGISTRO DE DESPACHO</div>
 
   <input type="hidden" id="TxtIdu" value="<?php echo (!empty($_SESSION["ses_Id"])) ? $_SESSION["ses_Id"] : ""; ?>" readonly />
@@ -286,38 +290,80 @@ Redireccionar();
       </div>
       <!-- TAB PLANILLA DETALLE -->
       <div class="tab-pane fade p-1" id="dvPlanillaDetalle" role="tabpanel" aria-labelledby="nav-profile-tab">
-        <div class="row mb-3">
-          <div class="col-md-4 align-self-end">
-            <div class="form-group">
-              <label for="FiltroPlanilla">Filtro</label>
-              <input type="text" id="FiltroPlanilla" class="form-control shadow-sm size-14" placeholder="Filtre aquí por cualquier columna" autocomplete="off">
-            </div>
+        <div class="card p-2 mb-2 shadow-sm">
+          <div class="mb-2">
+            <input type="text" id="FiltroPlanilla" class="form-control form-control-sm shadow-sm size-14" placeholder="Filtre aquí por cualquier columna" autocomplete="off">
           </div>
-          <div class="col-md-2">
-            <div class="form-group">
-              <label for="fhIniD" class="size-13">FECHA INICIAL</label>
-              <input type="text" class="form-control shadow-sm size-14" id="fhIniD">
-            </div>
-          </div>
-          <div class="col-md-2">
-            <div class="form-group">
-              <label for="fhFinD" class="size-13">FECHA FINAL</label>
-              <input type="text" class="form-control shadow-sm size-14" id="fhFinD">
-            </div>
-          </div>
-          <div class="col-md-3">
-            <div class="form-group">
-              <label for="TxtOficina2D" class="size-13">OFICINA</label>
-              <select id="TxtOficina2D" class="form-select shadow-sm size-14">
+          <div class="row mb-2">
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="TxtOficina2D" class="size-13">Oficina</label>
+                <select id="TxtOficina2D" class="form-select form-select-sm shadow-sm size-12">
 
-              </select>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <div class="form-group">
+                <label for="fhIniD" class="size-13">Fecha Inicial</label>
+                <input type="text" class="form-control form-control-sm shadow-sm size-12" id="fhIniD">
+              </div>
+            </div>
+            <div class="col-md-2">
+              <div class="form-group">
+                <label for="fhFinD" class="size-13">Fecha Final</label>
+                <input type="text" class="form-control form-control-sm shadow-sm size-12" id="fhFinD">
+              </div>
+            </div>
+            <div class="col-md-2">
+              <div class="form-group">
+                <label for="" class="size-13">Lista</label>
+                <select id="" class="form-select form-select-sm shadow-sm size-13">
+                  <option value="">--Seleccione--</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <div class="form-group">
+                <label for="" class="size-13">Ciudad</label>
+                <select class="form-select form-select-sm shadow-sm size-13" id="">
+                  <option value="">--Seleccione--</option>
+                </select>
+              </div>
             </div>
           </div>
-          <div class="col-md-1 align-self-end">
-            <button type="button" class="btn btn-outline-primary w-100" style="padding-top: 3px;" title="Click aquí para consultar" onClick="ConsultarDetallePlanilla();">
-              <i class="fa-solid fa-magnifying-glass fa-lg"></i>
-            </button>
+          <div class="row">            
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="" class="size-13">Cliente</label>
+                <select class="form-select form-select-sm shadow-sm size-13" id="">
+                  <option value="">--Seleccione--</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="" class="size-13">Transportador</label>
+                <select id="" class="form-select form-select-sm shadow-sm size-13">
+                  <option value="">--Seleccione--</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="" class="size-13">Zona</label>
+                <select class="form-select form-select-sm shadow-sm size-13" id="">
+                  <option value="">--Seleccione--</option>
+                </select>
+              </div>
+            </div>
           </div>
+        </div>
+        <div class="d-flex justify-content-end mb-3">
+          <button type="button" class="btn btn-outline-primary btn-sm" title="Click aquí para consultar" onClick="ConsultarDetallePlanilla();">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            Consultar
+          </button>
         </div>
         <div style="overflow: auto;" id="dvListaDespachosDet"></div>
       </div>
@@ -428,7 +474,7 @@ Redireccionar();
           </div>
           <div id="ResultFletes"></div>
         </div>
-        <div class="modal-footer">          
+        <div class="modal-footer">
           <button type="button" class="btn btn-outline-danger btn-sm" data-bs-dismiss="modal">Cerrar</button>
         </div>
       </div>
@@ -514,6 +560,7 @@ Redireccionar();
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.13.2/dist/sweetalert2.all.min.js"></script>
   <script type="text/javascript" src="../lib/MaskMoney/jquery.maskMoney.js?<?php echo (rand()); ?>"></script>
   <script type="text/javascript" src="../lib/js/jquery.uitablefilter.js"></script>
+  <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
   <!--   EXPORTAR A EXCEL -->
   <script src="../lib/exportar_html_excel/FileSaver.min.js"></script>
   <script src="../lib/exportar_html_excel/Blob.min.js"></script>

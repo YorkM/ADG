@@ -724,6 +724,19 @@ WHERE T.CODIGO_SAP= '" . $_POST['codigo'] . "'";
 		else echo json_encode(['ok' => false, 'msg' => "Error al actualizar el pago"]);
 		break;
 
+	case "I_SOPORTE":
+		$idAbono = intval($_POST['idAbono']);
+		$numeroDocumento = $_POST['numeroDocumento'];
+		$fechaPago = $_POST['fechaPago'];
+		$formaPago = $_POST['formaPago'];
+
+		$sql = "UPDATE T_ACUERDOS_PAGO SET NUMERO_DOCUMENTO = '$numeroDocumento', FECHA_REALIZA_PAGO = '$fechaPago', FORMA_PAGO = '$formaPago' WHERE ID = $idAbono";	
+		$update = mssql_query($sql);
+
+		if ($update) echo json_encode(['ok' => true, 'msg' => "Soporte pago actualizado correctamente"]);
+		else echo json_encode(['ok' => false, 'msg' => "Error al actualizar el soporte pago"]);
+		break;
+
 	case "I_ABONO":
 		$codigo = $_POST['codigo'];
 		$estado = $_POST['estado'];
@@ -744,7 +757,7 @@ WHERE T.CODIGO_SAP= '" . $_POST['codigo'] . "'";
 		$estado = $_POST['estado'];		
 
 		$sql = "SELECT AP.ID, PJ.ORGANIZACION, PJ.CODIGO, PJ.ZONA_VENTAS, ISNULL(AP.CUMPLE, 0) AS CUMPLE,
-		PJ.NOMBRE_CLIENTE, AP.FECHA_PAGO, AP.VALOR_PAGO,
+		PJ.NOMBRE_CLIENTE, AP.FECHA_PAGO, AP.VALOR_PAGO, AP.NUMERO_DOCUMENTO, AP.FECHA_REALIZA_PAGO, AP.FORMA_PAGO,
 		CASE WHEN AP.TIPO_PAGO = '1' THEN 'ABONO' ELSE 'TOTAL' END AS TIPO,
 		CASE WHEN AP.ESTADO = '1' THEN 'PREJURÍDICA' ELSE 'JURÍDICA' END AS ESTADO,
 		CASE WHEN AP.CUMPLE = '1' THEN 'SI' WHEN AP.CUMPLE = '2' THEN 'NO' ELSE '-' END AS CUMPLE_T

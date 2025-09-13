@@ -1,4 +1,4 @@
-// FUNCIÓN CONFIRM AACCIONES
+// FUNCIÓN CONFIRM ACCIONES
 const confirmAlert = async (title, text) => {
   const result = await Swal.fire({
     title: `${title}`,
@@ -11,6 +11,10 @@ const confirmAlert = async (title, text) => {
     cancelButtonText: 'Cancelar',
   });
   return result;
+}
+// FUNCIÓN PARA CORTAR TEXTO
+function cortarTexto(texto, maxLongitud) {
+  return texto.length > maxLongitud ? texto.slice(0, maxLongitud) + '...' : texto;
 }
 // FUNCIÓN OBTENER LISTAS DE FLETES
 async function ConsultaListaFlete() {
@@ -192,7 +196,7 @@ const AgregarListaFlete = async () => {
     UnloadImg();
   }
 }
-
+// FUNCIÓN CONSULTAR DETALLE DE PLANILLA
 function ConsultarDetallePlanilla() {
   $.ajax({
     url: "../models/Mensajeros.php",
@@ -210,81 +214,160 @@ function ConsultarDetallePlanilla() {
     },
     async: true,
     success: function (data) {
-      if (data != '' && data != null) {
-        var tabla = '<table class="table table-bordered table-hover table-sm w-100" id="tdListaDespachoDetalle">'
-          + '<thead>'
-          + '<th class="bag-info size-14 text-green no-wrap">LOTE</th>'
-          + '<th class="bag-info size-14 text-green no-wrap">OFICINA</th>'
-          + '<th class="bag-info size-14 text-green no-wrap">ZONA</th>'
-          + '<th class="bag-info size-14 text-green no-wrap">DESCRIPCIÓN</th>'
-          + '<th class="bag-info size-14 text-green no-wrap">FLETE</th>'
-          + '<th class="bag-info size-14 text-green no-wrap">FECHA</th>'
-          + '<th class="bag-info size-14 text-green no-wrap">INICIO</th>'
-          + '<th class="bag-info size-14 text-green no-wrap">FIN</th>'
-          + '<th class="bag-info size-14 text-green no-wrap">IC</th>'
-          + '<th class="bag-info size-14 text-green no-wrap">CAJAS</th>'
-          + '<th class="bag-info size-14 text-green no-wrap">PAQUETES</th>'
-          + '<th class="bag-info size-14 text-green no-wrap">CLIENTE</th>'
-          + '<th class="bag-info size-14 text-green no-wrap">NIT</th>'
-          + '<th class="bag-info size-14 text-green no-wrap text-center">FACTURA</th>'
-          + '<th class="bag-info size-14 text-green no-wrap d-none">FACTURA</th>'
-          + '<th class="bag-info size-14 text-green no-wrap">VALOR</th>'
-          + '<th class="bag-info size-14 text-green no-wrap">DIRECCIÓN</th>'
-          + '<th class="bag-info size-14 text-green no-wrap">CIUDAD</th>'
-          + '<th class="bag-info size-14 text-green no-wrap">TRANSP.</th>'
-          + '<th class="bag-info size-14 text-green no-wrap">COND. PAGO</th>'
-          + '<th class="bag-info size-14 text-green no-wrap">GUÍA</th>'
-          + '<th class="bag-info size-14 text-green no-wrap">LISTA</th>'
-          + '<th class="bag-info size-14 text-green no-wrap">% FLETE</th>'
-          + '<th class="bag-info size-14 text-green no-wrap">VLR. FLETE</th>'
-          + '<th class="bag-info size-14 text-green no-wrap">DIF.</th>'
-          + '<th class="bag-info size-14 text-green no-wrap">FLETE/PROVEEDOR</th>'
-          + '</thead>'
-          + '<tbody>';
-        for (var i = 0; i < data.length; i++) {
-          var d = data[i];
-          var VLR_FLETE = 0;
-          var DIF = 0;
-          var COLOR = ' style="color:#00B362;"';
-          if (d.PCJ_FLETE > 0) {
-            VLR_FLETE = Math.round(parseFloat(d.VALOR * (d.PCJ_FLETE / 100)));
-            DIF = d.FLETE - VLR_FLETE;
-          }
-          if (DIF > 0) {
-            COLOR = ' style="color:#FF0509;"';
+      if (data.length) {
+        let tabla = `
+        <table class="table table-bordered table-hover table-sm w-100" id="tdListaDespachoDetalle">
+          <thead>
+            <tr>
+              <th class="bag-info size-14 text-green no-wrap">LOTE</th>
+              <th class="bag-info size-14 text-green no-wrap">EMPRESA</th>
+              <th class="bag-info size-14 text-green no-wrap">OFICINA</th>
+              <th class="bag-info size-14 text-green no-wrap">ZONA</th>
+              <th class="bag-info size-14 text-green no-wrap">DESCRIPCIÓN</th>
+              <th class="bag-info size-14 text-green no-wrap">FECHA</th>
+              <th class="bag-info size-14 text-green no-wrap">CLIENTE</th>
+              <th class="bag-info size-14 text-green no-wrap">CÓDIGO SAP</th>
+              <th class="bag-info size-14 text-green no-wrap">COND. PAGO</th>
+              <th class="bag-info size-14 text-green no-wrap">DIRECCIÓN</th>
+              <th class="bag-info size-14 text-green no-wrap">CIUDAD</th>
+              <th class="bag-info size-14 text-green no-wrap text-center">FACTURA</th>
+              <th class="bag-info size-14 text-green no-wrap d-none">FACTURA</th>
+              <th class="bag-info size-14 text-green no-wrap">TRANSP.</th>
+              <th class="bag-info size-14 text-green no-wrap">GUÍA</th>
+              <th class="bag-info size-14 text-green no-wrap">VALOR FACTURA</th>
+              <th class="bag-info size-14 text-green no-wrap">VALOR</th>
+              <th class="bag-info size-14 text-green no-wrap">LISTA</th>
+              <th class="bag-info size-14 text-green no-wrap">% FLETE</th>
+              <th class="bag-info size-14 text-green no-wrap">VLR. FLETE APROBADO</th>
+              <th class="bag-info size-14 text-green no-wrap">VLR. FLETE</th>
+              <th class="bag-info size-14 text-green no-wrap">FLETE REAL</th>
+              <th class="bag-info size-14 text-green no-wrap">FLETE PROVEEDOR</th>
+              <th class="bag-info size-14 text-green no-wrap">FLETE FINAL</th>
+              <th class="bag-info size-14 text-green no-wrap">DIF.</th>
+              <th class="bag-info size-14 text-green no-wrap">INDICADOR FLETE</th>
+              <th class="bag-info size-14 text-green no-wrap">CAJAS</th>
+              <th class="bag-info size-14 text-green no-wrap">PAQUETES</th>
+              <th class="bag-info size-14 text-green no-wrap">INICIO</th>
+              <th class="bag-info size-14 text-green no-wrap">FIN</th>
+            </tr>
+          </thead>
+          <tbody>`;
+
+        let totalCajas = 0;
+        let totalPaquetes = 0;
+        let totalFacturaSin = 0;
+        let totalFacturaCon = 0;
+        let totalPorcFlete = 0;
+        let totalFleteAprob = 0;
+        let totalFlete = 0;
+        let totalFleteReal = 0;
+        let diferencia = 0;
+        let totalFleteProveedor = 0;
+        let totalFleteFinal = 0;
+        let totalIndicador = 0;
+        let totalIndicadorF;
+
+        data.forEach(item => {
+          let VLR_FLETE = 0;
+          let VLR_FLETE_APROB = 0;
+          let DIF = 0;
+          let COLOR = 'style="color: #00B362;"';
+
+          let fleteProveedor = 0;
+
+          if (item.FLETE_PROVEEDOR.trim() === "") {
+            fleteProveedor = 0;
+          } else {
+            fleteProveedor = parseFloat(item.FLETE_PROVEEDOR);
           }
 
-          tabla += '<tr>'
-            + '<td class="size-13 vertical no-wrap">' + d.ID_LOTE + '</td>'
-            + '<td class="size-13 vertical no-wrap text-center">' + d.OFICINA_VENTAS + '</td>'
-            + '<td class="size-13 vertical no-wrap">' + d.ZONA + '</td>'
-            + '<td class="size-12 vertical no-wrap">' + d.ZONA_DESCRIPCION + '</td>'
-            + '<td class="size-13 vertical no-wrap fw-bold">' + formatNum(d.FLETE, '$') + '</td>'
-            + '<td class="size-13 vertical no-wrap">' + d.FECHA + '</td>'
-            + '<td class="size-13 vertical no-wrap">' + d.FECHA_INICIO + '</td>'
-            + '<td class="size-13 vertical no-wrap">' + d.FECHA_FIN + '</td>'
-            + '<td class="size-13 vertical no-wrap">' + d.CODIGO_SAP + '</td>'
-            + '<td class="size-13 vertical no-wrap text-center">' + d.N_CAJAS + '</td>'
-            + '<td class="size-13 vertical no-wrap text-center">' + d.N_PAQUETES + '</td>'
-            + '<td class="size-12 vertical no-wrap">' + d.CLIENTE + '</td>'
-            + '<td class="size-13 vertical no-wrap">' + d.NIT + '</td>'
-            + '<td class="size-13 vertical no-wrap text-center facturas">' + d.NUMERO_FACTURA + '</td>'
-            + '<td class="size-13 vertical no-wrap d-none">' + d.NUMERO_FACTURA + '</td>'
-            + '<td class="size-13 vertical no-wrap fw-bold">' + formatNum(d.VALOR, '$') + '</td>'
-            + '<td class="size-13 vertical no-wrap">' + d.DIRECCION + '</td>'
-            + '<td class="size-12 vertical no-wrap">' + d.CIUDAD + '</td>'
-            + '<td class="size-12 vertical no-wrap">' + d.TRANSPORTADOR + '</td>'
-            + '<td class="size-13 vertical no-wrap">' + d.CONDICION_PAGO + '</td>'
-            + '<td class="size-13 vertical no-wrap">' + d.GUIA + '</td>'
-            + '<td class="size-13 vertical no-wrap">' + d.LISTA + '</td>'
-            + '<td class="size-13 vertical no-wrap">' + d.PCJ_FLETE + '%</td>'
-            + '<td class="size-13 vertical no-wrap fw-bold">' + formatNum(VLR_FLETE, '$') + '</td>'
-            + '<td class="size-13 vertical no-wrap fw-bold" ' + COLOR + '>' + formatNum(DIF, '$') + '</td>'
-            + '<td class="size-13 vertical no-wrap">' + d.FLETE_PROVEEDOR + '-' + d.NOMBRE_FLETE_PROV + '</td>'
-            + '</tr>';
-        }
+          const fleteFinal = parseFloat(item.FLETE) - fleteProveedor;
+          totalFleteProveedor += fleteProveedor;
+
+          if (parseInt(item.PCJ_FLETE) > 0) {
+            VLR_FLETE = Math.round(parseFloat(item.VALOR * (item.PCJ_FLETE / 100)));
+            VLR_FLETE_APROB = Math.round(parseFloat(item.VALOR_NETO * (item.PCJ_FLETE / 100)));
+            DIF = VLR_FLETE_APROB - fleteFinal;
+          }
+
+          if (DIF > 0) COLOR = 'style="color: #FF0509;"';
+          
+          const indicadorFlete = (fleteFinal / parseFloat(item.VALOR_NETO)).toFixed(2);
+
+          totalCajas = data.reduce((acumulador, item) => acumulador + parseInt(item.N_CAJAS) , 0);
+          totalPaquetes = data.reduce((acumulador, item) => acumulador + parseInt(item.N_PAQUETES) , 0);
+          totalFacturaSin = data.reduce((acumulador, item) => acumulador + parseFloat(item.VALOR_NETO) , 0);
+          totalFacturaCon = data.reduce((acumulador, item) => acumulador + parseFloat(item.VALOR) , 0);
+          totalFleteReal = data.reduce((acumulador, item) => acumulador + parseFloat(item.FLETE) , 0);
+          totalPorcFlete = data.reduce((acumulador, item) => acumulador + parseInt(item.PCJ_FLETE), 0);
+          totalPorcFlete = (totalPorcFlete / data.length).toFixed(2);
+          totalFleteAprob += VLR_FLETE_APROB;
+          totalFlete += VLR_FLETE
+          diferencia += DIF;
+          totalFleteFinal += fleteFinal;
+          totalIndicador += parseFloat(indicadorFlete);
+          totalIndicador = totalIndicador / data.length;
+          totalIndicadorF = totalIndicador.toFixed(2);
+
+          tabla += `
+          <tr>
+            <td class="size-13 vertical no-wrap">${item.ID_LOTE}</td>
+            <td class="size-13 vertical no-wrap">${item.ORGANIZACION_VENTAS}</td>
+            <td class="size-13 vertical no-wrap text-center">${item.OFICINA_VENTAS}</td>
+            <td class="size-13 vertical no-wrap">${item.ZONA}</td>
+            <td class="size-12 vertical no-wrap">${item.ZONA_DESCRIPCION}</td>
+            <td class="size-13 vertical no-wrap">${item.FECHA}</td>
+            <td class="size-12 vertical no-wrap" title="${item.CLIENTE}">${cortarTexto(item.CLIENTE, 30)}</td>
+            <td class="size-13 vertical no-wrap">${item.CODIGO_SAP}</td>
+            <td class="size-13 vertical no-wrap">${item.CONDICION_PAGO}</td>
+            <td class="size-13 vertical no-wrap" title="${item.DIRECCION}">${cortarTexto(item.DIRECCION, 30)}</td>
+            <td class="size-12 vertical no-wrap">${item.CIUDAD}</td>
+            <td class="size-13 vertical no-wrap text-center facturas">${item.NUMERO_FACTURA}</td>
+            <td class="size-13 vertical no-wrap d-none">${item.NUMERO_FACTURA}</td>
+            <td class="size-12 vertical no-wrap" title="${item.TRANSPORTADOR}">${cortarTexto(item.TRANSPORTADOR, 35)}</td>
+            <td class="size-13 vertical no-wrap">${item.GUIA}</td>
+            <td class="size-13 vertical no-wrap fw-bold">${formatNum(item.VALOR_NETO, '$')}</td>
+            <td class="size-13 vertical no-wrap fw-bold">${formatNum(item.VALOR, '$')}</td>
+            <td class="size-13 vertical no-wrap fw-bold">${item.LISTA}</td>
+            <td class="size-13 vertical no-wrap fw-bold">${item.PCJ_FLETE }%</td>
+            <td class="size-13 vertical no-wrap fw-bold">${formatNum(VLR_FLETE_APROB, '$')}</td>
+            <td class="size-13 vertical no-wrap fw-bold">${formatNum(VLR_FLETE, '$')}</td>
+            <td class="size-13 vertical no-wrap fw-bold">${formatNum(item.FLETE, '$')}</td>
+            <td class="size-13 vertical no-wrap fw-bold">${formatNum(fleteProveedor, "$")} - ${item.NOMBRE_FLETE_PROV}</td>
+            <td class="size-13 vertical no-wrap fw-bold">${formatNum(fleteFinal, "$")}</td>
+            <td class="size-13 vertical no-wrap fw-bold" ${COLOR}>${formatNum(DIF, '$')}</td>
+            <td class="size-13 vertical no-wrap fw-bold">${indicadorFlete}%</td>
+            <td class="size-13 vertical no-wrap text-center fw-bold">${item.N_CAJAS}</td>
+            <td class="size-13 vertical no-wrap text-center fw-bold">${item.N_PAQUETES}</td>
+            <td class="size-13 vertical no-wrap">${item.FECHA_INICIO}</td>
+            <td class="size-13 vertical no-wrap">${item.FECHA_FIN}</td>
+          </tr>`;
+        });
         
-        tabla += '</tbody></table>';
+        tabla += `
+          </tbody>
+          <tfoot>
+            <tr>
+              <th colspan="14" class="text-center bag-info text-green">TOTALES</th>
+              <th class="text-center bag-info text-green d-none"></th>
+              <th class="fw-bold size-14 bag-info text-green">${formatNum(totalFacturaSin, "$")}</th>
+              <th class="fw-bold size-14 bag-info text-green">${formatNum(totalFacturaCon, "$")}</th>
+              <th class="fw-bold size-14 bag-info text-green"></th>
+              <th class="fw-bold size-14 bag-info text-green">${totalPorcFlete}%</th>
+              <th class="fw-bold size-14 bag-info text-green">${formatNum(totalFleteAprob, "$")}</th>
+              <th class="fw-bold size-14 bag-info text-green">${formatNum(totalFlete, "$")}</th>
+              <th class="fw-bold size-14 bag-info text-green">${formatNum(totalFleteReal, "$")}</th>
+              <th class="fw-bold size-14 bag-info text-green">${formatNum(totalFleteProveedor, "$")}</th>
+              <th class="fw-bold size-14 bag-info text-green">${formatNum(totalFleteFinal, "$")}</th>
+              <th class="fw-bold size-14 bag-info text-green">${formatNum(diferencia, "$")}</th>
+              <th class="fw-bold size-14 bag-info text-green">${totalIndicadorF}%</th>
+              <th class="fw-bold size-14 text-center bag-info text-green">${totalCajas}</th>
+              <th class="fw-bold size-14 text-center bag-info text-green">${totalPaquetes}</th>
+              <th class="fw-bold size-14 bag-info text-green"></th>
+              <th class="fw-bold size-14 bag-info text-green"></th>
+            </tr>
+          </tfoot>
+        </table>`;
         $("#dvListaDespachosDet").html(tabla);
         theTable = $("#tdListaDespachoDetalle");
         const facturasCeldas = document.querySelectorAll("#tdListaDespachoDetalle td.facturas");
@@ -314,9 +397,12 @@ function ConsultarDetallePlanilla() {
         $("#tdListaDespachoDetalle > caption > button").text('Exportar a Excel');
 
       } else {
-        $("#dvListaDespachosDet").html('<div class="alert alert-danger" role="alert">'
-          + '<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>'
-          + '<span class="sr-only">Error:</span>  NO EXISTEN RESULTADOS PARA LAS CONDICIONES SELECCIONADAS' + '</div>');
+        const msgHtml = `
+        <div class="alert alert-danger" role="alert">
+          <i class="fa-solid fa-circle-exclamation"></i>
+          <span class="sr-only">Error:</span>NO EXISTEN RESULTADOS PARA LAS CONDICIONES SELECCIONADAS
+        </div>`;
+        $("#dvListaDespachosDet").html(msgHtml);
       }
     }
   }).always(function () {
