@@ -1576,7 +1576,7 @@ const getAbonos = async (codigo, estado) => {
 
         $('#tablaAbonos').on('click', '.btn-soporte', async function () {
           const { ID, CUMPLE, NUMERO_DOCUMENTO, FECHA_REALIZA_PAGO, FORMA_PAGO } = JSON.parse($(this).attr("data-item"));
-          // const item = JSON.parse($(this).attr("data-item"));
+
           if (CUMPLE !== "1") {
             Swal.fire("Oops!!!", "Este item no cumple el acuerdo de pago, por ende no se puede agregar soporte aún", "warning");
             return;
@@ -1655,6 +1655,10 @@ const gestionarProceso = (item) => {
 
   if (estado === "6" || estado === "7" || estado === "8" || estado === "9" || estado === "10" || estado === "11" || estado === "12" || estado === "13") seccionesJuridicas.forEach(item => item.classList.remove('d-none'));
   else seccionesJuridicas.forEach(item => item.classList.add('d-none'));
+
+  (item.COMENTARIO_PREJURIDICA.length) && $('#comentarioCartaPreju').val(item.COMENTARIO_PREJURIDICA);
+  (item.COMENTARIO_ACUERDO.length) && $('#comentarioAcuerdo').val(item.COMENTARIO_ACUERDO);
+  (item.COMENTARIO_FINALIZA_PREJU.length) && $('#comentarioFinalizacion').val(item.COMENTARIO_FINALIZA_PREJU);
 
   $('#modalGestion').modal("show");
 }
@@ -1905,7 +1909,7 @@ const gestionarSoportePago = async () => {
     const comentario = $('#comentarioFinalizacion').val();
 
     if (!soporte || !fechaSoporte) {
-      Swal.fire("Oops!!!", "El soporte de pago y la fecha del soporte son obligatorios", "error");
+      Swal.fire("Oops!!!", "El soporte de pago y la fecha del mismo son requeridos", "error");
       return;
     }
     
@@ -2228,26 +2232,22 @@ const generarReporte = async () => {
 // FUNCIÓN EXPORTAR A EXCEL
 function exportarExcel(idTabla, nombreArchivo = "reporte.xlsx") {
   const tabla = document.getElementById(idTabla);
+  const tablaClon = tabla.cloneNode(true);
 
-  const hoja = XLSX.utils.table_to_sheet(tabla);
+  tablaClon.querySelectorAll("td").forEach(td => {
+    let texto = td.innerText.trim();
+    if (texto.startsWith("$")) {
+      texto = texto.replace(/\$/g, "").replace(/\./g, "");
+      td.innerText = texto;
+    }
+  });
+
+  const hoja = XLSX.utils.table_to_sheet(tablaClon);
 
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, hoja, "Datos");
 
-  function s2ab(s) {
-    const buf = new ArrayBuffer(s.length);
-    const view = new Uint8Array(buf);
-    for (let i = 0; i < s.length; i++) {
-      view[i] = s.charCodeAt(i) & 0xff;
-    }
-    return buf;
-  }
-
-  const wbout = XLSX.write(wb, {
-    bookType: "xlsx",
-    type: "binary",
-    cellDates: true,
-  });
+  const wbout = XLSX.write(wb, { bookType: "xlsx", type: "binary" });
 
   const blob = new Blob([s2ab(wbout)], { type: "application/octet-stream" });
   const link = document.createElement("a");
@@ -2256,6 +2256,13 @@ function exportarExcel(idTabla, nombreArchivo = "reporte.xlsx") {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+
+  function s2ab(s) {
+    const buf = new ArrayBuffer(s.length);
+    const view = new Uint8Array(buf);
+    for (let i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xff;
+    return buf;
+  }
 }
 // FUNCIÓN VER ARCHIVOS ESTADO PROCESO
 const verArchivosEstadoProceso = () => {
@@ -2358,6 +2365,7 @@ const actualizarCumplePago = async (idAbono, valor, estado) => {
 }
 // FUNCIÓN PARA GUARDAR INFORMACIÓN DE PAGO
 const guardarSoportePago = async (idAbono) => {
+  const { CODIGO: codigo } = JSON.parse(sessionStorage.DatosProceso);
   const numeroDocumento = $('#numeroDocumento').val();
   const fechaPago = $('#fechaPagoS').val();
   const formaPago = $('#formaPago').val();
@@ -2382,6 +2390,7 @@ const guardarSoportePago = async (idAbono) => {
 
     if (resp.ok) {
       Swal.fire("Excelente", "Se guardaron los datos correctamente", "success");
+      getAbonos(codigo, retornarEstado());
       $('#modalSoporte').modal("hide");
     }
   } catch (error) {

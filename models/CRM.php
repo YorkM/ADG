@@ -612,7 +612,7 @@ WHERE T.CODIGO_SAP= '" . $_POST['codigo'] . "'";
 	case "U_ESTADOS":
 		$idProceso = intval($_POST['idProceso']);
 		$fechaCartaPreju = $_POST['fechaCartaPreju'];
-		$comentario = $_POST['comentario'];
+		$comentario = utf8_decode($_POST['comentario']);
 		$estado = $_POST['estado'];
 		
 		$sql = "UPDATE T_PROCESOS_JURIDICOS SET ESTADO = '$estado', FECHA_CARTA_JURI = '$fechaCartaPreju', COMENTARIO_PREJURIDICA = '$comentario' WHERE ID = $idProceso";		

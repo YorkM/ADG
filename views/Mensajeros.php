@@ -291,11 +291,14 @@ Redireccionar();
       <!-- TAB PLANILLA DETALLE -->
       <div class="tab-pane fade p-1" id="dvPlanillaDetalle" role="tabpanel" aria-labelledby="nav-profile-tab">
         <div class="card p-2 mb-2 shadow-sm">
-          <div class="mb-2">
-            <input type="text" id="FiltroPlanilla" class="form-control form-control-sm shadow-sm size-14" placeholder="Filtre aquí por cualquier columna" autocomplete="off">
-          </div>
-          <div class="row mb-2">
-            <div class="col-md-4">
+          <div class="row">
+            <div class="col-md-7">
+              <div class="form-group">
+                <label for="FiltroPlanilla" class="size-13">Filtro General</label>
+                <input type="text" id="FiltroPlanilla" class="form-control form-control-sm shadow-sm size-14" placeholder="Filtre aquí por cualquier columna" autocomplete="off">
+              </div>
+            </div>
+            <div class="col-md-5">
               <div class="form-group">
                 <label for="TxtOficina2D" class="size-13">Oficina</label>
                 <select id="TxtOficina2D" class="form-select form-select-sm shadow-sm size-12">
@@ -303,6 +306,8 @@ Redireccionar();
                 </select>
               </div>
             </div>
+          </div>
+          <div class="row mb-2">
             <div class="col-md-2">
               <div class="form-group">
                 <label for="fhIniD" class="size-13">Fecha Inicial</label>
@@ -317,42 +322,50 @@ Redireccionar();
             </div>
             <div class="col-md-2">
               <div class="form-group">
-                <label for="" class="size-13">Lista</label>
-                <select id="" class="form-select form-select-sm shadow-sm size-13">
+                <label for="filtroLista" class="size-13">Lista</label>
+                <select id="filtroLista" class="form-select form-select-sm shadow-sm size-13">
                   <option value="">--Seleccione--</option>
                 </select>
               </div>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-3">
               <div class="form-group">
-                <label for="" class="size-13">Ciudad</label>
-                <select class="form-select form-select-sm shadow-sm size-13" id="">
+                <label for="filtroCiudad" class="size-13">Ciudad</label>
+                <select class="form-select form-select-sm shadow-sm size-13" id="filtroCiudad">
+                  <option value="">--Seleccione--</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="filtroCodigo" class="size-13">Código SAP</label>
+                <select class="form-select form-select-sm shadow-sm size-13" id="filtroCodigo">
                   <option value="">--Seleccione--</option>
                 </select>
               </div>
             </div>
           </div>
-          <div class="row">            
+          <div class="row">
             <div class="col-md-4">
               <div class="form-group">
-                <label for="" class="size-13">Cliente</label>
-                <select class="form-select form-select-sm shadow-sm size-13" id="">
+                <label for="filtroCliente" class="size-13">Cliente</label>
+                <select class="form-select form-select-sm shadow-sm size-13" id="filtroCliente">
                   <option value="">--Seleccione--</option>
                 </select>
               </div>
             </div>
             <div class="col-md-4">
               <div class="form-group">
-                <label for="" class="size-13">Transportador</label>
-                <select id="" class="form-select form-select-sm shadow-sm size-13">
+                <label for="filtroTransportador" class="size-13">Transportador</label>
+                <select id="filtroTransportador" class="form-select form-select-sm shadow-sm size-13">
                   <option value="">--Seleccione--</option>
                 </select>
               </div>
             </div>
             <div class="col-md-4">
               <div class="form-group">
-                <label for="" class="size-13">Zona</label>
-                <select class="form-select form-select-sm shadow-sm size-13" id="">
+                <label for="filtroZona" class="size-13">Zona</label>
+                <select class="form-select form-select-sm shadow-sm size-13" id="filtroZona">
                   <option value="">--Seleccione--</option>
                 </select>
               </div>
@@ -360,7 +373,7 @@ Redireccionar();
           </div>
         </div>
         <div class="d-flex justify-content-end mb-3">
-          <button type="button" class="btn btn-outline-primary btn-sm" title="Click aquí para consultar" onClick="ConsultarDetallePlanilla();">
+          <button type="button" class="btn btn-outline-primary btn-sm" title="Click aquí para consultar" id="consultarDetallePlanilla">
             <i class="fa-solid fa-magnifying-glass"></i>
             Consultar
           </button>
