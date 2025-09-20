@@ -114,6 +114,10 @@ Redireccionar();
       color: #055160 !important;
     }
 
+    .btn-grid {
+      padding: 2px 6px;
+    }
+
     #loaderCRM {
       position: fixed;
       inset: 0;
@@ -674,6 +678,12 @@ Redireccionar();
             </div>
           </div>
         </div>
+        <div class="d-flex justify-content-end mb-2">
+          <button class="btn btn-outline-success btn-sm" id="exportarCartera">
+            <i class="fa-solid fa-file-excel"></i>
+            Exportar a Excel
+          </button>
+        </div>
         <div id="dvResultCartera" class="table-responsive" style="overflow: auto;"></div>
       </div>
       <!-- TAB PRODUCTOS -->
@@ -816,12 +826,12 @@ Redireccionar();
         </div>
       </div>
       <!-- TAB PROCESOS JUDICIALES -->
-      <div class="d-flex justify-content-end">
-        <button class="btn btn-outline-secondary btn-sm" title="Click aquí para ver u ocultar la sección de datos básicos" id="btnHeader">
-          <i class="fa-solid fa-plus"></i>
-        </button>
-      </div>
       <div class="tab-pane fade p-1" id="dvJuridica" role="tabpanel">
+        <div class="d-flex justify-content-end mb-2">
+          <button class="btn btn-outline-secondary btn-sm" title="Click aquí para ver u ocultar la sección de datos básicos" id="btnHeader">
+            <i class="fa-solid fa-plus"></i>
+          </button>
+        </div>
         <h6 class="title-card d-none header-main">DATOS BÁSICOS DEL CLIENTE</h6>
         <div class="card p-2 border-card shadow-sm mb-4 d-none header-main">
           <div class="container-fluid">
@@ -926,17 +936,22 @@ Redireccionar();
             </div>
           </div>
         </div>
-        <!-- <p style="font-family: system-ui; font-size: 14px; color: #055160;">A continuación se listan todos los procesos... Tanto en estados Finalizados, Prejurídicos y Jurídicos</p> -->
         <div class="row mb-2 align-items-baseline">
           <div class="col-md-6">
-            <input type="text" class="form-control form-control-sm shadow-sm" autocomplete="off" placeholder="Filtro de búsqueda..." id="filtroProcesos">
+            <div class="form-group">
+              <label for="filtroProcesos" class="size-13">Filtro General</label>
+              <input type="text" class="form-control form-control-sm shadow-sm" autocomplete="off" placeholder="Filtro de búsqueda..." id="filtroProcesos">
+            </div>
           </div>
           <div class="col-md-4">
-            <select class="form-select form-select-sm shadow-sm size-13" id="filtroOficina">
+            <div class="form-group">
+              <label for="filtroOficina" class="size-13">Filtro Oficina</label>
+              <select class="form-select form-select-sm shadow-sm size-13" id="filtroOficina">
 
-            </select>
+              </select>
+            </div>
           </div>
-          <div class="col-md-2">
+          <div class="col-md-2 align-self-end">
             <button class="btn btn-outline-success btn-sm shadow-sm w-100" id="exportarExcelMain">
               <i class="fa-solid fa-file-excel"></i>
               Exportar a Excel
@@ -1090,23 +1105,30 @@ Redireccionar();
         </div>
         <div class="modal-body">
           <input type="hidden" id="idAbonoHidden">
+          <div class="d-flex justify-content-end mb-2">
+            <button class="btn btn-outline-primary btn-sm" id="btnGuardarSoporte2">
+              <i class="fa-solid fa-floppy-disk"></i>
+            </button>
+          </div>
           <h6 class="title-card">INFORMACIÓN SOPORTE PAGO</h6>
           <div class="card p-2 border-card shadow-sm">
             <div class="container-fluid">
               <div class="row mb-2">
-                <div class="col-md-4">
+                <div class="col-md-6">
                   <div class="form-group">
                     <label class="size-13" for="numeroDocumento">Número Documento:</label>
                     <input type="text" class="form-control form-control-sm shadow-sm size-13" placeholder="Número Documento" id="numeroDocumento" autocomplete="off">
                   </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-6">
                   <div class="form-group">
                     <label class="size-13" for="fechaPagoS">Fecha Pago:</label>
                     <input type="date" class="form-control form-control-sm shadow-sm size-13" id="fechaPagoS">
                   </div>
                 </div>
-                <div class="col-md-4">
+              </div>
+              <div class="row">
+                <div class="col-md-6">
                   <div class="form-group">
                     <label class="size-13" for="formaPago">Forma Pago:</label>
                     <select class="form-select form-select-sm shadow-sm size-13" id="formaPago">
@@ -1118,11 +1140,17 @@ Redireccionar();
                     </select>
                   </div>
                 </div>
-              </div>
-              <div class="d-flex justify-content-end">
-                <button class="btn btn-outline-primary btn-sm" id="btnGuardarSoporte2">
-                  <i class="fa-solid fa-floppy-disk"></i>
-                </button>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="size-13" for="formaPago">Adjuntar Soporte:</label>
+                    <div class="input-group">
+                      <input type="file" accept=".pdf" class="form-control form-control-sm shadow-sm size-13" id="soportePagoAbono">
+                      <button class="btn btn-outline-primary btn-sm" id="verSoporte">
+                        <i class="fa-solid fa-eye"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -1281,7 +1309,7 @@ Redireccionar();
           </div>
           <hr>
           <h6 class="title-card">FINALIZACIÓN PROCESO PREJURÍDICO</h6>
-          <div class="card p-2 border-card shadow-sm mb-5">
+          <div class="card p-2 border-card shadow-sm mb-2">
             <div class="container-fluid">
               <div class="row mb-2">
                 <div class="col-md-6">
@@ -1310,6 +1338,18 @@ Redireccionar();
                   </button>
                 </div>
               </div>
+            </div>
+          </div>
+          <div class="mb-5 d-none" id="contenedorPrincipalReporte2">
+            <h5 class="text-center text-green mb-3">REPORTE PROCESO PREJURÍDICO</h5>
+            <div class="d-flex justify-content-end mb-1">
+              <button class="btn btn-outline-success btn-sm" id="exportarExcel2">
+                <i class="fa-solid fa-file-excel"></i>
+                Exportar a Excel
+              </button>
+            </div>
+            <div style="overflow: auto;" id="contenedorReporte2">
+
             </div>
           </div>
           <h5 class="text-center text-green d-none seccion-juridico">GESTIÓN DE PROCESOS JURÍDICOS</h5>
@@ -1374,7 +1414,7 @@ Redireccionar();
                 <div class="col-md-4">
                   <div class="input-group">
                     <span class="input-group-text bold-span size-13">Juzgado:</span>
-                    <input type="text" class="form-control form-control-sm shadow-sm size-13" placeholder="JUZGADO" id="juzgadoM">
+                    <input type="text" class="form-control form-control-sm shadow-sm size-13" placeholder="JUZGADO" id="juzgadoM" autocomplete="off">
                   </div>
                 </div>
                 <div class="col-md-4">
@@ -1413,37 +1453,46 @@ Redireccionar();
           <div class="card p-2 border-card shadow-sm mb-5 d-none seccion-juridico">
             <div class="container-fluid">
               <div class="row mb-2">
-                <div class="col-md-4">
+                <div class="col-md-6">
                   <div class="input-group">
                     <span class="input-group-text bold-span size-13">Mandamiento de Pago:</span>
                     <input type="file" accept=".pdf" class="form-control form-control-sm shadow-sm size-13" id="mandamientoM">
                   </div>
+                </div>                
+                <div class="col-md-6">
+                  <div class="input-group">
+                    <span class="input-group-text bold-span size-13">Fecha Mandamiento:</span>
+                    <input type="date" class="form-control form-control-sm shadow-sm size-13" id="fechaMandamientoM">
+                  </div>
+                </div>                
+              </div>
+              <div class="d-flex justify-content-end mb-3">               
+                <div class="align-self-center">
+                  <button class="btn btn-outline-primary btn-sm shadow-sm" title="Ver o guardar el mandamiento de pago" id="btnVerGuardarMandamiento">
+                    <i class="fa-solid fa-upload"></i>
+                  </button>
                 </div>
-                <div class="col-md-4">
+              </div>
+              <div class="row mb-2">                
+                <div class="col-md-6">
                   <div class="input-group">
                     <span class="input-group-text bold-span size-13">Notificación Demanda:</span>
                     <input type="file" accept=".pdf" class="form-control form-control-sm shadow-sm size-13" id="notificacionM">
                   </div>
-                </div>
-                <div class="col-md-4">
+                </div>               
+                <div class="col-md-6">
                   <div class="input-group">
-                    <span class="input-group-text bold-span size-13">Acuerdo Pago:</span>
-                    <input type="file" accept=".pdf" class="form-control form-control-sm shadow-sm size-13" id="acuerdo2M">
+                    <span class="input-group-text bold-span size-13">Fecha Notificación:</span>
+                    <input type="date" class="form-control form-control-sm shadow-sm size-13" id="fechaNotificacionM">
                   </div>
-                </div>
+                </div>             
               </div>
               <div class="d-flex justify-content-between gap-2">
                 <div style="flex: 1;">
                   <textarea class="form-control form-control-sm shadow-sm size-13 bag-warning" placeholder="Nota de observaciones(Opcional)" id="comentarioObservaciones"></textarea>
                 </div>
                 <div class="align-self-center">
-                  <button class="btn btn-outline-success btn-sm shadow-sm" title="Ver mandamiento de pago u orden de embargo" id="btnVerMandamiento">
-                    <i class="fa-solid fa-eye"></i>
-                  </button>
-                  <button class="btn btn-outline-secondary btn-sm shadow-sm" title="Ver notificación de demanda" id="btnVerNotificación">
-                    <i class="fa-solid fa-eye"></i>
-                  </button>
-                  <button class="btn btn-outline-primary btn-sm shadow-sm" title="Ver acuerdo de pago o guardar información de las observaciones" id="btnVerGuardarAcuerdo">
+                  <button class="btn btn-outline-primary btn-sm shadow-sm" title="Ver o guardar la notificación de demanda" id="btnVerGuardarDemanda">
                     <i class="fa-solid fa-upload"></i>
                   </button>
                 </div>
@@ -1538,9 +1587,13 @@ Redireccionar();
           </div>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-warning btn-sm" id="generarReporte">
+          <button class="btn btn-outline-primary btn-sm" id="generarReporte2">
             <i class="fa-solid fa-list"></i>
-            Generar Reporte
+            Generar Reporte Procesos Prejurídicos
+          </button>
+          <button class="btn btn-outline-success btn-sm" id="generarReporte">
+            <i class="fa-solid fa-list"></i>
+            Generar Reporte Procesos Jurídicos
           </button>
         </div>
       </div>

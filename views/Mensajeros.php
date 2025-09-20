@@ -95,6 +95,26 @@ Redireccionar();
     label {
       font-weight: 500;
     }
+
+    table.dataTable,
+    table.dataTable th,
+    table.dataTable td {
+      border: 1px solid #ccc;
+      border-collapse: collapse;
+      padding: 0;
+    }
+
+    table.dataTable {
+      border-spacing: 0;
+    }
+
+    table.dataTable>thead>tr>th, table.dataTable>thead>tr>td {
+      padding: 5px !important;
+    }
+
+    table.dataTable tbody td {
+      padding: 5px 10px;
+    }
   </style>
 </head>
 
@@ -292,13 +312,13 @@ Redireccionar();
       <div class="tab-pane fade p-1" id="dvPlanillaDetalle" role="tabpanel" aria-labelledby="nav-profile-tab">
         <div class="card p-2 mb-2 shadow-sm">
           <div class="row">
-            <div class="col-md-7">
+            <div class="col-md-5">
               <div class="form-group">
                 <label for="FiltroPlanilla" class="size-13">Filtro General</label>
                 <input type="text" id="FiltroPlanilla" class="form-control form-control-sm shadow-sm size-14" placeholder="Filtre aquí por cualquier columna" autocomplete="off">
               </div>
             </div>
-            <div class="col-md-5">
+            <div class="col-md-4">
               <div class="form-group">
                 <label for="TxtOficina2D" class="size-13">Oficina</label>
                 <select id="TxtOficina2D" class="form-select form-select-sm shadow-sm size-12">
@@ -306,26 +326,26 @@ Redireccionar();
                 </select>
               </div>
             </div>
-          </div>
-          <div class="row mb-2">
-            <div class="col-md-2">
-              <div class="form-group">
-                <label for="fhIniD" class="size-13">Fecha Inicial</label>
-                <input type="text" class="form-control form-control-sm shadow-sm size-12" id="fhIniD">
-              </div>
-            </div>
-            <div class="col-md-2">
-              <div class="form-group">
-                <label for="fhFinD" class="size-13">Fecha Final</label>
-                <input type="text" class="form-control form-control-sm shadow-sm size-12" id="fhFinD">
-              </div>
-            </div>
-            <div class="col-md-2">
+            <div class="col-md-3">
               <div class="form-group">
                 <label for="filtroLista" class="size-13">Lista</label>
                 <select id="filtroLista" class="form-select form-select-sm shadow-sm size-13">
                   <option value="">--Seleccione--</option>
                 </select>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="fhIniD" class="size-13">Fecha Inicial</label>
+                <input type="text" class="form-control form-control-sm shadow-sm size-12" id="fhIniD">
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="fhFinD" class="size-13">Fecha Final</label>
+                <input type="text" class="form-control form-control-sm shadow-sm size-12" id="fhFinD">
               </div>
             </div>
             <div class="col-md-3">
@@ -372,7 +392,8 @@ Redireccionar();
             </div>
           </div>
         </div>
-        <div class="d-flex justify-content-end mb-3">
+        <div class="d-flex justify-content-end gap-2 mb-3">
+          <div id="contenedorBtnExportar"></div>
           <button type="button" class="btn btn-outline-primary btn-sm" title="Click aquí para consultar" id="consultarDetallePlanilla">
             <i class="fa-solid fa-magnifying-glass"></i>
             Consultar

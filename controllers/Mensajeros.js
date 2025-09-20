@@ -218,7 +218,7 @@ const ConsultarDetallePlanilla = async () => {
     UnloadImg();
   }
 }
-
+// FUNCIÓN CONSULTAR DETALLE DE PLANTILLAS
 function mostrarDetallePlanilla(data) {
   if (data.length) {
     let tabla = `
@@ -310,36 +310,36 @@ function mostrarDetallePlanilla(data) {
 
       tabla += `
       <tr>
-        <td class="size-13 vertical no-wrap">${item.ID_LOTE}</td>
-        <td class="size-13 vertical no-wrap">${item.ORGANIZACION_VENTAS}</td>
-        <td class="size-13 vertical no-wrap text-center">${item.OFICINA_VENTAS}</td>
-        <td class="size-13 vertical no-wrap">${item.ZONA}</td>
+        <td class="size-14 vertical no-wrap">${item.ID_LOTE}</td>
+        <td class="size-14 vertical no-wrap">${item.ORGANIZACION_VENTAS}</td>
+        <td class="size-14 vertical no-wrap text-center">${item.OFICINA_VENTAS}</td>
+        <td class="size-14 vertical no-wrap">${item.ZONA}</td>
         <td class="size-12 vertical no-wrap">${item.ZONA_DESCRIPCION}</td>
-        <td class="size-13 vertical no-wrap">${item.FECHA}</td>
+        <td class="size-14 vertical no-wrap">${item.FECHA}</td>
         <td class="size-12 vertical no-wrap" title="${item.CLIENTE}">${cortarTexto(item.CLIENTE, 30)}</td>
-        <td class="size-13 vertical no-wrap">${item.CODIGO_SAP}</td>
-        <td class="size-13 vertical no-wrap">${item.CONDICION_PAGO}</td>
+        <td class="size-14 vertical no-wrap">${item.CODIGO_SAP}</td>
+        <td class="size-14 vertical no-wrap">${item.CONDICION_PAGO}</td>
         <td class="size-13 vertical no-wrap" title="${item.DIRECCION}">${cortarTexto(item.DIRECCION, 30)}</td>
         <td class="size-12 vertical no-wrap">${item.CIUDAD}</td>
-        <td class="size-13 vertical no-wrap text-center facturas">${item.NUMERO_FACTURA}</td>
-        <td class="size-13 vertical no-wrap d-none">${item.NUMERO_FACTURA}</td>
+        <td class="size-14 vertical no-wrap text-center facturas">${item.NUMERO_FACTURA}</td>
+        <td class="size-14 vertical no-wrap d-none">${item.NUMERO_FACTURA}</td>
         <td class="size-12 vertical no-wrap" title="${item.TRANSPORTADOR}">${cortarTexto(item.TRANSPORTADOR, 35)}</td>
-        <td class="size-13 vertical no-wrap">${item.GUIA}</td>
-        <td class="size-13 vertical no-wrap fw-bold">${formatNum(item.VALOR_NETO, '$')}</td>
-        <td class="size-13 vertical no-wrap fw-bold">${formatNum(item.VALOR, '$')}</td>
-        <td class="size-13 vertical no-wrap fw-bold">${item.LISTA}</td>
-        <td class="size-13 vertical no-wrap fw-bold">${item.PCJ_FLETE}%</td>
-        <td class="size-13 vertical no-wrap fw-bold">${formatNum(VLR_FLETE_APROB, '$')}</td>
-        <td class="size-13 vertical no-wrap fw-bold">${formatNum(VLR_FLETE, '$')}</td>
-        <td class="size-13 vertical no-wrap fw-bold">${formatNum(item.FLETE, '$')}</td>
-        <td class="size-13 vertical no-wrap fw-bold">${formatNum(fleteProveedor, "$")} - ${item.NOMBRE_FLETE_PROV}</td>
-        <td class="size-13 vertical no-wrap fw-bold">${formatNum(fleteFinal, "$")}</td>
-        <td class="size-13 vertical no-wrap fw-bold" ${COLOR}>${formatNum(DIF, '$')}</td>
-        <td class="size-13 vertical no-wrap fw-bold">${indicadorFlete}%</td>
-        <td class="size-13 vertical no-wrap text-center fw-bold">${item.N_CAJAS}</td>
-        <td class="size-13 vertical no-wrap text-center fw-bold">${item.N_PAQUETES}</td>
-        <td class="size-13 vertical no-wrap">${item.FECHA_INICIO}</td>
-        <td class="size-13 vertical no-wrap">${item.FECHA_FIN}</td>
+        <td class="size-14 vertical no-wrap">${item.GUIA}</td>
+        <td data-order="${item.VALOR_NETO}" class="size-14 vertical no-wrap">${formatNum(item.VALOR_NETO, '$')}</td>
+        <td data-order="${item.VALOR}" class="size-14 vertical no-wrap">${formatNum(item.VALOR, '$')}</td>
+        <td data-order="${item.LISTA}" class="size-14 vertical no-wrap">${item.LISTA}</td>
+        <td data-order="${item.PCJ_FLETE}" class="size-14 vertical no-wrap">${item.PCJ_FLETE}%</td>
+        <td data-order="${VLR_FLETE_APROB}" class="size-14 vertical no-wrap">${formatNum(VLR_FLETE_APROB, '$')}</td>
+        <td data-order="${VLR_FLETE}" class="size-14 vertical no-wrap">${formatNum(VLR_FLETE, '$')}</td>
+        <td data-order="${item.FLETE}" class="size-14 vertical no-wrap">${formatNum(item.FLETE, '$')}</td>
+        <td class="size-14 vertical no-wrap">${formatNum(fleteProveedor, "$")} - ${item.NOMBRE_FLETE_PROV}</td>
+        <td data-order="${fleteFinal}" class="size-14 vertical no-wrap">${formatNum(fleteFinal, "$")}</td>
+        <td data-order="${DIF}" class="size-14 vertical no-wrap" ${COLOR}>${formatNum(DIF, '$')}</td>
+        <td data-order="${indicadorFlete}" class="size-14 vertical no-wrap">${indicadorFlete}%</td>
+        <td data-order="${item.N_CAJAS}" class="size-14 vertical no-wrap text-center">${item.N_CAJAS}</td>
+        <td data-order="${item.N_PAQUETES}" class="size-14 vertical no-wrap text-center">${item.N_PAQUETES}</td>
+        <td class="size-14 vertical no-wrap">${item.FECHA_INICIO}</td>
+        <td class="size-14 vertical no-wrap">${item.FECHA_FIN}</td>
       </tr>`;
     });
 
@@ -355,23 +355,23 @@ function mostrarDetallePlanilla(data) {
     </tbody>
     <tfoot>
       <tr>
-        <th colspan="14" class="text-center bag-info text-green">TOTALES</th>
-        <th class="text-center bag-info text-green d-none"></th>
-        <th class="fw-bold size-14 bag-info text-green">${formatNum(totalFacturaSin, "$")}</th>
-        <th class="fw-bold size-14 bag-info text-green">${formatNum(totalFacturaCon, "$")}</th>
-        <th class="fw-bold size-14 bag-info text-green"></th>
-        <th class="fw-bold size-14 bag-info text-green">${totalPorcFlete}%</th>
-        <th class="fw-bold size-14 bag-info text-green">${formatNum(totalFleteAprob, "$")}</th>
-        <th class="fw-bold size-14 bag-info text-green">${formatNum(totalFlete, "$")}</th>
-        <th class="fw-bold size-14 bag-info text-green">${formatNum(totalFleteReal, "$")}</th>
-        <th class="fw-bold size-14 bag-info text-green">${formatNum(totalFleteProveedor, "$")}</th>
-        <th class="fw-bold size-14 bag-info text-green">${formatNum(totalFleteFinal, "$")}</th>
-        <th class="fw-bold size-14 bag-info text-green">${formatNum(diferencia, "$")}</th>
-        <th class="fw-bold size-14 bag-info text-green">${totalIndicadorF}%</th>
-        <th class="fw-bold size-14 text-center bag-info text-green">${totalCajas}</th>
-        <th class="fw-bold size-14 text-center bag-info text-green">${totalPaquetes}</th>
-        <th class="fw-bold size-14 bag-info text-green"></th>
-        <th class="fw-bold size-14 bag-info text-green"></th>
+        <td colspan="14" class="text-center bag-info text-green">TOTALES</td>
+        <td class="text-center bag-info text-green d-none"></td>
+        <td class="size-15 bag-info text-green">${formatNum(totalFacturaSin, "$")}</td>
+        <td class="size-15 bag-info text-green">${formatNum(totalFacturaCon, "$")}</td>
+        <td class="size-15 bag-info text-green"></td>
+        <td class="size-15 bag-info text-green">${totalPorcFlete}%</td>
+        <td class="size-15 bag-info text-green">${formatNum(totalFleteAprob, "$")}</td>
+        <td class="size-15 bag-info text-green">${formatNum(totalFlete, "$")}</td>
+        <td class="size-15 bag-info text-green">${formatNum(totalFleteReal, "$")}</td>
+        <td class="size-15 bag-info text-green">${formatNum(totalFleteProveedor, "$")}</td>
+        <td class="size-15 bag-info text-green">${formatNum(totalFleteFinal, "$")}</td>
+        <td class="size-15 bag-info text-green">${formatNum(diferencia, "$")}</td>
+        <td class="size-15 bag-info text-green">${totalIndicadorF}%</td>
+        <td class="size-15 text-center bag-info text-green">${totalCajas}</td>
+        <td class="size-15 text-center bag-info text-green">${totalPaquetes}</td>
+        <td class="size-15 bag-info text-green"></td>
+        <td class="size-15 bag-info text-green"></td>
       </tr>
     </tfoot></table>`;
 
@@ -389,19 +389,26 @@ function mostrarDetallePlanilla(data) {
       position: 'botton',
       bootstrap: true,
       fileName: `Detalle de planillas de despacho del ${$("#fhIniD").val()} al ${$("#fhFinD").val()}`
-    });
+    });   
 
-    $("#tdListaDespachoDetalle > caption").css({
-      "position": "absolute",
-      "top": "65px",
-      "right": "20px"
-    });
-
+    $("#tdListaDespachoDetalle > caption").css("padding", "0");
     $("#tdListaDespachoDetalle > caption > button").removeClass('xlsx');
     $("#tdListaDespachoDetalle > caption > button").removeClass('btn-outline-secondary');
     $("#tdListaDespachoDetalle > caption > button").addClass('btn-outline-success');
     $("#tdListaDespachoDetalle > caption > button").addClass('btn-sm');
-    $("#tdListaDespachoDetalle > caption > button").text('Exportar a Excel');
+    $("#tdListaDespachoDetalle > caption > button").html('<i class="fa-solid fa-file-excel"></i> Exportar a Excel');
+
+    $('#tdListaDespachoDetalle').DataTable({
+      paging: false,
+      searching: false,
+      ordering: true,
+      info: false,
+      responsive: true,     
+      language: {
+        zeroRecords: "No se encontraron registros",
+        infoEmpty: "No hay registros disponibles"
+      }
+    });
 
   } else {
     const msgHtml = `
@@ -412,7 +419,7 @@ function mostrarDetallePlanilla(data) {
     $("#dvListaDespachosDet").html(msgHtml);
   }
 }
-
+// FUNCIÓN LLENAR SELECTS DE FILTROS
 function llenarSelect(selector, campo, data) {
   const valoresUnicos = [...new Set(data.map(x => x[campo]))].sort();
   const select = document.querySelector(selector);
@@ -425,7 +432,7 @@ function llenarSelect(selector, campo, data) {
     }
   });
 }
-
+// FUNCIÓN PARA FILTROS DINÁICOS
 function aplicarFiltros(data) {
   const lista = document.querySelector('#filtroLista').value;
   const zona = document.querySelector('#filtroZona').value;
@@ -445,7 +452,7 @@ function aplicarFiltros(data) {
 
   mostrarDetallePlanilla(resultado);
 }
-
+// FUNCIÓN PARA RESETEO DE CAMPOS
 const Limpiar = async () => {
   var op = OficinasVentas('N');
   $("#TxtOficina").html(op);
@@ -471,11 +478,12 @@ const Limpiar = async () => {
   $("#TxtNFactura").focus();
   desbloquearTransportador();
 }
-
+// FUNCIÓN VERIFICAR MENSAJERO
 function VerificarMensajero() {
-  var sw = 0;
-  var opc = '';
-  var id = '';
+  let sw = 0;
+  let opc = '';
+  let id = '';
+
   if ($("#TxtTipoEnvio").val() == 'M') {
     opc = 's_verificar_mensajero';
     id = $("#TxtEmpacador").val();
@@ -483,6 +491,7 @@ function VerificarMensajero() {
     opc = 's_verificar_transportador';
     id = $("#TxtTransportador").val();
   }
+  
   if (id != '') {
     $.ajax({
       url: "../models/Mensajeros.php",
@@ -1667,6 +1676,7 @@ const resumirFacturas = (facturasCeldas) => {
       btn.classList.add("btn-sm");
       btn.classList.add("fw-bold");
       btn.setAttribute("title", "Ver mas...");
+      btn.style.padding = "2px 6px";
       btn.onclick = () => {
         Swal.fire("Facturas:", `${facturas.join("-")}`, "info");
       };
@@ -1698,6 +1708,25 @@ $(function () {
       aplicarFiltros(arrayDespachosFiltrados);
     }));
   });
+
+  const observer = new MutationObserver((mutationsList) => {
+    for (const mutation of mutationsList) {
+      for (const node of mutation.addedNodes) {
+        if (node.nodeType === 1 && node.matches('#tdListaDespachoDetalle > caption')) {
+          if (!node.hasAttribute('data-movido')) {
+            node.setAttribute('data-movido', 'true');
+
+            const contenedor = document.querySelector('#contenedorBtnExportar');
+
+            contenedor.innerHTML = '';
+            contenedor.appendChild(node);
+          }
+        }
+      }
+    }
+  });
+
+  observer.observe(document.querySelector('#dvListaDespachosDet'), { childList: true, subtree: true }); 
 
   $("#exportarExcel").click(function () {
     fnExcelReport('tdListaDespachoExcel');

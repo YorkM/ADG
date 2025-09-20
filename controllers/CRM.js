@@ -31,7 +31,7 @@ function cargaMes(campo){
 	$(`#${campo}`).html(option);
 }
 // FUNCIÓN PARA SUBIR ARCHIVOS AL SERVIDOR
-const SubirArchivosAdj = async (idProceso, arrayArchivos, codigo) => {
+const SubirArchivosAdj = async (idProceso, arrayArchivos, codigo, sw) => {
   for (let i = 0; i < arrayArchivos.length; i++) {
     if (arrayArchivos[i]) {
       const item = arrayArchivos[i];
@@ -52,12 +52,48 @@ const SubirArchivosAdj = async (idProceso, arrayArchivos, codigo) => {
           link: "../models/CRM.php", 
           nombreArchivo: nuevoNombre,
           campoActualizar, 
-          idProceso, 
+          idProceso,
+          sw 
         });
       } else {
         console.log(i);
       }
     }
+  }
+}
+// FUNCIÓN EXPORTAR A EXCEL
+function exportarExcel(idTabla, nombreArchivo = "reporte.xlsx") {
+  const tabla = document.getElementById(idTabla);
+  const tablaClon = tabla.cloneNode(true);
+
+  tablaClon.querySelectorAll("td").forEach(td => {
+    let texto = td.innerText.trim();
+    if (texto.startsWith("$")) {
+      texto = texto.replace(/\$/g, "").replace(/\./g, "");
+      td.innerText = texto;
+    }
+  });
+
+  const hoja = XLSX.utils.table_to_sheet(tablaClon);
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, hoja, "Datos");
+
+  const wbout = XLSX.write(wb, { bookType: "xlsx", type: "binary" });
+
+  const blob = new Blob([s2ab(wbout)], { type: "application/octet-stream" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = nombreArchivo;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  function s2ab(s) {
+    const buf = new ArrayBuffer(s.length);
+    const view = new Uint8Array(buf);
+    for (let i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xff;
+    return buf;
   }
 }
 // FUNCIÓN OBTENER PERMISOS
@@ -611,10 +647,10 @@ async function DelDireccion(id) {
     },
     success: function (data) { //alert(data);
       if (data == 1) {
-        Swal.fire('Excelente!', 'Direccion eliminada correctamente!', 'success');
+        Swal.fire('Excelente!', 'Dirección eliminada correctamente!', 'success');
         Direcciones();
       } else {
-        Swal.fire('Oops!', 'Error al intentar eliminar esta direccion!', 'error');
+        Swal.fire('Oops!', 'Error al intentar eliminar esta dirección!', 'error');
       }
     }
   });
@@ -706,7 +742,7 @@ function Cartera() {
         });       
 
         let tabla = `
-        <table class="table table-bordered table-hover table-sm">
+        <table class="table table-bordered table-hover table-sm" id="tablaCartera">
           <thead>
             <tr>
               <th class="bag-info size-th-2">VALOR TOTAL:${formatNum(total, '$')}</th>
@@ -1123,9 +1159,7 @@ function Sincronizar() {
         op: 'S_SINC_TERCEROS',
         codigo: codigo
       },
-      success: function (data) {
-         Swal.fire('Msj', data, 'warning');
-      }
+      success: function (data) { Swal.fire('Msj', data, 'warning'); }
     });
   }else{
 	  Swal.fire('Oops', 'No ha seleccionado un cliente.', 'error'); 
@@ -1230,6 +1264,7 @@ const getRotacion = async () => {
     const totalVentas = data.reduce((acumulador, item) => acumulador + parseFloat(item.VENTAS), 0);
     const dias = parseInt(data[0].DIAS);
     let elementos = ``;
+
     data.forEach(item => {
       elementos += `
       <tr>
@@ -1323,11 +1358,13 @@ const cambiarEstados = async (idProceso, estado, fechaCartaPreju, comentario) =>
 }
 // FUNCIÓN VER ARCHIVOS
 const verArchivos = async (archivo) => {
-  let url = `${urlArchivo}${archivo}.pdf`;
-  let elementoIframe = `<iframe src="${url}?t=${new Date().getTime()}" style="width:100%; height:80vh; border:none;"></iframe>`;
-  $("#verPDF").html(elementoIframe);
-  $("#modalVerPDF").modal('show');
-  $('#modalGestion').modal("hide");
+  if (archivo) {
+    const url = `${urlArchivo}${archivo}.pdf`;
+    const elementoIframe = `<iframe src="${url}?t=${new Date().getTime()}" style="width: 100%; height: 80vh; border: none;"></iframe>`;
+    $("#verPDF").html(elementoIframe);
+    $("#modalVerPDF").modal('show');
+    $('#modalGestion').modal("hide");
+  } 
 }
 // FUNCIÓN PARA OBTENER LOS DATOS DEL CLIENTE
 const getDatosClientes = async (codigo) => {
@@ -1394,18 +1431,22 @@ const gestionarLogs = async (idProceso) => {
     '6': {icon: '<i class="fa-solid fa-gavel"></i>', texto: 'COBRO JURÍDICO' },
     '7': {icon: '<i class="fa-solid fa-folder-open"></i>', texto: 'DOCUMENTACIÓN JURÍDICA' },
     '8': {icon: '<i class="fa-solid fa-binoculars"></i>', texto: 'DATOS SEGUIMIENTO' },
-    '9': {icon: '<i class="fa-solid fa-pencil"></i>', texto: 'OBSERVACIONES' },
+    '9': {icon: '<i class="fa-solid fa-paper-plane"></i>', texto: 'MANDAMIENTO DE PAGO' },
     '10': {icon: '<i class="fa-solid fa-hourglass-end"></i>', texto: 'DILIGENCIA PENDIENTE' },
     '11': {icon: '<i class="fa-solid fa-handshake"></i>', texto: 'EN ACUERDO DE PAGO' },
     '12': {icon: '<i class="fa-solid fa-thumbs-up"></i>', texto: 'FINALIZADO' },
-    '13': {icon: '<i class="fa-solid fa-hands-bound"></i>', texto: 'ESTADO DE INSOLVENCIA' }
+    '13': {icon: '<i class="fa-solid fa-hands-bound"></i>', texto: 'ESTADO DE INSOLVENCIA' },
+    '14': {icon: '<i class="fa-solid fa-bell"></i>', texto: 'NOTIFICACIÓN DE DEMANADA' }
   }
 
   const resp = await enviarPeticion({ op: "G_LOGS", link: "../models/CRM.php", idProceso });
+
   $(".timeline").html(``);
+
   resp.forEach((item, index) => {
     const position = index % 2 === 0 ? "left" : "right";
     const color = index % 2 === 0 ? "#0A97B0" : "#FC8F54";
+
     let timelineItem = renderizarLogs(position, color, item, estados);
       $('.timeline').append(timelineItem);
     });
@@ -1419,19 +1460,11 @@ const renderizarTds = (item, colorFila, clase, estado, title) => `
   <td class="size-13 vertical no-wrap" style="background-color: ${colorFila}">${item.ORGANIZACION}</td>
   <td class="size-13 vertical no-wrap" style="background-color: ${colorFila}">${item.OFICINA}</td>
   <td class="d-flex justify-content-center gap-2 align-items-center" style="background-color: ${colorFila}">
-    <button 
-      class="btn btn-outline-primary btn-sm shadow-sm gestion"
-      style="padding: 2px 6px;" 
-      data-item='${JSON.stringify(item)}' 
-      title="Ir a gestión de proceso"
-    ><i class="fa-solid fa-bars"></i>
+    <button class="btn btn-outline-primary btn-sm shadow-sm gestion btn-grid" data-item='${JSON.stringify(item)}' title="Ir a gestión de proceso">
+      <i class="fa-solid fa-bars"></i>
     </button>
-    <button 
-      class="btn btn-outline-success btn-sm shadow-sm btn-timeline"
-      style="padding: 2px 6px;" 
-      data-id="${item.ID}" 
-      title="Ver gestión del proceso"
-    ><i class="fa-solid fa-gear"></i>
+    <button class="btn btn-outline-success btn-sm shadow-sm btn-timeline btn-grid" data-id="${item.ID}" title="Ver gestión del proceso">
+      <i class="fa-solid fa-gear"></i>
     </button>
   </td>
   <td class="size-13 vertical no-wrap" style="background-color: ${colorFila}">${item.CODIGO}</td>
@@ -1447,20 +1480,24 @@ const renderizarTds = (item, colorFila, clase, estado, title) => `
   <td class="size-12 vertical no-wrap" style="background-color: ${colorFila}">${formatDate(item.FECHA_REGISTRO).toUpperCase()}</td>
 </tr>`;
 // DICCINARIO DE ESTADOS
+const textPreJuridica = "Proceso en estado <strong>PREJURÍDICO</strong>";
+const textJuridica = "Proceso en estado <strong>JURÍDICO</strong>";
+
 const diccionarioEstados = {
-  '1': { color: "primary", texto: 'Proceso en estado <strong>PREJURÍDICO</strong>, en instancia de <strong>CARTA CIFIN</strong> adjunta, proceso que podrá ser enviado a cobro jurídico directamente, al cumplirse los 20 días hábiles y no haber algún tipo de acuerdo' },
-  '2': { color: "primary", texto: 'Proceso en estado <strong>PREJURÍDICO</strong>, en instancia de <strong>CARTA PREJURÍDICA</strong> adjunta, proceso que podrá ser enviado a cobro jurídico directamente, al cumplirse los 10 días hábiles y no haber algún tipo de acuerdo' },
-  '3': { color: "warning", texto: 'Proceso en estado <strong>PREJURÍDICO</strong>, en instancia de <strong>ACUERDO DE PAGO</strong>, proceso con un tiempo determinado para siguientes tomas de decisiones' },
-  '4': { color: "success", texto: 'Proceso en estado <strong>PREJURÍDICO</strong>, en instancia de <strong>SOPORTE DE PAGO</strong>, proceso que ha llegado a su finalización en los mejores términos' },
-  '5': { color: "success", texto: 'Proceso en estado <strong>PREJURÍDICO</strong>, en instancia de <strong>FINALIZADO</strong>, proceso cerrado por finalización de manera satisfactoria' },
-  '6': { color: "danger", texto: 'Proceso en estado <strong>JURÍDICO</strong>, en instancia de <strong>COBRO JURÍDICO</strong>, proceso que ha sido enviado a cobro jurídico por incumplimiento de algún tipo de acuerdo, al cuál se le adjuntará toda la documentación para el respectivo seguimiento' },
-  '7': { color: "danger", texto: 'Proceso en estado <strong>JURÍDICO</strong>, en instancia de <strong>DOCUMENTACIÓN JURÍDICA</strong>, proceso que ya cuenta con la información y con los documentos para el respectivo seguimiento del área jurídica' },
-  '8': { color: "danger", texto: 'Proceso en estado <strong>JURÍDICO</strong>, en instancia de <strong>DATOS SEGUIMIENTO</strong>, proceso que ya cuenta con los datos relacionados con el seguimiento' },
-  '9': { color: "danger", texto: 'Proceso en estado <strong>JURÍDICO</strong>, en instancia de <strong>OBSERVACIONES</strong>, proceso al que se le ha diligeciado la sección de observaciones y está por definirse su estado' },
-  '10': { color: "danger", texto: 'Proceso en estado <strong>JURÍDICO</strong>, en instancia de <strong>DILIGENCIA PENDIENTE</strong>, proceso en estado diligencia pendiente' },
-  '11': { color: "warning", texto: 'Proceso en estado <strong>JURÍDICO</strong>, en instancia de <strong>ACUERDO DE PAGO</strong>, proceso en estado de acuerdo de pago en cobro jurídico' },
-  '12': { color: "success", texto: 'Proceso en estado <strong>JURÍDICO</strong>, en instancia de <strong>FINALIZADO</strong>' },
-  '13': { color: "danger", texto: 'Proceso en estado <strong>JURÍDICO</strong>, en instancia de <strong>ESTADO DE INSOLVENCIA</strong>' }
+  '1': { color: "primary", texto: `${textPreJuridica}, en instancia de <strong>CARTA CIFIN</strong> adjunta, proceso que podrá ser enviado a cobro jurídico directamente, al cumplirse los 20 días hábiles y no haber algún tipo de acuerdo` },
+  '2': { color: "primary", texto: `${textPreJuridica}, en instancia de <strong>CARTA PREJURÍDICA</strong> adjunta, proceso que podrá ser enviado a cobro jurídico directamente, al cumplirse los 10 días hábiles y no haber algún tipo de acuerdo` },
+  '3': { color: "warning", texto: `${textPreJuridica}, en instancia de <strong>ACUERDO DE PAGO</strong>, proceso con un tiempo determinado para siguientes tomas de decisiones` },
+  '4': { color: "success", texto: `${textPreJuridica}, en instancia de <strong>SOPORTE DE PAGO</strong>, proceso que ha llegado a su finalización en los mejores términos` },
+  '5': { color: "success", texto: `${textPreJuridica}, en instancia de <strong>FINALIZADO</strong>, proceso cerrado por finalización de manera satisfactoria` },
+  '6': { color: "danger", texto: `${textJuridica}, en instancia de <strong>COBRO JURÍDICO</strong>, proceso que ha sido enviado a cobro jurídico por incumplimiento de algún tipo de acuerdo, al cuál se le adjuntará toda la documentación para el respectivo seguimiento` },
+  '7': { color: "danger", texto: `${textJuridica}, en instancia de <strong>DOCUMENTACIÓN JURÍDICA</strong>, proceso que ya cuenta con la información y con los documentos para el respectivo seguimiento del área jurídica` },
+  '8': { color: "danger", texto: `${textJuridica}, en instancia de <strong>DATOS SEGUIMIENTO</strong>, proceso que ya cuenta con los datos relacionados con el seguimiento` },
+  '9': { color: "danger", texto: `${textJuridica}, en instancia de <strong>OBSERVACIONES-MANDAMIENTO</strong>, proceso al que se le ha diligeciado el mandamiento de pago` },
+  '10': { color: "danger", texto: `${textJuridica}, en instancia de <strong>DILIGENCIA PENDIENTE</strong>, proceso en estado diligencia pendiente` },
+  '11': { color: "warning", texto: `${textJuridica}, en instancia de <strong>ACUERDO DE PAGO</strong>, proceso en estado de acuerdo de pago en cobro jurídico` },
+  '12': { color: "success", texto: `${textJuridica}, en instancia de <strong>FINALIZADO</strong>` },
+  '13': { color: "danger", texto: `${textJuridica}, en instancia de <strong>ESTADO DE INSOLVENCIA</strong>` },
+  '14': { color: "danger", texto: `${textJuridica}, en instancia de <strong>OBSERVACIONES-NOTIFICACIÓN</strong>, proceso al que se le ha diligeciado la notificación de demanda y está por definirse su estado` },
 }
 const retornarEstado = () => {
   const { ESTADO } = JSON.parse(sessionStorage.DatosProceso);
@@ -1575,7 +1612,7 @@ const getAbonos = async (codigo, estado) => {
         });
 
         $('#tablaAbonos').on('click', '.btn-soporte', async function () {
-          const { ID, CUMPLE, NUMERO_DOCUMENTO, FECHA_REALIZA_PAGO, FORMA_PAGO } = JSON.parse($(this).attr("data-item"));
+          const { ID, CUMPLE, NUMERO_DOCUMENTO, FECHA_REALIZA_PAGO, FORMA_PAGO, SOPORTE_PAGO } = JSON.parse($(this).attr("data-item"));
 
           if (CUMPLE !== "1") {
             Swal.fire("Oops!!!", "Este item no cumple el acuerdo de pago, por ende no se puede agregar soporte aún", "warning");
@@ -1586,9 +1623,13 @@ const getAbonos = async (codigo, estado) => {
             $('#numeroDocumento').val(NUMERO_DOCUMENTO);
             $('#fechaPagoS').val(FECHA_REALIZA_PAGO);
             $('#formaPago').val(FORMA_PAGO);
-            $('#numeroDocumento, #fechaPagoS, #formaPago, #btnGuardarSoporte2').prop("disabled", true);
+            sessionStorage.ArchivoSoporte = SOPORTE_PAGO;           
+            $('#numeroDocumento, #fechaPagoS, #formaPago, #btnGuardarSoporte2, #soportePagoAbono').prop("disabled", true);
+            $('#verSoporte').prop("disabled", false);
           } else {
-            $('#numeroDocumento, #fechaPagoS, #formaPago, #btnGuardarSoporte2').prop("disabled", false);
+            $('#numeroDocumento, #fechaPagoS, #formaPago, #btnGuardarSoporte2, #soportePagoAbono').prop("disabled", false);
+            $('#verSoporte').prop("disabled", true);
+            sessionStorage.ArchivoSoporte = null;
           }
 
           $('#idAbonoHidden').val(ID);
@@ -1629,12 +1670,33 @@ const gestionarProceso = (item) => {
 
   $('#alertEstados').html(alertHTML);
 
-  (estado === "1") ? $('#btnCargarCarta').html(`<i class="fa-solid fa-upload"></i>`) : $('#btnCargarCarta').html(`<i class="fa-solid fa-eye"></i>`);
-  (estado === "1" || estado === "2") ? $('#btnCargarAcuerdo').html(`<i class="fa-solid fa-upload"></i>`) : $('#btnCargarAcuerdo').html(`<i class="fa-solid fa-handshake"></i>`);
-  (estado === "1" || estado === "2" || estado === "3") ? $('#btnGuardarSoporte').html(`<i class="fa-solid fa-upload"></i>`) : $('#btnGuardarSoporte').html(`<i class="fa-solid fa-eye"></i>`);
-  (estado === "7" || estado === "8" || estado === "9" || estado === "10" || estado === "11" || estado === "12" || estado === "13") ? $('#btnGuardarDatosJuri').html(`<i class="fa-solid fa-eye"></i>`) : $('#btnGuardarDatosJuri').html(`<i class="fa-solid fa-upload"></i>`);
-  (estado === "8" || estado === "9" || estado === "10" || estado === "11" || estado === "12" || estado === "13") ? $('#btnGuardarDatosSegui').html(`<i class="fa-solid fa-eye"></i>`) : $('#btnGuardarDatosSegui').html(`<i class="fa-solid fa-upload"></i>`);
-  (estado === "9" || estado === "10" || estado === "11" || estado === "12" || estado === "13") ? $('#btnVerGuardarAcuerdo').html(`<i class="fa-solid fa-eye"></i>`) : $('#btnVerGuardarAcuerdo').html(`<i class="fa-solid fa-upload"></i>`);
+  (estado === "1") 
+  ? $('#btnCargarCarta').html(`<i class="fa-solid fa-upload"></i>`) 
+  : $('#btnCargarCarta').html(`<i class="fa-solid fa-eye"></i>`);
+
+  (["1", "2"].includes(estado)) 
+  ? $('#btnCargarAcuerdo').html(`<i class="fa-solid fa-upload"></i>`) 
+  : $('#btnCargarAcuerdo').html(`<i class="fa-solid fa-handshake"></i>`);
+
+  (["1", "2", "3"].includes(estado)) 
+  ? $('#btnGuardarSoporte').html(`<i class="fa-solid fa-upload"></i>`) 
+  : $('#btnGuardarSoporte').html(`<i class="fa-solid fa-eye"></i>`);
+
+  (["7", "8", "9", "10", "11", "12", "13"].includes(estado)) 
+  ? $('#btnGuardarDatosJuri').html(`<i class="fa-solid fa-eye"></i>`) 
+  : $('#btnGuardarDatosJuri').html(`<i class="fa-solid fa-upload"></i>`);
+
+  (["8", "9", "10", "11", "12", "13"].includes(estado)) 
+  ? $('#btnGuardarDatosSegui').html(`<i class="fa-solid fa-eye"></i>`) 
+  : $('#btnGuardarDatosSegui').html(`<i class="fa-solid fa-upload"></i>`);
+
+  (["9", "10", "11", "12", "13", "14"].includes(estado)) 
+  ? $('#btnVerGuardarMandamiento').html(`<i class="fa-solid fa-eye"></i>`) 
+  : $('#btnVerGuardarMandamiento').html(`<i class="fa-solid fa-upload"></i>`);
+
+  (["10", "11", "12", "13", "14"].includes(estado)) 
+  ? $('#btnVerGuardarDemanda').html(`<i class="fa-solid fa-eye"></i>`) 
+  : $('#btnVerGuardarDemanda').html(`<i class="fa-solid fa-upload"></i>`);
 
   if (estado === "3") {
     $('#btnAgregarAbono').removeClass("d-none");
@@ -1653,7 +1715,7 @@ const gestionarProceso = (item) => {
 
   const seccionesJuridicas = document.querySelectorAll('.seccion-juridico');
 
-  if (estado === "6" || estado === "7" || estado === "8" || estado === "9" || estado === "10" || estado === "11" || estado === "12" || estado === "13") seccionesJuridicas.forEach(item => item.classList.remove('d-none'));
+  if (["6", "7", "8", "9", "10", "11", "12", "13", "14"].includes(estado)) seccionesJuridicas.forEach(item => item.classList.remove('d-none'));
   else seccionesJuridicas.forEach(item => item.classList.add('d-none'));
 
   (item.COMENTARIO_PREJURIDICA.length) && $('#comentarioCartaPreju').val(item.COMENTARIO_PREJURIDICA);
@@ -1676,13 +1738,15 @@ const getDatosProcesos = async () => {
         let estado = "";
         let clase = "";
 
-        if (E === "1" || E === "2" || E === "3") {
+        if (["1", "2", "3"].includes(E)) {
           estado = "PREJURÍDICO";
           clase = "#ffc107";
-        } else if (E === "6" || E === "7" || E === "8" || E === "9" || E === "10" || E === "11" || E === "13") {
+
+        } else if (["6", "7", "8", "9", "10", "11", "13", "14"].includes(E)) {
           estado = "JURÍDICO";
           clase = "#dc3545";
-        } else if (E === "5" || E === "12") {
+
+        } else if (["5", "12"].includes(E)) {
           estado = "FINALIZADO";
           clase = "#198754 ";
         }
@@ -1735,11 +1799,12 @@ const getDatosProcesos = async () => {
       $('#tablaProcesos tbody').html(elementos);
 
       $('#tablaProcesos').on('click', '.gestion', async function () {
+        const oficinaLogin = $('#ofic').val();
         const item = JSON.parse($(this).attr("data-item"));        
         const { data } = await enviarPeticion({op: "G_PROCESO", link: "../models/CRM.php", idProceso: item.ID});
         sessionStorage.DatosProceso = JSON.stringify(data[0]);
-        
-        gestionarProceso(item);
+
+        if (oficinaLogin === item.OFICINA) gestionarProceso(item);
       });
 
       $('#tablaProcesos').on('click', '.btn-timeline', function () {
@@ -1817,7 +1882,7 @@ const guardarDatos = async () => {
     Swal.fire("Excelente", "Se guardaron los datos correctamente", "success");
     getDatosProcesos();
     guardarLogs(resp.id, "1", usuario);
-    SubirArchivosAdj(resp.id, arrayArchivos, codigo);
+    SubirArchivosAdj(resp.id, arrayArchivos, codigo, "1");
     limpiarCampos();
   }
 }
@@ -1834,7 +1899,7 @@ const gestionarCartaPrejuridica = () => {
       return;
     }
 
-    SubirArchivosAdj(item.ID, [{file: carta, campo: "CARTA_PREJURIDICA"}], item.CODIGO);
+    SubirArchivosAdj(item.ID, [{file: carta, campo: "CARTA_PREJURIDICA"}], item.CODIGO, "1");
 
     const OK = cambiarEstados(item.ID, "2", fechaCartaPreju, comentario);
 
@@ -1882,7 +1947,7 @@ const gestionarAcuerdo = async () => {
     
     if (resp.ok) {
       Swal.fire("Cargar Acuerdo", "El acuerdo ha sido cargado correctamente", "success");
-      SubirArchivosAdj(item.ID, [{file: acuerdo, campo: "ACUERDO_PAGO"}], item.CODIGO);
+      SubirArchivosAdj(item.ID, [{file: acuerdo, campo: "ACUERDO_PAGO"}], item.CODIGO, "1");
       guardarLogs(item.ID, "3", usuario);
       getDatosProcesos();
       $('#acuerdoM').val("");
@@ -1924,7 +1989,7 @@ const gestionarSoportePago = async () => {
     
     if (resp.ok) {
       Swal.fire("Cargar soporte", "El soporte de pago ha sido cargado correctamente", "success");
-      SubirArchivosAdj(item.ID, [{file: soporte, campo: "SOPORTE_PAGO"}], item.CODIGO);
+      SubirArchivosAdj(item.ID, [{file: soporte, campo: "SOPORTE_PAGO"}], item.CODIGO, "1");
       await guardarLogs(item.ID, "4", usuario);
       guardarLogs(item.ID, "5", usuario);
       getDatosProcesos();
@@ -1968,7 +2033,7 @@ const guardarDatosJuridica = async () => {
     
     if (resp.ok) {
       Swal.fire("Guardar información", "La información relacionada al envío de proceso a jurídica ha sido guardada correctamente", "success");
-      SubirArchivosAdj(item.ID, [{file: documentosJuri, campo: "DOCUMENTOS_JURIDICOS"}], item.CODIGO);
+      SubirArchivosAdj(item.ID, [{file: documentosJuri, campo: "DOCUMENTOS_JURIDICOS"}], item.CODIGO, "1");
       guardarLogs(item.ID, "7", usuario);
       getDatosProcesos();
       $('#documentosM').val("");
@@ -2044,7 +2109,7 @@ const guardarDatosSeguimiento = async () => {
     
     if (resp.ok) {
       Swal.fire("Guardar Seguimiento", "La información relacionada con el seguimiento del proceso se guardó correctamente", "success");
-      SubirArchivosAdj(item.ID, [{file: informeBienes, campo: "INFORME_BIENES"}, {file: demanda, campo: "DEMANDA"}, {file: juzgadoRadicado, campo: "JUZGADO_RADICADO"}], item.CODIGO);
+      SubirArchivosAdj(item.ID, [{file: informeBienes, campo: "INFORME_BIENES"}, {file: demanda, campo: "DEMANDA"}, {file: juzgadoRadicado, campo: "JUZGADO_RADICADO"}], item.CODIGO, "1");
       guardarLogs(item.ID, "8", usuario);
       getDatosProcesos();
       $('#bienesM').val("");
@@ -2070,20 +2135,19 @@ const guardarDatosObservaciones = async () => {
   const item = JSON.parse(sessionStorage.DatosProceso);
   if (item.ESTADO === "8") {
     const mandamiento = document.querySelector('#mandamientoM').files[0];
-    const notificaion = document.querySelector('#notificacionM').files[0];
-    const acuerdo = document.querySelector('#acuerdo2M').files[0];
     const comentario = $('#comentarioObservaciones').val();   
+    const fechaMandamiento = $('#fechaMandamientoM').val();   
 
-    if (!mandamiento || !notificaion || !acuerdo) {
-      Swal.fire("Oops!!!", "Todos los campos relacionados con la observación del proceso son obligatorios", "error");
+    if (!mandamiento || !fechaMandamiento) {
+      Swal.fire("Oops!!!", "El mandamiento de pago y la fecha del mismo son requeridos", "error");
       return;
     }
     
-    const result = await confirmAlert("Guardar Observaciones", "Se guardarán los datos relacionados con las observaciones del proceso... ¿Han sido verificados antes?");
+    const result = await confirmAlert("Guardar Mandamiento", "Se guardarán los datos relacionados al mandamiento de pago");
     if (!result.isConfirmed) return;
     
     const resp = await enviarPeticion({
-      op: "U_ESTADO_OBSERVACIONES",
+      op: "U_MANDAMIENTO",
       link: "../models/CRM.php",
       idProceso: item.ID,
       comentario,
@@ -2091,26 +2155,66 @@ const guardarDatosObservaciones = async () => {
     });
     
     if (resp.ok) {
-      Swal.fire("Guardar Observaciones", "La información relacionada con las observaciones del proceso se guardó correctamente", "success");
-      SubirArchivosAdj(item.ID, [{file: mandamiento, campo: "MANDAMIENTO"}, {file: notificaion, campo: "NOTIFICACION"}, {file: acuerdo, campo: "ACUERDO_PAGO"}], item.CODIGO);
+      Swal.fire("Excelente", "La información relacionada al mandamiento de pago se guardó correctamente", "success");
+      SubirArchivosAdj(item.ID, [{file: mandamiento, campo: "MANDAMIENTO"}], item.CODIGO, "1");
       guardarLogs(item.ID, "9", usuario);
       getDatosProcesos();
       $('#mandamientoM').val("");
-      $('#notificacionM').val("");
-      $('#acuerdo2M').val("");     
       $('#comentarioObservaciones').val("");     
       $('#modalGestion').modal("hide");
     }
 
   } else {
-    if (item.ACUERDO_PAGO) {
-      verArchivos(item.ACUERDO_PAGO);
+    if (item.MANDAMIENTO) {
+      verArchivos(item.MANDAMIENTO);
     } else {
       Swal.fire("Oops!!!", "No hay archivos disponibles", "info");
     }
   }
 }
-// FUNCIÓN SERRVICIO CAMBIO ESTADO
+// FUNCIÓN PARA DATOS DE LAS OBSERVACIONES 2
+const guardarDatosObservaciones2 = async () => {
+  const item = JSON.parse(sessionStorage.DatosProceso);
+  if (item.ESTADO === "9") {
+    const notificaion = document.querySelector('#notificacionM').files[0];
+    const fechaNotificaion = $('#fechaNotificacionM').val();   
+    const comentario = $('#comentarioObservaciones').val();   
+
+    if (!notificaion || !fechaNotificaion) {
+      Swal.fire("Oops!!!", "La notificación de demanda y la fecha de la misma son requeridas", "error");
+      return;
+    }
+    
+    const result = await confirmAlert("Guardar Notificación", "Se guardarán los datos relacionados con la notifcación de demanda");
+    if (!result.isConfirmed) return;
+    
+    const resp = await enviarPeticion({
+      op: "U_NOTIFICACION",
+      link: "../models/CRM.php",
+      idProceso: item.ID,
+      comentario,
+      estado: "14",
+    });
+    
+    if (resp.ok) {
+      Swal.fire("Excelente", "La información relacionada con la notificación de demanda se guardó correctamente", "success");
+      SubirArchivosAdj(item.ID, [{file: notificaion, campo: "NOTIFICACION"}], item.CODIGO, "1");
+      guardarLogs(item.ID, "14", usuario);
+      getDatosProcesos();
+      $('#notificacionM').val("");
+      $('#comentarioObservaciones').val("");     
+      $('#modalGestion').modal("hide");
+    }
+
+  } else {
+    if (item.NOTIFICACION) {
+      verArchivos(item.NOTIFICACION);
+    } else {
+      Swal.fire("Oops!!!", "No hay archivos disponibles", "info");
+    }
+  }
+}
+// FUNCIÓN SERVICIO CAMBIO ESTADO
 const servicioEstado = async (item, estadoJuridico, estado, archivo, campo) => {
   const resp = await enviarPeticion({
     op: "U_ESTADO_PROCESO",
@@ -2122,7 +2226,7 @@ const servicioEstado = async (item, estadoJuridico, estado, archivo, campo) => {
 
   if (resp.ok) {
     Swal.fire("Excelente", "El estado del caso ha sido actualizado y el archivo guardado correctamente", "success");
-    SubirArchivosAdj(item.ID, [{ file: archivo, campo }], item.CODIGO);
+    SubirArchivosAdj(item.ID, [{ file: archivo, campo }], item.CODIGO, "1");
     guardarLogs(item.ID, estado, usuario);
   }
 }
@@ -2172,7 +2276,7 @@ const guardarEstadoProceso = async (estadoJuridico) => {
   $('#estadoArchivo').val("");
   $('#modalGestion').modal("hide");
 }
-// FUNCIÓN GENERAR REPORTE
+// FUNCIÓN GENERAR REPORTE PROCESOS JURÍDICOS
 const generarReporte = async () => {
   const organizacion= $('#org').val();
   const oficina = $('#ofic').val();
@@ -2229,39 +2333,67 @@ const generarReporte = async () => {
     $('#contenedorReporte').html(tabla);
   }
 }
-// FUNCIÓN EXPORTAR A EXCEL
-function exportarExcel(idTabla, nombreArchivo = "reporte.xlsx") {
-  const tabla = document.getElementById(idTabla);
-  const tablaClon = tabla.cloneNode(true);
+// FUNCIÓN GENERAR REPORTE PROCESOS PREJURÍDICOS
+const generarReporte2 = async () => {
+  const organizacion= $('#org').val();
+  const oficina = $('#ofic').val();
+  const { data } = await enviarPeticion({op: "G_REPORTE_PROCESOS_2", link: "../models/CRM.php", organizacion, oficina});
 
-  tablaClon.querySelectorAll("td").forEach(td => {
-    let texto = td.innerText.trim();
-    if (texto.startsWith("$")) {
-      texto = texto.replace(/\$/g, "").replace(/\./g, "");
-      td.innerText = texto;
+  console.log(data);
+
+  if (data.length) {
+    $('#contenedorPrincipalReporte2').removeClass("d-none");
+
+    let tabla = `
+    <table class="table table-bordered table-hover table-sm w-100" id="tablaReporte2">
+      <thead>
+        <tr>
+          <th class="size-th bag-info no-wrap">CÓDIGO</th>
+          <th class="size-th bag-info no-wrap">ZONA</th>
+          <th class="size-th bag-info no-wrap">OFICINA</th>
+          <th class="size-th bag-info no-wrap">FECHA PREJURÍDICA</th>
+          <th class="size-th bag-info no-wrap">NOMBRE</th>
+          <th class="size-th bag-info no-wrap">RAZÓN SOCIAL</th>
+          <th class="size-th bag-info no-wrap">EJECUTIVO CARGO</th>
+          <th class="size-th bag-info no-wrap">ESTADO</th>
+          <th class="size-th bag-info no-wrap">FECHA CARTA CIFIN</th>
+          <th class="size-th bag-info no-wrap">FECHA CARTA PREJURÍDICA</th>
+          <th class="size-th bag-info no-wrap">FECHA INICIO ACUERDO</th>
+          <th class="size-th bag-info no-wrap">FECHA FIN ACUERDO</th>
+          <th class="size-th bag-info no-wrap">FECHA SOPORTE PAGO</th>
+        </tr>
+      </thead>
+      <tbody>`;
+
+    const estados = {
+      "1": "CARTA CIFIN",
+      "2": "CARTA PREJURÍDICA",
+      "3": "ACUERDO DE PAGO",
+      "4": "SOPORTE PAGO",
+      "5": "FINALIZADO",
     }
-  });
 
-  const hoja = XLSX.utils.table_to_sheet(tablaClon);
+    data.forEach(item => {
+      tabla += `
+      <tr>
+        <td class="size-13 vertical no-wrap">${item.CODIGO}</td>
+        <td class="size-12 vertical no-wrap">${item.ZONA_VENTAS}</td>
+        <td class="size-13 vertical no-wrap">${item.OFICINA}</td>
+        <td class="size-13 vertical no-wrap">${item.FECHA_CARTA_CIFIN}</td>
+        <td class="size-12 vertical no-wrap">${item.NOMBRE_CLIENTE}</td>
+        <td class="size-12 vertical no-wrap">${item.RAZON_SOCIAL}</td>
+        <td class="size-12 vertical no-wrap">${item.EJECUTIVO_CARGO}</td>
+        <td class="size-13 vertical no-wrap">${estados[item.ESTADO]}</td>
+        <td class="size-12 vertical no-wrap">${item.FECHA_CARTA_CIFIN}</td>
+        <td class="size-12 vertical no-wrap">${item.FECHA_CARTA_JURI}</td>
+        <td class="size-12 vertical no-wrap">${item.FECHA_INICIO_ACUERDO}</td>
+        <td class="size-12 vertical no-wrap">${item.FECHA_FIN_ACUERDO}</td>
+        <td class="size-12 vertical no-wrap">${item.FECHA_SOPORTE}</td>
+      </tr>`;
+    });
 
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, hoja, "Datos");
-
-  const wbout = XLSX.write(wb, { bookType: "xlsx", type: "binary" });
-
-  const blob = new Blob([s2ab(wbout)], { type: "application/octet-stream" });
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = nombreArchivo;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-
-  function s2ab(s) {
-    const buf = new ArrayBuffer(s.length);
-    const view = new Uint8Array(buf);
-    for (let i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xff;
-    return buf;
+    tabla += `</tbody></table>`;
+    $('#contenedorReporte2').html(tabla);
   }
 }
 // FUNCIÓN VER ARCHIVOS ESTADO PROCESO
@@ -2366,12 +2498,13 @@ const actualizarCumplePago = async (idAbono, valor, estado) => {
 // FUNCIÓN PARA GUARDAR INFORMACIÓN DE PAGO
 const guardarSoportePago = async (idAbono) => {
   const { CODIGO: codigo } = JSON.parse(sessionStorage.DatosProceso);
+  const soporte = document.querySelector('#soportePagoAbono').files[0];
   const numeroDocumento = $('#numeroDocumento').val();
   const fechaPago = $('#fechaPagoS').val();
   const formaPago = $('#formaPago').val();
 
-  if (!numeroDocumento || !fechaPago) {
-    Swal.fire("Oops!!!", "El número del doumento y la fecha de pago son requeridas", "error");
+  if (!numeroDocumento || !fechaPago || !soporte) {
+    Swal.fire("Oops!!!", "El número del documento, la fecha de pago y el soporte son requeridos", "error");
     return;
   }
 
@@ -2390,6 +2523,7 @@ const guardarSoportePago = async (idAbono) => {
 
     if (resp.ok) {
       Swal.fire("Excelente", "Se guardaron los datos correctamente", "success");
+      await SubirArchivosAdj(idAbono, [{file: soporte, campo: "SOPORTE_PAGO"}], numeroDocumento, "2");
       getAbonos(codigo, retornarEstado());
       $('#modalSoporte').modal("hide");
     }
@@ -2635,13 +2769,13 @@ $(function () {
 
     switch (id) {
       case '0405':
-        url = 'RecibosCaja.php';
         title = '0405 - RECIBOS DE PAGO';
+        url = 'RecibosCaja.php';
         break;
 
       case '0102':
-        url = 'ProgramacionCliente.php';
         title = '0102 - PROGRAMACION DE CLIENTE';
+        url = 'ProgramacionCliente.php';
         break;
     }
 
@@ -2667,10 +2801,7 @@ $(function () {
   getZonasVentas();
 
   const oficinasN = OficinasVentas('N');
-  $("#oficina").html(oficinasN);
-
-  const oficinasS = OficinasVentas('S');
-  $("#filtroOficina").html(oficinasS);
+  $("#oficina, #filtroOficina").html(oficinasN); 
 
   getRotacion();
 
@@ -2732,21 +2863,13 @@ $(function () {
     }
   });
 
-  $('#btnVerMandamiento').click(function () {
-    const item = JSON.parse(sessionStorage.DatosProceso);
-    if (item.MANDAMIENTO) {
-      verArchivos(item.MANDAMIENTO);
-    } else {
-      Swal.fire("Oops!!!", "El documento no ha sido cargado", "warning");
-    }
-  });
-
-  $('#btnVerNotificación').click(function () {
-    const item = JSON.parse(sessionStorage.DatosProceso);
-    if (item.NOTIFICACION) {
-      verArchivos(item.NOTIFICACION);
-    } else {
-      Swal.fire("Oops!!!", "El documento no ha sido cargado", "warning");
+  $('#verSoporte').click(function () {
+    $('#modalSoporte').modal("hide", 200);
+    if (sessionStorage.ArchivoSoporte !== "null") {
+      verArchivos(sessionStorage.ArchivoSoporte);
+      setTimeout(() => {
+        $('#modalGestion').modal("hide", 200);
+      }, 1000);
     }
   });
 
@@ -2756,6 +2879,7 @@ $(function () {
   
   $("#modalSoporte").on("hidden.bs.modal", () => {
     $('#modalGestion').modal("show");
+    $('#soportePagoAbono').val("");
     $('#numeroDocumento').val("");
     $('#fechaPagoS').val("");
     $('#formaPago').val("");
@@ -2763,6 +2887,7 @@ $(function () {
 
   $("#modalGestion").on("hidden.bs.modal", () => {
     $('#contenedorPrincipalReporte').addClass("d-none");
+    $('#contenedorPrincipalReporte2').addClass("d-none");
     $('#contenedorSeccionAbono').addClass("d-none");
     $('#btnAgregarAbono').html(`<i class="fa-solid fa-plus"></i>`);
     $('#btnAgregarAbono2').html(`<i class="fa-solid fa-plus"></i>`);
@@ -2805,8 +2930,12 @@ $(function () {
     guardarDatosSeguimiento();
   });
 
-  $('#btnVerGuardarAcuerdo').click(function () {
+  $('#btnVerGuardarMandamiento').click(function () {
     guardarDatosObservaciones();
+  });
+
+  $('#btnVerGuardarDemanda').click(function () {
+    guardarDatosObservaciones2();
   });
 
   $('#btnEstado').click(function () {
@@ -2818,9 +2947,25 @@ $(function () {
     generarReporte();
   });
 
+  $('#generarReporte2').click(function () {
+    generarReporte2();
+  });
+
   $('#exportarExcel').click(function () {
     if ($('#tablaReporte tbody tr').length) {
       exportarExcel("tablaReporte");
+    }
+  });
+
+  $('#exportarCartera').click(function () {
+    if ($('#tablaCartera tbody tr').length) {
+      exportarExcel("tablaCartera");
+    }
+  });
+
+  $('#exportarExcel2').click(function () {
+    if ($('#tablaReporte2 tbody tr').length) {
+      exportarExcel("tablaReporte2");
     }
   });
 

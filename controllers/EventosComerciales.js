@@ -2310,14 +2310,14 @@ const verPresupuestoMercadeo = async (id) => {
      <table class="table table-sm table-bordered table-hover" id="tablaPresupuestoMerc">
         <thead class="thead-list-eventos table-info">
           <tr>
-            <th>Tipo</th>
-            <th>Categoría</th>
-            <th>Cantidad</th>
-            <th>Valor Unitario</th>
-            <th>Presupuesto</th>
-            <th>Ejecutado</th>
-            <th>Proveedor</th>
-            <th>Factura</th>
+            <th>TIPO</th>
+            <th>CATEGORIA</th>
+            <th>CANTIDAD</th>
+            <th>VALOR UNITARIO</th>
+            <th>PRESUPUESTO</th>
+            <th>EJECUTADO</th>
+            <th>PROVEEDOR</th>
+            <th>FACTURA</th>
           </tr>
         </thead>
         <tbody>`;
@@ -4071,6 +4071,7 @@ function setupCurrencyFormatting(selector) {
       $(this).val(value.toString());
     }
   });
+  
 
   $(selector).on("blur", function () {
     let value = parseCurrency($(this).val());
