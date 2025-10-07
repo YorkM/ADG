@@ -563,165 +563,355 @@ const verDetalleConsolidados = async (codigoCliente) => {
 };
 
 // TODO: REALIZAR AJUSTE DE ASIGNAR OFICINA DINÁMICAMENTE
+// const verConsolidadoOficinas = (resp) => {
+//   const oficinaMedellin = resp.filter((item) => item.OFICINA_VENTAS === "2100");
+//   const oficinaBogota = resp.filter((item) => item.OFICINA_VENTAS === "2200");
+//   const oficinaCali = resp.filter((item) => item.OFICINA_VENTAS === "2300");
+//   const oficinaBarranquilla = resp.filter(
+//     (item) => item.OFICINA_VENTAS === "2400"
+//   );
+
+//   //? MEDELLIN
+//   const consolidadoMedellin = oficinaMedellin.reduce(
+//     (acumulado, item) => {
+//       const valorTotal = parseFloat(item.VALOR_TOTAL || 0);
+//       const valorFacturado = parseFloat(item.VALOR_FACTURADO || 0);
+
+//       acumulado.total += valorTotal;
+//       acumulado.facturado += valorFacturado;
+//       acumulado.pendiente += valorTotal - valorFacturado;
+
+//       return acumulado;
+//     },
+//     { total: 0, facturado: 0, pendiente: 0 }
+//   );
+//   consolidadoMedellin.porcentajeCumplimiento =
+//     consolidadoMedellin.total > 0
+//       ? (consolidadoMedellin.facturado / consolidadoMedellin.total) * 100
+//       : 0;
+//   consolidadoMedellin.porcentajeCumplimiento = parseFloat(
+//     consolidadoMedellin.porcentajeCumplimiento.toFixed(2)
+//   );
+//   consolidadoMedellin.oficina = "MEDELLÍN";
+
+//   //? BOGOTÁ
+//   const consolidadoBogota = oficinaBogota.reduce(
+//     (acumulado, item) => {
+//       const valorTotal = parseFloat(item.VALOR_TOTAL || 0);
+//       const valorFacturado = parseFloat(item.VALOR_FACTURADO || 0);
+
+//       acumulado.total += valorTotal;
+//       acumulado.facturado += valorFacturado;
+//       acumulado.pendiente += valorTotal - valorFacturado;
+
+//       return acumulado;
+//     },
+//     { total: 0, facturado: 0, pendiente: 0 }
+//   );
+//   consolidadoBogota.porcentajeCumplimiento =
+//     consolidadoBogota.total > 0
+//       ? (consolidadoBogota.facturado / consolidadoBogota.total) * 100
+//       : 0;
+//   consolidadoBogota.porcentajeCumplimiento = parseFloat(
+//     consolidadoBogota.porcentajeCumplimiento.toFixed(2)
+//   );
+//   consolidadoBogota.oficina = "BOGOTÁ";
+
+//   //? CALI
+//   const consolidadoCali = oficinaCali.reduce(
+//     (acumulado, item) => {
+//       const valorTotal = parseFloat(item.VALOR_TOTAL || 0);
+//       const valorFacturado = parseFloat(item.VALOR_FACTURADO || 0);
+
+//       acumulado.total += valorTotal;
+//       acumulado.facturado += valorFacturado;
+//       acumulado.pendiente += valorTotal - valorFacturado;
+
+//       return acumulado;
+//     },
+//     { total: 0, facturado: 0, pendiente: 0 }
+//   );
+//   consolidadoCali.porcentajeCumplimiento =
+//     consolidadoCali.total > 0
+//       ? (consolidadoCali.facturado / consolidadoCali.total) * 100
+//       : 0;
+//   consolidadoCali.porcentajeCumplimiento = parseFloat(
+//     consolidadoCali.porcentajeCumplimiento.toFixed(2)
+//   );
+//   consolidadoCali.oficina = "CALI";
+
+//   //? BARRANQUILLA
+//   const consolidadoBarranquilla = oficinaBarranquilla.reduce(
+//     (acumulado, item) => {
+//       const valorTotal = parseFloat(item.VALOR_TOTAL || 0);
+//       const valorFacturado = parseFloat(item.VALOR_FACTURADO || 0);
+
+//       acumulado.total += valorTotal;
+//       acumulado.facturado += valorFacturado;
+//       acumulado.pendiente += valorTotal - valorFacturado;
+
+//       return acumulado;
+//     },
+//     { total: 0, facturado: 0, pendiente: 0 }
+//   );
+//   consolidadoBarranquilla.porcentajeCumplimiento =
+//     consolidadoBarranquilla.total > 0
+//       ? (consolidadoBarranquilla.facturado / consolidadoBarranquilla.total) *
+//         100
+//       : 0;
+//   consolidadoBarranquilla.porcentajeCumplimiento = parseFloat(
+//     consolidadoBarranquilla.porcentajeCumplimiento.toFixed(2)
+//   );
+//   consolidadoBarranquilla.oficina = "BARRANQUILLA";
+
+//   const objOficinas = [
+//     consolidadoMedellin,
+//     consolidadoBogota,
+//     consolidadoCali,
+//     consolidadoBarranquilla,
+//   ];
+
+//   let elementos = ``;
+//   let bgColor = ``;
+
+//   objOficinas.forEach((item) => {
+//     const porcentaje = parseFloat(item.porcentajeCumplimiento);
+//     const facturado = parseFloat(item.facturado).toFixed(2);
+//     const pendiente = parseFloat(item.pendiente).toFixed(2);
+
+//     if (porcentaje < 30.5) {
+//       bgColor = "#ec7063";
+//     } else if (porcentaje >= 30.5 && porcentaje < 99) {
+//       bgColor = "#f9e79f";
+//     } else {
+//       bgColor = "#1abc9c";
+//     }
+
+//     elementos += `
+//           <tr>
+//             <td>${item.oficina}</td>
+//             <td>${formatNum(item.total, "$")}</td>
+//             <td>${formatNum(facturado, "$")}</td>
+//             <td>${formatNum(pendiente, "$")}</td>
+//             <td style="background-color: ${bgColor};">${
+//       item.porcentajeCumplimiento
+//     }</td>
+//           </tr>`;
+//   });
+
+//   const totalGeneral = objOficinas.reduce(
+//     (acc, oficina) => acc + oficina.total,
+//     0
+//   );
+//   const totalFacturado = objOficinas.reduce(
+//     (acc, oficina) => acc + oficina.facturado,
+//     0
+//   );
+//   const totalPendiente = objOficinas.reduce(
+//     (acc, oficina) => acc + oficina.pendiente,
+//     0
+//   );
+//   const porcentajeCumplimientoTotal = (
+//     (totalFacturado / totalGeneral) *
+//     100
+//   ).toFixed(2);
+
+//   $("#tablaOficinas tbody").html(elementos);
+//   $("#tPassport").text(formatNum(totalGeneral, "$"));
+//   $("#tFacturado").text(formatNum(parseFloat(totalFacturado).toFixed(2), "$"));
+//   $("#tPendiente").text(formatNum(parseFloat(totalPendiente).toFixed(2), "$"));
+//   $("#tPorcentaje").text(porcentajeCumplimientoTotal + "%");
+// };
 const verConsolidadoOficinas = (resp) => {
-  const oficinaMedellin = resp.filter((item) => item.OFICINA_VENTAS === "2100");
-  const oficinaBogota = resp.filter((item) => item.OFICINA_VENTAS === "2200");
-  const oficinaCali = resp.filter((item) => item.OFICINA_VENTAS === "2300");
-  const oficinaBarranquilla = resp.filter(
-    (item) => item.OFICINA_VENTAS === "2400"
-  );
+    // Obtener el valor del input org_ses
+    const orgSes = $("#org_ses").val() || "2000";
+    
+    // Filtrar las oficinas según el valor de orgSes
+    const oficinaMedellin = resp.filter(item => item.OFICINA_VENTAS === "2100");
+    const oficinaBogota = resp.filter(item => item.OFICINA_VENTAS === "2200");
+    const oficinaCali = resp.filter(item => item.OFICINA_VENTAS === "2300");
+    const oficinaBarranquilla = resp.filter(item => item.OFICINA_VENTAS === "2400");
+    const oficinaMonteria = resp.filter(item => item.OFICINA_VENTAS === "1100");
+    const oficinaCartagena = resp.filter(item => item.OFICINA_VENTAS === "1200");
+    
+    // Calcular los consolidados para todas las oficinas
 
-  //? MEDELLIN
-  const consolidadoMedellin = oficinaMedellin.reduce(
-    (acumulado, item) => {
-      const valorTotal = parseFloat(item.VALOR_TOTAL || 0);
-      const valorFacturado = parseFloat(item.VALOR_FACTURADO || 0);
+    //? MEDELLIN
+    const consolidadoMedellin = oficinaMedellin.reduce((acumulado, item) => {
+        const valorTotal = parseFloat(item.VALOR_TOTAL || 0);
+        const valorFacturado = parseFloat(item.VALOR_FACTURADO || 0);
 
-      acumulado.total += valorTotal;
-      acumulado.facturado += valorFacturado;
-      acumulado.pendiente += valorTotal - valorFacturado;
+        acumulado.total += valorTotal;
+        acumulado.facturado += valorFacturado;
+        acumulado.pendiente += valorTotal - valorFacturado;
 
-      return acumulado;
-    },
-    { total: 0, facturado: 0, pendiente: 0 }
-  );
-  consolidadoMedellin.porcentajeCumplimiento =
-    consolidadoMedellin.total > 0
-      ? (consolidadoMedellin.facturado / consolidadoMedellin.total) * 100
-      : 0;
-  consolidadoMedellin.porcentajeCumplimiento = parseFloat(
-    consolidadoMedellin.porcentajeCumplimiento.toFixed(2)
-  );
-  consolidadoMedellin.oficina = "MEDELLÍN";
+        return acumulado;
+    }, {
+        total: 0,
+        facturado: 0,
+        pendiente: 0
+    });
+    consolidadoMedellin.porcentajeCumplimiento = consolidadoMedellin.total > 0
+        ? (consolidadoMedellin.facturado / consolidadoMedellin.total) * 100
+        : 0;
+    consolidadoMedellin.porcentajeCumplimiento = parseFloat(consolidadoMedellin.porcentajeCumplimiento.toFixed(2));
+    consolidadoMedellin.oficina = "MEDELLÍN";
 
-  //? BOGOTÁ
-  const consolidadoBogota = oficinaBogota.reduce(
-    (acumulado, item) => {
-      const valorTotal = parseFloat(item.VALOR_TOTAL || 0);
-      const valorFacturado = parseFloat(item.VALOR_FACTURADO || 0);
+    //? BOGOTÁ
+    const consolidadoBogota = oficinaBogota.reduce((acumulado, item) => {
+        const valorTotal = parseFloat(item.VALOR_TOTAL || 0);
+        const valorFacturado = parseFloat(item.VALOR_FACTURADO || 0);
 
-      acumulado.total += valorTotal;
-      acumulado.facturado += valorFacturado;
-      acumulado.pendiente += valorTotal - valorFacturado;
+        acumulado.total += valorTotal;
+        acumulado.facturado += valorFacturado;
+        acumulado.pendiente += valorTotal - valorFacturado;
 
-      return acumulado;
-    },
-    { total: 0, facturado: 0, pendiente: 0 }
-  );
-  consolidadoBogota.porcentajeCumplimiento =
-    consolidadoBogota.total > 0
-      ? (consolidadoBogota.facturado / consolidadoBogota.total) * 100
-      : 0;
-  consolidadoBogota.porcentajeCumplimiento = parseFloat(
-    consolidadoBogota.porcentajeCumplimiento.toFixed(2)
-  );
-  consolidadoBogota.oficina = "BOGOTÁ";
+        return acumulado;
+    }, {
+        total: 0,
+        facturado: 0,
+        pendiente: 0
+    });
+    consolidadoBogota.porcentajeCumplimiento = consolidadoBogota.total > 0
+        ? (consolidadoBogota.facturado / consolidadoBogota.total) * 100
+        : 0;
+    consolidadoBogota.porcentajeCumplimiento = parseFloat(consolidadoBogota.porcentajeCumplimiento.toFixed(2));
+    consolidadoBogota.oficina = "BOGOTÁ";
 
-  //? CALI
-  const consolidadoCali = oficinaCali.reduce(
-    (acumulado, item) => {
-      const valorTotal = parseFloat(item.VALOR_TOTAL || 0);
-      const valorFacturado = parseFloat(item.VALOR_FACTURADO || 0);
+    //? CALI
+    const consolidadoCali = oficinaCali.reduce((acumulado, item) => {
+        const valorTotal = parseFloat(item.VALOR_TOTAL || 0);
+        const valorFacturado = parseFloat(item.VALOR_FACTURADO || 0);
 
-      acumulado.total += valorTotal;
-      acumulado.facturado += valorFacturado;
-      acumulado.pendiente += valorTotal - valorFacturado;
+        acumulado.total += valorTotal;
+        acumulado.facturado += valorFacturado;
+        acumulado.pendiente += valorTotal - valorFacturado;
 
-      return acumulado;
-    },
-    { total: 0, facturado: 0, pendiente: 0 }
-  );
-  consolidadoCali.porcentajeCumplimiento =
-    consolidadoCali.total > 0
-      ? (consolidadoCali.facturado / consolidadoCali.total) * 100
-      : 0;
-  consolidadoCali.porcentajeCumplimiento = parseFloat(
-    consolidadoCali.porcentajeCumplimiento.toFixed(2)
-  );
-  consolidadoCali.oficina = "CALI";
+        return acumulado;
+    }, {
+        total: 0,
+        facturado: 0,
+        pendiente: 0
+    });
+    consolidadoCali.porcentajeCumplimiento = consolidadoCali.total > 0
+        ? (consolidadoCali.facturado / consolidadoCali.total) * 100
+        : 0;
+    consolidadoCali.porcentajeCumplimiento = parseFloat(consolidadoCali.porcentajeCumplimiento.toFixed(2));
+    consolidadoCali.oficina = "CALI";
 
-  //? BARRANQUILLA
-  const consolidadoBarranquilla = oficinaBarranquilla.reduce(
-    (acumulado, item) => {
-      const valorTotal = parseFloat(item.VALOR_TOTAL || 0);
-      const valorFacturado = parseFloat(item.VALOR_FACTURADO || 0);
+    //? BARRANQUILLA
+    const consolidadoBarranquilla = oficinaBarranquilla.reduce((acumulado, item) => {
+        const valorTotal = parseFloat(item.VALOR_TOTAL || 0);
+        const valorFacturado = parseFloat(item.VALOR_FACTURADO || 0);
 
-      acumulado.total += valorTotal;
-      acumulado.facturado += valorFacturado;
-      acumulado.pendiente += valorTotal - valorFacturado;
+        acumulado.total += valorTotal;
+        acumulado.facturado += valorFacturado;
+        acumulado.pendiente += valorTotal - valorFacturado;
 
-      return acumulado;
-    },
-    { total: 0, facturado: 0, pendiente: 0 }
-  );
-  consolidadoBarranquilla.porcentajeCumplimiento =
-    consolidadoBarranquilla.total > 0
-      ? (consolidadoBarranquilla.facturado / consolidadoBarranquilla.total) *
-        100
-      : 0;
-  consolidadoBarranquilla.porcentajeCumplimiento = parseFloat(
-    consolidadoBarranquilla.porcentajeCumplimiento.toFixed(2)
-  );
-  consolidadoBarranquilla.oficina = "BARRANQUILLA";
+        return acumulado;
+    }, {
+        total: 0,
+        facturado: 0,
+        pendiente: 0
+    });
+    consolidadoBarranquilla.porcentajeCumplimiento = consolidadoBarranquilla.total > 0
+        ? (consolidadoBarranquilla.facturado / consolidadoBarranquilla.total) * 100
+        : 0;
+    consolidadoBarranquilla.porcentajeCumplimiento = parseFloat(consolidadoBarranquilla.porcentajeCumplimiento.toFixed(2));
+    consolidadoBarranquilla.oficina = "BARRANQUILLA";
+    
+    //? MONTERIA
+    const consolidadoMonteria = oficinaMonteria.reduce((acumulado, item) => {
+        const valorTotal = parseFloat(item.VALOR_TOTAL || 0);
+        const valorFacturado = parseFloat(item.VALOR_FACTURADO || 0);
 
-  const objOficinas = [
-    consolidadoMedellin,
-    consolidadoBogota,
-    consolidadoCali,
-    consolidadoBarranquilla,
-  ];
+        acumulado.total += valorTotal;
+        acumulado.facturado += valorFacturado;
+        acumulado.pendiente += valorTotal - valorFacturado;
 
-  let elementos = ``;
-  let bgColor = ``;
+        return acumulado;
+    }, {
+        total: 0,
+        facturado: 0,
+        pendiente: 0
+    });
+    consolidadoMonteria.porcentajeCumplimiento = consolidadoMonteria.total > 0
+        ? (consolidadoMonteria.facturado / consolidadoMonteria.total) * 100
+        : 0;
+    consolidadoMonteria.porcentajeCumplimiento = parseFloat(consolidadoMonteria.porcentajeCumplimiento.toFixed(2));
+    consolidadoMonteria.oficina = "MONTERIA";
+    
+    //? CARTAGENA
+    const consolidadoCartagena = oficinaCartagena.reduce((acumulado, item) => {
+        const valorTotal = parseFloat(item.VALOR_TOTAL || 0);
+        const valorFacturado = parseFloat(item.VALOR_FACTURADO || 0);
 
-  objOficinas.forEach((item) => {
-    const porcentaje = parseFloat(item.porcentajeCumplimiento);
-    const facturado = parseFloat(item.facturado).toFixed(2);
-    const pendiente = parseFloat(item.pendiente).toFixed(2);
+        acumulado.total += valorTotal;
+        acumulado.facturado += valorFacturado;
+        acumulado.pendiente += valorTotal - valorFacturado;
 
-    if (porcentaje < 30.5) {
-      bgColor = "#ec7063";
-    } else if (porcentaje >= 30.5 && porcentaje < 99) {
-      bgColor = "#f9e79f";
+        return acumulado;
+    }, {
+        total: 0,
+        facturado: 0,
+        pendiente: 0
+    });
+    consolidadoCartagena.porcentajeCumplimiento = consolidadoCartagena.total > 0
+        ? (consolidadoCartagena.facturado / consolidadoCartagena.total) * 100
+        : 0;
+    consolidadoCartagena.porcentajeCumplimiento = parseFloat(consolidadoCartagena.porcentajeCumplimiento.toFixed(2));
+    consolidadoCartagena.oficina = "CARTAGENA";
+
+    // Filtrar las oficinas a mostrar según el valor de org_ses
+    let objOficinas = [];
+    if (orgSes === "1000") {
+        // Si es 1000, mostrar solo Montería y Cartagena
+        objOficinas = [consolidadoMonteria, consolidadoCartagena];
+    } else if (orgSes === "2000") {
+        // Si es 2000, mostrar Medellín, Bogotá, Cali y Barranquilla
+        objOficinas = [consolidadoMedellin, consolidadoBogota, consolidadoCali, consolidadoBarranquilla];
     } else {
-      bgColor = "#1abc9c";
+        // Por defecto, mostrar todas
+        objOficinas = [consolidadoMedellin, consolidadoBogota, consolidadoCali, consolidadoBarranquilla, consolidadoMonteria, consolidadoCartagena];
     }
 
-    elementos += `
+    let elementos = ``;
+    let bgColor = ``;
+
+    objOficinas.forEach(item => {
+        const porcentaje = parseFloat(item.porcentajeCumplimiento);
+        const facturado = parseFloat(item.facturado).toFixed(2);
+        const pendiente = parseFloat(item.pendiente).toFixed(2);
+
+        if (porcentaje < 30.5) {
+            bgColor = "#ec7063";
+        } else if (porcentaje >= 30.5 && porcentaje < 99) {
+            bgColor = "#f9e79f";
+        } else {
+            bgColor = "#1abc9c";
+        }
+
+        elementos += `
           <tr>
             <td>${item.oficina}</td>
             <td>${formatNum(item.total, "$")}</td>
             <td>${formatNum(facturado, "$")}</td>
             <td>${formatNum(pendiente, "$")}</td>
-            <td style="background-color: ${bgColor};">${
-      item.porcentajeCumplimiento
-    }</td>
+            <td style="background-color: ${bgColor};">${item.porcentajeCumplimiento}</td>
           </tr>`;
-  });
+    });
 
-  const totalGeneral = objOficinas.reduce(
-    (acc, oficina) => acc + oficina.total,
-    0
-  );
-  const totalFacturado = objOficinas.reduce(
-    (acc, oficina) => acc + oficina.facturado,
-    0
-  );
-  const totalPendiente = objOficinas.reduce(
-    (acc, oficina) => acc + oficina.pendiente,
-    0
-  );
-  const porcentajeCumplimientoTotal = (
-    (totalFacturado / totalGeneral) *
-    100
-  ).toFixed(2);
+    const totalGeneral = objOficinas.reduce((acc, oficina) => acc + oficina.total, 0);
+    const totalFacturado = objOficinas.reduce((acc, oficina) => acc + oficina.facturado, 0);
+    const totalPendiente = objOficinas.reduce((acc, oficina) => acc + oficina.pendiente, 0);
+    const porcentajeCumplimientoTotal = ((totalFacturado / totalGeneral) * 100).toFixed(2);
 
-  $("#tablaOficinas tbody").html(elementos);
-  $("#tPassport").text(formatNum(totalGeneral, "$"));
-  $("#tFacturado").text(formatNum(parseFloat(totalFacturado).toFixed(2), "$"));
-  $("#tPendiente").text(formatNum(parseFloat(totalPendiente).toFixed(2), "$"));
-  $("#tPorcentaje").text(porcentajeCumplimientoTotal + "%");
-};
+    $('#tablaOficinas tbody').html(elementos);
+    $('#tPassport').text(formatNum(totalGeneral, "$"));
+    $('#tFacturado').text(formatNum(parseFloat(totalFacturado).toFixed(2), "$"));
+    $('#tPendiente').text(formatNum(parseFloat(totalPendiente).toFixed(2), "$"));
+    $('#tPorcentaje').text(porcentajeCumplimientoTotal + "%");
+}
 
 const verConsolidadoEvento = async (id) => {
   try {
@@ -1475,22 +1665,24 @@ const guardarPresupuestoZonas = async () => {
     let datosOficina = [];
     let datosZona = [];
 
-    $("#tablaPresupuestoZona tbody tr").each(function () {
-      let fila = $(this).find("td");
-      let $input = fila.find(".inputPresupuestoZona");
-      let valorPresupuesto = parseFloat(
-        $input.val().replace(/\$/g, "").replace(/\./g, "")
-      );
+        $("#tablaPresupuestoZona tbody tr").each(function () {
+            let fila = $(this).find("td");
+            let $input = fila.find(".inputPresupuestoZona");
+            let valorPresupuesto = parseFloat($input.val().replace(/\$/g, "").replace(/\./g, ""));
 
-      let data = {
-        idEvento,
-        zonaVentas: fila.eq(1).text(),
-        zonaDescripcion: fila.eq(2).text(),
-        presupuesto: valorPresupuesto,
-      };
+            let $inputPresupuestoAsistencia = fila.find(".inputPresupuestoAsistencia");
+            let valorPresupuestoAsistencia = parseFloat($inputPresupuestoAsistencia.val().replace(/\$/g, "").replace(/\./g, ""));
 
-      datosZona.push(data);
-    });
+            let data = {
+                idEvento,
+                zonaVentas: fila.eq(1).text(),  
+                zonaDescripcion: fila.eq(2).text(),
+                presupuesto: valorPresupuesto,
+                presupuestoAsistencia: valorPresupuestoAsistencia
+            };
+
+            datosZona.push(data);
+        });
 
     $("#tablaPresupuestoEvento tbody tr").each(function () {
       let fila = $(this).find("td");
@@ -1611,22 +1803,19 @@ const eliminarPresupuestoEvento = async (idEvento, oficina, zonaVentas) => {
 };
 
 const getZonasPresupuesto = async (oficina, idEvento) => {
-  try {
-    $("#containerTablaPresupuestoZona").html(``);
+    try {
+        $('#containerTablaPresupuestoZona').html(``);
 
-    const resp = await enviarPeticion({
-      op: "G_PRESUPUESTO_EVENTO_ZONA",
-      link: "../models/EventosComerciales.php",
-      oficina,
-      idEvento,
-    });
+        const resp = await enviarPeticion({
+            op: "G_PRESUPUESTO_EVENTO_ZONA",
+            link: "../models/EventosComerciales.php",
+            oficina,
+            idEvento
+        });
 
-    const totalPresupuestoZona = resp.data.reduce(
-      (acc, item) => acc + parseFloat(item.PRESUPUESTO),
-      0
-    );
+        const totalPresupuestoZona = resp.data.reduce((acc, item) => acc + parseFloat(item.PRESUPUESTO), 0);
 
-    let tabla = `
+        let tabla = `
       <table class="table table-bordered table-sm table-hover animate__animated animate__fadeIn" id="tablaPresupuestoZona">
         <thead class="table-info">
           <tr>
@@ -1634,51 +1823,57 @@ const getZonasPresupuesto = async (oficina, idEvento) => {
             <th>Zona Ventas</th>
             <th>Zona Descripción</th>
             <th>Presupuesto</th>
+            <th>Presupuesto asistencia</th>
           </tr>
         </thead>
         <tbody>`;
 
-    if (resp.data.length) {
-      resp.data.forEach((item, index) => {
-        tabla += `
+        if (resp.data.length) {
+            resp.data.forEach((item, index) => {
+                tabla += `
           <tr>
             <td>${index + 1}</td>
             <td>${item.ZONA_VENTAS}</td>
             <td>${item.ZONA_DESCRIPCION}</td>
             <td style="display: none;">${item.PRESUPUESTO}</td>    
             <td>
-              <input type="text" class="form-control form-control-sm inputPresupuestoZona" value="${formatNum(
-                item.PRESUPUESTO,
-                "$"
-              )}">
+              <input type="text" class="form-control form-control-sm inputPresupuestoZona" value="${formatNum(item.PRESUPUESTO, "$")}">
+            </td>  
+            <td>
+              <input type="text" class="form-control form-control-sm inputPresupuestoAsistencia" value="${formatNum(item.PRESUPUESTO_ASISTENCIA, "")}">
             </td>    
           </tr>`;
-      });
+            });
 
-      tabla += `
+            tabla += `
         </tbody>
       </table>`;
 
-      $("#containerTablaPresupuestoZona").html(tabla);
+            $('#containerTablaPresupuestoZona').html(tabla);
 
-      $(".inputPresupuestoZona").on("input", function () {
-        let value = $(this)
-          .val()
-          .replace(/[^0-9]/g, "");
-        if (value)
-          value = parseFloat(value).toLocaleString("es-ES", {
-            minimumFractionDigits: 0,
-          });
-        $(this).val("$" + value);
-      });
+            $('.inputPresupuestoZona').on('input', function () {
+                let value = $(this).val().replace(/[^0-9]/g, '');
+                if (value) value = parseFloat(value).toLocaleString('es-ES', {
+                    minimumFractionDigits: 0
+                });
+                $(this).val("$" + value);
+            });
 
-      $("#totalPresupuesto").text(formatNum(totalPresupuestoZona, "$"));
-      $("#modalPresupuestoZona").modal("show");
+            $('.inputPresupuestoAsistencia').on('input', function () {
+                let value = $(this).val().replace(/[^0-9]/g, '');
+                if (value) value = parseFloat(value).toLocaleString('es-ES', {
+                    minimumFractionDigits: 0
+                });
+                $(this).val("" + value);
+            });
+
+            $('#totalPresupuesto').text(formatNum(totalPresupuestoZona, "$"));
+            $('#modalPresupuestoZona').modal('show');
+        }
+    } catch (error) {
+        console.log(error);
     }
-  } catch (error) {
-    console.log(error);
-  }
-};
+}
 
 const getPresupuestoEvento = async (idEvento) => {
   $("#containerTablaPresupuesto").html(``);

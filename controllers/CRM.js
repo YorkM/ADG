@@ -692,6 +692,8 @@ function Cartera() {
           style = 'style="display: none;"';
         }
 
+        console.log(data);
+
         data.forEach(item => {
           if (parseInt(item.DEMORA) > 0) {
             mora = 'style="background-color: #F77577"';
@@ -2801,7 +2803,11 @@ $(function () {
   getZonasVentas();
 
   const oficinasN = OficinasVentas('N');
-  $("#oficina, #filtroOficina").html(oficinasN); 
+  $("#oficina, #filtroOficina").html(oficinasN);
+  
+  if (rolId === "10") {
+    $('#btnRotacion, #btnJuridica').prop("disabled", true);
+  }
 
   getRotacion();
 

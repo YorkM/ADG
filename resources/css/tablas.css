@@ -1,0 +1,78 @@
+/* Estilo general reutilizable para tablas */
+.tabla-estilo {
+    width: 100%;
+    margin: 0 auto;
+    font-size: 14px;
+    border-collapse: collapse;
+    border-spacing: 0;
+    box-shadow: 0 0 8px rgba(0,0,0,0.03);
+    max-height:80vh; 
+}
+
+.tabla-estilo th {
+  background-color: #cff4fc;
+  color: #0c5866;
+  height: 35px;
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+  text-align: left;
+  min-width: fit-content;
+}
+
+.tabla-estilo td {
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.15) !important;
+  vertical-align: middle;
+}
+
+.tabla-estilo tbody tr:nth-child(odd) td:first-child {
+  background-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+.tabla-estilo tbody tr:nth-child(even) td:first-child {
+  background-color: rgba(0, 0, 0, 0.015) !important;
+}
+
+.tabla-estilo tbody tr:nth-child(odd) td {
+  background-color: rgba(0, 0, 0, 0.04) !important;
+}
+
+.tabla-estilo td:first-child {
+  font-weight: 500;
+  color: #03373e;
+}
+
+.tabla-estilo tr:hover td {
+  background-color: #e6f9ffa2;
+}
+
+.tabla-estilo.striped tbody tr:nth-child(odd) {
+  background-color: rgba(0, 0, 0, 0.025);
+}
+
+/* Scroll vertical si se aplica dentro de contenedor */
+.tabla-estilo-wrapper {
+  margin: 0 auto;
+  max-height: 80vh;
+  overflow-y: auto;
+  overflow-x: auto;
+}
+
+.tabla-estilo-wrapper::-webkit-scrollbar {
+width: 10px;
+height: 10px;
+}
+
+.tabla-estilo-wrapper::-webkit-scrollbar-track {
+background: #f8f9fa; 
+border-radius: 6px;
+}
+
+.tabla-estilo-wrapper::-webkit-scrollbar-thumb {
+background: #6da8b4ff; 
+border-radius: 6px;
+border: 2px solid #f8f9fa;
+transition: all 0.3s ease;
+}
+

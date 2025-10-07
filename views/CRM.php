@@ -440,6 +440,44 @@ Redireccionar();
                 </div>
               </div>
             </div>
+            <h6 class="title-card">CARTAS</h6>
+            <input type="hidden" class="form-control" id="txt_anio_carta" readonly>
+            <div class="card p-2 border-card shadow-sm mb-4">
+              <div class="row mb-3">
+                <div class="col-md-10">
+                  <div class="input-group">
+                    <span class="input-group-text bold-span size-13">Tipos de Cartas:</span>
+                    <select id="slcCartas" class="form-select form-select-sm shadow-sm size-13">
+                      <option value="0">Carta de aviso</option>
+                      <option value="1">Carta CIFIN</option>
+                      <option value="2">Carta prejuridica</option>
+                      <option value="3">Certificados de compras</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-2 align-self-end">
+                  <button class="btn btn-outline-warning btn-sm w-100" id="btnEnviarCarta">
+                    <i class="fa-solid fa-paper-plane"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <input type="text" class="form-control form-control-sm shadow-sm size-13 bag-disabled" id="txt_tipo_carta" readonly disabled>
+                  <!-- <div class="input-group">
+                    <span class="input-group-text bold-span size-13">Condición de Pago:</span>
+                    <input type="text" id="txtCondicion" class="form-control form-control-sm shadow-sm size-13 bag-disabled" size="5" readonly disabled>
+                  </div> -->
+                </div>
+                <div class="col-md-6">
+                  <input type="text" class="form-control form-control-sm shadow-sm size-13 bag-disabled" id="txt_fecha_carta" readonly disabled>
+                  <!-- <div class="input-group">
+                    <span class="input-group-text bold-span size-13">Lista Precios:</span>
+                    <input type="text" id="txtLista" class="form-control form-control-sm shadow-sm size-13 bag-disabled" size="5" readonly disabled>
+                  </div> -->
+                </div>
+              </div>
+            </div>
             <h6 class="title-card">GESTIONES REALIZADAS (6 MESES)</h6>
             <div class="card p-2 border-card shadow-sm mb-4">
               <div id="dvGestiones" style="height: 250px; overflow: auto;"></div>
@@ -1037,7 +1075,7 @@ Redireccionar();
 
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-outline-warning" onClick="EnviarMail()">Enviar Email</button>
+          <button type="button" class="btn btn-outline-warning btn-sm" onClick="EnviarMail()">Enviar Email</button>
           <button type="button" class="btn btn-outline-danger btn-sm" data-bs-dismiss="modal">Cerrar</button>
         </div>
       </div>
@@ -1458,34 +1496,34 @@ Redireccionar();
                     <span class="input-group-text bold-span size-13">Mandamiento de Pago:</span>
                     <input type="file" accept=".pdf" class="form-control form-control-sm shadow-sm size-13" id="mandamientoM">
                   </div>
-                </div>                
+                </div>
                 <div class="col-md-6">
                   <div class="input-group">
                     <span class="input-group-text bold-span size-13">Fecha Mandamiento:</span>
                     <input type="date" class="form-control form-control-sm shadow-sm size-13" id="fechaMandamientoM">
                   </div>
-                </div>                
+                </div>
               </div>
-              <div class="d-flex justify-content-end mb-3">               
+              <div class="d-flex justify-content-end mb-3">
                 <div class="align-self-center">
                   <button class="btn btn-outline-primary btn-sm shadow-sm" title="Ver o guardar el mandamiento de pago" id="btnVerGuardarMandamiento">
                     <i class="fa-solid fa-upload"></i>
                   </button>
                 </div>
               </div>
-              <div class="row mb-2">                
+              <div class="row mb-2">
                 <div class="col-md-6">
                   <div class="input-group">
                     <span class="input-group-text bold-span size-13">Notificación Demanda:</span>
                     <input type="file" accept=".pdf" class="form-control form-control-sm shadow-sm size-13" id="notificacionM">
                   </div>
-                </div>               
+                </div>
                 <div class="col-md-6">
                   <div class="input-group">
                     <span class="input-group-text bold-span size-13">Fecha Notificación:</span>
                     <input type="date" class="form-control form-control-sm shadow-sm size-13" id="fechaNotificacionM">
                   </div>
-                </div>             
+                </div>
               </div>
               <div class="d-flex justify-content-between gap-2">
                 <div style="flex: 1;">

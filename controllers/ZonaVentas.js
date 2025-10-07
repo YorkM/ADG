@@ -1,4 +1,5 @@
 
+
 function ValidarColCsv(csvval) {
 
 	let sw = true;
@@ -264,113 +265,140 @@ function ToggleChack(ob, zona, op) {
 	UpdateConfigZona(zona, op, ob);
 }
 
-
 function listarZonasVentas() {
+    let dato = $("#busqueda").val();
+    let ofi = $("#oficina").val();
 
-	let dato = $("#busqueda").val();
-	let ofi = $("#oficina").val();
+    // Definir colores para los estilos en línea
+    const colors = {
+        warning: {
+            bg: '#fff3cd',
+            text: '#856404',
+            border: '#ffeaa7'
+        },
+        success: {
+            bg: '#d4edda',
+            text: '#155724',
+            border: '#c3e6cb'
+        },
+        danger: {
+            bg: '#f8d7da',
+            text: '#721c24',
+            border: '#f5c6cb'
+        },
+        info: {
+            bg: '#d1ecf1',
+            text: '#0c5460',
+            border: '#bee5eb'
+        },
+        primary: {
+            bg: '#cce5ff',
+            text: '#004085',
+            border: '#b8daff'
+        }
+    };
 
-	$.ajax({
-		url: "../models/ZonaVentas.php",
-		type: "POST",
-		data: ({
-			op: "ListarZonasVentas",
-			dato: dato,
-			ofi: ofi
-		}),
-		beforeSend: function () {
-			$("#result").html('<div class="alert alert-danger">Cargando...</div>');
-		},
-		dataType: "json",
-		async: true,
-		success: function (data) {
+    $.ajax({
+        url: "../models/ZonaVentas.php",
+        type: "POST",
+        data: ({
+            op: "ListarZonasVentas",
+            dato: dato,
+            ofi: ofi
+        }),
+        beforeSend: function () {
+            $("#result").html('<div class="alert alert-danger my-3">Cargando...</div>');
+        },
+        dataType: "json",
+        async: true,
+        success: function (data) {
+            if (data.length > 0) {
+                let tb = '<div class="card tabla-estilo-wrapper">' +
+                    '<table class="tabla-estilo">' +
+                    '<thead class="sticky-top">' +
+                    '<tr>' +
+                    '<th colspan="5">&nbsp</th>' +
+                    '<th colspan="6" style="background-color: ' + colors.warning.bg + '; color: ' + colors.warning.text + '!important; text-align: center;">VISITAS OPTIMAS</th>' +
+                    '<th colspan="6" style="background-color: ' + colors.success.bg + '; color: ' + colors.success.text + '!important; text-align: center;">LLAMADAS OPTIMAS</th>' +
+					'<th></th>' +
+                    '</tr>' +
+                    '<tr>' +
+                    '<th>Zona</th>' +
+                    '<th>Zona descripción</th>' +
+                    '<th style="background-color: ' + colors.warning.bg + ' !important; color: ' + colors.warning.text + ' !important; text-align: center;" align="center"><label onClick="Swal.fire(\'No participa en seg de presupuesto<br> (NO SE MUESTRA EN EL 0108)\');"><u>Config_1</u></label></th>' +
+                    '<th style="background-color: ' + colors.info.bg + ' !important; color: ' + colors.info.text + ' !important; text-align: center;" align="center"><label onClick="Swal.fire(\'No afecta el valor del presupuesto<br> (SE MUESTRA EN EL 0108 , PERO NO AFECTA EL VALOR DEL PRESUPUESTO)\');"><u>Config_2</u></th>' +
+                    '<th style="background-color: ' + colors.danger.bg + ' !important; color: ' + colors.danger.text + ' !important; text-align: center;" align="center"><label onClick="Swal.fire(\'No seguimiento presupuesto<br> (NO SE TOMA EN CUENTA 0108,0109,0122)\');"><u>Config_3</u></label></th>' +
+                    '<th style="text-align: center;" align="center">AA</th>' +
+                    '<th style="text-align: center;" align="center">A</th>' +
+                    '<th style="text-align: center;" align="center">B</th>' +
+                    '<th style="text-align: center;" align="center">C</th>' +
+                    '<th style="text-align: center;" align="center">D</th>' +
+                    '<th style="text-align: center;" align="center">E</th>' +
+                    '<th style="text-align: center;" align="center">AA</th>' +
+                    '<th style="text-align: center;" align="center">A</th>' +
+                    '<th style="text-align: center;" align="center">B</th>' +
+                    '<th style="text-align: center;" align="center">C</th>' +
+                    '<th style="text-align: center;" align="center">D</th>' +
+                    '<th style="text-align: center;" align="center">E</th>' +
+                    '<th>&nbsp;</th>' +
+                    '</tr>' +
+                    '</thead>' +
+                    '<tbody>';
 
-			if (data.length > 0) {
+                data.forEach(res => {
+                    if (res.n_seg_p == 'S') {
+                        check_n_seg_p = '<i class="fa fa-check p-2 m-2 checked_icon text-dark"></i>';
+                    } else {
+                        check_n_seg_p = '<i class="checked_icon"> &nbsp;</i>';
+                    }
 
-				let tb = '<div class="tabla-estilo-wrapper">' +
-					'<table class="tabla-estilo" >' +
-					'<thead class="sticky-top"  >' +
-					'<tr>' +
-					'<th colspan="5">&nbsp</th>' +
-					'<th colspan="6" class="table-warning text-center">VISITAS OPTIMAS</th>' +
-					'<th colspan="6" class="table-success text-center">LLAMADAS OPTIMAS</th>' +
-					'</tr>' +
-					'<tr>' +
-					'<th>Zona</th>' +
-					'<th>Zona descripción</th>' +
-					'<th class="text-center alert-warning" align="center"><label onClick="Swal.fire(\'No participa en seg de presupuesto<br> (NO SE MUESTRA EN EL 0108)\');"><u>Config_1</u></label></th>' +
-					'<th class="text-center alert-info"" align="center"><label onClick="Swal.fire(\'\No afecta el valor del presupuesto<br> (SE MUESTRA EN EL 0108 , PERO NO AFECTA EL VALOR DEL PRESUPUESTO)\');"><u>Config_2</u></th>' +
-					'<th class="text-center alert-danger"" align="center"><label onClick="Swal.fire(\'No seguimiento presupuesto<br> (NO SE TOMA EN CUENTA 0108,0109,0122)\');"><u>Config_3</u></label></th>' +
-					'<th class="text-center" align="center">AA</th>' +
-					'<th class="text-center" align="center">A</th>' +
-					'<th class="text-center" align="center">B</th>' +
-					'<th class="text-center" align="center">C</th>' +
-					'<th class="text-center" align="center">D</th>' +
-					'<th class="text-center" align="center">E</th>' +
-					'<th class="text-center" align="center">AA</th>' +
-					'<th class="text-center" align="center">A</th>' +
-					'<th class="text-center" align="center">B</th>' +
-					'<th class="text-center" align="center">C</th>' +
-					'<th class="text-center" align="center">D</th>' +
-					'<th class="text-center" align="center">E</th>' +
-					'<th>&nbsp;</th>' +
-					'</tr>' +
-					'</thead>' +
-					'<tbody>';
+                    if (res.n_cal_p == 'S') {
+                        check_n_cal_p = '<i class="fa fa-check p-2 m-2 checked_icon text-dark"></i>';
+                    } else {
+                        check_n_cal_p = '<i class="checked_icon"> &nbsp;</i>';
+                    }
 
-				data.forEach(res => {
-					if (res.n_seg_p == 'S') {
-						check_n_seg_p = '<i class="fa fa-check p-2 m-2 checked_icon text-dark"></i>';
-					} else {
-						check_n_seg_p = '<i class="checked_icon"> &nbsp;</i>';
-					}
+                    if (res.n_seg_v == 'N') {
+                        check_n_seg_v = '<i class="fa fa-check p-2 m-2 checked_icon text-dark"></i>';
+                    } else {
+                        check_n_seg_v = '<i class="checked_icon"> &nbsp;</i>';
+                    }
 
-					if (res.n_cal_p == 'S') {
-						check_n_cal_p = '<i class="fa fa-check p-2 m-2 checked_icon text-dark"></i>';
-					} else {
-						check_n_cal_p = '<i class="checked_icon"> &nbsp;</i>';
-					}
-
-					if (res.n_seg_v == 'N') {
-						check_n_seg_v = '<i class="fa fa-check p-2 m-2 checked_icon text-dark"></i>';
-					} else {
-						check_n_seg_v = '<i class="checked_icon"> &nbsp;</i>';
-					}
-
-					tb += '<tr class="tr_lsit_zonas">' +
-						'<td>' + res.zona_ventas + '</td>' +
-						'<td align="center" ><b>' + res.zona_descripcion + '</b></td>' +
-						'<td class="alert-warning" onclick="ToggleChack(this,' + res.zona_ventas + ',' + 1 + ')">' + check_n_seg_p + '</td>' +
-						'<td class="alert-primary" onclick="ToggleChack(this,' + res.zona_ventas + ',' + 2 + ')">' + check_n_cal_p + '</td>' +
-						'<td class="alert-danger" onclick="ToggleChack(this,' + res.zona_ventas + ',' + 3 + ')">' + check_n_seg_v + '</td>' +
-						//clasificacion segun categorias
-						'<td class="table-warning"><input type="text" class="form-control " value ="' + res.v_aa + '" onKeyPress="return vnumeros(event)" onBlur="AddCategoriaZona(\'V_AA\',\'' + res.zona_ventas + '\',this.value)"/></td>' +
-						'<td class="table-warning"><input type="text" class="form-control" value ="' + res.v_a + '" onKeyPress="return vnumeros(event)" onBlur="AddCategoriaZona(\'V_A\',\'' + res.zona_ventas + '\',this.value)"/></td>' +
-						'<td class="table-warning"><input type="text" class="form-control" value ="' + res.v_b + '" onKeyPress="return vnumeros(event)" onBlur="AddCategoriaZona(\'V_B\',\'' + res.zona_ventas + '\',this.value)"/></td>' +
-						'<td class="table-warning"><input type="text" class="form-control" value ="' + res.v_c + '" onKeyPress="return vnumeros(event)" onBlur="AddCategoriaZona(\'V_C\',\'' + res.zona_ventas + '\',this.value)"/></td>' +
-						'<td class="table-warning"><input type="text" class="form-control" value ="' + res.v_d + '" onKeyPress="return vnumeros(event)" onBlur="AddCategoriaZona(\'V_D\',\'' + res.zona_ventas + '\',this.value)"/></td>' +
-						'<td class="table-warning"><input type="text" class="form-control" value ="' + res.v_e + '" onKeyPress="return vnumeros(event)" onBlur="AddCategoriaZona(\'V_E\',\'' + res.zona_ventas + '\',this.value)"/></td>' +
-						'<td class="table-success"><input type="text" class="form-control" value ="' + res.t_aa + '" onKeyPress="return vnumeros(event)" onBlur="AddCategoriaZona(\'T_AA\',\'' + res.zona_ventas + '\',this.value)"/></td>' +
-						'<td class="table-success"><input type="text" class="form-control" value ="' + res.t_a + '" onKeyPress="return vnumeros(event)" onBlur="AddCategoriaZona(\'T_A\',\'' + res.zona_ventas + '\',this.value)"/></td>' +
-						'<td class="table-success"><input type="text" class="form-control" value ="' + res.t_b + '" onKeyPress="return vnumeros(event)" onBlur="AddCategoriaZona(\'T_B\',\'' + res.zona_ventas + '\',this.value)"/></td>' +
-						'<td class="table-success"><input type="text" class="form-control" value ="' + res.t_c + '" onKeyPress="return vnumeros(event)" onBlur="AddCategoriaZona(\'T_C\',\'' + res.zona_ventas + '\',this.value)"/></td>' +
-						'<td class="table-success"><input type="text" class="form-control" value ="' + res.t_d + '" onKeyPress="return vnumeros(event)" onBlur="AddCategoriaZona(\'T_D\',\'' + res.zona_ventas + '\',this.value)"/></td>' +
-						'<td class="table-success"><input type="text" class="form-control" value ="' + res.t_e + '" onKeyPress="return vnumeros(event)" onBlur="AddCategoriaZona(\'T_E\',\'' + res.zona_ventas + '\',this.value)"/></td>' +
-						//clasificacion segun categorias
-						'<td><button class="btn btn-default" onclick="EliminarZonaVentas(\'' + res.zona_ventas + '\')"><i class="fa fa-trash text-danger"></i></button></td>' +
-						'</tr>';
-
-				});
-				tb += '</tbody>';
-				tb += '</table>';
-				tb += '</div>';
-				$("#result").html(tb);
-			} else { $("#result").html('<div class="alert alert-danger">Sin resultados</div>'); }
-
-		}
-	}).fail(function (data) { $("#result").html(data.responseText); });
-
-
+                    tb += '<tr class="tr_lsit_zonas">' +
+                        '<td>' + res.zona_ventas + '</td>' +
+                        '<td align="center" ><b>' + res.zona_descripcion + '</b></td>' +
+                        '<td style="background-color: ' + colors.warning.bg + ' !important; color: ' + colors.warning.text + '!important;" onclick="ToggleChack(this,' + res.zona_ventas + ',' + 1 + ')">' + check_n_seg_p + '</td>' +
+                        '<td style="background-color: ' + colors.primary.bg + ' !important; color: ' + colors.primary.text + '!important;" onclick="ToggleChack(this,' + res.zona_ventas + ',' + 2 + ')">' + check_n_cal_p + '</td>' +
+                        '<td style="background-color: ' + colors.danger.bg + ' !important; color: ' + colors.danger.text + '!important;" onclick="ToggleChack(this,' + res.zona_ventas + ',' + 3 + ')">' + check_n_seg_v + '</td>' +
+                        // VISITAS OPTIMAS (color warning)
+                        '<td style="background-color: ' + colors.warning.bg + '!important;"><input type="text" class="form-control" value="' + res.v_aa + '" onKeyPress="return vnumeros(event)" onBlur="AddCategoriaZona(\'V_AA\',\'' + res.zona_ventas + '\',this.value)"/></td>' +
+                        '<td style="background-color: ' + colors.warning.bg + '!important;"><input type="text" class="form-control" value="' + res.v_a + '" onKeyPress="return vnumeros(event)" onBlur="AddCategoriaZona(\'V_A\',\'' + res.zona_ventas + '\',this.value)"/></td>' +
+                        '<td style="background-color: ' + colors.warning.bg + '!important;"><input type="text" class="form-control" value="' + res.v_b + '" onKeyPress="return vnumeros(event)" onBlur="AddCategoriaZona(\'V_B\',\'' + res.zona_ventas + '\',this.value)"/></td>' +
+                        '<td style="background-color: ' + colors.warning.bg + '!important;"><input type="text" class="form-control" value="' + res.v_c + '" onKeyPress="return vnumeros(event)" onBlur="AddCategoriaZona(\'V_C\',\'' + res.zona_ventas + '\',this.value)"/></td>' +
+                        '<td style="background-color: ' + colors.warning.bg + '!important;"><input type="text" class="form-control" value="' + res.v_d + '" onKeyPress="return vnumeros(event)" onBlur="AddCategoriaZona(\'V_D\',\'' + res.zona_ventas + '\',this.value)"/></td>' +
+                        '<td style="background-color: ' + colors.warning.bg + '!important;"><input type="text" class="form-control" value="' + res.v_e + '" onKeyPress="return vnumeros(event)" onBlur="AddCategoriaZona(\'V_E\',\'' + res.zona_ventas + '\',this.value)"/></td>' +
+                        // LLAMADAS OPTIMAS (color success)
+                        '<td style="background-color: ' + colors.success.bg + '!important;"><input type="text" class="form-control" value="' + res.t_aa + '" onKeyPress="return vnumeros(event)" onBlur="AddCategoriaZona(\'T_AA\',\'' + res.zona_ventas + '\',this.value)"/></td>' +
+                        '<td style="background-color: ' + colors.success.bg + '!important;"><input type="text" class="form-control" value="' + res.t_a + '" onKeyPress="return vnumeros(event)" onBlur="AddCategoriaZona(\'T_A\',\'' + res.zona_ventas + '\',this.value)"/></td>' +
+                        '<td style="background-color: ' + colors.success.bg + '!important;"><input type="text" class="form-control" value="' + res.t_b + '" onKeyPress="return vnumeros(event)" onBlur="AddCategoriaZona(\'T_B\',\'' + res.zona_ventas + '\',this.value)"/></td>' +
+                        '<td style="background-color: ' + colors.success.bg + '!important;"><input type="text" class="form-control" value="' + res.t_c + '" onKeyPress="return vnumeros(event)" onBlur="AddCategoriaZona(\'T_C\',\'' + res.zona_ventas + '\',this.value)"/></td>' +
+                        '<td style="background-color: ' + colors.success.bg + '!important;"><input type="text" class="form-control" value="' + res.t_d + '" onKeyPress="return vnumeros(event)" onBlur="AddCategoriaZona(\'T_D\',\'' + res.zona_ventas + '\',this.value)"/></td>' +
+                        '<td style="background-color: ' + colors.success.bg + '!important;"><input type="text" class="form-control" value="' + res.t_e + '" onKeyPress="return vnumeros(event)" onBlur="AddCategoriaZona(\'T_E\',\'' + res.zona_ventas + '\',this.value)"/></td>' +
+                        '<td><button class="btn btn-outline-danger" onclick="EliminarZonaVentas(\'' + res.zona_ventas + '\')"><i class="fa fa-trash"></i></button></td>' +
+                        '</tr>';
+                });
+                
+                tb += '</tbody>';
+                tb += '</table>';
+                tb += '</div>';
+                $("#result").html(tb);
+            } else { 
+                $("#result").html('<div class="alert alert-danger">Sin resultados</div>'); 
+            }
+        }
+    }).fail(function (data) { 
+        $("#result").html(data.responseText); 
+    });
 }
 
 
@@ -492,9 +520,10 @@ var n_mod_insert = 0;
 
 $(function () {
 
+	
+
 	limpiar();
 	OfcS = OficinasVentas('N');
-
 	$("#oficina").append(OfcS);
 
 
