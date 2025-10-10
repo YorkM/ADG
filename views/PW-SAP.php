@@ -46,6 +46,7 @@ Redireccionar();
       font-weight: 500;
       background-color: #cff4fc;
       padding: 0 5px;
+      border: 1px solid #9eeaf9;
     }
 
     .title-tab {
@@ -198,6 +199,10 @@ Redireccionar();
       font-size: 12px !important;
     }
 
+    .size-13 {
+      font-size: 13px !important;
+    }
+
     .size-14 {
       font-size: 14px !important;
     }
@@ -269,6 +274,148 @@ Redireccionar();
       align-items: center;
       gap: 10px;
     }
+
+    .title-card {
+      background-color: #cff4fc;
+      border: 1px solid #9eeaf9;
+      padding: 5px;
+      color: #055160;
+      font-weight: 400;
+      font-size: 14px;
+      margin-bottom: 0;
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
+    }
+
+    .border-card {
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+      border-top: 1px solid #9eeaf9;
+    }
+
+    .bold-span {
+      font-weight: bold;
+      color: #055160;
+      text-transform: uppercase;
+      font-size: 11px;
+    }
+
+    .size-th-2 {
+      font-size: 13px;
+      font-weight: 400;
+      color: #055160 !important;
+    }
+
+
+
+    .dataTables_wrapper .top-section {
+        display: flex;
+        justify-content: space-between; 
+        align-items: center;
+        width: 100%;
+        padding: 10px 15px;
+        box-sizing: border-box;
+        background-color: #f8f9fa; 
+        border-radius: 4px;
+        margin-bottom: 15px; 
+    }
+
+    .buttons-group {
+        display: flex;
+        gap: 8px; 
+    }
+
+    .dt-buttons .btn {
+        padding: 6px 12px;
+        font-size: 14px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background-color: #fff;
+        color: #333;
+        transition: all 0.3s;
+    }
+
+    .dt-buttons .btn:hover {
+        background-color: #e9ecef;
+        border-color: #ccc;
+    }
+
+    .search-group {
+        margin-left: auto; 
+    }
+
+    .dataTables_filter input {
+        padding: 6px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        height: 34px;
+        width: 250px; 
+        font-size: 14px;
+    }
+
+    .dataTables_filter input:focus {
+        border-color: #80bdff;
+        outline: 0;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+    @media (max-width: 768px) {
+        .top-section {
+            flex-direction: column; 
+            gap: 10px;
+            padding: 10px;
+        }
+        .buttons-group, .search-group {
+            width: 100%;
+        }
+        .dataTables_filter input {
+            width: 100%; 
+        }
+    }
+    table.dataTable tbody td.alert-success,
+    table.dataTable tbody td.alert-warning {
+        background-color: inherit !important;
+    }
+
+    table.dataTable tbody td.alert-success {
+        background-color: #d4edda !important;
+        color: #000000 !important;
+    }
+
+    table.dataTable tbody td.alert-warning {
+        background-color: #fff3cd !important;
+        color: #000000 !important;
+    }
+    .bottom-section {
+        width: 100%;
+        padding: 10px 15px;
+        box-sizing: border-box;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #f8f9fa; 
+        border-radius: 4px;
+        margin-top: 10px !important;
+    }
+
+    .info-group {
+        margin-right: auto; 
+        font-size: 14px;
+        color: #6c757d;
+    }
+
+    .pagination-group {
+        margin-left: auto; 
+    }
+
+    .dataTables_paginate .paginate_button:hover {
+        background-color: #e9ecef;
+    }
+    .dataTables_paginate .paginate_button.current {
+        background-color: #007bff;
+        color: white !important;
+        border-color: #007bff;
+    }
   </style>
 </head>
 
@@ -288,6 +435,23 @@ Redireccionar();
   <input type="hidden" id="tipo_documento" value="<?php echo (!empty($_GET["tipo_documento"])) ? $_GET["tipo_documento"] : ""; ?>">
   <input type="hidden" id="emailCliente" value="<?php echo (!empty($_GET["emailCliente"])) ? $_GET["emailCliente"] : ""; ?>">
   <input type="hidden" id="pedido_integracion" value="<?php echo (!empty($_GET["pedido_integracion"])) ? $_GET["pedido_integracion"] : ""; ?>">
+
+  <input type="hidden" id="TxtRolId" value="<?php if (!empty($_SESSION["ses_RolesId"])) {
+                                              echo $_SESSION["ses_RolesId"];
+                                            } ?>">
+  <input type="hidden" id="TxtIdu" value="<?php if (!empty($_SESSION["ses_Id"])) {
+                                            echo $_SESSION["ses_Id"];
+                                          } ?>">
+  <input type="hidden" id="TxtCodSap" value="<?php if (!empty($_SESSION["ses_CodSap"])) {
+                                                echo $_SESSION["ses_CodSap"];
+                                              } ?>">
+  <input type="hidden" id="Rol" value="<?php if (!empty($_SESSION["ses_RolesId"])) {
+                                          echo $_SESSION["ses_RolesId"];
+                                        } ?>">
+
+  <input type="hidden" id="txt_codigoSapHidden">
+  <input type="hidden" id="txt_organizacion">
+  <input type="hidden" id="bodegaTercero">
 
   <div id="data"></div>
 
@@ -366,6 +530,18 @@ Redireccionar();
               </a>
             </li>
           </ul>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="btnAcuerdos" data-bs-toggle="tab" data-bs-target="#dvAcuerdosCom" type="button" role="tab" aria-controls="dvAcuerdosCom" aria-selected="false">
+            <i class="fa-solid fa-handshake"></i></i>&nbsp;
+            <span class="btn-text">Acuerdo Comercial</span>
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="btnFidelizacion" data-bs-toggle="tab" data-bs-target="#dvFidelizacion" type="button" role="tab" aria-controls="dvFidelizacion" aria-selected="false">
+            <i class="fa-solid fa-users"></i>&nbsp;
+            <span class="btn-text">Fidelización Clientes</span>
+          </button>
         </li>
       </ul>
     </div>
@@ -778,6 +954,216 @@ Redireccionar();
           <div id="ResultEventos"></div>
         </div>
       </div>
+      <!-- TAB ACUERDO COMERCIAL -->
+      <div class="tab-pane fade p-2" id="dvAcuerdosCom" role="tabpanel">
+        <h6 class="title-card" id="titleAC">CREAR ACUERDO COMERCIAL</h6>
+        <div class="card p-2 border-card shadow-sm mb-3" id="divCreaAcuerdo">
+          <div class="row mb-3">
+            <div class="col-md-3">
+              <div class="input-group">
+                <span class="input-group-text bold-span">N° Acuerdo:</span>
+                <input type="text" id="numeroAcu" class="form-control form-control-sm shadow-sm size-13">
+              </div>
+            </div>
+            <div class="col-md-2">
+              <div class="input-group">
+                <span class="input-group-text bold-span">Fecha Inicio:</span>
+                <input type="text" id="fechaiAcu" class="form-control form-control-sm shadow-sm size-13" readonly>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <div class="input-group">
+                <span class="input-group-text bold-span">Fecha Fin:</span>
+                <input type="text" id="fechafAcu" class="form-control form-control-sm shadow-sm size-13" readonly>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="input-group">
+                <span class="input-group-text bold-span">Monto del acuerdo:</span>
+                <input type="text" id="montoAcu" class="form-control form-control-sm shadow-sm size-13">
+              </div>
+            </div>
+            <div class="col-md-2">
+              <div class="input-group">
+                <span class="input-group-text bold-span">Incentivo acuerdo %</span>
+                <input type="text" id="incenAcu" class="form-control form-control-sm shadow-sm size-13">
+              </div>
+            </div>
+          </div>
+          <div class="input-group mb-3">
+            <span class="input-group-text bold-span">Observaciones:</span>
+            <textarea id="obsAcu" class="form-control form-control-sm shadow-sm size-13"></textarea>
+          </div>
+          <div class="row">
+            <div class="col-md-11">
+              <div class="input-group">
+                <span class="input-group-text bold-span">Acuerdo:</span>
+                <input type="file" id="acuerdoPDF" name="acuerdoPDF" class="form-control shadow-sm size-13" readonly>
+                <input type="hidden" id="nacuerdoPDF" name="nacuerdoPDF">
+              </div>
+            </div>
+            <div class="col-md-1">
+              <button class="btn btn-success btn-sm w-100 h-100" onClick="GuardarAcuerdo();">
+                <i class="fa-solid fa-plus"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <h6 class="title-card">ACUERDOS REALIZADOS</h6>
+        <div class="card p-2 border-card shadow-sm">
+          <div id="dvResultAcu" class="table-responsive"></div>
+        </div>
+      </div>
+      <!-- TAB FIDELIZACIÓN ÁCIDA DE CLIENTES -->
+      <div class="tab-pane fade p-2" id="dvFidelizacion" role="tabpanel">
+        <div class="p-2">
+          <h6 class="mb-3 title-tab">FIDELIZACIÓN ÁCIDA DE CLIENTES</h6>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="SlcOficina" class="form-label">Oficina</label>
+                <select id="SlcOficina" class="form-select form-select-sm size-14 shadow-sm"></select>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="txtZonas2" class="form-label">Zona Ventas <span class="text-muted"><i>(Opción todas se excluyen módulo 0412)</i></span></label>
+                <select id="txtZonas2" class="form-select form-select-sm size-14 shadow-sm "></select>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="meses" class="form-label">Mes</label>
+                <select id="meses" class="form-select form-select-sm size-14 shadow-sm "></select>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="ano" class="form-label">Año</label>
+                <select id="ano" class="form-select form-select-sm size-14 shadow-sm "></select>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="Clasificaciones" class="form-label">Clasificaciones</label>
+                <select id="Clasificaciones" class="form-select form-select-sm size-14 shadow-sm ">
+                  <option value="-">TODAS</option>
+                  <option value="AA">AA</option>
+                  <option value="A">A</option>
+                  <option value="B">B</option>
+                  <option value="C">C</option>
+                  <option value="D">D</option>
+                  <option value="E">E</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="txtClasePedidoFi" class="form-label">Clase de Pedido</label>
+                <select id="txtClasePedidoFi" class="form-select form-select-sm size-14 shadow-sm ">
+                  <option value="T" selected>TODOS</option>
+                  <option value="ZPWA">ZPWA - ADMINISTRADOR</option>
+                  <option value="ZPWV">ZPWV - VENDEDOR</option>
+                  <option value="ZPWL">ZPWL - TELEVENDEDOR</option>
+                  <option value="ZPWP">ZPWP - PROVEEDOR</option>
+                  <option value="ZPWT">ZPWT - TRANSFERENCISTA</option>
+                  <option value="ZPWC">ZPWC - CLIENTE</option>
+                  <option value="ZPIC">ZPIC - INTEGRACION COMERCIAL</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="d-flex justify-content-end mt-2 mb-3">
+            <button class="btn btn-outline-success btn-sm shadow-sm" id="btn_consultar">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              Consultar
+            </button>
+          </div>
+          <div class="row g-3 mb-4" id="FilaTotales" style="display:none;">
+            <!-- Tarjeta Presupuesto de Ventas -->
+            <div class="col-12 col-sm-6 col-md-3">
+              <div class="card border-warning h-100 ">
+                <div class="card-body p-2">
+                  <div class="d-flex">
+                    <div class="bg-warning text-white rounded-circle p-2 me-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                      <i class="fas fa-dollar-sign fa-xs"></i>
+                    </div>
+                    <div class="flex-grow-1 text-truncate">
+                      <h6 class="text-muted text-uppercase small mb-1" style="font-size: 0.7rem;">Presupuesto Ventas</h6>
+                      <div class="d-flex align-items-end justify-content-between">
+                        <p class="mb-0 fw-bold" style="font-size: 1.1rem;"><span id="p_pres_venta"></span></p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Tarjeta Cumplimiento de Ventas -->
+            <div class="col-12 col-sm-6 col-md-3">
+              <div class="card border-danger h-100 ">
+                <div class="card-body p-2">
+                  <div class="d-flex">
+                    <div class="bg-danger text-white rounded-circle p-2 me-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                      <i class="fas fa-chart-line fa-xs"></i>
+                    </div>
+                    <div class="flex-grow-1 text-truncate">
+                      <h6 class="text-muted text-uppercase small mb-1" style="font-size: 0.7rem;">Cumplimiento Ventas</h6>
+                      <div class="d-flex align-items-end justify-content-between">
+                        <p class="mb-0 fw-bold" style="font-size: 1.1rem;"><span id="p_cump_venta"></span></p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Tarjeta Presupuesto de Cartera -->
+            <div class="col-12 col-sm-6 col-md-3">
+              <div class="card border-info h-100 ">
+                <div class="card-body p-2">
+                  <div class="d-flex">
+                    <div class="bg-info text-white rounded-circle p-2 me-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                      <i class="fas fa-wallet fa-xs"></i>
+                    </div>
+                    <div class="flex-grow-1 text-truncate">
+                      <h6 class="text-muted text-uppercase small mb-1" style="font-size: 0.7rem;">Presupuesto Cartera</h6>
+                      <div class="d-flex align-items-end justify-content-between">
+                        <p class="mb-0 fw-bold" style="font-size: 1.1rem;"><span id="p_pres_cartera"></span></p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Tarjeta Cumplimiento de Cartera -->
+            <div class="col-12 col-sm-6 col-md-3">
+              <div class="card border-primary h-100">
+                <div class="card-body p-2">
+                  <div class="d-flex">
+                    <div class="bg-primary text-white rounded-circle p-2 me-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                      <i class="fas fa-check-circle fa-xs"></i>
+                    </div>
+                    <div class="flex-grow-1 text-truncate">
+                      <h6 class="text-muted text-uppercase small mb-1" style="font-size: 0.7rem;">Cumplimiento Cartera</h6>
+                      <div class="d-flex align-items-end justify-content-between">
+                        <p class="mb-0 fw-bold" style="font-size: 1.1rem;"><span id="p_cump_cartera"></span></p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="ConsolidadoAcidez" class="mb-3"></div>
+          <div id="result"></div>
+          <div>
+            <div class="card-body p-0">
+              <table id="TableView" class="tabla-estilo nowrap" style="width:100%">
+
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
   <!-- FIN CONTENIDO PRINCIPAL -->
@@ -934,6 +1320,23 @@ Redireccionar();
             Excel
           </button>
           <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- MODAL VER PDF -->
+  <div class="modal fade" id="ModalPDF2" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="min-width: 70%;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5 text-green">VISUALIZAR DOCUMENTO</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="ContenidoPDF">
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-danger btn-sm" data-bs-dismiss="modal">Cerrar</button>
         </div>
       </div>
     </div>
@@ -1719,6 +2122,7 @@ Redireccionar();
   <script type="text/javascript" src="../lib/js/servicios.js?<?php echo (rand()); ?>"></script>
   <script type="text/javascript" src="../resources/HighCharts/code/highcharts.js?<?php echo (rand()); ?>"></script>
   <script type="text/javascript" src="../resources/select2/js/select2.full.min.js"></script>
+  <script type="text/javascript" src="../controllers/FidelizacionPWA.js?<?php echo (rand()); ?>"></script>
   <script type="text/javascript" src="../controllers/PW-SAP.js?<?php echo (rand()); ?>"></script>
   <script type="text/javascript" src="../lib/js/Isa.js?<?php echo (rand()); ?>"></script>
 </body>

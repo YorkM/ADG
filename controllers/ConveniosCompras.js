@@ -83,7 +83,6 @@ $(function () {
   });
 });
 
-
 // EJECUCIÓN DE FUNCIONALIDADES AL CARGAR EL DOM
 // OBTENER Y CARGAR LOS CENTROS
 const getCentros = async () => {
@@ -253,7 +252,6 @@ const guardarConvenio = async () => {
     return false;
   }
 
-  // Validación de campos numéricos
   let camposVacios = false;
 
   $(".form-percent").each(function () {
@@ -269,7 +267,6 @@ const guardarConvenio = async () => {
     return false;
   }
 
-  // Validación de grupos de artículos seleccionados
   const grupos = $("#inGrupoArticulo").val();
   if (!grupos || grupos.length === 0) {
     Swal.fire("Oops", "No ha seleccionado ningún grupo de artículo.", "error");
@@ -647,15 +644,15 @@ const generarGrafica = (valorObjetivos, valorCompras, valorVentas, tipoConvenio)
     },
     series: [{
       name: 'Objetivo',
-      data: valorObjetivos,
+      data: valorObjetivos
     },
     {
       name: 'Compras',
-      data: valorCompras,
+      data: valorCompras
     },
     {
       name: 'Ventas',
-      data: valorVentas,
+      data: valorVentas
     }],
     credits: {
       enabled: false
@@ -1338,6 +1335,34 @@ const detalleConvenio = (id) => {
       Q3: vlrRbManejo3,
       Q4: vlrRbManejo4,
       ANUAL: 0
+    },
+    NODEVOLUCIONES: {
+      Q1: vlrRbDevoluciones1,
+      Q2: vlrRbDevoluciones2,
+      Q3: vlrRbDevoluciones3,
+      Q4: vlrRbDevoluciones4,
+      ANUAL: 0
+    },
+    DINAMICA: {
+      Q1: vlrRbDinamica1,
+      Q2: vlrRbDinamica2,
+      Q3: vlrRbDinamica3,
+      Q4: vlrRbDinamica4,
+      ANUAL: 0
+    },
+    INVENTARIO: {
+      Q1: vlrRbInventario1,
+      Q2: vlrRbInventario2,
+      Q3: vlrRbInventario3,
+      Q4: vlrRbInventario4,
+      ANUAL: 0
+    },
+    LOGISTICA: {
+      Q1: vlrRbLogistica1,
+      Q2: vlrRbLogistica2,
+      Q3: vlrRbLogistica3,
+      Q4: vlrRbLogistica4,
+      ANUAL: 0
     }
   }
 
@@ -1350,13 +1375,11 @@ function generarLiquidacion(idConvenio) {
   const convenio = objetoFiltrado[0];
   if (!convenio) return null;
 
-  const tipoConvenio = convenio.TIPO_CONVENIO || "T"; // T=Trimestral, S=Semestral, C=Cuatrimestral, A=Anual
+  const tipoConvenio = convenio.TIPO_CONVENIO || "T";
   const rebatesOriginales = JSON.parse(localStorage.getItem("TotalRebate")) || {};
 
-  // 🔹 Clonar rebates originales para no modificar la referencia
   const rebates = JSON.parse(JSON.stringify(rebatesOriginales));
 
-  // 🔹 Convertir los rebates originales (que suelen venir en Q1–Q4) a periodos del tipo de convenio
   Object.keys(rebates).forEach(tipo => {
     const r = rebates[tipo];
 
@@ -1368,35 +1391,21 @@ function generarLiquidacion(idConvenio) {
       r["C2"] = (r["Q2"] || 0) + (r["Q3"] || 0);
       r["C3"] = (r["Q4"] || 0);
     } else if (tipoConvenio === "A") {
-      r["A1"] =
-        (r["Q1"] || 0) +
-        (r["Q2"] || 0) +
-        (r["Q3"] || 0) +
-        (r["Q4"] || 0);
+      r["A1"] = (r["Q1"] || 0) + (r["Q2"] || 0) + (r["Q3"] || 0) + (r["Q4"] || 0);
     }
   });
 
-  // 🔹 Función para determinar el periodo según el mes y tipo de convenio
   const obtenerPeriodo = (mes, tipo) => {
     const m = Number(mes);
-
     switch (tipo) {
-      case "T": // Trimestres (3 meses)
-        return `Q${Math.ceil(m / 3)}`;
-      case "S": // Semestres (6 meses)
-        return m <= 6 ? "S1" : "S2";
-      case "C": // Cuatrimestres (4 meses)
-        if (m <= 4) return "C1";
-        if (m <= 8) return "C2";
-        return "C3";
-      case "A": // Año completo
-        return "A1";
-      default:
-        return `Q${Math.ceil(m / 3)}`; // Por defecto trimestral
+      case "T": return `Q${Math.ceil(m / 3)}`;
+      case "S": return m <= 6 ? "S1" : "S2";
+      case "C": return m <= 4 ? "C1" : m <= 8 ? "C2" : "C3";
+      case "A": return "A1";
+      default: return `Q${Math.ceil(m / 3)}`;
     }
   };
 
-  // 🔹 Agrupar datos por centro y periodo
   const reporte = {};
   const totalesGenerales = {};
 
@@ -1412,7 +1421,6 @@ function generarLiquidacion(idConvenio) {
       totalesGenerales[periodo] = { VENTAS: 0, COMPRAS: 0, IMPACTOS: 0 };
     }
 
-    // Acumular datos
     reporte[CENTRO].DETALLE[periodo].VENTAS += parseFloat(d.VAL_NETO_VENTAS || 0);
     reporte[CENTRO].DETALLE[periodo].COMPRAS += parseFloat(d.VAL_NETO_COMPRAS || 0);
     reporte[CENTRO].DETALLE[periodo].IMPACTOS += parseInt(d.IMPACTOS || 0);
@@ -1422,29 +1430,40 @@ function generarLiquidacion(idConvenio) {
     totalesGenerales[periodo].IMPACTOS += parseInt(d.IMPACTOS || 0);
   });
 
-  // 🔹 Calcular participación, liquidaciones y totales de rebates
   const totalesRebates = {};
 
   Object.values(reporte).forEach(r => {
     let totalCentro = 0;
-
+    
     Object.entries(r.DETALLE).forEach(([periodo, valores]) => {
       valores.REBATES = {};
 
       Object.entries(rebates).forEach(([tipoRebate, periodos]) => {
-        const baseIndicador = tipoRebate.toUpperCase(); // Ej: COMPRAS, IMPACTOS
-        const baseTotal = totalesGenerales[periodo]?.[baseIndicador] || 0;
-        const baseCentro = valores[baseIndicador] || 0;
+        const baseIndicador = tipoRebate.toUpperCase();
+
+        const baseTotal =
+          totalesGenerales[periodo]?.[baseIndicador] ||
+          totalesGenerales[periodo]?.COMPRAS ||
+          totalesGenerales[periodo]?.VENTAS ||
+          0;
+
+        const baseCentro =
+          valores[baseIndicador] ||
+          valores.COMPRAS ||
+          valores.VENTAS ||
+          0;
+
         const participacion = baseTotal > 0 ? baseCentro / baseTotal : 0;
+        const participacionPcj = (participacion * 100).toFixed(2);
+
         const totalRebatePeriodo = periodos[periodo] || 0;
         const valorLiquidado = totalRebatePeriodo * participacion;
 
         valores.REBATES[tipoRebate] = {
-          PARTICIPACION: (participacion * 100).toFixed(2),
+          PARTICIPACION: participacionPcj,
           VALOR_LIQUIDADO_REAL: valorLiquidado,
         };
 
-        // Sumar totales por tipo y periodo
         if (!totalesRebates[tipoRebate]) totalesRebates[tipoRebate] = {};
         if (!totalesRebates[tipoRebate][periodo]) totalesRebates[tipoRebate][periodo] = 0;
         totalesRebates[tipoRebate][periodo] += valorLiquidado;
@@ -1456,12 +1475,10 @@ function generarLiquidacion(idConvenio) {
     r.TOTAL_REBATES = totalCentro;
   });
 
-  // 🔹 Calcular totales globales de rebates
   Object.keys(totalesRebates).forEach(tipo => {
     totalesRebates[tipo]["TOTAL"] = Object.values(totalesRebates[tipo]).reduce((a, b) => a + b, 0);
   });
 
-  // 🔹 Resultado final
   return {
     tipoConvenio,
     reporte: Object.values(reporte),
@@ -1530,7 +1547,7 @@ function renderReporteLiquidacion(data) {
       <h2 class="accordion-header" id="heading${i}">
         <button class="accordion-button collapsed bg-light shadow-sm" type="button" data-bs-toggle="collapse"
           data-bs-target="#collapse${i}" aria-expanded="false" aria-controls="collapse${i}">
-          <strong>${centro.CENTRO}</strong> &nbsp;  &nbsp; Total Rebates: <span class="text-success fw-bold ms-1 size-14">$${formatNum(centro.TOTAL_REBATES)}</span>
+          <strong>${centro.CENTRO}</strong> &nbsp;  &nbsp; Total Rebates: <span class="text-success fw-bold ms-1 size-14">$${formatNum(Math.round(centro.TOTAL_REBATES))}</span>
         </button>
       </h2>
       <div id="collapse${i}" class="accordion-collapse collapse" aria-labelledby="heading${i}"
@@ -1601,7 +1618,7 @@ function renderTotalesGenerales(totales, totalesRebates) {
         <th class="bag-info text-green">Ventas</th>
         <th class="bag-info text-green">Compras</th>
         <th class="bag-info text-green">Impactos</th>
-        ${Object.keys(totalesRebates).map(tipo => `<th class="bag-info text-green">${tipo}</th>`).join("")}
+        ${Object.keys(totalesRebates).map(tipo => `<th class="bag-info text-green size-14">${tipo}</th>`).join("")}
       </tr>
     </thead>
     <tbody>`;
@@ -1614,7 +1631,7 @@ function renderTotalesGenerales(totales, totalesRebates) {
       <td class="size-14">$${formatNum(valores.COMPRAS)}</td>
       <td class="size-14">${formatNum(valores.IMPACTOS)}</td>
       ${Object.keys(totalesRebates)
-        .map(tipo => `<td>$${formatNum(totalesRebates[tipo][periodo] || 0)}</td>`)
+        .map(tipo => `<td class="size-14">$${formatNum(totalesRebates[tipo][periodo] || 0)}</td>`)
         .join("")}
     </tr>`;
   });
@@ -1655,19 +1672,16 @@ const calcularPorcentaje = (valor, objetivo) => {
 }
 // FUNCIÓN PARA UNIR LAS COMPRAS Y VENTAS POR MES Y AÑO
 function unirArraysPorCentro(ventas = [], compras = [], centrosAsociadosRaw = '') {
-  // Normalizar el string de centros -> array limpio
   const centrosAsociados = centrosAsociadosRaw
     .split(/[-,;|]/)     // separa por -, , ; o |
     .map(c => c.trim().toUpperCase())
     .filter(Boolean);
 
-  // Si no hay centros, devolvemos vacío
   if (!centrosAsociados.length) return [];
 
   const consolidado = {};
   const key = (centro, anio, mes) => `${centro}-${anio}-${mes}`;
 
-  // Procesar ventas
   ventas.forEach(v => {
     const centro = String(v.CENTRO || '').trim().toUpperCase();
     if (!centrosAsociados.includes(centro)) return;
@@ -1691,7 +1705,6 @@ function unirArraysPorCentro(ventas = [], compras = [], centrosAsociadosRaw = ''
     consolidado[k].IMPACTOS += Number(v.IMPACTOS || 0);
   });
 
-  // Procesar compras
   compras.forEach(c => {
     const centro = String(c.CENTRO || '').trim().toUpperCase();
     if (!centrosAsociados.includes(centro)) return;
@@ -1714,7 +1727,6 @@ function unirArraysPorCentro(ventas = [], compras = [], centrosAsociadosRaw = ''
     consolidado[k].VAL_NETO_COMPRAS += Number(c.VAL_NETO_COMPRAS || 0);
   });
 
-  // Pasar a array y ordenar
   return Object.values(consolidado).sort((a, b) => {
     if (a.ANIO === b.ANIO) {
       if (a.MES === b.MES) {
@@ -1793,11 +1805,9 @@ function limpiarFormulario() {
 
   const grupoArticulo = document.getElementById("inGrupoArticulo");
   if (grupoArticulo) {
-    // Limpiar selecciones del DOM
     Array.from(grupoArticulo.options).forEach(option => {
       option.selected = false;
     });
-    // Limpiar Select2
     if ($(grupoArticulo).data('select2')) {
       $(grupoArticulo).val(null).trigger('change');
     }

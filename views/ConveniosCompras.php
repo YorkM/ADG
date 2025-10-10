@@ -13,24 +13,19 @@ Redireccionar();
   <meta http-equiv="Pragma" content="no-cache">
   <meta charset="utf-8">
   <title>Administración de convenios de compras</title>
-  <!-- Latest compiled and minified CSS -->
-  <!-- <link type="text/css" rel="stylesheet" href="../resources/bootstrap/bootstrap-5.0.2-dist/css/bootstrap.min.css"> -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- <link type="text/css" rel="stylesheet" href="../resources/css/start/jquery-ui-1.9.2.custom.css?<?php echo (rand()); ?>"/> -->
   <link type="text/css" rel="stylesheet" href="../lib/SweetAlert2_V10/dist/sweetalert2.all.js?<?php echo (rand()); ?>" />
   <link type="text/css" rel="stylesheet" href="../resources/css/Animate.css?<?php echo (rand()); ?>">
-  <!--<link type="text/css" rel="stylesheet" href="../resources/css/BootstrapTabs.css?<?php echo (rand()); ?>" >-->
   <link type="text/css" rel="stylesheet" href="../resources/select2-bootstrap4-theme/select2-bootstrap4.css">
   <link type="text/css" rel="stylesheet" href="../resources/select2/css/select2.css">
   <link type="text/css" rel="stylesheet" href="../resources/fontawesome/css/all.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
   <link rel="stylesheet" href="../resources/css/formulario.css">
-  <!-- <link rel="stylesheet" href="../resources/css/tab.css"> -->
   <link rel="stylesheet" href="../resources/css/calendario.css">
   <link rel="stylesheet" href="../resources/css/AutoComplete.css">
   <link rel="stylesheet" href="../resources/css/tablas.css">
   <link rel="stylesheet" href="../resources/css/imgPre.css">
-  <!------------------------------------------------------------------------------------------------------------------>
+  
   <script type="text/javascript" src="../lib/js/jquery-2.1.1.min.js?<?php echo (rand()); ?>"></script>
   <script type="text/javascript" src="../lib/js/jquery-ui-1.9.2.custom.js?<?php echo (rand()); ?>"></script>
   <script type="text/javascript" src="../resources/bootstrap/bootstrap-5.0.2-dist/js/bootstrap.min.js?1905557934"></script>

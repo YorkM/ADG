@@ -1,3 +1,5 @@
+const arrayMeses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+const arrayMesesShort = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
 const urlModel = "../models/PW-SAP.php";
 let ArrProd = [];
 let ArrEan = [];
@@ -541,7 +543,7 @@ function Limpiar() {
 
   $("#txt_oficina, #txt_destinatario").empty();
   $("#txt_destinatario").attr('disabled', false);
-  $("#btnProductos, #btnPedidos").attr("disabled", true);
+  $("#btnProductos, #btnPedidos, #btnAcuerdos").attr("disabled", true);
   $("#btnDescuentos").hide();
 
   $('#txt_cliente').prop('readonly', false);
@@ -571,7 +573,7 @@ function Limpiar() {
   }
 
   const Rol = +$.trim($("#Rol").val());
-  const botonesOcultar = "#btnEditar, #btnTempTerceros, #btnAddEntregas, #separadorEntregas, #btListaFacts, #separadorFacturas, #btnMenu5, #btnMenu6, #btnMenu7, #btnMenu8";
+  const botonesOcultar = "#btnEditar, #btnTempTerceros, #btnAddEntregas, #separadorEntregas, #btListaFacts, #separadorFacturas, #btnMenu5, #btnMenu6, #btnMenu7, #btnMenu8, #btnAcuerdos";
 
   if ([9, 11, 120].includes(Rol)) {
     $(botonesOcultar).hide();
@@ -1555,7 +1557,6 @@ async function ActualizarDetalle(idfila, cant, totalfila, codigo) {
       lista: $("#txt_lista").val(),
       canal: '10'
     });
-    console.log(data);
     if (numeroSAP != 0) {
       await InserUpdateSAP('MODIFICAR', numero, numeroSAP);
     }
@@ -2150,7 +2151,6 @@ function RecuperarPedido() {
 async function EnviarMail(tipo, numero) {
   try {
     const data = await enviarPeticion({ metodo: "GET", link: "../resources/tcpdf/pedidos.php", ped: numero, tipo: tipo });
-    console.log(data);
   } catch (error) {
     console.error(error);
   }
@@ -2159,7 +2159,6 @@ async function EnviarMail(tipo, numero) {
 async function EnviarMailAnulacion(tipo, numero, texto) {
   try {
     const data = await enviarPeticion({ op: "EMAIL", link: urlModel, tipo, numero, texto });
-    console.log(data);
   } catch (error) {
     console.error(error);
   }
@@ -3574,7 +3573,6 @@ async function NotaRapida() {
   if (entr == '' || entr == 0 || entr == '0') {
     try {
       const data = await enviarPeticion({op: "U_NOTAS", link: urlModel, nota, nump});
-      console.log(data);
       if (data.ok) {
         if (nums != 0) GuardarDirecto();
         else Swal.fire('Excelente', 'Nota actualizada con éxito.', 'success');
@@ -4392,6 +4390,189 @@ function manejarCambio(e) {
   tituloModulo.style.display = e.matches ? "none" : "block";
   dvResultProductos.style.height = e.matches ? "74vh" : "64vh";
 }
+// FUNCIÓN REDONDEAR VALORES
+function redondear(numero, digitos) {
+  let base = Math.pow(10, digitos);
+  let entero = Math.round(numero * base);
+  return entero / base;
+}
+// FUNCIÓN VER ACUERDOS
+function Veracuerdos(archivo) {
+  $("#ContenidoPDF").html(`<embed src="../resources/acuerdos/${archivo}" frameborder="0" width="100%" height="400px">`);
+  $("#ModalPDF2").modal("show");
+}
+// FUNCIÓN LISTAR ACUERDOS
+function Listar_acuerdos() {
+  let codigo = $("#txt_codigoSapHidden").val();
+  let org = $("#txt_organizacion").val();
+
+  $.ajax({
+    type: "POST",
+    encoding: "UTF-8",
+    url: "../models/CRM.php",
+    async: true,
+    dataType: "json",
+    error: function (JQERROR) {
+      alert(JQERROR);
+    },
+    beforeSend: function () {
+      LoadImg('Cargando Información...');
+    },
+    data: {
+      op: 'B_ACUERDOS',
+      codigo,
+      org
+    },
+    success: function (data) {
+      if (data.length) {
+        let tabla = `
+        <table class="table table-bordered table-hover table-sm">
+            <thead>
+              <tr>
+                <th class="size-th-2 bag-info">N°</th>
+                <th class="size-th-2 bag-info">NOMBRE</th>
+                <th class="size-th-2 bag-info">FECHA INI</th>
+                <th class="size-th-2 bag-info">FECHA FIN</th>
+                <th class="size-th-2 bag-info">INCENTIVO %</th>
+                <th class="size-th-2 bag-info">MONTO $</th>
+                <th class="size-th-2 bag-info">OBSERVACIONES</th>
+                <th class="size-th-2 bag-info">FACTURADO</th>
+                <th class="size-th-2 bag-info">CUMPLIMIENTO</th>
+                <th class="size-th-2 bag-info"></th>
+              </tr>
+            </thead>
+            <tbody>`;
+
+        data.forEach(item => {
+          let cumplimiento = formatNum(redondear((item.vlr / item.MONTO) * 100, 2));
+
+          tabla += `
+          <tr ondblclick="Veracuerdos('${item.ADJUNTO}')">
+            <td class="size-14 vertical">${item.NUMERO}</td>
+            <td class="size-13 vertical">${item.NOMBRES}</td>
+            <td class="size-14 vertical">${item.FECHA_INI}</td>
+            <td class="size-14 vertical">${item.FECHA_FIN}</td>
+            <td class="size-14 vertical">${item.INCENTIVO}</td>
+            <td class="size-14 vertical">${formatNum(item.MONTO, '$')}</td>
+            <td class="size-13 vertical">${item.OBSERVACION}</td>
+            <td class="size-14 vertical">${formatNum(item.vlr, '$')}</td>
+            <td class="size-14 vertical">${cumplimiento}%</td>`;
+
+          if ($("#Rol").val() == '1') {
+            tabla += `
+            <td align="center">
+              <span onClick="DelAcuerdo('${item.ID}')"><i class="fa-solid fa-trash-can text-danger"></i></span>
+            </td></tr>`;
+          } else {
+            tabla += `
+            <td class="hidden" align="center">
+              <span onClick="DelAcuerdo('${item.ID}')"><i class="fa-solid fa-trash-can text-danger"></i></span>
+            </td></tr>`;
+          }
+        });
+        tabla += `</tbody></table>`;
+        $("#dvResultAcu").html(tabla);
+      } else {
+        $("#dvResultAcu").html(`<p class="text-center lead">No existen acuerdos</p>`);
+      }
+    }
+  }).done(function () {
+    UnloadImg();
+  })
+}
+// FUNCIÓN ELIMINAR ACUERDO
+async function DelAcuerdo(id) {
+  const result = await confirmAlert("Eliminar Acuerdo", "¿Está seguro(a) de eliminar el acuerdo?");
+  if (!result.isConfirmed) return;
+
+  $.ajax({
+    type: "POST",
+    encoding: "UTF-8",
+    url: "../models/CRM.php",
+    async: true,
+    dataType: "html",
+    error: function (JQERROR) {
+      alert(JQERROR);
+    },
+    data: {
+      op: 'D_ACUERDOS',
+      id: id
+    },
+    success: function (data) {
+      if (data == 1) {
+        Swal.fire('Excelente!', 'Acuerdo eliminado correctamente!', 'success');
+        Listar_acuerdos();
+      } else {
+        Swal.fire('Oops!', 'Error al intentar eliminar este contrato!', 'error');
+      }
+    }
+  });
+}
+// FUNCIÓN CARGAR AJAX - ARCHIVOS
+function uploadAjax(caja, tipo) {
+  let inputFileImage = document.getElementById(caja);
+  let file = inputFileImage.files[0];
+  let data = new FormData();
+
+  data.append('archivo', file);
+  data.append('op', 'subir');
+  data.append('tipo', tipo);
+  data.append('codigo', $("#txtCodigo").val());
+  data.append('numero', $("#numeroAcu").val());
+  const url = "../models/CRM.php";
+
+  $.ajax({
+    url,
+    type: "POST",
+    contentType: false,
+    data,
+    processData: false,
+    cache: false,
+    async: false,
+    success: function (data) {
+      $(`#n${caja}`).val(data);
+    }
+  });
+}
+// FUNCIÓN GUARDAR ACUERDO
+function GuardarAcuerdo() {
+  if ($("#acuerdoPDF").val() != '') {
+    uploadAjax('acuerdoPDF', 'acuerdo');
+    $.ajax({
+      type: "POST",
+      encoding: "UTF-8",
+      url: "../models/CRM.php",
+      async: true,
+      dataType: "html",
+      error: function (JQERROR) {
+        alert(JQERROR);
+      },
+      data: {
+        op: 'G_ACUERDOS',
+        c_sap: $("#txt_codigoSapHidden").val(),
+        acu: $("#numeroAcu").val(),
+        f_ini: $("#fechaiAcu").val(),
+        f_fin: $("#fechafAcu").val(),
+        mont: $("#montoAcu").val(),
+        inc: $("#incenAcu").val(),
+        obs: $("#obsAcu").val(),
+        adj: $("#nacuerdoPDF").val(),
+        oficina: $("#bodegaTercero").val(),
+        organizacion: $("#txt_organizacion").val()
+      },
+      success: function (data) {
+        if (data == 1) {
+          Swal.fire('Excelente!', 'El acuerdo se guardo correctamente!', 'success');
+          Listar_acuerdos();
+        } else {
+          Swal.fire('Oops!', 'Error al intentar almacenar este acuerdo!', 'error');
+        }
+      }
+    });
+  } else {
+    Swal.fire('Oops!!!', 'No se sube imagen... Selecciona una primero', 'error');
+  }
+}
 
 // EJECUCIÓN DE LAS FUNCIONALIDADES AL CARGAR EL DOM
 $(function () {
@@ -4421,7 +4602,7 @@ $(function () {
     GestionPedidos();
   });
 
-  $("#txtZonas, #FiltroOficinaVentas, #txtClasePedido").select2({
+  $("#txtZonas, #FiltroOficinaVentas").select2({
     theme: 'bootstrap-5'
   });
 
@@ -4656,6 +4837,9 @@ $(function () {
         $("#txt_vendedor_tel").val(ui.item.telefono_vendedor);
         $("#txt_televendedor_tel").val(ui.item.telefono_televendedor);
         $("#txt_codigoSap").val(ui.item.codigo_sap);
+        $("#txt_codigoSapHidden").val(ui.item.codigo_sap);
+        $("#txt_organizacion").val(`${ui.item.bodega.substring(0, 1)}000`);
+        $("#bodegaTercero").val(ui.item.bodega);
         $("#txt_descuento").val(ui.item.descuento_financiero);
         $("#txt_plazo").val(ui.item.dias_pago + ' dias');
 
@@ -4666,7 +4850,7 @@ $(function () {
         $("#txt_institucional").val(ui.item.institucional == 1 ? 'SI' : 'NO');
         $("#txt_controlado").val(ui.item.controlados == 1 ? 'SI' : 'NO');
 
-        $("#btnProductos").attr("disabled", false);
+        $("#btnProductos, #btnAcuerdos").attr("disabled", false);
 
         $("#txtGrp1").val(ui.item.grupo1);
         $("#txtGrp2").val(ui.item.grupo2);
@@ -4674,6 +4858,7 @@ $(function () {
 
         CargarEvento();
         BuscarProductos();
+        Listar_acuerdos();
       }
     });
   }
@@ -4682,7 +4867,6 @@ $(function () {
 
   // FILTROS DESCUENTOS, BONIFICADOS Y STOCK
   $(".form-check-input").click(async function () {
-    debugger;
     let id = $(this).attr('id');
 
     if ($(this).hasClass('DivCheckBoxTrue')) $(this).removeClass('DivCheckBoxTrue');
@@ -4946,7 +5130,10 @@ $(function () {
     crearPedidoRedencion();
   });
 
-  let valor_rol = $("#Rol").val();
+  let valor_rol = $("#Rol").val(); 
+  if (valor_rol === "10") {
+    $('#btnAcuerdos').hide();
+  }
   let valoresPermitidosrol = ["12", "1", "44", "72", "13", "14"];
   $("#cartera_edades, #Presupuesto_datos").toggle(valoresPermitidosrol.includes(valor_rol));
 
@@ -4974,4 +5161,16 @@ $(function () {
   $('#btnEnviarSolicitud').click(function () {
     ejecutarSolDesbloqueo();
   });
+
+  $("#fechaiAcu, #fechafAcu").datepicker({
+    changeMonth: true,
+    changeYear: true,
+    monthNames: arrayMeses,
+    monthNamesShort: arrayMesesShort,
+    dateFormat: 'yy-mm-dd',
+    width: 100,
+    heigth: 100
+  });
+
+  $("#fechaiAcu, #fechafAcu").val(FechaActualAmd());
 });
