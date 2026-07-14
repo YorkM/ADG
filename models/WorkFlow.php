@@ -35,6 +35,36 @@ switch ($_POST['op']) {
         echo json_encode($sql);
         break;
 
+    case "G_COMENTARIO_APROBADO":
+        $idSolicitud = intval($_POST['idSolicitud']);
+        $estado = $_POST['estado'];
+
+        $sql = GenerarArray("SELECT COMENTARIO FROM T_WORKFLOW_COMENTARIOS WHERE ID_SOLICITUD = $idSolicitud AND ESTADO = '$estado'", '');
+        echo json_encode($sql);
+        break;
+
+    case "G_TERCEROS":
+        $nit = $_POST['nit'];
+        $sql = "SELECT TOP 10 NIT, CODIGO_SAP, CASE WHEN RAZON_COMERCIAL IS NULL THEN NOMBRES ELSE RAZON_COMERCIAL END AS NOMBRES
+        FROM T_TERCEROS 
+        WHERE NIT LIKE '$nit%'";
+        $terceros = GenerarArray($sql, '');
+        echo json_encode($terceros);
+        break;
+
+    case "G_TERCEROS_2":
+        $identificacion = $_POST['identificacion'];
+        $sql = "SELECT TOP 10 
+            IDENTIFICACION,
+            CONCAT(NOMBRES, ' ', APELLIDOS) AS NOMBRE,
+            CELULAR,
+            LOWER(EMAIL) AS EMAIL
+        FROM T_USUARIOS 
+        WHERE IDENTIFICACION LIKE '$identificacion%' AND ESTADO = 'A'";
+        $terceros = GenerarArray($sql, '');
+        echo json_encode($terceros);
+        break;
+
     case "G_INFOTABLAG":
         $sql = GenerarArray("SELECT * FROM T_GASTOS_AUTORIZADOS", '');
         echo json_encode($sql);
@@ -43,37 +73,56 @@ switch ($_POST['op']) {
     case "G_SOLICITUDES":
         $fecha_desde = $_POST['fechaDesde'];
         $fecha_hasta = $_POST['fechaHasta'];
+        $organizacion = $_POST['organizacion'];
         $departamento = $_POST['departamento'];
         $oficina = $_POST['oficina'];
+        $estado = $_POST['estado'];
         $sql = "SELECT 
-                    WF.ID,
-                WF.ORGANIZACION_VENTAS,
-                CASE
-                    WHEN WF.ORGANIZACION_VENTAS = '2000' THEN 'ROMA'
-                    ELSE 'MULTIDROGAS'
-                END AS ORGANIZACION_VENTAS_T,
-                WF.OFICINA_VENTAS,
-                OV.DESCRIPCION AS OFICINA_VENTAS_T,
-                WF.CONCEPTO_GASTO,
-                WF.TIPO_GASTO,
-                WF.USUARIO_SOLICITA,
-                WF.FECHA_SOLICITA,
-                WF.COMENTARIO_SOLICITA,
-                ISNULL(WF.ADJUNTO_SOLICITA_1, '') AS ADJUNTO_SOLICITA_1,
-                ISNULL(WF.ADJUNTO_SOLICITA_2, '') AS ADJUNTO_SOLICITA_2,
-                ISNULL(WF.ADJUNTO_SOLICITA_3, '') AS ADJUNTO_SOLICITA_3,
-                ISNULL(WF.NOTA, '0') AS INDICADORNOTA,
-                U.EMAIL,
-                D.DESCRIPCION AS DPTO,
-                WF.ESTADO,
-                CG.CONCEPTO,
-                CONCAT(U.NOMBRES, ' ', U.APELLIDOS) AS NOMBRE_USUARIO
-                FROM T_WORKFLOW WF
-                INNER JOIN T_USUARIOS U ON WF.USUARIO_SOLICITA = U.[LOGIN]
-                INNER JOIN T_DPTO D ON U.ID_DPTO = D.ID
-                INNER JOIN T_OFICINAS_VENTAS OV ON WF.OFICINA_VENTAS = OV.OFICINA_VENTAS
-                INNER JOIN T_CONCEPTOS_GASTOS CG ON WF.CONCEPTO_GASTO = CG.ID
-                WHERE CAST(WF.FECHA_SOLICITA AS DATE) between CAST('$fecha_desde' AS DATE) and CAST('$fecha_hasta' AS DATE)";
+            WF.ID,
+            WF.ORGANIZACION_VENTAS,
+
+            CASE
+                WHEN WF.ORGANIZACION_VENTAS = '2000' THEN 'ROMA'
+                ELSE 'MULTIDROGAS'
+            END AS ORGANIZACION_VENTAS_T,
+
+            WF.OFICINA_VENTAS,
+            OV.DESCRIPCION AS OFICINA_VENTAS_T,
+            WF.CONCEPTO_GASTO,
+            WF.TIPO_GASTO,
+            WF.TIPO_ANTICIPO,
+            WF.USUARIO_SOLICITA,
+            WF.FECHA_SOLICITA,
+            WF.DOCUMENTO_CAUSA,
+            WF.NUMERO_ZP,
+            WF.COMENTARIO_SOLICITA,
+
+            ISNULL(WF.ADJUNTO_SOLICITA_1, '') AS ADJUNTO_SOLICITA_1,
+            ISNULL(WF.ADJUNTO_SOLICITA_2, '') AS ADJUNTO_SOLICITA_2,
+            ISNULL(WF.ADJUNTO_SOLICITA_3, '') AS ADJUNTO_SOLICITA_3,
+            ISNULL(WF.NOTA, '0') AS INDICADORNOTA,
+
+            U.EMAIL,
+            D.DESCRIPCION AS DPTO,
+
+            CASE WHEN WF.DOCUMENTO_IDENTIDAD = '' 
+            THEN WF.NIT_TERCERO ELSE WF.DOCUMENTO_IDENTIDAD END 
+            AS DOCUMENTO,
+
+            CASE WHEN WF.NOMBRE_TERCERO = '' 
+            THEN WF.RAZON_SOCIAL_TERCERO ELSE WF.NOMBRE_TERCERO END 
+            AS NOMBRE_TERCERO,
+
+            WF.ESTADO,
+            CG.CONCEPTO,
+            CONCAT(U.NOMBRES, ' ', U.APELLIDOS) AS NOMBRE_USUARIO
+        FROM T_WORKFLOW WF
+            INNER JOIN T_USUARIOS U ON WF.USUARIO_SOLICITA = U.[LOGIN]
+            INNER JOIN T_DPTO D ON U.ID_DPTO = D.ID
+            INNER JOIN T_OFICINAS_VENTAS OV ON WF.OFICINA_VENTAS = OV.OFICINA_VENTAS
+            INNER JOIN T_CONCEPTOS_GASTOS CG ON WF.CONCEPTO_GASTO = CG.ID
+        WHERE CAST(WF.FECHA_SOLICITA AS DATE) between CAST('$fecha_desde' AS DATE) and CAST('$fecha_hasta' AS DATE)
+            AND WF.ORGANIZACION_VENTAS = '$organizacion'";
 
         if ($departamento != '' ) {
             $sql .= " AND D.DESCRIPCION = '$departamento'";
@@ -83,10 +132,15 @@ switch ($_POST['op']) {
             $sql .= " AND WF.OFICINA_VENTAS = '$oficina'";
         }
 
-        $sql .= "ORDER BY WF.FECHA_SOLICITA ";
+        if ($estado != '') {
+            $sql .= " AND WF.ESTADO = '$estado'";
+        }
+
+        $sql .= "ORDER BY WF.FECHA_SOLICITA";
 
         $solicitudes = GenerarArray($sql, '');
-        echo json_encode(['data '=> $solicitudes, 'sql' => $sql]);
+        if ($solicitudes) echo json_encode(['ok' => true, 'data' => $solicitudes]);
+        else echo json_encode(['ok' => false, 'data' => []]);
         break;
 
     case "I_CONCEPTO":
@@ -102,6 +156,17 @@ switch ($_POST['op']) {
     case "G_COMENTARIOS":
         $idSolicitud = $_POST['idSolicitud'];
         $sql = GenerarArray("SELECT * FROM T_WORKFLOW_COMENTARIOS WHERE ID_SOLICITUD = $idSolicitud ORDER BY FECHA ASC", '');
+        echo json_encode($sql);
+        break;
+
+    case "G_COMENTARIOS_2":
+        $idSolicitud = $_POST['idSolicitud'];
+        $sql = GenerarArray("SELECT
+            CASE WHEN COMENTARIO = '' THEN '-' ELSE COMENTARIO END AS COMENTARIO,
+            USUARIO
+        FROM T_WORKFLOW_COMENTARIOS 
+        WHERE ID_SOLICITUD = $idSolicitud 
+        ORDER BY FECHA ASC", '');
         echo json_encode($sql);
         break;
 
@@ -138,14 +203,47 @@ switch ($_POST['op']) {
         $adj = $_POST["adj"];
         $accion = $_POST["accion"];
 
-        if ($accion == "1") $update = mssql_query("UPDATE T_WORKFLOW SET ADJUNTO_SOLICITA_$adj = '$nombre', ADJUNTO_FINALIZA = ADJUNTO_SOLICITA_1  WHERE ID = $id_sol");
+        if ($accion == "1" || $accion == "6") $update = mssql_query("UPDATE T_WORKFLOW SET ADJUNTO_SOLICITA_$adj = '$nombre', ADJUNTO_FINALIZA = '$nombre'  WHERE ID = $id_sol");
         else if ($accion == "2") $update = mssql_query("UPDATE T_WORKFLOW SET ADJUNTO_PAGO = '$nombre' WHERE ID = $id_sol");
         else if ($accion == "3") $update = mssql_query("UPDATE T_WORKFLOW SET ADJUNTO_FINALIZA = '$nombre' WHERE ID = $id_sol");
         else if ($accion == "4") $update = mssql_query("UPDATE T_WORKFLOW SET ADJUNTO_FACTURA = '$nombre' WHERE ID = $id_sol");
         else if ($accion == "5") $update = mssql_query("UPDATE T_WORKFLOW SET ADJUNTO_LEGALIZACION = '$nombre' WHERE ID = $id_sol");
         else $update = mssql_query("UPDATE T_WORKFLOW SET ADJUNTO_SOLICITA_$adj = '$nombre' WHERE ID = $id_sol");
 
-        mssql_query("UPDATE T_WORKFLOW SET ADJUNTO_FINALIZA = ADJUNTO_SOLICITA_1, FECHA_FINALIZA = GETDATE() WHERE ID = '$id_sol'");
+        echo json_encode(array('ok' => true));
+        break;
+
+    case 'U_ADJUNTO_VARIADO':
+        $idSolicitud = intval($_POST['idSolicitud']);
+        $nombreArchivo = $_POST['nombre'];
+        $accion = $_POST['accion'];
+
+        $query = "";
+
+        if ($accion == "1") {
+            $query = "UPDATE T_WORKFLOW SET ADJUNTO_CONTABILIDAD = '$nombreArchivo' WHERE ID = $idSolicitud;";
+            
+        } else if ($accion == "2") {
+            $query = "UPDATE T_WORKFLOW SET ADJUNTO_PAGO = '$nombreArchivo' WHERE ID = $idSolicitud;";
+        }
+
+        $resultado = mssql_query($query);
+
+        if ($resultado) echo json_encode(['ok' => true, 'msg' => 'Adjunto actualizado exitosamente']);
+        else echo json_encode(['ok' => false, 'msg' => "Error al actualizar el adjunto"]);
+        break;
+
+    case "U_ADJUNTOS_UPDATE":
+        $id_sol = $_POST["id_sol"];
+        $nombre = $_POST["nombre"];
+        $adj = $_POST["adj"];
+
+        $campo = "ADJUNTO_SOLICITA_" . intval($adj);
+
+        $query = "UPDATE T_WORKFLOW SET $campo = '$nombre' WHERE ID = $id_sol";
+
+        $update = mssql_query($query);
+
         echo json_encode(array('ok' => true));
         break;
 
@@ -170,13 +268,23 @@ switch ($_POST['op']) {
         $usuario = "";
         $campoVariado = "";
         $valorVariado = "";
-        if ($estado == "K" || $estado == "O") {
+
+        if ($estado == "K") {
             $fecha = "FECHA_AUTORIZA";
             $comentario = "COMENTARIO_AUTORIZA";
             $usuario = "USUARIO_AUTORIZA";
             $campoVariado = "ARCHIVO_SELECCIONADO";
             $valorVariado = isset($_POST["campoRadio"]) ? $_POST["campoRadio"] : "";
         }
+
+        if ($estado == "O") {
+            $fecha = "FECHA_FINALIZA";
+            $comentario = "COMENTARIO_FINALIZA";
+            $usuario = "USUARIO_FINALIZA";
+            $campoVariado = "ARCHIVO_SELECCIONADO";
+            $valorVariado = isset($_POST["campoRadio"]) ? $_POST["campoRadio"] : "";
+        }
+
         if ($estado == "Q") {
             $fechafactura = isset($_POST['fechaFactura']) ? $_POST['fechaFactura'] : "";
             $numeroDocumento = isset($_POST['numeroDocumento']) ? $_POST['numeroDocumento'] : "";
@@ -184,14 +292,21 @@ switch ($_POST['op']) {
             $valorFactura = isset($_POST['valorFactura']) ? $_POST['valorFactura'] : "";
             $subTotalFactura = isset($_POST['subTotalFactura']) ? $_POST['subTotalFactura'] : "";
             $iva = isset($_POST['iva']) ? $_POST['iva'] : "";
+            $nit = isset($_POST['nit']) ? $_POST['nit'] : "";
+            $codigoSap = isset($_POST['codigoSap']) ? $_POST['codigoSap'] : "";
+            $fondo = isset($_POST['fondo']) ? $_POST['fondo'] : "";
+            $numeroFondo = isset($_POST['numeroFondo']) ? $_POST['numeroFondo'] : "";
             $valorLegal = isset($_POST['valorLegal']) ? $_POST['valorLegal'] : "";
+            $valorAnticipo = isset($_POST['valorAnticipo']) ? $_POST['valorAnticipo'] : "";
             $fecha = "FECHA_PRELIMINAR";
             $usuario = "USUARIO_ADJ_PRELI";
-            $result = mssql_query("UPDATE T_WORKFLOW SET ESTADO = '$estado', " . $usuario . " = '$usuariop', " . $fecha . " = GETDATE(), NUMERO_PRELIMINAR = '$numeroPreliminar', FECHA_DOCUMENTO = '$fechafactura', NUMERO_DOCUMENTO = '$numeroDocumento', NIT = '$razonSocial', VALOR_DOCUMENTO = '$valorFactura', IVA_DOCUMENTO = '$iva', SUBTOTAL_DOCUMENTO = '$subTotalFactura', VALOR_LEGALIZACION = '$valorLegal'  WHERE ID = $idSolicitud");
+            $result = mssql_query("UPDATE T_WORKFLOW SET ESTADO = '$estado', " . $usuario . " = '$usuariop', " . $fecha . " = GETDATE(), NUMERO_PRELIMINAR = '$numeroPreliminar', FECHA_DOCUMENTO = '$fechafactura', NUMERO_DOCUMENTO = '$numeroDocumento', NIT = '$nit',
+            RAZON_SOCIAL = '$razonSocial', CODIGO_SAP = '$codigoSap', FONDO = '$fondo', NUMERO_FONDO = '$numeroFondo', VALOR_DOCUMENTO = '$valorFactura', IVA_DOCUMENTO = '$iva', SUBTOTAL_DOCUMENTO = '$subTotalFactura', VALOR_LEGALIZACION = '$valorLegal', VALOR_ANTICIPO = '$valorAnticipo'  WHERE ID = $idSolicitud");
             if ($result) echo json_encode(array("ok" => true));
             else echo json_encode(array("ok" => false));
             die();
         }
+
         if ($estado == "U") {
             $fecha = "FECHA_FINALIZA";
             $usuario = "USUARIO_FINALIZA";
@@ -200,6 +315,7 @@ switch ($_POST['op']) {
             else echo json_encode(array("ok" => false));
             die();
         }
+
         if ($estado == "T" && isset($_POST['valorAutorizado'])) {
             $valorAutorizado = $_POST['valorAutorizado'];
             $result = mssql_query("UPDATE T_WORKFLOW SET ESTADO = '$estado', VALOR_AUTORIZADO = '$valorAutorizado' WHERE ID = $idSolicitud");
@@ -207,6 +323,7 @@ switch ($_POST['op']) {
             else echo json_encode(array("ok" => false));
             die();
         }
+
         if ($estado == "T") {
             $fecha = "FECHA_AUTORIZA_PRELI";
             $usuario = "USUARIO_AUTORIZA_PRELI";
@@ -215,6 +332,7 @@ switch ($_POST['op']) {
             else echo json_encode(array("ok" => false));
             die();
         }
+
         if ($estado == "R") {
             $comentario_sw = $_POST['comentarioSW'];
             $fecha = "FECHA_RECHAZA";
@@ -224,6 +342,7 @@ switch ($_POST['op']) {
             echo json_encode(array("ok" => true));
             die();
         }
+
         if ($estado == "C") {
             $fecha = "FECHA_CAUSA";
             $comentario = "COMENTARIO_CAUSA";
@@ -231,6 +350,7 @@ switch ($_POST['op']) {
             $campoVariado = "DOCUMENTO_CAUSA";
             $valorVariado = $_POST["numeroCausacion"];
         }
+
         if ($estado == "W") {
             $fecha = "FECHA_COMPENSACION";
             $comentario = "COMENTARIO_COMPENSA";
@@ -238,14 +358,17 @@ switch ($_POST['op']) {
             $campoVariado = "NUMERO_COMPENSACION";
             $valorVariado = $_POST["numeroCompensacion"];
         }
+
         if ($estado == "P") {
             $fecha = "FECHA_PAGA";
             $comentario = "COMENTARIO_PAGA";
             $usuario = "USUARIO_PAGA";
-            mssql_query("UPDATE T_WORKFLOW SET ESTADO = '$estado', " . $usuario . " = '$usuariop', " . $fecha . " = GETDATE(), " . $comentario . " = '$comentariop' WHERE ID = $idSolicitud");
+            $numeroZP = isset($_POST["numeroZP"]) ? $_POST["numeroZP"] : "";
+            mssql_query("UPDATE T_WORKFLOW SET ESTADO = '$estado', " . $usuario . " = '$usuariop', " . $fecha . " = GETDATE(), " . $comentario . " = '$comentariop', NUMERO_ZP = '$numeroZP' WHERE ID = $idSolicitud");
             echo json_encode(array("ok" => true));
             die();
         }
+        
         if ($estado == "F") {
             $fecha = "FECHA_FINALIZA";
             $comentario = "COMENTARIO_FINALIZA";
@@ -253,9 +376,27 @@ switch ($_POST['op']) {
             mssql_query("UPDATE T_WORKFLOW SET ESTADO = '$estado', " . $usuario . " = '$usuariop', " . $fecha . " = GETDATE(), " . $comentario . " = '$comentariop' WHERE ID = $idSolicitud");
             echo json_encode(array("ok" => true));
             die();
-        }       
+        }
 
-        $result = mssql_query("UPDATE T_WORKFLOW SET ESTADO = '$estado', " . $usuario . " = '$usuariop', " . $fecha . " = GETDATE(), " . $comentario . " = '$comentariop', " . $campoVariado . " = '$valorVariado' WHERE ID = $idSolicitud");
+        if ($estado == "N") {
+            $fecha = "FECHA_FINALIZA";
+            $comentario = "COMENTARIO_FINALIZA";
+            $usuario = "USUARIO_FINALIZA";
+            mssql_query("UPDATE T_WORKFLOW SET ESTADO = '$estado' WHERE ID = $idSolicitud");
+            echo json_encode(array("ok" => true));
+            die();
+        }
+
+        if ($estado == "M") {
+            mssql_query("UPDATE T_WORKFLOW SET ESTADO = '$estado' WHERE ID = $idSolicitud");
+            echo json_encode(array("ok" => true));
+            die();
+        }
+
+        if ($estado !== "M") {
+            $result = mssql_query("UPDATE T_WORKFLOW SET ESTADO = '$estado', " . $usuario . " = '$usuariop', " . $fecha . " = GETDATE(), " . $comentario . " = '$comentariop', " . $campoVariado . " = '$valorVariado' WHERE ID = $idSolicitud");
+        }
+
         if ($result) echo json_encode(array("ok" => true));
         else echo json_encode(array("ok" => false));
         break;
@@ -290,6 +431,7 @@ switch ($_POST['op']) {
         $estado = $_POST["estado"];
         $idSolicitud = $_POST["idSolicitud"];
         $titulo = "Notificación WorkFlow";
+
         if ($estado === "S" || $estado === "Q") {
             $msg = '
             <!DOCTYPE html>
@@ -309,8 +451,9 @@ switch ($_POST['op']) {
                 </p>    
             </body>        
             </html>';
-            $asunto = "Solicitud rechazada";
+            $asunto = "Nueva solicitud";
         }
+
         if ($estado === "R") {
             $msg = '
             <!DOCTYPE html>
@@ -338,6 +481,7 @@ switch ($_POST['op']) {
             </html>';
             $asunto = "Solicitud rechazada";
         }
+
         if ($estado === "P") {
             $msg = '
             <!DOCTYPE html>
@@ -365,6 +509,7 @@ switch ($_POST['op']) {
             </html>';
             $asunto = "Pago de solicitud";
         }
+
         if ($estado === "L" || $estado === "M" || $estado === "N") {
             $procesada;
             if ($estado === "L") $procesada = "COMPENSADA";
@@ -394,8 +539,9 @@ switch ($_POST['op']) {
                 </footer>
             </body>
             </html>';
-            $asunto = "Pago de solicitud";
+            $asunto = "Inconsistencia en solicitud";
         }
+
         if ($estado === "Z") {
             $msg = '
             <!DOCTYPE html>
@@ -420,8 +566,9 @@ switch ($_POST['op']) {
                 </footer>
             </body>
             </html>';
-            $asunto = "Pago de solicitud";
+            $asunto = "Restauración de solicitud";
         }
+
         EnviarMail($titulo, $msg, $asunto, $destino);
         break;
 
